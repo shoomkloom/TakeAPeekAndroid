@@ -1,8 +1,83 @@
 <resources>
     <string name="app_name">TakeAPeek</string>
+    <string name="app_name_lower">takeapeek</string>
+    <string name="label">TakeAPeek</string>
+    <string name="no_connection">No Connection</string>
+    <string name="ok">OK</string>
+    <string name="Error">Error</string>
+    <string name="Exit">Exit</string>
+    <string name="error_play_services">"No Google Play Services available, TakeAPeek cannot operate."</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <!-- Create Account -->
+    <string name="create_account_activity_title">Create TakeAPeek Account</string>
+    <string name="create_account_message1">Create Account</string>
+    <string name="create_account_your_country">Your country\u003a</string>
+    <string name="create_account_your_mobile">Mobile\u003a</string>
+    <string name="create_account_your_name">Your Name\u003a</string>
+    <string name="create_account_country_spinner_prompt">Country</string>
+    <string name="create_account_country_spinner_long_prompt">Select your Country\u003a</string>
+    <string name="create_account_terms_and_conditions">By proceeding you agree&lt;br&gt; to TakeAPeek &lt;a href="%1$s"&gt;Terms &amp; Conditions&lt;/a&gt;</string>
+    <string name="create_account_check_terms_and_conditions">I accept the terms and conditions</string>
+    <string name="create_account_ok_button">Signup</string>
+    <string name="create_account_message_bottom">By proceeding you agree to TakeAPeek</string>
+    <string name="create_account_empty_number">Please fill in a valid number and prefix</string>
+    <string name="create_account_progress_message">Creating account\u2026</string>
+    <string name="create_account_enter_code_message">Enter code here</string>
+    <string name="verify_account_progress_message">Verifying account\u2026</string>
+    <string name="request_call_progress_message">Requesting call\u2026</string>
+    <string name="error_no_account">Error: No TakeAPeek account found. Please try to reinstall.</string>
+    <string name="error_create_account">Could not create a TakeAPeek account at this time. Please try again later.</string>
+    <string name="error_verify_account">Could not verify TakeAPeek account at this time. Please make sure you can receive SMS messages and try again.</string>
+    <string name="error_loading_authentication">There was a problem loading the Authentication view.\n\nTry running TakeAPeek again.</string>
+    <string name="error_authentication_no_connection">Cannot create a new account at this time, no available internet connection.\n\nPlease try again later.</string>
+    <string name="error_non_valid_number">The number you filled in is not a valid mobile phone number.\n\nPlease make sure you fill in your correct number so that your friends can connect to you.</string>
+    <string name="error_sms_timeout">SMS message not identified.\nPlease do one of the following\u003a</string>
+    <string name="message_check_phone">If the number is incorrect, fix it</string>
+    <string name="request_call">Call me</string>
+    <string name="message_enter_code_manually">Enter code manually</string>
+    <string name="to_use">To use</string>
+    <string name="type_your_phone_number">Type your phone number</string>
+    <string name="for_your_protection">For protection</string>
+    <string name="verification_ooops">Ooops!</string>
+    <string name="sms_sent_to_number_message">We\'ve sent you a code to\n%1$s\nto verify that this is your number</string>
+    <string name="sms_no_verification_message">We couldn\'t detect the code.\nPlease check your number\nor request a new code</string>
+    <string name="code">Code\u003a</string>
+    <string name="message_edit_phone"><u>Change phone number</u></string>
+    <string name="resend_sms_code"><u>Request SMS code</u></string>
+    <string name="message_request_call"><u>Request voice code</u></string>
+    <string name="verification_verified">Verified User</string>
+    <string name="almost_done">Welcome\u2026</string>
+    <string name="creating_selfme_account">Creating your TakeAPeek account</string>
+    <string name="teaser_line_1">Take a picture.</string>
+    <string name="teaser_line_2">Post to <b>TakeAPeek</b>.</string>
+    <string name="teaser_line_3">Done!</string>
+    <string name="teaser_ok">Ok\u2026</string>
+    <string name="login_resend_edit_number_message">Your number\n%1$s</string>
+    <string name="code_hint">\?\u0020\?\u0020\?\u0020\?\u0020\?\u0020\?</string>
+    <string name="profile_mobile_number">Mobile Number</string>
+    <string name="submit">Submit</string>
+    <string name="create_account_verify_message">Detecting verification SMS\nThis might take a few moments\u2026</string>
+    <string name="error_more_than_one_account">There is more than one Self.Me account. Please delete all of them and run the Self.Me app again.</string>
+    <string name="account_already_exists">TakeAPeek account already exists.</string>
+    <string name="create_account_only_in_app">A new TakeAPeek account can only be created in the TakeAPeek app.</string>
+    <string name="create_account_verify_sms_error">Illegal verification code</string>
 </resources>

@@ -1,0 +1,53 @@
+#
+# generated on 2016/03/10 02:58:31
+#
+# --table-start--
+dataClass=com.takeapeek.ormlite.TakeAPeekContact
+tableName=takeapeekcontact
+# --table-fields-start--
+# --field-start--
+fieldName=id
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=TakeAPeekID
+columnName=TakeAPeekID
+# --field-end--
+# --field-start--
+fieldName=ContactData
+dataPersister=SERIALIZABLE
+# --field-end--
+# --field-start--
+fieldName=Likes
+columnName=Likes
+dataPersister=INTEGER
+# --field-end--
+# --field-start--
+fieldName=DidLike
+columnName=DidLike
+dataPersister=BOOLEAN
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.takeapeek.ormlite.TakeAPeekContactUpdateTimes
+tableName=takeapeekcontactupdatetimes
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=TakeAPeekID
+columnName=TakeAPeekID
+# --field-end--
+# --field-start--
+fieldName=PhotoServerTime
+columnName=PhotoServerTime
+dataPersister=LONG
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

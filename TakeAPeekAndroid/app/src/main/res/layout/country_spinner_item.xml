@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+	android:layout_width="270dp" 
+	android:layout_height="wrap_content" 
+	android:padding="3dip">    
+	
+    <LinearLayout
+			android:id="@+id/linearLayout1"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" >
+			
+		<TextView
+		    android:id="@+id/itemTextCountryName"
+		    android:layout_width="0px"
+			android:layout_height="wrap_content"
+			android:layout_weight="4"
+		    android:layout_marginLeft="1dip"
+		    android:layout_marginTop="1dip"
+		    android:lines="1"
+		    android:ellipsize="end"
+		    android:textSize="20sp"
+		    android:textColor="#14b2ca" />
+		
+		<TextView
+		    android:id="@+id/itemTextCountryPrefix"
+		    android:layout_width="0px"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+		    android:layout_marginTop="1dip"
+		    android:gravity="right"
+		    android:lines="1"
+		    android:textSize="20sp"
+		    android:textColor="#dfe6cd" />
+
+	</LinearLayout>
+</RelativeLayout>
