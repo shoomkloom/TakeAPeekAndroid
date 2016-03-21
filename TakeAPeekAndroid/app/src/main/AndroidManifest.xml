@@ -4,48 +4,75 @@
 
     <logback>
         <configuration>
-            <appender xml:name="RootFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-                <file>/sdcard/takeapeek/takeapeek.log</file>
-                <append>true</append>
+            <appender
+                class="ch.qos.logback.core.rolling.RollingFileAppender"
+                xml:name="RootFileAppender">
+                <file>
+                    /sdcard/takeapeek/takeapeek.log
+                </file>
+
+                <append>
+                    true
+                </append>
+
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-                    <fileNamePattern>/sdcard/takeapeek/takeapeek.%i.log</fileNamePattern>
-                    <minIndex>1</minIndex>
-                    <maxIndex>10</maxIndex>
+                    <fileNamePattern>
+                        /sdcard/takeapeek/takeapeek.%i.log
+                    </fileNamePattern>
+
+                    <minIndex>
+                        1
+                    </minIndex>
+
+                    <maxIndex>
+                        10
+                    </maxIndex>
                 </rollingPolicy>
+
                 <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-                    <maxFileSize>10MB</maxFileSize>
+                    <maxFileSize>
+                        10MB
+                    </maxFileSize>
                 </triggeringPolicy>
 
                 <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                     <layout class="ch.qos.logback.classic.log4j.XMLLayout">
-                        <locationInfo>true</locationInfo>
-                        <properties>true</properties>
+                        <locationInfo>
+                            true
+                        </locationInfo>
+
+                        <properties>
+                            true
+                        </properties>
                     </layout>
                 </encoder>
             </appender>
+
             <root>
                 <level xml:value="debug"/>
+
                 <appender-ref xml:ref="RootFileAppender"/>
             </root>
         </configuration>
     </logback>
 
     <!-- GCM permissions -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <!-- End GCM permissions -->
 
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -54,7 +81,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.takeapeek.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -64,24 +91,62 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.takeapeek.authenticator.AuthenticatorActivity"
+            android:label="@string/create_account_activity_title"
+            android:launchMode="singleTop"
+            android:noHistory="false"
+            android:excludeFromRecents="true"
+            android:stateNotNeeded="true"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.MainActivity" />
+        </activity>
+
+        <!-- The authenticator service -->
+        <service
+            android:name="com.takeapeek.authenticator.AuthenticationService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        <!-- End The authenticator service -->
+
+        <service
+            android:name="com.takeapeek.syncadapter.SyncService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/syncadapter" />
+            <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" />
+        </service>
+
         <!-- [START gcm_receiver] -->
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="com.takeapeek" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+
+                <category android:name="com.takeapeek"/>
             </intent-filter>
         </receiver>
         <!-- [END gcm_receiver] -->
 
+
         <!-- [START gcm_listener] -->
         <service
             android:name="com.takeapeek.TAPGcmListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
         <!-- [END gcm_listener] -->
@@ -99,7 +164,15 @@
             android:exported="false">
         </service>
 
-
+        <activity
+            android:name="com.takeapeek.capture.CaptureClipActivity"
+            android:label="@string/title_activity_capture_clip"
+            android:parentActivityName="com.takeapeek.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

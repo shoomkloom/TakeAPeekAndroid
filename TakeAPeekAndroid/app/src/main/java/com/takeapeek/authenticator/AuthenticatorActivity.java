@@ -56,6 +56,7 @@ import com.takeapeek.common.Helper;
 import com.takeapeek.common.Helper.FontTypeEnum;
 import com.takeapeek.common.PhoneNumberFormattingTextWatcher;
 import com.takeapeek.common.Transport;
+import com.takeapeek.ormlite.DatabaseManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,6 +154,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     private Bundle mResultBundle = null;
     
     Tracker mTracker = null;
+	private String mTrackerScreenName = "AuthenticatorActivity";
     
     /**
      * Set the result that is to be sent as the result of the request that caused this
@@ -437,10 +439,26 @@ public class AuthenticatorActivity extends AppCompatActivity
 	}
 
 	@Override
+	protected void onResume()
+	{
+		logger.debug("onResume() Invoked");
+
+		DatabaseManager.init(this);
+
+		mTracker.setScreenName(mTrackerScreenName);
+		mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
+		super.onResume();
+	}
+
+	@Override
 	protected void onPause() 
 	{
 		logger.debug("onPause() Invoked");
-		
+
+		mTracker.setScreenName(null);
+		mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
 		super.onPause();
 	}
 

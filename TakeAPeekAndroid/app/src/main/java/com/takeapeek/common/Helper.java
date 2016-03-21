@@ -120,10 +120,10 @@ public class Helper
 	{
 		Tracker gaTracker = null;
 		
-		TAPApplication smApplication = (TAPApplication)activity.getApplication();
-		if(smApplication != null)
+		TAPApplication tapApplication = (TAPApplication)activity.getApplication();
+		if(tapApplication != null)
 		{
-			gaTracker = smApplication.getTracker(TAPApplication.TrackerName.APP_TRACKER);
+			gaTracker = tapApplication.getDefaultTracker();
 		}
 		
 		return gaTracker;
@@ -133,10 +133,10 @@ public class Helper
 	{
 		Tracker gaTracker = null;
 		
-		TAPApplication smApplication = (TAPApplication)service.getApplication();
-		if(smApplication != null)
+		TAPApplication tapApplication = (TAPApplication)service.getApplication();
+		if(tapApplication != null)
 		{
-			gaTracker = smApplication.getTracker(TAPApplication.TrackerName.APP_TRACKER);
+			gaTracker = tapApplication.getDefaultTracker();
 		}
 		
 		return gaTracker;
