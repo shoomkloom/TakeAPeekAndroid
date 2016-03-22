@@ -14,6 +14,13 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Sign in</string>
 
+    <!-- Strings related to Capture -->
+    <string name="record">Record</string>
+    <string name="stop">Stop</string>
+    <string name="description_info">Info</string>
+    <string name="permission_request">TakeAPeek needs permission for camera and audio recording.</string>
+    <string name="camera_error">This device doesn\'t is not supported.</string>
+
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
@@ -23,9 +30,7 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
     <!-- Create Account -->
     <string name="create_account_activity_title">Create TakeAPeek Account</string>
@@ -80,4 +85,5 @@
     <string name="account_already_exists">TakeAPeek account already exists.</string>
     <string name="create_account_only_in_app">A new TakeAPeek account can only be created in the TakeAPeek app.</string>
     <string name="create_account_verify_sms_error">Illegal verification code</string>
+    <string name="title_activity_capture_clip">CaptureClipActivity</string>
 </resources>

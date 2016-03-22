@@ -38,8 +38,7 @@ public class Transport
 	public static long serverTimeDelta = 0;
 	private static ReentrantLock lock = new ReentrantLock();
 	
-	/*/@@*/static String mServerRootURL = "";
-	//@@*/static String mServerRootURL = "";
+	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net/";
 	//@@*/static String mServerRootURL = "http://10.0.0.4:8888";
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
@@ -62,7 +61,7 @@ public class Transport
     {
 		logger.debug("CreateProfile(..) Invoked - before lock");
 		
-		ResponseObject fmResponse = null;
+		ResponseObject responseObject = null;
 		
 		lock.lock();
 		
@@ -77,7 +76,7 @@ public class Transport
 			nameValuePairs.add(new NameValuePair("platform", "Android"));
 			
 			//Returns the password
-			fmResponse = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+			responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
 		}
 		catch(Exception e)
 		{
@@ -90,7 +89,7 @@ public class Transport
 			logger.debug("CreateProfile(..) - after unlock");
 		}
 		
-		return fmResponse;
+		return responseObject;
     }
 	
 /*@@	

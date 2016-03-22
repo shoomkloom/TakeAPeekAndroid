@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -19,24 +21,74 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.ormlite.DatabaseManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
     static private final Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final int RESULT_AUTHENTICATE = 9001;
 
     SharedPreferences mSharedPreferences = null;
+    public Tracker mTracker = null;
+    private String mTrackerScreenName = "MainActivity";
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private boolean mIsReceiverRegistered;
+
+    enum EnumHandlerMessage
+    {
+    }
+
+    final IncomingHandler mHandler = new IncomingHandler(this);
+
+    static class IncomingHandler extends Handler
+    {
+        private final WeakReference<MainActivity> mActivityWeakReference;
+
+        IncomingHandler(MainActivity activity)
+        {
+            mActivityWeakReference = new WeakReference<MainActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            MainActivity activity = mActivityWeakReference.get();
+            if (activity != null)
+            {
+                activity.HandleMessage(msg);
+            }
+        }
+    }
+
+    public void HandleMessage(Message msg)
+    {
+        logger.debug("HandleMessage(.) Invoked");
+
+        EnumHandlerMessage enumHandlerMessage = EnumHandlerMessage.values()[msg.arg1];
+
+        switch(enumHandlerMessage)
+        {
+
+            default:
+                logger.info("HandleMessage: default");
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,9 +96,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         logger.debug("onCreate(.) Invoked");
 
-        setContentView(R.layout.activity_main);
-
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        DatabaseManager.init(this);
+
+        //Get a Tracker
+        mTracker = Helper.GetAppTracker(this);
+
+        if(Helper.DoesTakeAPeekAccountExist(this, mTracker, mHandler) == true)
+        {
+            CreateMain();
+        }
+        else
+        {
+            final Intent intent = new Intent(this, AuthenticatorActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivityForResult(intent, RESULT_AUTHENTICATE);
+        }
+    }
+
+    private void CreateMain()
+    {
+        logger.debug("CreateMain() Invoked");
+
+        setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,6 +166,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     {
         logger.debug("onResume() Invoked");
 
+        DatabaseManager.init(this);
+
+        mTracker.setScreenName(mTrackerScreenName);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         super.onResume();
         RegisterReceiver();
     }
@@ -101,6 +179,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause()
     {
         logger.debug("onPause() Invoked");
+
+        mTracker.setScreenName(null);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         mIsReceiverRegistered = false;
@@ -192,6 +273,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        logger.debug("onActivityResult(...) Invoked");
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode != RESULT_OK)
+        {
+            logger.warn(String.format("onActivityResult returned with resultCode = %d or data was null", resultCode));
+
+            if(requestCode == RESULT_AUTHENTICATE)
+            {
+                logger.info("onActivityResult: requestCode == RESULT_AUTHENTICATE, calling finish()");
+                finish();
+            }
+
+            return;
+        }
+
+        switch (requestCode)
+        {
+            case RESULT_AUTHENTICATE:
+                logger.info("onActivityResult: requestCode = 'RESULT_AUTHENTICATE'");
+
+                CreateMain();
+
+                break;
+
+            default: break;
+        }
+    }
+
     private void RegisterReceiver()
     {
         logger.debug("RegisterReceiver() Invoked");
@@ -224,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else
             {
-                Helper.ErrorMessage(this, null/*tracker*/, null/*handler*/, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
+                Helper.ErrorMessage(this, mTracker, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
                 Helper.Error(logger, "No Google Play Services. This device is not supported.");
                 finish();
             }
