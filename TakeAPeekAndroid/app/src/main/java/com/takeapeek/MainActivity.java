@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else
             {
-                Helper.ErrorMessage(this, null/*tracker*/, null/*handler*/, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
+                Helper.ErrorMessage(this, mTracker, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
                 Helper.Error(logger, "No Google Play Services. This device is not supported.");
                 finish();
             }
