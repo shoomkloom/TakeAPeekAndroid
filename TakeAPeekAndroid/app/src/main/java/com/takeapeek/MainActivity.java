@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else
         {
             final Intent intent = new Intent(this, AuthenticatorActivity.class);
+            intent.putExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN, "MainActivity");
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivityForResult(intent, RESULT_AUTHENTICATE);
         }

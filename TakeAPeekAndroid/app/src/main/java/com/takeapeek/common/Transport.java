@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -29,8 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class Transport
 {
 	static private final Logger logger = LoggerFactory.getLogger(Transport.class);
@@ -38,7 +37,7 @@ public class Transport
 	public static long serverTimeDelta = 0;
 	private static ReentrantLock lock = new ReentrantLock();
 	
-	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net/";
+	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
 	//@@*/static String mServerRootURL = "http://10.0.0.4:8888";
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
@@ -71,7 +70,8 @@ public class Transport
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
 	
-			nameValuePairs.add(new NameValuePair("action_type", "create_profile"));
+			//@@nameValuePairs.add(new NameValuePair("action_type", "create_profile"));
+			nameValuePairs.add(new NameValuePair("action_type", "create_profile_nosms"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
 			nameValuePairs.add(new NameValuePair("platform", "Android"));
 			
@@ -507,12 +507,14 @@ public class Transport
 			if (IsConnected(context))
 			{
 				int responseCode = 0;
-				HttpsURLConnection httpsURLConnection = null;
+				//@@HttpsURLConnection httpsURLConnection = null;
+				HttpURLConnection httpsURLConnection = null;
 
 				try
 				{
 					URL url = new URL(requestStr);
-					httpsURLConnection = (HttpsURLConnection) url.openConnection();
+					//@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
+					httpsURLConnection = (HttpURLConnection) url.openConnection();
 					httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
 					httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
 					httpsURLConnection.setRequestMethod("GET");
@@ -552,10 +554,19 @@ public class Transport
 				catch (SocketTimeoutException e)
 				{
 					Helper.Error(logger, "EXCEPTION: SocketTimeoutException when calling httpsURLConnection.connect().", e);
+					throw e;
+				}
+				catch (Exception e)
+				{
+					Helper.Error(logger, "EXCEPTION: Exception when calling httpsURLConnection.connect().", e);
+					throw e;
 				}
 				finally
 				{
-					httpsURLConnection.disconnect();
+					if(httpsURLConnection != null)
+					{
+						httpsURLConnection.disconnect();
+					}
 				}
 			}
 			else
@@ -707,12 +718,14 @@ public class Transport
             if (IsConnected(context))
             {
                 int responseCode = 0;
-                HttpsURLConnection httpsURLConnection = null;
+                //@@HttpsURLConnection httpsURLConnection = null;
+                HttpURLConnection httpsURLConnection = null;
 
                 try
                 {
                     URL url = new URL(requestStr);
-                    httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    //@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    httpsURLConnection = (HttpURLConnection) url.openConnection();
                     httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
                     httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
                     httpsURLConnection.setRequestMethod("POST");

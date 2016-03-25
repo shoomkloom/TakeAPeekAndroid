@@ -5,22 +5,14 @@ import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
-import android.net.Uri.Builder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.Groups;
-import android.provider.ContactsContract.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -254,7 +246,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        final Intent intent = getIntent();
 			        String authRequestOriginator = intent.getStringExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN);
 			        
-			        if(authRequestOriginator != null && authRequestOriginator.compareTo("SplashActivity") == 0)
+			        if(authRequestOriginator != null && authRequestOriginator.compareTo("MainActivity") == 0)
 			        {
 			        	setContentView(R.layout.activity_login);
 			        	
@@ -582,6 +574,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     	
         final Account account = new Account(mUsername, Constants.TAKEAPEEK_ACCOUNT_TYPE);
 
+/*@@
     	// Set contacts sync for this account.
         ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
         ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
@@ -591,10 +584,12 @@ public class AuthenticatorActivity extends AppCompatActivity
         params.putBoolean(ContentResolver.SYNC_EXTRAS_DO_NOT_RETRY, false);
         params.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, false);
         ContentResolver.addPeriodicSync(account, ContactsContract.AUTHORITY, params, Constants.SYNC_PERIOD);
+@@*/
         
         mAccountManager.addAccountExplicitly(account, mPassword, null);
-        
-        //Set Self.Me contacts to be visible by default
+
+/*@@
+        //Set TakeAPeek contacts to be visible by default
         ContentProviderClient client = getContentResolver().acquireContentProviderClient(ContactsContract.AUTHORITY_URI);
         ContentValues values = new ContentValues();
         values.put(Groups.ACCOUNT_NAME, mUsername);
@@ -611,7 +606,8 @@ public class AuthenticatorActivity extends AppCompatActivity
         {
         	Helper.Error(logger, "EXCEPTION: when adding account", e);
         }
-        
+@@*/
+
         DismissProgressDialog();
         
         mHandler.postDelayed(new Runnable() 
@@ -850,7 +846,8 @@ public class AuthenticatorActivity extends AppCompatActivity
     			
     			mHandlerState = HandlerState.firstVerification;
     			UpdateUI();
-    			
+
+/*@@
             	//Set a 30 second timeout for receiving the verification SMS
             	mHandler.postDelayed(new Runnable() 
             	{
@@ -861,6 +858,7 @@ public class AuthenticatorActivity extends AppCompatActivity
                         mHandler.sendMessage(msg);
                     }
                 }, 30000);
+@@*/
     			break;
     			
     		case receiveSMSTimeout:
