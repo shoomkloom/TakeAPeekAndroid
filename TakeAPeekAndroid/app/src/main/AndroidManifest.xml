@@ -81,15 +81,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.NoActionBar"
         android:name="com.takeapeek.common.TAPApplication" >
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name="com.takeapeek.MainActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -170,8 +168,7 @@
         <activity
             android:name="com.takeapeek.capture.CaptureClipActivity"
             android:label="@string/title_activity_capture_clip"
-            android:parentActivityName="com.takeapeek.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName="com.takeapeek.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
