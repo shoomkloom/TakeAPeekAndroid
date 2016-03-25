@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/sm_darkgray"
+    android:background="@color/tap_darkgray"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
@@ -32,7 +32,7 @@
           	android:layout_height="wrap_content"
           	android:layout_gravity="start"
           	android:text="@string/to_use"
-          	android:textColor="@color/sm_white"
+          	android:textColor="@color/tap_white"
           	android:textSize="48sp" />
 
 	    <TextView
@@ -42,7 +42,7 @@
 	        android:layout_width="match_parent"
 	        android:paddingTop="32dp"
 	        android:text="@string/type_your_phone_number"
-	        android:textColor="@color/sm_white"
+	        android:textColor="@color/tap_white"
 	        android:textSize="24sp" />
 	    
 	    <!-- Prefix spinner and Number -->
@@ -74,10 +74,10 @@
 	                android:layout_width="190dp"
 	                android:layout_height="wrap_content"
 	                android:layout_toRightOf="@+id/SpinnerCountry"
-	                android:textColor="@color/sm_white"
+	                android:textColor="@color/tap_white"
 	                android:textSize="24sp"
 	                android:hint="@string/profile_mobile_number"
-	                android:textColorHint="@color/sm_white"
+	                android:textColorHint="@color/tap_white"
 	                android:inputType="phone"
 	                android:background="#00000000"
 	                android:paddingBottom="7dp"
@@ -90,7 +90,7 @@
 			        android:layout_alignLeft="@+id/SpinnerCountry"
 			        android:layout_alignBottom="@+id/edittext_number"
 			        android:layout_alignRight="@+id/edittext_number"
-			        android:background="@color/sm_white" />
+			        android:background="@color/tap_white" />
 	            
 	        </RelativeLayout>
 	        
@@ -147,7 +147,7 @@
             android:layout_marginTop="30dp"
             android:layout_gravity="center_horizontal"
             android:text="@string/create_account_message_bottom"
-            android:textColor="@color/sm_white"
+            android:textColor="@color/tap_white"
             android:textColorLink="@color/linkcolor"
             android:background="#00000000"
             android:textSize="16sp" />
@@ -171,7 +171,7 @@
           	android:layout_height="wrap_content"
           	android:gravity="start"
           	android:text="@string/for_your_protection"
-          	android:textColor="@color/sm_orange"
+          	android:textColor="@color/tap_orange"
           	android:textSize="48sp" />
 	    
 	    <TextView
@@ -179,7 +179,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:gravity="start"
-			android:textColor="@color/sm_white"
+			android:textColor="@color/tap_white"
 			android:textSize="24sp" />
 	    
 	    <!-- Prefix text and code -->
@@ -203,7 +203,7 @@
 					android:layout_height="wrap_content"
 					android:gravity="right"
 					android:text="@string/code"
-					android:textColor="@color/sm_blue"
+					android:textColor="@color/tap_blue"
 					android:textSize="24sp" />
 	            
 	            <EditText
@@ -211,10 +211,10 @@
 	                android:layout_width="190dp"
 	                android:layout_height="wrap_content"
 	                android:layout_toRightOf="@+id/login_textview_code_title"
-	                android:textColor="@color/sm_white"
+	                android:textColor="@color/tap_white"
 	                android:textSize="24sp"
 	                android:hint="@string/code_hint"
-	                android:textColorHint="@color/sm_white"
+	                android:textColorHint="@color/tap_white"
 	                android:gravity="center_horizontal"
 	                android:background="#00000000"
 	                android:paddingBottom="7dp"
@@ -228,7 +228,7 @@
 			        android:layout_alignLeft="@+id/login_textview_code_title"
 			        android:layout_alignBottom="@+id/editText_SMS_code"
 			        android:layout_alignRight="@+id/editText_SMS_code"
-			        android:background="@color/sm_white" />
+			        android:background="@color/tap_white" />
 	            
 	        </RelativeLayout>
 	        
@@ -284,7 +284,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:text="@string/create_account_verify_message"
-            android:textColor="@color/sm_orange"
+            android:textColor="@color/tap_orange"
             android:layout_marginTop="5dp"
             android:textSize="16sp" />
 	    
@@ -331,7 +331,7 @@
 	        	android:layout_width="match_parent"
 	          	android:layout_height="wrap_content"
 	          	android:layout_gravity="start"
-	          	android:textColor="@color/sm_white"
+	          	android:textColor="@color/tap_white"
 	          	android:layout_marginTop="15dp"
 	          	android:textSize="24sp" />
 	        
@@ -367,7 +367,7 @@
           	android:layout_alignParentLeft="true"
           	android:layout_alignParentStart="true"
           	android:text="@string/teaser_line_1"
-          	android:textColor="@color/sm_darkorange"
+          	android:textColor="@color/tap_darkorange"
           	android:textSize="48sp" />
         
         <TextView
@@ -380,7 +380,7 @@
           	android:layout_alignParentLeft="true"
           	android:layout_alignParentStart="true"
           	android:text="@string/teaser_line_2"
-          	android:textColor="@color/sm_blue"
+          	android:textColor="@color/tap_blue"
           	android:textSize="48sp" />
         
         <TextView
@@ -393,7 +393,7 @@
           	android:layout_alignParentLeft="true"
           	android:layout_alignParentStart="true"
           	android:text="@string/teaser_line_3"
-          	android:textColor="@color/sm_orange"
+          	android:textColor="@color/tap_orange"
           	android:textSize="48sp" />
         
         <Button

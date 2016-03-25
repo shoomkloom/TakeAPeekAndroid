@@ -257,7 +257,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        	}
 			        	
 			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
-			        	int selfmeColor = getResources().getColor(R.color.sm_blue);
+			        	int selfmeColor = getResources().getColor(R.color.tap_blue);
 			        	String toUse = getString(R.string.to_use);
 			        	String takeapeek = getString(R.string.app_name_lower);
 			        	String toUseTakeAPeek = String.format("%s %s", toUse, takeapeek);

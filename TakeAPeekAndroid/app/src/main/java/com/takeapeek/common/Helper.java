@@ -951,7 +951,7 @@ public class Helper
     	int likeTextY = 382;
     	int likeTextX = 45;
     	
-    	String textColor = String.format("#%6x", context.getResources().getColor(R.color.sm_white));
+    	String textColor = String.format("#%6x", context.getResources().getColor(R.color.tap_white));
     	
     	for(int i=0; i<3; i++)
     	{

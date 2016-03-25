@@ -2,16 +2,16 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item 
         android:state_enabled="false"
-        android:color="@color/sm_lightgray" />
+        android:color="@color/tap_lightgray" />
     <item 
         android:state_pressed="true" 
         android:state_enabled="true"
-        android:color="@color/sm_lightblue" />
+        android:color="@color/tap_lightblue" />
     <item
         android:state_focused="true"
         android:state_enabled="true"
-        android:color="@color/sm_white" />
+        android:color="@color/tap_white" />
     <item
         android:state_enabled="true"
-        android:color="@color/sm_white" />
+        android:color="@color/tap_white" />
 </selector>
