@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,12 +19,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.takeapeek.authenticator.AuthenticatorActivity;
+import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int RESULT_AUTHENTICATE = 9001;
+    private static final int RESULT_CAPTURECLIP = 9002;
 
     SharedPreferences mSharedPreferences = null;
     public Tracker mTracker = null;
@@ -126,15 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(onClickListener);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -303,6 +297,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
 
+            case RESULT_CAPTURECLIP:
+                logger.info("onActivityResult: requestCode = 'RESULT_CAPTURECLIP'");
+
+                break;
+
             default: break;
         }
     }
@@ -347,4 +346,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return true;
     }
+
+    private OnClickListener onClickListener = new OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            logger.debug("OnClickListener:onClick(.) Invoked");
+
+            switch(v.getId())
+            {
+                case R.id.fab:
+                    logger.info("onClick: fab");
+                    try
+                    {
+                        if(mTracker != null)
+                        {
+                            mTracker.send(new HitBuilders.EventBuilder()
+                                    .setCategory(Constants.GA_UI_ACTION)
+                                    .setAction(Constants.GA_BUTTON_PRESS)
+                                    .setLabel("fab")
+                                    .build());
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
+                    }
+                    try
+                    {
+                        final Intent intent = new Intent(MainActivity.this, CaptureClipActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivityForResult(intent, RESULT_CAPTURECLIP);
+
+/*@@
+                        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+@@*/
+
+                    }
+                    catch (Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: Exception when clicking the share button", e);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    };
 }

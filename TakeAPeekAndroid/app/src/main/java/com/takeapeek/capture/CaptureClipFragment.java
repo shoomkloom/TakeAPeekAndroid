@@ -39,6 +39,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -52,11 +53,19 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.takeapeek.R;
+import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,6 +78,10 @@ import java.util.concurrent.TimeUnit;
 
 public class CaptureClipFragment extends Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback
 {
+    static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
+
+    Tracker mTracker = null;
+
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
@@ -104,6 +117,10 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      * Button to record video
      */
     private Button mButtonVideo;
+
+    private TextView mTextViewCounter;
+
+    private CountDownTimer mCountDownTimer = null;
 
     /**
      * A refernce to the opened {@link android.hardware.camera2.CameraDevice}.
@@ -194,6 +211,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         @Override
         public void onOpened(CameraDevice cameraDevice)
         {
+            logger.debug("CameraDevice.onOpened(.) Invoked");
+
             mCameraDevice = cameraDevice;
             startPreview();
             mCameraOpenCloseLock.release();
@@ -207,6 +226,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         @Override
         public void onDisconnected(CameraDevice cameraDevice)
         {
+            logger.debug("CameraDevice.onDisconnected(.) Invoked");
+
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
@@ -215,6 +236,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         @Override
         public void onError(CameraDevice cameraDevice, int error)
         {
+            logger.error("CameraDevice.onError(.) Invoked");
+
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
@@ -229,6 +252,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     public static CaptureClipFragment newInstance()
     {
+        logger.debug("CaptureClipFragment() Invoked");
+
         return new CaptureClipFragment();
     }
 
@@ -241,6 +266,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private static Size chooseVideoSize(Size[] choices)
     {
+        logger.debug("chooseVideoSize(.) Invoked");
+
         for (Size size : choices)
         {
             if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080)
@@ -289,6 +316,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private static Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio)
     {
+        logger.debug("chooseOptimalSize(....) Invoked");
+
         // Collect the supported resolutions that are at least as big as the preview Surface
         List<Size> bigEnough = new ArrayList<Size>();
         int w = aspectRatio.getWidth();
@@ -318,21 +347,29 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        logger.debug("onCreateView(...) Invoked");
+
+        mTracker = Helper.GetAppTracker(getActivity());
+
         return inflater.inflate(R.layout.fragment_capture_clip, container, false);
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState)
     {
+        logger.debug("onViewCreated(..) Invoked");
+
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mButtonVideo = (Button) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
+        mTextViewCounter = (TextView) view.findViewById(R.id.counter);
     }
 
     @Override
     public void onResume()
     {
+        logger.debug("onResume() Invoked");
+
         super.onResume();
 
         startBackgroundThread();
@@ -350,8 +387,16 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
     @Override
     public void onPause()
     {
+        logger.debug("onPause() Invoked");
+
         closeCamera();
         stopBackgroundThread();
+
+        File lastFile = new File(mOutputFilePath);
+        if(lastFile.exists() && lastFile.length() == 0)
+        {
+            lastFile.delete();
+        }
 
         super.onPause();
     }
@@ -359,16 +404,36 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View view)
     {
+        logger.debug("onClick() Invoked");
+
         switch (view.getId())
         {
             case R.id.video:
             {
                 if (mIsRecordingVideo)
                 {
+                    if(mTracker != null)
+                    {
+                        mTracker.send(new HitBuilders.EventBuilder()
+                                .setCategory(Constants.GA_UI_ACTION)
+                                .setAction(Constants.GA_BUTTON_PRESS)
+                                .setLabel("Stop Recording Video")
+                                .build());
+                    }
+
                     stopRecordingVideo();
                 }
                 else
                 {
+                    if(mTracker != null)
+                    {
+                        mTracker.send(new HitBuilders.EventBuilder()
+                                .setCategory(Constants.GA_UI_ACTION)
+                                .setAction(Constants.GA_BUTTON_PRESS)
+                                .setLabel("Start Recording Video")
+                                .build());
+                    }
+
                     startRecordingVideo();
                 }
                 break;
@@ -383,6 +448,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void startBackgroundThread()
     {
+        logger.debug("startBackgroundThread() Invoked");
+
         mBackgroundThread = new HandlerThread("CameraBackground");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
@@ -393,6 +460,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void stopBackgroundThread()
     {
+        logger.debug("stopBackgroundThread() Invoked");
+
         mBackgroundThread.quitSafely();
 
         try
@@ -403,7 +472,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         }
         catch (InterruptedException e)
         {
-            e.printStackTrace();
+            Helper.Error(logger, "Exception: When calling stopBackgroundThread", e);
         }
     }
 
@@ -415,6 +484,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private boolean shouldShowRequestPermissionRationale(String[] permissions)
     {
+        logger.debug("shouldShowRequestPermissionRationale(.) Invoked");
+
         for (String permission : permissions)
         {
             if (FragmentCompat.shouldShowRequestPermissionRationale(this, permission))
@@ -431,6 +502,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void requestVideoPermissions()
     {
+        logger.debug("requestVideoPermissions() Invoked");
+
         if (shouldShowRequestPermissionRationale(VIDEO_PERMISSIONS))
         {
             new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
@@ -443,6 +516,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     private void requestStoragePermissions()
     {
+        logger.debug("requestStoragePermissions() Invoked");
+
         if (shouldShowRequestPermissionRationale(STORAGE_PERMISSIONS))
         {
             new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
@@ -456,7 +531,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
-        //@@Log.d(TAG, "onRequestPermissionsResult");
+        logger.debug("onRequestPermissionsResult(...) Invoked");
 
         if (requestCode == REQUEST_VIDEO_PERMISSIONS)
         {
@@ -466,14 +541,14 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
                 {
                     if (result != PackageManager.PERMISSION_GRANTED)
                     {
-                        ErrorDialog.newInstance(getString(R.string.permission_request)).show(getChildFragmentManager(), FRAGMENT_DIALOG);
+                        Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
                         break;
                     }
                 }
             }
             else
             {
-                ErrorDialog.newInstance(getString(R.string.permission_request)).show(getChildFragmentManager(), FRAGMENT_DIALOG);
+                Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
             }
         }
         else if(requestCode == REQUEST_STORAGE_PERMISSIONS)
@@ -484,14 +559,14 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
                 {
                     if (result != PackageManager.PERMISSION_GRANTED)
                     {
-                        ErrorDialog.newInstance(getString(R.string.permission_request)).show(getChildFragmentManager(), FRAGMENT_DIALOG);
+                        Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
                         break;
                     }
                 }
             }
             else
             {
-                ErrorDialog.newInstance(getString(R.string.permission_request)).show(getChildFragmentManager(), FRAGMENT_DIALOG);
+                Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
             }
         }
         else
@@ -502,6 +577,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     private boolean hasPermissionsGranted(String[] permissions)
     {
+        logger.debug("hasPermissionsGranted(.) Invoked");
+
         for (String permission : permissions)
         {
             if (ActivityCompat.checkSelfPermission(getActivity(), permission) != PackageManager.PERMISSION_GRANTED)
@@ -518,6 +595,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void openCamera(int width, int height)
     {
+        logger.debug("openCamera(..) Invoked");
+/*@@
         if (!hasPermissionsGranted(VIDEO_PERMISSIONS))
         {
             requestVideoPermissions();
@@ -529,7 +608,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
             requestStoragePermissions();
             return;
         }
-
+@@*/
         final Activity activity = getActivity();
 
         if (null == activity || activity.isFinishing())
@@ -581,7 +660,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            ErrorDialog.newInstance(getString(R.string.camera_error)).show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.camera_error));
         }
         catch (InterruptedException e)
         {
@@ -591,6 +670,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     private void closeCamera()
     {
+        logger.debug("closeCamera() Invoked");
+
         try
         {
             mCameraOpenCloseLock.acquire();
@@ -621,6 +702,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void startPreview()
     {
+        logger.debug("startPreview() Invoked");
+
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize)
         {
             return;
@@ -663,13 +746,9 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
                 }
             }, mBackgroundHandler);
         }
-        catch (CameraAccessException e)
+        catch (Exception e)
         {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+            Helper.Error(logger, "Exception: When calling startPreview", e);
         }
     }
 
@@ -678,6 +757,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void updatePreview()
     {
+        logger.debug("updatePreview() Invoked");
+
         if (null == mCameraDevice)
         {
             return;
@@ -693,12 +774,14 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         }
         catch (CameraAccessException e)
         {
-            e.printStackTrace();
+            Helper.Error(logger, "Exception: When calling updatePreview", e);
         }
     }
 
     private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder)
     {
+        logger.debug("setUpCaptureRequestBuilder(.) Invoked");
+
         builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
     }
 
@@ -712,6 +795,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     private void configureTransform(int viewWidth, int viewHeight)
     {
+        logger.debug("configureTransform(..) Invoked");
+
         Activity activity = getActivity();
         if (null == mTextureView || null == mPreviewSize || null == activity)
         {
@@ -739,6 +824,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     private void setUpMediaRecorder() throws IOException
     {
+        logger.debug("setUpMediaRecorder() Invoked");
+
         final Activity activity = getActivity();
         if (null == activity)
         {
@@ -753,7 +840,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         mMediaRecorder.setOutputFile(mOutputFilePath);
         mMediaRecorder.setVideoEncodingBitRate(1000000);
         mMediaRecorder.setVideoFrameRate(24);
-        mMediaRecorder.setMaxDuration(10000); //10 seconds
+        mMediaRecorder.setMaxDuration(12000); //12 seconds
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
@@ -765,6 +852,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     private String getVideoFilePath(Context context) throws IOException
     {
+        logger.debug("getVideoFilePath(.) Invoked");
+
         Date currentDate = new Date(System.currentTimeMillis());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateAndTime = simpleDateFormat.format(currentDate);
@@ -774,36 +863,52 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
     private void startRecordingVideo()
     {
+        logger.debug("startRecordingVideo() Invoked");
+
         try
         {
             // UI
             mButtonVideo.setText(R.string.stop);
             mIsRecordingVideo = true;
 
+            mTextViewCounter.setText("10");
+            mCountDownTimer = new CountDownTimer(10000, 1000)
+            {
+                public void onTick(long millisUntilFinished)
+                {
+                    mTextViewCounter.setText(String.format("%d", millisUntilFinished / 1000));
+                }
+
+                public void onFinish()
+                {
+                    stopRecordingVideo();
+                }
+            }.start();
+
+
             // Start recording
             mMediaRecorder.start();
         }
         catch (IllegalStateException e)
         {
-            e.printStackTrace();
+            Helper.Error(logger, "Exception: When calling startRecordingVideo", e);
         }
     }
 
     private void stopRecordingVideo()
     {
+        logger.debug("stopRecordingVideo() Invoked");
+
         // UI
         mIsRecordingVideo = false;
         mButtonVideo.setText(R.string.record);
 
+        mCountDownTimer.cancel();
+        mTextViewCounter.setText("10");
+
         // Stop recording
         mMediaRecorder.stop();
         mMediaRecorder.reset();
-
-        Activity activity = getActivity();
-        if (null != activity)
-        {
-            Toast.makeText(activity, "Video saved: " + mOutputFilePath, Toast.LENGTH_LONG).show();
-        }
 
         startPreview();
     }
@@ -813,6 +918,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      */
     static class CompareSizesByArea implements Comparator<Size>
     {
+        static private final Logger logger = LoggerFactory.getLogger(CompareSizesByArea.class);
+
         @Override
         public int compare(Size lhs, Size rhs)
         {
@@ -821,8 +928,11 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         }
     }
 
+/*@@
     public static class ErrorDialog extends DialogFragment
     {
+        static private final Logger logger = LoggerFactory.getLogger(ErrorDialog.class);
+
         private static final String ARG_MESSAGE = "message";
 
         public static ErrorDialog newInstance(String message)
@@ -852,6 +962,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
                     .create();
         }
     }
+@@*/
 
     public static class ConfirmationDialog extends DialogFragment
     {

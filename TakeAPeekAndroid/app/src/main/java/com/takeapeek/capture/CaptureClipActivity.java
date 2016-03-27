@@ -3,7 +3,7 @@ package com.takeapeek.capture;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.view.WindowManager;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -28,6 +28,10 @@ public class CaptureClipActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
+        logger.debug("onCreate(.) Invoked");
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         //Get a Tracker
         mTracker = Helper.GetAppTracker(this);
 
@@ -36,9 +40,12 @@ public class CaptureClipActivity extends AppCompatActivity
         DatabaseManager.init(this);
 
         setContentView(R.layout.activity_capture_clip);
+
+/*@@
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+@@*/
 
         if (null == savedInstanceState)
         {

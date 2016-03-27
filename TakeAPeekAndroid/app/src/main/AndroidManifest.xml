@@ -10,7 +10,7 @@
                 class="ch.qos.logback.core.rolling.RollingFileAppender"
                 xml:name="RootFileAppender">
                 <file>
-                    /sdcard/takeapeek/takeapeek.log
+                    /sdcard/TakeAPeek/logs/takeapeek.log
                 </file>
 
                 <append>
@@ -72,9 +72,11 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
         android:allowBackup="true"
@@ -103,6 +105,21 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity" />
+        </activity>
+
+        <activity
+            android:name="com.takeapeek.capture.CaptureClipActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_capture_clip"
+            android:launchMode="singleTop"
+            android:noHistory="false"
+            android:excludeFromRecents="true"
+            android:stateNotNeeded="true"
+            android:parentActivityName="com.takeapeek.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.MainActivity"/>
         </activity>
 
         <!-- The authenticator service -->
@@ -164,15 +181,6 @@
             android:name="com.takeapeek.RegistrationIntentService"
             android:exported="false">
         </service>
-
-        <activity
-            android:name="com.takeapeek.capture.CaptureClipActivity"
-            android:label="@string/title_activity_capture_clip"
-            android:parentActivityName="com.takeapeek.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.takeapeek.MainActivity"/>
-        </activity>
     </application>
 
 </manifest>
