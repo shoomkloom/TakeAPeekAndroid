@@ -30,6 +30,7 @@ dependencies {
     // [START gms_compile]
     compile 'com.google.android.gms:play-services-analytics:8.4.0'
     compile "com.google.android.gms:play-services-gcm:8.4.0"
+    compile "com.google.android.gms:play-services-location:8.4.0"
     // [END gms_compile]
     compile files('libs/gson-2.1.jar')
     compile files('libs/ormlite-android-4.47.jar')

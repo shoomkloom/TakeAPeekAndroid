@@ -154,6 +154,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
+
+        /*/@@@@@@@@@@@@@@@@@@@@ Upload test
+        //Start asynchronous request to server
+        new AsyncTask<Void, Void, Boolean>()
+        {
+            @Override
+            protected Boolean doInBackground(Void... params)
+            {
+                try
+                {
+                    String username = Helper.GetTakeAPeekAccountUsername(MainActivity.this);
+                    String password = Helper.GetTakeAPeekAccountPassword(MainActivity.this);
+
+                    String outputFilePath = Helper.GetTakeAPeekPath(MainActivity.this) + "TakeAPeek.mp4";
+                    File fileToUpload = new File(outputFilePath);
+                    long fileToUploadLength = fileToUpload.length();
+                    Transport.UploadPeek(
+                            MainActivity.this, username, password, null, fileToUpload, fileToUpload.getName(),
+                            String.format("%smp4", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX),
+                            mSharedPreferences);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When trying to upload captured clip", e);
+                    return false;
+                }
+            }
+        }.execute();
+        //@@@@@@@@@@@@@@@@@@@@*/
     }
 
     @Override
@@ -302,7 +333,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
 
-            default: break;
+            default:
+                logger.error(String.format("onActivityResult: unknown requestCode = '%d' returned", requestCode));
+                break;
         }
     }
 
@@ -373,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     {
                         Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
                     }
+
                     try
                     {
                         final Intent intent = new Intent(MainActivity.this, CaptureClipActivity.class);

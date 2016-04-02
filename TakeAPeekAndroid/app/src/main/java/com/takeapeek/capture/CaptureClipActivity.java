@@ -1,5 +1,6 @@
 package com.takeapeek.capture;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,33 @@ public class CaptureClipActivity extends AppCompatActivity
     SharedPreferences mSharedPreferences = null;
     Tracker mTracker = null;
     private String mTrackerScreenName = "CaptureClipActivity";
+
+    public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        logger.debug("onActivityResult(...) Invoked");
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode != RESULT_OK)
+        {
+            logger.warn(String.format("onActivityResult returned with resultCode != RESULT_OK: '%d'", resultCode));
+            return;
+        }
+
+        switch (requestCode)
+        {
+            case CONNECTION_FAILURE_RESOLUTION_REQUEST:
+                logger.info("onActivityResult: requestCode = 'CONNECTION_FAILURE_RESOLUTION_REQUEST'");
+                break;
+
+            default:
+                logger.error(String.format("onActivityResult: unknown requestCode = '%d' returned", requestCode));
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

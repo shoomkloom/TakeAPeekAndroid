@@ -7,7 +7,8 @@ public class DatabaseConfigUtil extends OrmLiteConfigUtil
 	private static final Class<?>[] classes = new Class[] 
 	{
         TakeAPeekContact.class,
-        TakeAPeekContactUpdateTimes.class
+        TakeAPeekContactUpdateTimes.class,
+		TakeAPeekObject.class
 	};
 
 	public static void main(String[] args) throws Exception 

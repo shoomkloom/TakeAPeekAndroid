@@ -20,6 +20,15 @@ import android.provider.ContactsContract.Data;
 
 public class Constants 
 {
+    public enum ContentTypeEnum
+    {
+        PROFILE_PNG,
+        PNG,
+        JSON,
+        ZIP,
+        MP4
+    }
+
 	public enum ContactTypeEnum
 	{
 		//The order below is very important - don't change the order!
@@ -68,6 +77,9 @@ public class Constants
         likeFriend,
         addedPublic
     }
+
+    //@@Need to protect these
+    public static String GOOLGLE_MAP_API = "AIzaSyDN-rC2dCkmhNFWIbu7VcM9lkSQ6waVj_U";
 	
 	//TakeAPeekContact constants
 	public static String DEFAULT_CONTACT_NAME = "Default";
@@ -132,7 +144,7 @@ public class Constants
     public static final String PROFILE_IMAGE_FILE_NAME = "profileImage.png";
     public static final String PROFILE_SAMPLED_IMAGE_FILE_NAME = "profileImageSampled.png";
     public static final String PROFILE_IMAGE_NAME = "profileImage";
-    
+
     //Logs zip file name
     public static final String LOGSZIPFILE_FILE_NAME = "takeapeekLogs.zip";
     public static final String LOGSZIPFILE_NAME = "takeapeekLogs";
@@ -241,9 +253,14 @@ public class Constants
     public static final int DEFAULT_PRESENCE = 0;
     
     public static final String MIMETYPE_JSON = "json";
+    public static final String MIMETYPE_PROFILE_PNG = "profile_png";
     public static final String MIMETYPE_IMAGE_PNG = "png";
     public static final String MIMETYPE_ZIP = "zip";
-    
+    public static final String MIMETYPE_MP4 = "mp4";
+
+    //POST Request Headers
+    public static final String POST_HEADER_FILENAME = "filename";
+
     public static final String AUTHENTICATION_NUMBER_EMPTY = "empty";
     public static final String AUTHENTICATION_NUMBER_NONVALID = "nonvalid";
     public static final String AUTHENTICATION_FAIL = "fail";

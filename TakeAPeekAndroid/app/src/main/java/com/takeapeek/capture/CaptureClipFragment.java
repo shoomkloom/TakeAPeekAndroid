@@ -24,6 +24,8 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Matrix;
@@ -37,7 +39,9 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.location.Location;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -58,9 +62,17 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.Transport;
+import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,10 +88,16 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class CaptureClipFragment extends Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback
+public class CaptureClipFragment extends Fragment implements
+        View.OnClickListener,
+        FragmentCompat.OnRequestPermissionsResultCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener
 {
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
 
+    SharedPreferences mSharedPreferences = null;
     Tracker mTracker = null;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -117,6 +135,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
      * Button to record video
      */
     private Button mButtonVideo;
+    private Button mButtonPreview;
+    private Button mButtonUpload;
 
     private TextView mTextViewCounter;
 
@@ -134,6 +154,12 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
     private CameraCaptureSession mPreviewSession;
 
     private String mOutputFilePath = null;
+    private String mCompleteOutputFilePath = null;
+    private TakeAPeekObject mCompletedTakeAPeekObject = null;
+
+    private GoogleApiClient mGoogleApiClient = null;
+    private Location mLastLocation = null;
+    private LocationRequest mLocationRequest;
 
     /**
      * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
@@ -349,7 +375,21 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
     {
         logger.debug("onCreateView(...) Invoked");
 
-        mTracker = Helper.GetAppTracker(getActivity());
+        Activity activity = getActivity();
+        mSharedPreferences = activity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mTracker = Helper.GetAppTracker(activity);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(activity)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
         return inflater.inflate(R.layout.fragment_capture_clip, container, false);
     }
@@ -362,6 +402,11 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mButtonVideo = (Button) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
+        mButtonPreview = (Button) view.findViewById(R.id.preview);
+        mButtonPreview.setOnClickListener(this);
+        mButtonUpload = (Button) view.findViewById(R.id.upload);
+        mButtonUpload.setOnClickListener(this);
+
         mTextViewCounter = (TextView) view.findViewById(R.id.counter);
     }
 
@@ -371,6 +416,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         logger.debug("onResume() Invoked");
 
         super.onResume();
+
+        mGoogleApiClient.connect();
 
         startBackgroundThread();
 
@@ -398,6 +445,12 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
             lastFile.delete();
         }
 
+        if (mGoogleApiClient.isConnected())
+        {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+
         super.onPause();
     }
 
@@ -412,7 +465,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
             {
                 if (mIsRecordingVideo)
                 {
-                    if(mTracker != null)
+                    if (mTracker != null)
                     {
                         mTracker.send(new HitBuilders.EventBuilder()
                                 .setCategory(Constants.GA_UI_ACTION)
@@ -425,7 +478,7 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
                 }
                 else
                 {
-                    if(mTracker != null)
+                    if (mTracker != null)
                     {
                         mTracker.send(new HitBuilders.EventBuilder()
                                 .setCategory(Constants.GA_UI_ACTION)
@@ -436,8 +489,38 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
 
                     startRecordingVideo();
                 }
-                break;
             }
+            break;
+
+            case R.id.preview:
+            {
+                if (mTracker != null)
+                {
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory(Constants.GA_UI_ACTION)
+                            .setAction(Constants.GA_BUTTON_PRESS)
+                            .setLabel("Preview Recorded Video")
+                            .build());
+                }
+
+                PreviewRecordedVideo();
+            }
+            break;
+
+            case R.id.upload:
+            {
+                if (mTracker != null)
+                {
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory(Constants.GA_UI_ACTION)
+                            .setAction(Constants.GA_BUTTON_PRESS)
+                            .setLabel("Upload Recorded Video")
+                            .build());
+                }
+
+                UploadRecordedVideo(mCompletedTakeAPeekObject);
+            }
+            break;
 
             default: break;
         }
@@ -858,7 +941,88 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateAndTime = simpleDateFormat.format(currentDate);
 
-        return String.format("%s/TakeAPeek_%s.mp4", Helper.GetTakeAPeekImagePath(context), currentDateAndTime);
+        return String.format("%s/TakeAPeek_%s.mp4", Helper.GetTakeAPeekPath(context), currentDateAndTime);
+    }
+
+    private String getVideoThumbnailFilePath(String videoFilePath)
+    {
+        logger.debug("getVideoThumbnailFilePath(.) Invoked");
+
+        return videoFilePath.replace(".mp4", "_Thumbnail.png");
+    }
+
+    private void PreviewRecordedVideo()
+    {
+        logger.debug("PreviewRecordedVideo() Invoked");
+
+        try
+        {
+
+        }
+        catch (IllegalStateException e)
+        {
+            Helper.Error(logger, "Exception: When calling PreviewRecordedVideo", e);
+        }
+    }
+
+    private void UploadRecordedVideo(TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("UploadRecordedVideo(.) Invoked");
+
+        try
+        {
+            // UI
+            mButtonVideo.setEnabled(false);
+            mButtonPreview.setEnabled(false);
+            mButtonUpload.setEnabled(false);
+
+            //Start asynchronous request to server
+            new AsyncTask<Void, Void, Boolean>()
+            {
+                @Override
+                protected Boolean doInBackground(Void... params)
+                {
+                    try
+                    {
+                        Activity activity = getActivity();
+                        String username = Helper.GetTakeAPeekAccountUsername(activity);
+                        String password = Helper.GetTakeAPeekAccountPassword(activity);
+
+                        File fileToUpload = new File(mCompleteOutputFilePath);
+                        String completedTakeAPeekJson = new Gson().toJson(mCompletedTakeAPeekObject);
+
+                        Transport.UploadPeek(
+                                activity, username, password, completedTakeAPeekJson, fileToUpload, fileToUpload.getName(),
+                                Constants.ContentTypeEnum.MP4,
+                                mSharedPreferences);
+
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When trying to upload captured clip", e);
+                        return false;
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(Boolean result)
+                {
+                    mButtonVideo.setEnabled(true);
+                    mButtonPreview.setEnabled(true);
+                    mButtonUpload.setEnabled(true);
+
+                    if(result == false)
+                    {
+                        Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.Error));
+                    }
+                }
+            }.execute();
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: Exception when clicking the upload button", e);
+        }
     }
 
     private void startRecordingVideo()
@@ -869,6 +1033,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         {
             // UI
             mButtonVideo.setText(R.string.stop);
+            mButtonPreview.setVisibility(View.GONE);
+            mButtonUpload.setVisibility(View.GONE);
             mIsRecordingVideo = true;
 
             mTextViewCounter.setText("10");
@@ -902,6 +1068,8 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         // UI
         mIsRecordingVideo = false;
         mButtonVideo.setText(R.string.record);
+        mButtonPreview.setVisibility(View.VISIBLE);
+        mButtonUpload.setVisibility(View.VISIBLE);
 
         mCountDownTimer.cancel();
         mTextViewCounter.setText("10");
@@ -910,7 +1078,108 @@ public class CaptureClipFragment extends Fragment implements View.OnClickListene
         mMediaRecorder.stop();
         mMediaRecorder.reset();
 
+        //Save the completed file path before starting a new preview
+        if(mLastLocation == null)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+
+            // set title
+            alertDialogBuilder.setTitle(R.string.Error);
+
+            // set dialog message
+            alertDialogBuilder
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setMessage(R.string.error_cannot_get_location)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.cancel();
+                        }
+                    });
+
+            // create and show alert dialog
+            alertDialogBuilder.create().show();
+        }
+        else
+        {
+            mCompleteOutputFilePath = mOutputFilePath;
+            mCompletedTakeAPeekObject = new TakeAPeekObject();
+            mCompletedTakeAPeekObject.CreationTime = System.currentTimeMillis();
+            mCompletedTakeAPeekObject.ContentType = Constants.MIMETYPE_MP4;
+            mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
+            mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
+        }
+
         startPreview();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle)
+    {
+        logger.debug("onConnected(.) Invoked");
+        logger.info("Location services connected.");
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation == null)
+        {
+            logger.warn("mLastLocation == null, creating a location update request.");
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+        else
+        {
+            logger.info("mLastLocation received.");
+            HandleNewLocation();
+        }
+    }
+
+    private void HandleNewLocation()
+    {
+        logger.debug("HandleNewLocation() Invoked");
+        logger.info(String.format("Last location is: '%s'", mLastLocation.toString()));
+    }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+        logger.debug("onConnectionSuspended(.) Invoked");
+        logger.info("Location services suspended. Please reconnect.");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+        logger.debug("onConnectionFailed(.) Invoked");
+
+        if (connectionResult.hasResolution())
+        {
+            try
+            {
+                Activity activity = getActivity();
+
+                // Start an Activity that tries to resolve the error
+                connectionResult.startResolutionForResult(activity, CaptureClipActivity.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            }
+            catch (IntentSender.SendIntentException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            Helper.Error(logger, String.format("Location services connection failed with code %d", connectionResult.getErrorCode()));
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        logger.debug("onLocationChanged(.) Invoked");
+
+        mLastLocation = location;
+        HandleNewLocation();
     }
 
     /**

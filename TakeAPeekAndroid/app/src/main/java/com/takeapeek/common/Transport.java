@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
@@ -16,12 +17,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -37,8 +44,9 @@ public class Transport
 	public static long serverTimeDelta = 0;
 	private static ReentrantLock lock = new ReentrantLock();
 	
-	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
-	//@@*/static String mServerRootURL = "http://10.0.0.4:8888";
+	//@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
+	//@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
+    /*/@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
 	public static boolean IsConnected(Context context)
@@ -128,8 +136,43 @@ public class Transport
 		return fmResponse;
 	}
 @@*/
-	
-	public static ResponseObject StartVoiceVerification(Context context, Tracker gaTracker, String userName, SharedPreferences sharedPreferences) throws Exception
+
+    public static ResponseObject Test(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("Test(....) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("Test(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "simpletest"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("text", "This is a test"));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside Test(....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("Test(....) - after unlock");
+        }
+
+        return responseObject;
+    }
+
+    public static ResponseObject StartVoiceVerification(Context context, Tracker gaTracker, String userName, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("StartVoiceVerification(...) Invoked - before lock");
 		
@@ -327,7 +370,7 @@ public class Transport
 		{
 			logger.debug("SendSyncRequest(.....) - inside lock");
 			
-			String requestStr = String.format("%s/rest/SMClientAPI?", mServerRootURL);
+			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
 			nameValuePairs.add(new NameValuePair("action_type", "request"));
@@ -338,11 +381,11 @@ public class Transport
 			{
 				String requestJSON = new Gson().toJson(requestObject);
 				
-				responseObject = DoHTTPPost(context, gaTracker, requestStr, nameValuePairs, "Request", requestJSON.getBytes(), Constants.MIMETYPE_JSON, sharedPreferences);
+				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, requestJSON.getBytes(), "Request", Constants.ContentTypeEnum.JSON, sharedPreferences);
 			}
 			else
 			{
-				responseObject = DoHTTPPost(context, gaTracker, requestStr, nameValuePairs, "Request", null, Constants.MIMETYPE_JSON, sharedPreferences);
+                responseObject = DoHTTPPost(context, requestStr, nameValuePairs, null, "Request", Constants.ContentTypeEnum.JSON, sharedPreferences);
 			}
 			
 			if(responseObject != null)
@@ -359,9 +402,60 @@ public class Transport
 		return responseObject;
 	}
 
-	public static void UploadFile(Context context, Tracker gaTracker, String username, String password, File fileToUpload, String contentName, String contentType, SharedPreferences sharedPreferences) throws Exception
+    public static void UploadFile(Context context, String username, String password, String metaDataJson, File fileToUpload, String contentName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("UploadFile(....) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        Helper.lockProfilePicture.lock();
+
+        try
+        {
+            logger.debug("UploadFile(....) - inside lock");
+
+            String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "upload_file"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+
+            long byteLength = fileToUpload.length();
+            byte[] bytes = new byte[(int) byteLength];
+
+            try
+            {
+                responseObject = DoHTTPPost(context, requestStr, nameValuePairs, metaDataJson, fileToUpload, contentName, contentType, sharedPreferences);
+            }
+            catch(Exception e)
+            {
+                String error;
+
+                if(responseObject != null)
+                {
+                    error = responseObject.error;
+                }
+                else
+                {
+                    error = "Unavailable";
+                }
+
+                Helper.Error(logger, String.format("EXCEPTION: When trying to upload a file. Response error: %s", error), e);
+                throw e;
+            }
+        }
+        finally
+        {
+            Helper.lockProfilePicture.unlock();
+            logger.debug("UploadPeek(....) - after unlock");
+        }
+    }
+
+	public static void UploadPeek(Context context, String username, String password, String metaDataJson, File fileToUpload, String contentName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
-		logger.debug("UploadFile(....) Invoked - before lock");
+		logger.debug("UploadPeek(....) Invoked - before lock");
 		
 		ResponseObject responseObject = null;
 		
@@ -369,26 +463,19 @@ public class Transport
 
 		try
 		{
-			logger.debug("UploadFile(....) - inside lock");
+			logger.debug("UploadPeek(....) - inside lock");
 			
-			String requestStr = String.format("%s/rest/SMClientAPI?", mServerRootURL);
+			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
 	
-			nameValuePairs.add(new NameValuePair("action_type", "upload_file"));
+			nameValuePairs.add(new NameValuePair("action_type", "upload_peek"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
 			nameValuePairs.add(new NameValuePair("password", password));
 		
-			long byteLength = fileToUpload.length();
-			byte[] bytes = new byte[(int) byteLength];
-			
 			try
 			{
-				FileInputStream fileStream = new FileInputStream(fileToUpload);
-				fileStream.read(bytes);
-				fileStream.close();
-				
-				responseObject = DoHTTPPost(context, gaTracker, requestStr, nameValuePairs, contentName, bytes, contentType, sharedPreferences);
+				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, metaDataJson, fileToUpload, contentName, contentType, sharedPreferences);
 			}
 			catch(Exception e)
 			{
@@ -410,7 +497,7 @@ public class Transport
 		finally
 		{
 			Helper.lockProfilePicture.unlock();
-			logger.debug("UploadFile(....) - after unlock");
+			logger.debug("UploadPeek(....) - after unlock");
 		}
 	}
 	
@@ -676,8 +763,13 @@ public class Transport
 
 		return responseObject;
 	}
-	
-	private static ResponseObject DoHTTPPost(Context context, Tracker gaTracker, String requestStr, List<NameValuePair> nameValuePairs, String fileName, byte[] bytes, String contentType, SharedPreferences sharedPreferences) throws Exception
+
+    private static ResponseObject DoHTTPPost(Context context, String requestStr, List<NameValuePair> nameValuePairs, byte[] bytes, String fileName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
+    {
+        return null;
+    }
+
+	private static ResponseObject DoHTTPPost(Context context, String requestStr, List<NameValuePair> nameValuePairs, String metaDataJson, File fileToUpload, String fileName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("DoHTTPPost(........) Invoked - before lock");
 
@@ -717,6 +809,178 @@ public class Transport
 
             if (IsConnected(context))
             {
+                //@@Need to change this to HttpsURLConnection
+                HttpURLConnection httpURLConnection = null;
+                DataOutputStream dataOutputStream = null;
+                InputStream inputStream = null;
+
+                int bytesRead, bytesAvailable, bufferSize;
+                byte[] buffer;
+                int maxBufferSize = 1024*1024;
+
+                FileInputStream fileInputStream = null;
+
+                try
+                {
+                    int responseCode = 0;
+                    fileInputStream = new FileInputStream(fileToUpload);
+
+                    URL url = new URL(requestStr);
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setDoInput(true);
+
+                    // Allow Outputs
+                    httpURLConnection.setDoOutput(true);
+
+                    // Don't use a cached copy.
+                    httpURLConnection.setUseCaches(false);
+
+                    httpURLConnection.setChunkedStreamingMode(maxBufferSize);
+
+                    // Use a post method.
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
+
+                    switch (contentType)
+                    {
+                        case PROFILE_PNG:
+                            logger.info("contentType = PROFILE_PNG");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_PROFILE_PNG));
+                            break;
+
+                        case PNG:
+                            logger.info("contentType = PNG");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_IMAGE_PNG));
+                            break;
+
+                        case JSON:
+                            logger.info("contentType = JSON");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_JSON));
+                            break;
+
+                        case ZIP:
+                            logger.info("contentType = ZIP");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_ZIP));
+                            break;
+
+                        case MP4:
+                            logger.info("contentType = MP4");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_MP4));
+                            break;
+                    }
+
+                    dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
+
+                    if(metaDataJson != null && metaDataJson != "")
+                    {
+                        byte[] metaDataJsonBytes = metaDataJson.getBytes("UTF-8");
+/*@@
+                        int metaDataJsonBytesLength = metaDataJsonBytes.length;
+                        String metaDataJsonBytesLengthStr = String.format("%d", metaDataJsonBytesLength);
+                        byte[] metaDataJsonBytesLengthStrBytes = metaDataJsonBytesLengthStr.getBytes("UTF-8");
+
+                        dataOutputStream.write(metaDataJsonBytesLengthStrBytes);
+                        dataOutputStream.writeBytes("\\r\\n");
+@@*/
+                        dataOutputStream.write(metaDataJsonBytes);
+                        dataOutputStream.writeByte('\n');
+                    }
+
+                    //Write the file data
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    buffer = new byte[bufferSize];
+
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                    while (bytesRead > 0)
+                    {
+                        dataOutputStream.write(buffer, 0, bufferSize);
+                        bytesAvailable = fileInputStream.available();
+                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                    }
+
+                    dataOutputStream.flush();
+
+                    logger.info("Sent the request, getting the response");
+
+                    //Get the response
+                    responseCode = httpURLConnection.getResponseCode();
+                    inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
+
+                    boolean isBlocked = false;
+                    String responseStr = null;
+                    try
+                    {
+                        responseStr = Helper.convertStreamToString(inputStream);
+
+                        if(responseStr != null && responseStr != "")
+                        {
+                            responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        String errorDetails = String.format("JSON exception for response string = '%s'", responseStr);
+                        Helper.Error(logger, String.format("EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
+                        throw e;
+                    }
+
+                    if(responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
+                    {
+                        isBlocked = true;
+                        Helper.SetProfileState(sharedPreferences.edit(), ProfileStateEnum.Blocked);
+                    }
+
+                    if (responseCode != 200)
+                    {
+                        if(isBlocked)
+                        {
+                            String error = responseObject == null ?
+                                    String.format("HTTP status code: %d", responseCode) :
+                                    String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
+
+                            Helper.Error(logger, error);
+                            throw new Exception(error);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When trying to upload a file", e);
+                }
+                finally
+                {
+                    // Close streams and httpconnection
+                    if(fileInputStream != null)
+                    {
+                        fileInputStream.close();
+                    }
+
+                    if(dataOutputStream != null)
+                    {
+                        dataOutputStream.flush();
+                    }
+
+                    if(dataOutputStream != null)
+                    {
+                        dataOutputStream.close();
+                    }
+
+                    if(inputStream != null)
+                    {
+                        inputStream.close();
+                    }
+
+                    if(httpURLConnection != null)
+                    {
+                        httpURLConnection.disconnect();
+                    }
+                }
+
+
+/*@@
                 int responseCode = 0;
                 //@@HttpsURLConnection httpsURLConnection = null;
                 HttpURLConnection httpsURLConnection = null;
@@ -726,8 +990,8 @@ public class Transport
                     URL url = new URL(requestStr);
                     //@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
                     httpsURLConnection = (HttpURLConnection) url.openConnection();
-                    httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
-                    httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
+                    httpsURLConnection.setReadTimeout(20000 /* milliseconds /);
+                    httpsURLConnection.setConnectTimeout(20000 /* milliseconds /);
                     httpsURLConnection.setRequestMethod("POST");
                     httpsURLConnection.setDoInput(true);
                     httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, contentType));
@@ -735,11 +999,12 @@ public class Transport
 
                     httpsURLConnection.setUseCaches(false);
                     httpsURLConnection.setDoOutput(true);
-                    httpsURLConnection.setChunkedStreamingMode(0);
+                    httpsURLConnection.setChunkedStreamingMode(1024);
+                    httpsURLConnection.setRequestProperty("Connection", "Keep-Alive");
 
                     //Send request
                     OutputStream outputStream = new BufferedOutputStream(httpsURLConnection.getOutputStream());
-                    outputStream.write(bytes);
+                    //@@outputStream.write(bytes);
                     outputStream.flush();
                     outputStream.close();
 
@@ -789,6 +1054,8 @@ public class Transport
                 {
                     httpsURLConnection.disconnect();
                 }
+@@*/
+
             }
             else
             {
@@ -809,5 +1076,121 @@ public class Transport
 
         return responseObject;
 	}
+
+    /**
+     * This function upload the large file to server with other POST values.
+     * @param filename
+     * @param targetUrl
+     * @return
+     */
+    public static String uploadFileToServer(String filename, String targetUrl)
+    {
+        HttpURLConnection conn = null;
+        DataOutputStream dos = null;
+        DataInputStream inStream = null;
+
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1*1024;
+
+        try
+        {
+            FileInputStream fileInputStream = new FileInputStream(new File(filename) );
+
+            URL url = new URL(targetUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+
+            // Allow Outputs
+            conn.setDoOutput(true);
+
+            // Don't use a cached copy.
+            conn.setUseCaches(false);
+
+            conn.setChunkedStreamingMode(maxBufferSize);
+
+            // Use a post method.
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            conn.setRequestProperty("Content-Type", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX + "mp4");
+
+            dos = new DataOutputStream( conn.getOutputStream() );
+
+            bytesAvailable = fileInputStream.available();
+            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            buffer = new byte[bufferSize];
+
+            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+            while (bytesRead > 0)
+            {
+                dos.write(buffer, 0, bufferSize);
+                bytesAvailable = fileInputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+
+            // close streams
+            Log.e("MediaPlayer","File is written");
+            fileInputStream.close();
+            dos.flush();
+            dos.close();
+        }
+        catch (MalformedURLException ex)
+        {
+            Log.e("MediaPlayer", "error: " + ex.getMessage(), ex);
+        }
+        catch (IOException ioe)
+        {
+            Log.e("MediaPlayer", "error: " + ioe.getMessage(), ioe);
+        }
+
+        return null;
+    }
+
+    /**
+     * This function download the large files from the server
+     * @param filename
+     * @param urlString
+     * @throws MalformedURLException
+     * @throws IOException
+     */
+    public static void downloadFileFromServer(String filename, String urlString) throws MalformedURLException, IOException
+    {
+        BufferedInputStream in = null;
+        FileOutputStream fout = null;
+
+        try
+        {
+            URL url = new URL(urlString);
+
+            in = new BufferedInputStream(url.openStream());
+            fout = new FileOutputStream(filename);
+
+            byte data[] = new byte[1024];
+            int count;
+            while ((count = in.read(data, 0, 1024)) != -1)
+            {
+                fout.write(data, 0, count);
+                System.out.println(count);
+            }
+        }
+        finally
+        {
+            if (in != null)
+            {
+                in.close();
+            }
+            if (fout != null)
+            {
+                fout.close();
+            }
+        }
+
+        System.out.println("Done");
+    }
 }
 

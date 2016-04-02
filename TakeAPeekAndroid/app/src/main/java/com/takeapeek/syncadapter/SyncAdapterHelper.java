@@ -347,13 +347,13 @@ public class SyncAdapterHelper implements Runnable
 				
 				try
 				{
-					Transport.UploadFile(mContext, mTracker, takeAPeekAccountUsername, takeAPeekAccountPassword, profileImage, contentName, Constants.MIMETYPE_IMAGE_PNG, mSharedPreferences);
+					Transport.UploadPeek(mContext, takeAPeekAccountUsername, takeAPeekAccountPassword, null, profileImage, contentName, Constants.ContentTypeEnum.PNG, mSharedPreferences);
 					
 					Helper.SetProfileImageHasChanged(mSharedPreferences.edit(), false);
 				}
 				catch(Exception e)
 				{
-					Helper.Error(logger, "EXCEPTION: When calling Transport.UploadFile", e);
+					Helper.Error(logger, "EXCEPTION: When calling Transport.UploadPeek", e);
 				}
 			}
 		}

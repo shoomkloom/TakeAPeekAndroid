@@ -205,18 +205,19 @@ public class Helper
 		
 		return takeAPeekDataDirectoryPath;
 	}
-	
+
 	static public String GetTakeAPeekPath(Context context) throws IOException
 	{
 		logger.debug("GetTakeAPeekPath(.) Invoked");
 		
-		String takeapeekDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "takeapeek/";
+		String takeapeekDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "TakeAPeek/";
 		
 		CreateDirectoryIfDoesNotExist(takeapeekDirectoryPath, true);
 		
 		return takeapeekDirectoryPath;
 	}
-	
+
+/*@@
 	static public String GetTakeAPeekImagePath(Context context) throws IOException
 	{
 		logger.debug("GetTakeAPeekImagePath(.) Invoked");
@@ -227,6 +228,7 @@ public class Helper
 		
 		return takeapeekDirectoryPath;
 	}
+@@*/
 	
 	static public String GetLogsZipFilePath(Context context) throws IOException
 	{
