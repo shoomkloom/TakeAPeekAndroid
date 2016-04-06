@@ -4,9 +4,9 @@
 <!-- for the SyncAdapter. -->
 
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:contentAuthority="com.android.contacts"
+    android:contentAuthority="com.takeapeek.provider"
     android:accountType="com.takeapeek"
-    android:supportsUploading="false"
+    android:supportsUploading="true"
     android:userVisible="true"
     android:isAlwaysSyncable="true"
 />

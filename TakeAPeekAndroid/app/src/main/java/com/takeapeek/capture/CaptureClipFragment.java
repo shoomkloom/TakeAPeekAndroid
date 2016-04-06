@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
@@ -41,7 +42,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.location.Location;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -67,11 +67,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
-import com.takeapeek.common.Transport;
+import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
@@ -154,7 +153,6 @@ public class CaptureClipFragment extends Fragment implements
     private CameraCaptureSession mPreviewSession;
 
     private String mOutputFilePath = null;
-    private String mCompleteOutputFilePath = null;
     private TakeAPeekObject mCompletedTakeAPeekObject = null;
 
     private GoogleApiClient mGoogleApiClient = null;
@@ -378,6 +376,7 @@ public class CaptureClipFragment extends Fragment implements
         Activity activity = getActivity();
         mSharedPreferences = activity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
         mTracker = Helper.GetAppTracker(activity);
+        DatabaseManager.init(activity);
 
         mGoogleApiClient = new GoogleApiClient.Builder(activity)
                 .addConnectionCallbacks(this)
@@ -971,53 +970,20 @@ public class CaptureClipFragment extends Fragment implements
 
         try
         {
-            // UI
-            mButtonVideo.setEnabled(false);
-            mButtonPreview.setEnabled(false);
-            mButtonUpload.setEnabled(false);
-
-            //Start asynchronous request to server
-            new AsyncTask<Void, Void, Boolean>()
+            if(mCompletedTakeAPeekObject != null)
             {
-                @Override
-                protected Boolean doInBackground(Void... params)
-                {
-                    try
-                    {
-                        Activity activity = getActivity();
-                        String username = Helper.GetTakeAPeekAccountUsername(activity);
-                        String password = Helper.GetTakeAPeekAccountPassword(activity);
+                DatabaseManager.getInstance().AddTakeAPeekObject(mCompletedTakeAPeekObject);
 
-                        File fileToUpload = new File(mCompleteOutputFilePath);
-                        String completedTakeAPeekJson = new Gson().toJson(mCompletedTakeAPeekObject);
+                //Run the sync adapter
+                logger.info("Requesting sync from sync adapter");
+                Activity activity = getActivity();
+                ContentResolver.requestSync(Helper.GetTakeAPeekAccount(activity), Constants.TAKEAPEEK_AUTHORITY, Bundle.EMPTY);
+            }
 
-                        Transport.UploadPeek(
-                                activity, username, password, completedTakeAPeekJson, fileToUpload, fileToUpload.getName(),
-                                Constants.ContentTypeEnum.MP4,
-                                mSharedPreferences);
-
-                        return true;
-                    }
-                    catch (Exception e)
-                    {
-                        Helper.Error(logger, "EXCEPTION: When trying to upload captured clip", e);
-                        return false;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(Boolean result)
-                {
-                    mButtonVideo.setEnabled(true);
-                    mButtonPreview.setEnabled(true);
-                    mButtonUpload.setEnabled(true);
-
-                    if(result == false)
-                    {
-                        Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.Error));
-                    }
-                }
-            }.execute();
+            // UI
+            mButtonVideo.setEnabled(true);
+            mButtonPreview.setVisibility(View.GONE);
+            mButtonUpload.setVisibility(View.GONE);
         }
         catch (Exception e)
         {
@@ -1104,10 +1070,10 @@ public class CaptureClipFragment extends Fragment implements
         }
         else
         {
-            mCompleteOutputFilePath = mOutputFilePath;
             mCompletedTakeAPeekObject = new TakeAPeekObject();
+            mCompletedTakeAPeekObject.FilePath = mOutputFilePath;
             mCompletedTakeAPeekObject.CreationTime = System.currentTimeMillis();
-            mCompletedTakeAPeekObject.ContentType = Constants.MIMETYPE_MP4;
+            mCompletedTakeAPeekObject.ContentType = Constants.ContentTypeEnum.mp4.toString();
             mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
             mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
         }

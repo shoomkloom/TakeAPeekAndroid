@@ -15,6 +15,9 @@ public class TakeAPeekObject
     @DatabaseField(generatedId=true, columnName = "id")
     private int id;
 
+    @DatabaseField(columnName = "TakeAPeekID")
+    public String TakeAPeekID = "-1";
+
     @DatabaseField(dataType= DataType.LONG, columnName = "CreationTime")
     public long CreationTime = 0;
 
@@ -26,4 +29,7 @@ public class TakeAPeekObject
 
     @DatabaseField(dataType= DataType.DOUBLE, columnName = "Latitude")
     public double Latitude = 0;
+
+    @DatabaseField(columnName = "FilePath")
+    public String FilePath = "";
 }

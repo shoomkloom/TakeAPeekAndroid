@@ -36,6 +36,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	// the DAO object we use to access the SimpleData table
 	private Dao<TakeAPeekContact, Integer> mTakeAPeekContactDao = null;
 	private Dao<TakeAPeekContactUpdateTimes, Integer> mTakeAPeekContactUpdateTimesDao = null;
+	private Dao<TakeAPeekObject, Integer> mTakeAPeekObjectDao = null;
 
 	public DatabaseHelper(Context context) 
 	{
@@ -49,6 +50,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		{
 			TableUtils.createTable(connectionSource, TakeAPeekContact.class);
 			TableUtils.createTable(connectionSource, TakeAPeekContactUpdateTimes.class);
+			TableUtils.createTable(connectionSource, TakeAPeekObject.class);
 		}
 		catch (Exception e) 
 		{
@@ -114,5 +116,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 		}
 
 		return mTakeAPeekContactUpdateTimesDao;
+	}
+
+	//TakeAPeekContact
+	public Dao<TakeAPeekObject, Integer> GetTakeAPeekObjectDao()
+	{
+		if (null == mTakeAPeekObjectDao)
+		{
+			try
+			{
+				mTakeAPeekObjectDao = getDao(TakeAPeekObject.class);
+			}
+			catch (java.sql.SQLException e)
+			{
+				Helper.Error(logger, "EXCEPTION: in GetTakeAPeekObjectDao", e);
+			}
+		}
+
+		return mTakeAPeekObjectDao;
 	}
 }

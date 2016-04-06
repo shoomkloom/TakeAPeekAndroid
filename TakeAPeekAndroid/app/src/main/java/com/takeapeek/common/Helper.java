@@ -63,7 +63,6 @@ import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekContact;
 import com.takeapeek.ormlite.TakeAPeekContactUpdateTimes;
 import com.takeapeek.syncadapter.ActiveSyncService;
-import com.takeapeek.syncadapter.SyncAdapterHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -3118,26 +3117,6 @@ public class Helper
     	catch(Exception ex)
     	{
     		logger.warn("EXCPETION: inside HideVirtualKeyboard()", ex);
-    	}
-    }
-    
-    public static void SyncContactList(Context context, Tracker tracker, ArrayList<String> numbersToSyncASAPArray)
-    {
-    	logger.debug("SyncContactList(.) Invoked");
-
-    	try
-    	{
-    		SyncAdapterHelper syncAdapterHelper = new SyncAdapterHelper();
-    		
-    		syncAdapterHelper.Init(context, tracker, false, false);
-    		syncAdapterHelper.SetNumbersToSyncASAP(numbersToSyncASAPArray);
-    		
-    		Thread scanThread = new Thread(syncAdapterHelper, "SyncContactListThread");
-    		scanThread.start();
-    	}
-    	catch(Exception e)
-    	{
-    		Error(logger, "EXCEPTION when trying to sync asap", e);
     	}
     }
 

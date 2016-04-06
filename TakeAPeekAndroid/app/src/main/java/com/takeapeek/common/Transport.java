@@ -44,9 +44,9 @@ public class Transport
 	public static long serverTimeDelta = 0;
 	private static ReentrantLock lock = new ReentrantLock();
 	
-	//@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
+	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
 	//@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-    /*/@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
+    //@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
 	public static boolean IsConnected(Context context)
@@ -381,11 +381,11 @@ public class Transport
 			{
 				String requestJSON = new Gson().toJson(requestObject);
 				
-				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, requestJSON.getBytes(), "Request", Constants.ContentTypeEnum.JSON, sharedPreferences);
+				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, requestJSON.getBytes(), "Request", Constants.ContentTypeEnum.json, sharedPreferences);
 			}
 			else
 			{
-                responseObject = DoHTTPPost(context, requestStr, nameValuePairs, null, "Request", Constants.ContentTypeEnum.JSON, sharedPreferences);
+                responseObject = DoHTTPPost(context, requestStr, nameValuePairs, null, "Request", Constants.ContentTypeEnum.json, sharedPreferences);
 			}
 			
 			if(responseObject != null)
@@ -843,29 +843,29 @@ public class Transport
 
                     switch (contentType)
                     {
-                        case PROFILE_PNG:
-                            logger.info("contentType = PROFILE_PNG");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_PROFILE_PNG));
+                        case profile_png:
+                            logger.info("contentType = profile_png");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.profile_png));
                             break;
 
-                        case PNG:
-                            logger.info("contentType = PNG");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_IMAGE_PNG));
+                        case png:
+                            logger.info("contentType = png");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.png));
                             break;
 
-                        case JSON:
-                            logger.info("contentType = JSON");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_JSON));
+                        case json:
+                            logger.info("contentType = json");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.json));
                             break;
 
-                        case ZIP:
-                            logger.info("contentType = ZIP");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_ZIP));
+                        case zip:
+                            logger.info("contentType = zip");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.zip));
                             break;
 
-                        case MP4:
-                            logger.info("contentType = MP4");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.MIMETYPE_MP4));
+                        case mp4:
+                            logger.info("contentType = mp4");
+                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.mp4));
                             break;
                     }
 
@@ -927,7 +927,7 @@ public class Transport
                         throw e;
                     }
 
-                    if(responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
+                    if(responseObject.error != null && responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
                     {
                         isBlocked = true;
                         Helper.SetProfileState(sharedPreferences.edit(), ProfileStateEnum.Blocked);
@@ -978,84 +978,6 @@ public class Transport
                         httpURLConnection.disconnect();
                     }
                 }
-
-
-/*@@
-                int responseCode = 0;
-                //@@HttpsURLConnection httpsURLConnection = null;
-                HttpURLConnection httpsURLConnection = null;
-
-                try
-                {
-                    URL url = new URL(requestStr);
-                    //@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                    httpsURLConnection = (HttpURLConnection) url.openConnection();
-                    httpsURLConnection.setReadTimeout(20000 /* milliseconds /);
-                    httpsURLConnection.setConnectTimeout(20000 /* milliseconds /);
-                    httpsURLConnection.setRequestMethod("POST");
-                    httpsURLConnection.setDoInput(true);
-                    httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, contentType));
-                    httpsURLConnection.setRequestProperty("FileName", fileName);
-
-                    httpsURLConnection.setUseCaches(false);
-                    httpsURLConnection.setDoOutput(true);
-                    httpsURLConnection.setChunkedStreamingMode(1024);
-                    httpsURLConnection.setRequestProperty("Connection", "Keep-Alive");
-
-                    //Send request
-                    OutputStream outputStream = new BufferedOutputStream(httpsURLConnection.getOutputStream());
-                    //@@outputStream.write(bytes);
-                    outputStream.flush();
-                    outputStream.close();
-
-                    responseCode = httpsURLConnection.getResponseCode();
-                    logger.info(String.format("responseCode = %d", responseCode));
-
-                    InputStream inputStream = new BufferedInputStream(httpsURLConnection.getInputStream());
-
-                    boolean isBlocked = false;
-                    String responseStr = null;
-                    try
-                    {
-                        responseStr = Helper.convertStreamToString(inputStream);
-                        responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
-                    }
-                    catch (Exception e)
-                    {
-                        String errorDetails = String.format("JSON exception for response string = '%s'", responseStr);
-                        Helper.Error(logger, String.format("EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
-                        throw e;
-                    }
-
-                    if(responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
-                    {
-                        isBlocked = true;
-                        Helper.SetProfileState(sharedPreferences.edit(), ProfileStateEnum.Blocked);
-                    }
-
-                    if (responseCode != 200)
-                    {
-                        if(isBlocked)
-                        {
-                            String error = responseObject == null ?
-                                    String.format("HTTP status code: %d", responseCode) :
-                                    String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
-
-                            Helper.Error(logger, error);
-                            throw new Exception(error);
-                        }
-                    }
-                }
-                catch (SocketTimeoutException e)
-                {
-                    Helper.Error(logger, "EXCEPTION: SocketTimeoutException when calling httpsURLConnection.connect().", e);
-                }
-                finally
-                {
-                    httpsURLConnection.disconnect();
-                }
-@@*/
-
             }
             else
             {

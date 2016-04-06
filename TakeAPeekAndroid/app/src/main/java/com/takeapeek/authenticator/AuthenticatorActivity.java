@@ -5,6 +5,7 @@ import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -574,18 +575,16 @@ public class AuthenticatorActivity extends AppCompatActivity
     	
         final Account account = new Account(mUsername, Constants.TAKEAPEEK_ACCOUNT_TYPE);
 
-/*@@
     	// Set contacts sync for this account.
-        ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
-        ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
-        
+        ContentResolver.setSyncAutomatically(account, Constants.TAKEAPEEK_AUTHORITY, true);
+        ContentResolver.setIsSyncable(account, Constants.TAKEAPEEK_AUTHORITY, 1);
+
         Bundle params = new Bundle();
         params.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, false);
         params.putBoolean(ContentResolver.SYNC_EXTRAS_DO_NOT_RETRY, false);
         params.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, false);
-        ContentResolver.addPeriodicSync(account, ContactsContract.AUTHORITY, params, Constants.SYNC_PERIOD);
-@@*/
-        
+        ContentResolver.addPeriodicSync(account, Constants.TAKEAPEEK_AUTHORITY, params, Constants.SYNC_PERIOD);
+
         mAccountManager.addAccountExplicitly(account, mPassword, null);
 
 /*@@

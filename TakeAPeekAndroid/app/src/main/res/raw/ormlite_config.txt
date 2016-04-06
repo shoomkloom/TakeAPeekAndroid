@@ -1,5 +1,5 @@
 #
-# generated on 2016/03/10 02:58:31
+# generated on 2016/04/06 10:02:35
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -47,6 +47,45 @@ columnName=TakeAPeekID
 fieldName=PhotoServerTime
 columnName=PhotoServerTime
 dataPersister=LONG
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.takeapeek.ormlite.TakeAPeekObject
+tableName=takeapeekobject
+# --table-fields-start--
+# --field-start--
+fieldName=id
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=TakeAPeekID
+columnName=TakeAPeekID
+# --field-end--
+# --field-start--
+fieldName=CreationTime
+columnName=CreationTime
+dataPersister=LONG
+# --field-end--
+# --field-start--
+fieldName=ContentType
+columnName=ContentType
+# --field-end--
+# --field-start--
+fieldName=Longitude
+columnName=Longitude
+dataPersister=DOUBLE
+# --field-end--
+# --field-start--
+fieldName=Latitude
+columnName=Latitude
+dataPersister=DOUBLE
+# --field-end--
+# --field-start--
+fieldName=FilePath
+columnName=FilePath
 # --field-end--
 # --table-fields-end--
 # --table-end--

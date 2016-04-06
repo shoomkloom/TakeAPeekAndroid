@@ -22,11 +22,11 @@ public class Constants
 {
     public enum ContentTypeEnum
     {
-        PROFILE_PNG,
-        PNG,
-        JSON,
-        ZIP,
-        MP4
+        profile_png,
+        png,
+        json,
+        zip,
+        mp4
     }
 
 	public enum ContactTypeEnum
@@ -91,6 +91,7 @@ public class Constants
 	
     //Account type string.
     public static final String TAKEAPEEK_ACCOUNT_TYPE = "com.takeapeek";
+    public static final String TAKEAPEEK_AUTHORITY = "com.takeapeek.provider";
 
     //Authtoken type string.
     public static final String TAKEAPEEK_AUTHTOKEN_TYPE = "com.takeapeek";
@@ -101,7 +102,7 @@ public class Constants
     public static final String PARAM_USERNAME = "username";
     
     //Sync period in seconds
-    public static final long SYNC_PERIOD = 10800; // seconds per 3 hours
+    public static final long SYNC_PERIOD = 600; // seconds per 10 minutes
     
     //The file name to use for shared preferences between all part of the TakeAPeek project
     public static final String SHARED_PREFERENCES_FILE_NAME = "TakeAPeekSharedPreferences";
@@ -251,12 +252,6 @@ public class Constants
     public static final long INTERVAL_MONTH = 2678400000L; //Millis per month;
     public static final int DEFAULT_MOOD = 1;
     public static final int DEFAULT_PRESENCE = 0;
-    
-    public static final String MIMETYPE_JSON = "json";
-    public static final String MIMETYPE_PROFILE_PNG = "profile_png";
-    public static final String MIMETYPE_IMAGE_PNG = "png";
-    public static final String MIMETYPE_ZIP = "zip";
-    public static final String MIMETYPE_MP4 = "mp4";
 
     //POST Request Headers
     public static final String POST_HEADER_FILENAME = "filename";

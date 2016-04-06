@@ -21,6 +21,7 @@ public class DatabaseManager
 	
 	static ReentrantLock lockTakeAPeekContact = new ReentrantLock();
 	static ReentrantLock lockTakeAPeekContactUpdateTimes = new ReentrantLock();
+	static ReentrantLock lockTakeAPeekObject = new ReentrantLock();
 
 	static public void init(Context context) 
 	{
@@ -56,7 +57,7 @@ public class DatabaseManager
 	}
 	
 	//TakeAPeekContact
-	public void AddTakeAPeekContact(TakeAPeekContact TakeAPeekContact) 
+	public void AddTakeAPeekContact(TakeAPeekContact takeAPeekContact) 
 	{
 		//Do not lock this function
 		
@@ -64,7 +65,7 @@ public class DatabaseManager
 		
 		try 
 		{
-			getHelper().GetTakeAPeekContactDao().create(TakeAPeekContact);
+			getHelper().GetTakeAPeekContactDao().create(takeAPeekContact);
 		} 
 		catch (SQLException e) 
 		{
@@ -72,27 +73,27 @@ public class DatabaseManager
 		}
 	}
 	
-	public TakeAPeekContact GetTakeAPeekContactWithId(int TakeAPeekContactId) 
+	public TakeAPeekContact GetTakeAPeekContactWithId(int takeAPeekContactId) 
 	{
 		//Do not lock this function
 		
 		logger.debug("GetTakeAPeekContactWithId(.) Invoked");
 		
-		TakeAPeekContact TakeAPeekContact = null;
+		TakeAPeekContact takeAPeekContact = null;
 		
 		try 
 		{
-			TakeAPeekContact = getHelper().GetTakeAPeekContactDao().queryForId(TakeAPeekContactId);
+			takeAPeekContact = getHelper().GetTakeAPeekContactDao().queryForId(takeAPeekContactId);
 		}
 		catch (SQLException e) 
 		{
 			Helper.Error(logger, "SQLException", e);
 		}
 		
-		return TakeAPeekContact;
+		return takeAPeekContact;
 	}
 	
-	public void DeleteTakeAPeekContact(TakeAPeekContact TakeAPeekContact) 
+	public void DeleteTakeAPeekContact(TakeAPeekContact takeAPeekContact) 
 	{
 		//Do not lock this function
 		
@@ -100,7 +101,7 @@ public class DatabaseManager
 		
 		try 
 		{
-			getHelper().GetTakeAPeekContactDao().delete(TakeAPeekContact);
+			getHelper().GetTakeAPeekContactDao().delete(takeAPeekContact);
 		} 
 		catch (SQLException e) 
 		{
@@ -108,7 +109,7 @@ public class DatabaseManager
 		}		
 	}
 
-	public void UpdateTakeAPeekContact(TakeAPeekContact TakeAPeekContact) 
+	public void UpdateTakeAPeekContact(TakeAPeekContact takeAPeekContact) 
 	{
 		//Do not lock this function
 		
@@ -116,7 +117,7 @@ public class DatabaseManager
 		
 		try 
 		{
-			int result = getHelper().GetTakeAPeekContactDao().update(TakeAPeekContact);
+			int result = getHelper().GetTakeAPeekContactDao().update(takeAPeekContact);
 			logger.debug(String.format("%d rows were updated", result));
 		} 
 		catch (SQLException e) 
@@ -132,18 +133,18 @@ public class DatabaseManager
     	
     	logger.debug("GetTakeAPeekContactList() Invoked");
     	
-    	List<TakeAPeekContact> TakeAPeekContactList = null;
+    	List<TakeAPeekContact> takeAPeekContactList = null;
     	
     	try
     	{
-    		TakeAPeekContactList = getHelper().GetTakeAPeekContactDao().queryForAll();
+			takeAPeekContactList = getHelper().GetTakeAPeekContactDao().queryForAll();
 		} 
 		catch (SQLException e) 
 		{
 			Helper.Error(logger, "SQLException", e);
 		}
 		
-		return TakeAPeekContactList;
+		return takeAPeekContactList;
 	}
 	
 	public HashMap<String, TakeAPeekContact> GetTakeAPeekContactHash()
@@ -154,13 +155,13 @@ public class DatabaseManager
 		
 		HashMap<String, TakeAPeekContact> hashMap = new HashMap<String, TakeAPeekContact>();
 		
-		List<TakeAPeekContact> TakeAPeekContactList  = GetTakeAPeekContactList();
+		List<TakeAPeekContact> takeAPeekContactList  = GetTakeAPeekContactList();
 		
-		if(TakeAPeekContactList != null)
+		if(takeAPeekContactList != null)
     	{
-			for (TakeAPeekContact TakeAPeekContact : TakeAPeekContactList) 
+			for (TakeAPeekContact takeAPeekContact : takeAPeekContactList) 
 			{
-				hashMap.put(TakeAPeekContact.TakeAPeekID, TakeAPeekContact);
+				hashMap.put(takeAPeekContact.TakeAPeekID, takeAPeekContact);
 			}
     	}
 		
@@ -175,62 +176,62 @@ public class DatabaseManager
 		
 		HashMap<String, TakeAPeekContact> hashMap = new HashMap<String, TakeAPeekContact>();
 		
-		List<TakeAPeekContact> TakeAPeekContactList  = GetTakeAPeekContactList();
+		List<TakeAPeekContact> takeAPeekContactList  = GetTakeAPeekContactList();
 		
-		if(TakeAPeekContactList != null)
+		if(takeAPeekContactList != null)
     	{
-			for (TakeAPeekContact TakeAPeekContact : TakeAPeekContactList) 
+			for (TakeAPeekContact takeAPeekContact : takeAPeekContactList) 
 			{
-				hashMap.put(TakeAPeekContact.ContactData.profileId, TakeAPeekContact);
+				hashMap.put(takeAPeekContact.ContactData.profileId, takeAPeekContact);
 			}
     	}
 		
 		return hashMap;
 	}
     
-    public void SetTakeAPeekContact(String selfMeID, ContactObject contactData, int likes)
+    public void SetTakeAPeekContact(String takeAPeekID, ContactObject contactData, int likes)
     {
     	//Do not lock this function
     	
     	logger.debug("SetTakeAPeekContact(.....) Invoked");
     	
-    	TakeAPeekContact TakeAPeekContact = GetTakeAPeekContact(selfMeID);
+    	TakeAPeekContact takeAPeekContact = GetTakeAPeekContact(takeAPeekID);
     	
-    	if(TakeAPeekContact == null)
+    	if(takeAPeekContact == null)
     	{
-    		AddTakeAPeekContact(new TakeAPeekContact(selfMeID, contactData, likes));
+    		AddTakeAPeekContact(new TakeAPeekContact(takeAPeekID, contactData, likes));
     	}
     	else
     	{
-    		TakeAPeekContact.ContactData = contactData;
+			takeAPeekContact.ContactData = contactData;
 
-    		UpdateTakeAPeekContact(TakeAPeekContact);
+    		UpdateTakeAPeekContact(takeAPeekContact);
     	}
     }
     
-    public TakeAPeekContact GetTakeAPeekContact(String selfMeID)
+    public TakeAPeekContact GetTakeAPeekContact(String takeAPeekID)
     {
     	logger.debug("GetTakeAPeekContact(.) Invoked - before lock");
     	
-    	TakeAPeekContact TakeAPeekContact = null;
+    	TakeAPeekContact takeAPeekContact = null;
     	
     	lockTakeAPeekContact.lock();
     	try
     	{
 	    	logger.debug("GetContactUpdateTimes(.) - inside lock");
 	    	
-	    	HashMap<String, TakeAPeekContact> TakeAPeekContactHashMap = GetTakeAPeekContactHash();
+	    	HashMap<String, TakeAPeekContact> takeAPeekContactHashMap = GetTakeAPeekContactHash();
     		
-	    	TakeAPeekContact foundTakeAPeekContact = TakeAPeekContactHashMap.get(selfMeID);
+	    	TakeAPeekContact foundTakeAPeekContact = takeAPeekContactHashMap.get(takeAPeekID);
 	    	
 	    	if(foundTakeAPeekContact != null)
 	    	{
-	    		TakeAPeekContact = foundTakeAPeekContact;
+				takeAPeekContact = foundTakeAPeekContact;
 	    	}
     	}
 		catch (Exception e)
 		{
-			Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekContact with selfMeID=%s", selfMeID), e);
+			Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekContact with takeAPeekID=%s", takeAPeekID), e);
 		}
     	finally
     	{
@@ -238,7 +239,7 @@ public class DatabaseManager
     		logger.debug("GetContactUpdateTimes(.) - after unlock");
     	}
     	
-    	return TakeAPeekContact;
+    	return takeAPeekContact;
     }
     
     public void ClearAllTakeAPeekContacts()
@@ -251,13 +252,13 @@ public class DatabaseManager
     	{
 	    	logger.debug("ClearAllTakeAPeekContacts() - inside lock");
 			
-	    	List<TakeAPeekContact> TakeAPeekContactList = GetTakeAPeekContactList();
+	    	List<TakeAPeekContact> takeAPeekContactList = GetTakeAPeekContactList();
 	    	
-	    	if(TakeAPeekContactList != null)
+	    	if(takeAPeekContactList != null)
 	    	{
-				for(TakeAPeekContact TakeAPeekContact : TakeAPeekContactList)
+				for(TakeAPeekContact takeAPeekContact : takeAPeekContactList)
 				{
-					DeleteTakeAPeekContact(TakeAPeekContact);
+					DeleteTakeAPeekContact(takeAPeekContact);
 				}
 	    	}
 		}
@@ -269,7 +270,7 @@ public class DatabaseManager
 	}
 
 	//TakeAPeekContactUpdateTimes
-	public void AddTakeAPeekContactUpdateTimes(TakeAPeekContactUpdateTimes selfMeContactUpdateTimes)
+	public void AddTakeAPeekContactUpdateTimes(TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes)
 	{
 		//Do not lock this function
 
@@ -277,7 +278,7 @@ public class DatabaseManager
 
 		try
 		{
-			getHelper().GetTakeAPeekContactUpdateTimesDao().create(selfMeContactUpdateTimes);
+			getHelper().GetTakeAPeekContactUpdateTimesDao().create(takeAPeekContactUpdateTimes);
 		}
 		catch (SQLException e)
 		{
@@ -285,27 +286,27 @@ public class DatabaseManager
 		}
 	}
 
-	public TakeAPeekContactUpdateTimes GetTakeAPeekContactUpdateTimesWithId(int selfMeContactUpdateTimesId)
+	public TakeAPeekContactUpdateTimes GetTakeAPeekContactUpdateTimesWithId(int takeAPeekContactUpdateTimesId)
 	{
 		//Do not lock this function
 
 		logger.debug("GetTakeAPeekContactUpdateTimesWithId(.) Invoked");
 
-		TakeAPeekContactUpdateTimes selfMeContactUpdateTimes = null;
+		TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes = null;
 
 		try
 		{
-			selfMeContactUpdateTimes = getHelper().GetTakeAPeekContactUpdateTimesDao().queryForId(selfMeContactUpdateTimesId);
+			takeAPeekContactUpdateTimes = getHelper().GetTakeAPeekContactUpdateTimesDao().queryForId(takeAPeekContactUpdateTimesId);
 		}
 		catch (SQLException e)
 		{
 			Helper.Error(logger, "SQLException", e);
 		}
 
-		return selfMeContactUpdateTimes;
+		return takeAPeekContactUpdateTimes;
 	}
 
-	public void DeleteTakeAPeekContactUpdateTimes(TakeAPeekContactUpdateTimes selfMeContactUpdateTimes)
+	public void DeleteTakeAPeekContactUpdateTimes(TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes)
 	{
 		//Do not lock this function
 
@@ -313,7 +314,7 @@ public class DatabaseManager
 
 		try
 		{
-			getHelper().GetTakeAPeekContactUpdateTimesDao().delete(selfMeContactUpdateTimes);
+			getHelper().GetTakeAPeekContactUpdateTimesDao().delete(takeAPeekContactUpdateTimes);
 		}
 		catch (SQLException e)
 		{
@@ -321,7 +322,7 @@ public class DatabaseManager
 		}
 	}
 
-	public void UpdateTakeAPeekContactUpdateTimes(TakeAPeekContactUpdateTimes selfMeContactUpdateTimes)
+	public void UpdateTakeAPeekContactUpdateTimes(TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes)
 	{
 		//Do not lock this function
 
@@ -329,12 +330,184 @@ public class DatabaseManager
 
 		try
 		{
-			int result = getHelper().GetTakeAPeekContactUpdateTimesDao().update(selfMeContactUpdateTimes);
+			int result = getHelper().GetTakeAPeekContactUpdateTimesDao().update(takeAPeekContactUpdateTimes);
 			logger.debug(String.format("%d rows were updated", result));
 		}
 		catch (SQLException e)
 		{
 			Helper.Error(logger, "SQLException", e);
+		}
+	}
+
+	//TakeAPeekObject
+	public void AddTakeAPeekObject(TakeAPeekObject takeAPeekObject)
+	{
+		//Do not lock this function
+
+		logger.debug("AddTakeAPeekObject(.) Invoked");
+
+		try
+		{
+			getHelper().GetTakeAPeekObjectDao().create(takeAPeekObject);
+		}
+		catch (SQLException e)
+		{
+			Helper.Error(logger, "SQLException", e);
+		}
+	}
+
+	public TakeAPeekObject GetTakeAPeekObjectWithId(int takeAPeekObjectId)
+	{
+		//Do not lock this function
+
+		logger.debug("GetTakeAPeekObjectWithId(.) Invoked");
+
+		TakeAPeekObject takeAPeekObject = null;
+
+		try
+		{
+			takeAPeekObject = getHelper().GetTakeAPeekObjectDao().queryForId(takeAPeekObjectId);
+		}
+		catch (SQLException e)
+		{
+			Helper.Error(logger, "SQLException", e);
+		}
+
+		return takeAPeekObject;
+	}
+
+	public void DeleteTakeAPeekObject(TakeAPeekObject takeAPeekObject)
+	{
+		//Do not lock this function
+
+		logger.debug("DeleteTakeAPeekObject(.) Invoked");
+
+		try
+		{
+			getHelper().GetTakeAPeekObjectDao().delete(takeAPeekObject);
+		}
+		catch (SQLException e)
+		{
+			Helper.Error(logger, "SQLException", e);
+		}
+	}
+
+	public void UpdateTakeAPeekObject(TakeAPeekObject takeAPeekObject)
+	{
+		//Do not lock this function
+
+		logger.debug("UpdateTakeAPeekObject(.) Invoked");
+
+		try
+		{
+			int result = getHelper().GetTakeAPeekObjectDao().update(takeAPeekObject);
+			logger.debug(String.format("%d rows were updated", result));
+		}
+		catch (SQLException e)
+		{
+			Helper.Error(logger, "SQLException", e);
+		}
+	}
+
+	//TakeAPeekObject helper functions
+	public List<TakeAPeekObject> GetTakeAPeekObjectList()
+	{
+		//Do not lock this function
+
+		logger.debug("GetTakeAPeekObjectList() Invoked");
+
+		List<TakeAPeekObject> takeAPeekObjectList = null;
+
+		try
+		{
+			takeAPeekObjectList = getHelper().GetTakeAPeekObjectDao().queryForAll();
+		}
+		catch (SQLException e)
+		{
+			Helper.Error(logger, "SQLException", e);
+		}
+
+		return takeAPeekObjectList;
+	}
+
+	public HashMap<String, TakeAPeekObject> GetTakeAPeekObjectHash()
+	{
+		//Do not lock this function
+
+		logger.debug("GetTakeAPeekObjectHash()");
+
+		HashMap<String, TakeAPeekObject> hashMap = new HashMap<String, TakeAPeekObject>();
+
+		List<TakeAPeekObject> takeAPeekObjectList  = GetTakeAPeekObjectList();
+
+		if(takeAPeekObjectList != null)
+		{
+			for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
+			{
+				hashMap.put(takeAPeekObject.TakeAPeekID, takeAPeekObject);
+			}
+		}
+
+		return hashMap;
+	}
+
+	public TakeAPeekObject GetTakeAPeekObject(String takeAPeekID)
+	{
+		logger.debug("GetTakeAPeekObject(.) Invoked - before lock");
+
+		TakeAPeekObject takeAPeekObject = null;
+
+		lockTakeAPeekObject.lock();
+		try
+		{
+			logger.debug("GetTakeAPeekObject(.) - inside lock");
+
+			HashMap<String, TakeAPeekObject> takeAPeekObjectHashMap = GetTakeAPeekObjectHash();
+
+			TakeAPeekObject foundTakeAPeekObject = takeAPeekObjectHashMap.get(takeAPeekID);
+
+			if(foundTakeAPeekObject != null)
+			{
+				takeAPeekObject = foundTakeAPeekObject;
+			}
+		}
+		catch (Exception e)
+		{
+			Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekObject with takeAPeekID=%s", takeAPeekID), e);
+		}
+		finally
+		{
+			lockTakeAPeekObject.unlock();
+			logger.debug("GetTakeAPeekObject(.) - after unlock");
+		}
+
+		return takeAPeekObject;
+	}
+
+	public void ClearAllTakeAPeekObjects()
+	{
+		logger.debug("ClearAllTakeAPeekObjects() - before lock");
+
+		lockTakeAPeekObject.lock();
+
+		try
+		{
+			logger.debug("ClearAllTakeAPeekObjects() - inside lock");
+
+			List<TakeAPeekObject> takeAPeekObjectList = GetTakeAPeekObjectList();
+
+			if(takeAPeekObjectList != null)
+			{
+				for(TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
+				{
+					DeleteTakeAPeekObject(takeAPeekObject);
+				}
+			}
+		}
+		finally
+		{
+			lockTakeAPeekObject.unlock();
+			logger.debug("ClearAllTakeAPeekObjects() - after unlock");
 		}
 	}
 }

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.takeapeek"
-    android:installLocation="internalOnly" >
+<manifest package="com.takeapeek"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:installLocation="internalOnly">
 
     <logback>
         <configuration>
@@ -77,49 +76,47 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
+        android:name="com.takeapeek.common.TAPApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:name="com.takeapeek.common.TAPApplication" >
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name="com.takeapeek.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.takeapeek.authenticator.AuthenticatorActivity"
+            android:excludeFromRecents="true"
             android:label="@string/create_account_activity_title"
             android:launchMode="singleTop"
             android:noHistory="false"
-            android:excludeFromRecents="true"
-            android:stateNotNeeded="true"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.takeapeek.MainActivity" />
+                android:value="com.takeapeek.MainActivity"/>
         </activity>
-
         <activity
             android:name="com.takeapeek.capture.CaptureClipActivity"
-            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
             android:label="@string/title_activity_capture_clip"
             android:launchMode="singleTop"
             android:noHistory="false"
-            android:excludeFromRecents="true"
-            android:stateNotNeeded="true"
-            android:parentActivityName="com.takeapeek.MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape"
+            android:stateNotNeeded="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
@@ -128,24 +125,32 @@
         <!-- The authenticator service -->
         <service
             android:name="com.takeapeek.authenticator.AuthenticationService"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
+                <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                android:resource="@xml/authenticator"/>
         </service>
         <!-- End The authenticator service -->
 
         <service
             android:name="com.takeapeek.syncadapter.SyncService"
-            android:exported="true" >
+            android:exported="true"
+            android:process=":sync" >
             <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
+                <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/syncadapter" />
-            <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" />
+                <meta-data
+                    android:name="android.content.SyncAdapter"
+                    android:resource="@xml/syncadapter"/>
+            <!--
+                <meta-data
+                    android:name="android.provider.CONTACTS_STRUCTURE"
+                    android:resource="@xml/contacts"/>
+             -->
         </service>
 
         <!-- [START gcm_receiver] -->
@@ -184,6 +189,12 @@
             android:name="com.takeapeek.RegistrationIntentService"
             android:exported="false">
         </service>
+        <provider
+            android:name="com.takeapeek.syncadapter.SyncContentProvider"
+            android:authorities="com.takeapeek.provider"
+            android:exported="true"
+            android:syncable="true" >
+        </provider>
     </application>
 
 </manifest>
