@@ -44,9 +44,9 @@ public class Transport
 	public static long serverTimeDelta = 0;
 	private static ReentrantLock lock = new ReentrantLock();
 	
-	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
+	//@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
 	//@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-    //@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
+    /*/@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
 	public static boolean IsConnected(Context context)
@@ -357,7 +357,8 @@ public class Transport
 		
 		return responseObject;
     }
-	
+
+/*@@
 	public static ResponseObject SendSyncRequest(Context context, Tracker gaTracker, SharedPreferences sharedPreferences, String username, String password, RequestObject requestObject) throws Exception
 	{
 		logger.debug("SendSyncRequest(.....) Invoked - before lock");
@@ -401,7 +402,9 @@ public class Transport
 		
 		return responseObject;
 	}
+@@*/
 
+/*@@
     public static void UploadFile(Context context, String username, String password, String metaDataJson, File fileToUpload, String contentName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("UploadFile(....) Invoked - before lock");
@@ -452,10 +455,13 @@ public class Transport
             logger.debug("UploadPeek(....) - after unlock");
         }
     }
+@@*/
 
-	public static void UploadPeek(Context context, String username, String password, String metaDataJson, File fileToUpload, String contentName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
+	public static void UploadFile(Context context, String username, String password,
+		String metaDataJson, File fileToUpload, File thumbnailToUpload,
+		Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
-		logger.debug("UploadPeek(....) Invoked - before lock");
+		logger.debug("UploadFile(.........) Invoked - before lock");
 		
 		ResponseObject responseObject = null;
 		
@@ -463,19 +469,20 @@ public class Transport
 
 		try
 		{
-			logger.debug("UploadPeek(....) - inside lock");
+			logger.debug("UploadFile(.........) - inside lock");
 			
 			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
 	
-			nameValuePairs.add(new NameValuePair("action_type", "upload_peek"));
+			nameValuePairs.add(new NameValuePair("action_type", "upload_file"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
 			nameValuePairs.add(new NameValuePair("password", password));
 		
 			try
 			{
-				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, metaDataJson, fileToUpload, contentName, contentType, sharedPreferences);
+				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, metaDataJson, fileToUpload,
+						thumbnailToUpload, contentType, sharedPreferences);
 			}
 			catch(Exception e)
 			{
@@ -497,7 +504,7 @@ public class Transport
 		finally
 		{
 			Helper.lockProfilePicture.unlock();
-			logger.debug("UploadPeek(....) - after unlock");
+			logger.debug("UploadFile(.........) - after unlock");
 		}
 	}
 	
@@ -764,12 +771,9 @@ public class Transport
 		return responseObject;
 	}
 
-    private static ResponseObject DoHTTPPost(Context context, String requestStr, List<NameValuePair> nameValuePairs, byte[] bytes, String fileName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
-    {
-        return null;
-    }
-
-	private static ResponseObject DoHTTPPost(Context context, String requestStr, List<NameValuePair> nameValuePairs, String metaDataJson, File fileToUpload, String fileName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
+	private static ResponseObject DoHTTPPost(Context context, String requestStr, List<NameValuePair> nameValuePairs,
+		String metaDataJson, File fileToUpload, File thumbnailToUpload,
+		Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("DoHTTPPost(........) Invoked - before lock");
 
@@ -815,15 +819,16 @@ public class Transport
                 InputStream inputStream = null;
 
                 int bytesRead, bytesAvailable, bufferSize;
+				byte[] bufferThumbnail;
                 byte[] buffer;
                 int maxBufferSize = 1024*1024;
 
                 FileInputStream fileInputStream = null;
+				FileInputStream fileInputStreamThumbnail = null;
 
                 try
                 {
                     int responseCode = 0;
-                    fileInputStream = new FileInputStream(fileToUpload);
 
                     URL url = new URL(requestStr);
                     httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -874,19 +879,30 @@ public class Transport
                     if(metaDataJson != null && metaDataJson != "")
                     {
                         byte[] metaDataJsonBytes = metaDataJson.getBytes("UTF-8");
-/*@@
-                        int metaDataJsonBytesLength = metaDataJsonBytes.length;
-                        String metaDataJsonBytesLengthStr = String.format("%d", metaDataJsonBytesLength);
-                        byte[] metaDataJsonBytesLengthStrBytes = metaDataJsonBytesLengthStr.getBytes("UTF-8");
-
-                        dataOutputStream.write(metaDataJsonBytesLengthStrBytes);
-                        dataOutputStream.writeBytes("\\r\\n");
-@@*/
                         dataOutputStream.write(metaDataJsonBytes);
                         dataOutputStream.writeByte('\n');
                     }
 
+					if(thumbnailToUpload != null)
+					{
+						//Write the thumbnail file data
+						fileInputStreamThumbnail = new FileInputStream(thumbnailToUpload);
+						bytesAvailable = fileInputStreamThumbnail.available();
+						bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						bufferThumbnail = new byte[bufferSize];
+						bytesRead = fileInputStreamThumbnail.read(bufferThumbnail, 0, bufferSize);
+
+						while (bytesRead > 0)
+						{
+							dataOutputStream.write(bufferThumbnail, 0, bufferSize);
+							bytesAvailable = fileInputStreamThumbnail.available();
+							bufferSize = Math.min(bytesAvailable, maxBufferSize);
+							bytesRead = fileInputStreamThumbnail.read(bufferThumbnail, 0, bufferSize);
+						}
+					}
+
                     //Write the file data
+                    fileInputStream = new FileInputStream(fileToUpload);
                     bytesAvailable = fileInputStream.available();
                     bufferSize = Math.min(bytesAvailable, maxBufferSize);
                     buffer = new byte[bufferSize];
@@ -949,6 +965,7 @@ public class Transport
                 catch (Exception e)
                 {
                     Helper.Error(logger, "EXCEPTION: When trying to upload a file", e);
+					throw e;
                 }
                 finally
                 {

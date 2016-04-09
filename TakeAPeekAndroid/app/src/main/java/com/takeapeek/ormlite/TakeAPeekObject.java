@@ -32,4 +32,7 @@ public class TakeAPeekObject
 
     @DatabaseField(columnName = "FilePath")
     public String FilePath = "";
+
+    @DatabaseField(dataType= DataType.INTEGER, columnName = "ThumbnailByteLength")
+    public int ThumbnailByteLength = 0;
 }

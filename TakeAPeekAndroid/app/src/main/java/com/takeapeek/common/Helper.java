@@ -840,7 +840,7 @@ public class Helper
 		return jsonObject;
 	}
 	
-	public static String convertStreamToString(InputStream is) throws IOException 
+	public static String convertStreamToString(InputStream inputStream) throws IOException
 	{
 		logger.debug("convertStreamToString(.) Invoked");
 		
@@ -850,24 +850,17 @@ public class Helper
          * there's no more data to read. Each line will appended to a StringBuilder
          * and returned as String.
          */
-        if (is != null) 
+        if (inputStream != null)
         {
             StringBuilder sb = new StringBuilder();
             String line;
 
-            try 
-            {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                while ((line = reader.readLine()) != null) 
-                {
-                    sb.append(line);
-                }
-            } 
-            finally 
-            {
-                is.close();
-            }
-            
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+			while ((line = reader.readLine()) != null)
+			{
+				sb.append(line);
+			}
+
             return sb.toString();
         } 
         else 

@@ -1,5 +1,5 @@
 #
-# generated on 2016/04/06 10:02:35
+# generated on 2016/04/08 07:04:14
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -86,6 +86,11 @@ dataPersister=DOUBLE
 # --field-start--
 fieldName=FilePath
 columnName=FilePath
+# --field-end--
+# --field-start--
+fieldName=ThumbnailByteLength
+columnName=ThumbnailByteLength
+dataPersister=INTEGER
 # --field-end--
 # --table-fields-end--
 # --table-end--

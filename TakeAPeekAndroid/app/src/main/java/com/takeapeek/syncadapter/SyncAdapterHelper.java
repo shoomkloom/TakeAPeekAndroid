@@ -2,15 +2,15 @@ package com.takeapeek.syncadapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.os.Handler;
+import android.provider.MediaStore;
 
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.takeapeek.common.Constants;
-import com.takeapeek.common.ContactObject;
 import com.takeapeek.common.Helper;
-import com.takeapeek.common.RequestObject;
-import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekObject;
@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -117,11 +117,40 @@ public class SyncAdapterHelper implements Runnable
 
 				for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
 				{
+					//Create objects to upload
+
+					String thumbnailPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
+					File thumbnailToUpload = new File(thumbnailPath);
+
+					if(thumbnailToUpload.exists() == false)
+					{
+						//Create thumbnail
+						Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
+								takeAPeekObject.FilePath,
+								MediaStore.Video.Thumbnails.MINI_KIND);
+
+						//Save the thumbnail
+						FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
+						bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
+						fileOutputStreamThumbnail.close();
+					}
+
 					File fileToUpload = new File(takeAPeekObject.FilePath);
+
+					long thumbnailFileLength = thumbnailToUpload.length();
+					if ( thumbnailFileLength > (long)Integer.MAX_VALUE )
+					{
+						Helper.Error(logger, "ERROR: thumbnail file length is too long to handle");
+						throw new Exception("ERROR: thumbnail file length is too long to handle");
+					}
+					takeAPeekObject.ThumbnailByteLength = (int)thumbnailFileLength;
+
 					String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
 
-					Transport.UploadPeek(
-							mContext, username, password, completedTakeAPeekJson, fileToUpload, fileToUpload.getName(),
+					//Upload the Mutha!
+					Transport.UploadFile(
+							mContext, username, password, completedTakeAPeekJson,
+							fileToUpload, thumbnailToUpload,
 							Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
 							mSharedPreferences);
 				}
@@ -156,6 +185,7 @@ public class SyncAdapterHelper implements Runnable
 	 * @return ArrayList<TakeAPeekContact> list of contacts from the server
 	 * @throws Exception
 	 */
+/*@@
 	private ArrayList<ContactObject> PrepareAndSendSyncRequest(ArrayList<ContactObject> outgoingFriendRequestList, ArrayList<ContactObject> outgoingApprovedFriendList) throws Exception
 	{
 		logger.debug("PrepareAndSendSyncRequest(..) Invoked");
@@ -184,6 +214,7 @@ public class SyncAdapterHelper implements Runnable
 		
 		return null;
 	}
+@@*/
 
 	private void UploadChangedProfileImage() throws Exception
 	{
@@ -197,12 +228,14 @@ public class SyncAdapterHelper implements Runnable
 				
 				String takeAPeekAccountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
 				String takeAPeekAccountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
-				String contentName = String.format("%s_%s", Constants.PROFILE_IMAGE_NAME, takeAPeekAccountUsername);
 				File profileImage = new File(Helper.GetTakeAPeekProfileImagePath(mContext));
-				
+
 				try
 				{
-					Transport.UploadPeek(mContext, takeAPeekAccountUsername, takeAPeekAccountPassword, null, profileImage, contentName, Constants.ContentTypeEnum.png, mSharedPreferences);
+					Transport.UploadFile(
+							mContext, takeAPeekAccountUsername, takeAPeekAccountPassword,
+							null, profileImage, null, Constants.ContentTypeEnum.png,
+							mSharedPreferences);
 					
 					Helper.SetProfileImageHasChanged(mSharedPreferences.edit(), false);
 				}
