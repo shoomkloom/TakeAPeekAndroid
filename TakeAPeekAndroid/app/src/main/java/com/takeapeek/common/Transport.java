@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
@@ -17,15 +16,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -44,9 +40,9 @@ public class Transport
 	public static long serverTimeDelta = 0;
 	private static ReentrantLock lock = new ReentrantLock();
 	
-	//@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
+	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
 	//@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-    /*/@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
+    //@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
 	public static boolean IsConnected(Context context)
@@ -99,43 +95,6 @@ public class Transport
 		
 		return responseObject;
     }
-	
-/*@@	
-	public static ResponseObject StartSMSVerification(Context context, String userName, String passWord, SharedPreferences sharedPreferences) throws Exception
-	{
-		logger.debug("StartSMSVerification(...) Invoked - before lock");
-		
-		ResponseObject fmResponse = null;
-		
-		lock.lock();
-		
-		try
-		{
-			logger.debug("StartSMSVerification(...) - inside lock");
-			
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
-	
-			nameValuePairs.add(new NameValuePair("action_type", "start_sms_verification"));
-			nameValuePairs.add(new NameValuePair("user_name", userName));
-			nameValuePairs.add(new NameValuePair("password", passWord));
-			
-			//Returns the password
-			fmResponse = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
-		}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: inside StartSMSVerification(...)", e);
-			throw e;
-		}
-		finally
-		{
-			lock.unlock();
-			logger.debug("StartSMSVerification(...) - after unlock");
-		}
-		
-		return fmResponse;
-	}
-@@*/
 
     public static ResponseObject Test(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
     {
@@ -205,8 +164,82 @@ public class Transport
 		
 		return responseObject;
 	}
-	
-	public static ArrayList<ContactObject> GetFollowersList(Context context, Tracker gaTracker, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+
+    public static ResponseObject UpdateLocation(Context context, String userName, String password, double longitude, double latitude, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("UpdateLocation(......) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("UpdateLocation(......) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "update_location"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("longitude", String.format("%f", longitude)));
+            nameValuePairs.add(new NameValuePair("latitude", String.format("%f", latitude)));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside UpdateLocation(......)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("UpdateLocation(......) - after unlock");
+        }
+
+        return responseObject;
+    }
+
+    public static ResponseObject GetProfilesInBounds(Context context, String userName, String password, double north, double east, double south, double west, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetProfilesInBounds(........) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetProfilesInBounds(........) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_profiles_in_bounds"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("north", String.format("%f", north)));
+            nameValuePairs.add(new NameValuePair("east", String.format("%f", east)));
+            nameValuePairs.add(new NameValuePair("south", String.format("%f", south)));
+            nameValuePairs.add(new NameValuePair("west", String.format("%f", west)));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetPublicList(.....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetProfilesInBounds(........) - after unlock");
+        }
+
+        return responseObject;
+    }
+
+    public static ArrayList<ProfileObject> GetFollowersList(Context context, Tracker gaTracker, String userName, String password, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("GetFollowersList(.....) Invoked - before lock");
 		
@@ -243,7 +276,7 @@ public class Transport
 		
 		if(responseObject.followersList != null)
 		{
-			for(ContactObject contactObject : responseObject.followersList)
+			for(ProfileObject contactObject : responseObject.followersList)
 			{
 				//Update follower display names with local names
 				TakeAPeekContact selfMeContact = selfMeContactHash.get(contactObject.profileId);
@@ -609,6 +642,7 @@ public class Transport
 					URL url = new URL(requestStr);
 					//@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
 					httpsURLConnection = (HttpURLConnection) url.openConnection();
+                    httpsURLConnection.setRequestProperty("connection", "close");
 					httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
 					httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
 					httpsURLConnection.setRequestMethod("GET");
@@ -616,6 +650,9 @@ public class Transport
 
 					logger.info("DoHTTPGet: Calling httpsURLConnection.connect()...");
 					httpsURLConnection.connect();
+
+                    //Get the response
+                    logger.info("Sent the request, getting the response");
 					responseCode = httpsURLConnection.getResponseCode();
 					logger.info(String.format("responseCode = %d", responseCode));
 
@@ -832,6 +869,9 @@ public class Transport
 
                     URL url = new URL(requestStr);
                     httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestProperty("connection", "close");
+
                     httpURLConnection.setDoInput(true);
 
                     // Allow Outputs
@@ -844,7 +884,6 @@ public class Transport
 
                     // Use a post method.
                     httpURLConnection.setRequestMethod("POST");
-                    httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
 
                     switch (contentType)
                     {
@@ -919,9 +958,12 @@ public class Transport
 
                     dataOutputStream.flush();
 
-                    logger.info("Sent the request, getting the response");
+                    logger.info("DoHTTPPost: Calling httpsURLConnection.connect()...");
+                    httpURLConnection.connect();
 
                     //Get the response
+                    logger.info("Sent the request, getting the response");
+
                     responseCode = httpURLConnection.getResponseCode();
                     inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
 
@@ -1016,12 +1058,7 @@ public class Transport
         return responseObject;
 	}
 
-    /**
-     * This function upload the large file to server with other POST values.
-     * @param filename
-     * @param targetUrl
-     * @return
-     */
+/*@@
     public static String uploadFileToServer(String filename, String targetUrl)
     {
         HttpURLConnection conn = null;
@@ -1089,6 +1126,7 @@ public class Transport
 
         return null;
     }
+@@*/
 
     /**
      * This function download the large files from the server

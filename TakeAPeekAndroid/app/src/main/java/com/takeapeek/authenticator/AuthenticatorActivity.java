@@ -44,7 +44,7 @@ import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Constants.ContactTypeEnum;
 import com.takeapeek.common.Constants.ProfileStateEnum;
-import com.takeapeek.common.ContactObject;
+import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.Helper.FontTypeEnum;
 import com.takeapeek.common.PhoneNumberFormattingTextWatcher;
@@ -251,10 +251,10 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        {
 			        	setContentView(R.layout.activity_login);
 			        	
-			    		ContactObject takeAPeekContact = Helper.LoadTakeAPeekContact(this, Constants.DEFAULT_CONTACT_NAME);
+			    		ProfileObject takeAPeekContact = Helper.LoadTakeAPeekContact(this, Constants.DEFAULT_CONTACT_NAME);
 			        	if(takeAPeekContact == null)
 			        	{
-			        		takeAPeekContact = new ContactObject(ContactTypeEnum.profile);
+			        		takeAPeekContact = new ProfileObject(ContactTypeEnum.profile);
 			        	}
 			        	
 			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
@@ -1438,7 +1438,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
     		
 		try
 		{
-			ContactObject takeAPeekContact = Helper.LoadTakeAPeekContact(mAuthenticatorActivity, Constants.DEFAULT_CONTACT_NAME);
+			ProfileObject takeAPeekContact = Helper.LoadTakeAPeekContact(mAuthenticatorActivity, Constants.DEFAULT_CONTACT_NAME);
 			if(takeAPeekContact != null)
 			{
 	    		//Update the Mobile Number, National Significant Number and Country Prefix in the profile

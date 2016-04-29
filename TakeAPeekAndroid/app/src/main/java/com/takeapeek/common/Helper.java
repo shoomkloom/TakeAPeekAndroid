@@ -597,14 +597,14 @@ public class Helper
         return takeAPeekContactThumbnail;
 	}
 	
-	static public  void DownloadProfileImages(Context context, Tracker gaTracker, ArrayList<ContactObject> takeAPeekContactList, boolean force) throws Exception
+	static public  void DownloadProfileImages(Context context, Tracker gaTracker, ArrayList<ProfileObject> takeAPeekContactList, boolean force) throws Exception
 	{
 		logger.debug("DownloadProfileImages(...) Invoked");
 		
 		DownloadProfileImages(context, gaTracker, takeAPeekContactList, force, false);
 	}
 	
-	static public void DownloadProfileImages(Context context, Tracker gaTracker, ArrayList<ContactObject> takeAPeekContactList, boolean force, boolean checkIfPhotoFileUpdated) throws Exception
+	static public void DownloadProfileImages(Context context, Tracker gaTracker, ArrayList<ProfileObject> takeAPeekContactList, boolean force, boolean checkIfPhotoFileUpdated) throws Exception
 	{
 		logger.debug("DownloadProfileImages(..) Invoked");
 		
@@ -619,7 +619,7 @@ public class Helper
 			
 			for (int i=0; i<takeAPeekContactList.size(); i++)
 			{
-				ContactObject takeAPeekContact = takeAPeekContactList.get(i);
+				ProfileObject takeAPeekContact = takeAPeekContactList.get(i);
 				TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes = takeAPeekContactUpdateTimesMap.get(takeAPeekContact.userNumber);
 				
 				DownloadProfileImage(context, gaTracker, takeAPeekAccountUsername, takeAPeekAccountPassword, takeAPeekContact, force, checkIfPhotoFileUpdated, takeAPeekContactUpdateTimes);
@@ -628,23 +628,16 @@ public class Helper
 		}
 	}
 	
-	static public String GetProfileImageThumbnailFilePath(Context context, ContactObject takeAPeekContact) throws Exception
+	static public String GetProfileImageThumbnailFilePath(Context context, ProfileObject takeAPeekContact) throws Exception
 	{
 		logger.debug("GetProfileImageThumbnailFilePath(..) Invoked");
 		
 		String profileImageFilePath = GetProfileImageFilePath(context, takeAPeekContact);
 		
-		if(takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0)
-		{
-			logger.info("Using profileId so not adding photoServerTime");
-			
-			return profileImageFilePath.replace(".png", String.format("_%d.png", takeAPeekContact.likes));
-		}
-		
-		return  profileImageFilePath.replace(".png", String.format("_%d_%d.png", takeAPeekContact.photoServerTime, takeAPeekContact.likes));
+		return  profileImageFilePath.replace(".png", String.format("_%d.png", takeAPeekContact.photoServerTime));
 	}
 	
-	static public String GetProfileImageFilePath(Context context, ContactObject takeAPeekContact) throws Exception
+	static public String GetProfileImageFilePath(Context context, ProfileObject takeAPeekContact) throws Exception
 	{
 		logger.debug("GetProfileImageFilePath(..) Invoked");
 		
@@ -665,7 +658,7 @@ public class Helper
 		return responseTakeAPeekPhotoFilePath;
 	}
 	
-	static public void DownloadProfileImage(Context context, Tracker gaTracker, String accountUserName, String accountPassword, ContactObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
+	static public void DownloadProfileImage(Context context, Tracker gaTracker, String accountUserName, String accountPassword, ProfileObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
 	{
 		logger.debug("DownloadProfileImages(......) Invoked");
 		
@@ -1006,7 +999,7 @@ public class Helper
 			//Rounded corners
 			profileBitmap = Helper.GetRoundedCornerBitmap(profileBitmap, 20);
 			
-			ContactObject takeAPeekContact = Helper.LoadTakeAPeekContact(context, Constants.DEFAULT_CONTACT_NAME);
+			ProfileObject takeAPeekContact = Helper.LoadTakeAPeekContact(context, Constants.DEFAULT_CONTACT_NAME);
 			if(takeAPeekContact != null)
 			{
 				//Number of appearances
@@ -1369,7 +1362,7 @@ public class Helper
         return rotatedBitmap;
     }
     
-    private static void SaveContactToFile(String fileFullPath, ContactObject takeAPeekContact) throws Exception
+    private static void SaveContactToFile(String fileFullPath, ProfileObject takeAPeekContact) throws Exception
     {
     	logger.debug("SaveContactToFile(..) Invoked - before lock");
     	
@@ -1399,11 +1392,11 @@ public class Helper
     	}
     }
     
-    public static ContactObject LoadTakeAPeekContact(Context context, String contactName)
+    public static ProfileObject LoadTakeAPeekContact(Context context, String contactName)
     {
     	logger.debug("LoadTakeAPeekContact(..) Invoked");
     	
-    	ContactObject takeAPeekContact = null;
+    	ProfileObject takeAPeekContact = null;
     	
     	DatabaseManager.init(context);
 
@@ -1444,7 +1437,7 @@ public class Helper
     	return takeAPeekContact;
     }
     
-    public static void SaveTakeAPeekContact(Context context, String contactName, ContactObject takeAPeekContact)
+    public static void SaveTakeAPeekContact(Context context, String contactName, ProfileObject takeAPeekContact)
     {
     	logger.debug("SaveTakeAPeekContact(...) Invoked");
 
@@ -1477,11 +1470,11 @@ public class Helper
 @@*/
     }
     
-    private static ContactObject LoadContactFile(String fileFullPath) throws Exception
+    private static ProfileObject LoadContactFile(String fileFullPath) throws Exception
     {
     	logger.debug("LoadContactFile(.) Invoked - before lock");
     	
-    	ContactObject loadedContactData = null;
+    	ProfileObject loadedContactData = null;
     	
     	lockProfileData.lock();
     	
@@ -1498,7 +1491,7 @@ public class Helper
 				
 	    		fileInputStream = new FileInputStream(fileFullPath);
 	    		objectInputStream = new ObjectInputStream(fileInputStream);
-	    		loadedContactData = (ContactObject)objectInputStream.readObject();
+	    		loadedContactData = (ProfileObject)objectInputStream.readObject();
 	    		objectInputStream.close();
     		}
 		}

@@ -89,4 +89,5 @@
     <string name="create_account_only_in_app">A new TakeAPeek account can only be created in the TakeAPeek app.</string>
     <string name="create_account_verify_sms_error">Illegal verification code</string>
     <string name="title_activity_capture_clip">CaptureClipActivity</string>
+    <string name="title_activity_user_map">User Map</string>
 </resources>

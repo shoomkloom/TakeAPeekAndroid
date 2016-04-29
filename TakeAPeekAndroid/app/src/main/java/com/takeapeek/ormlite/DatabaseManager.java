@@ -2,7 +2,7 @@ package com.takeapeek.ormlite;
 
 import android.content.Context;
 
-import com.takeapeek.common.ContactObject;
+import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
@@ -189,7 +189,7 @@ public class DatabaseManager
 		return hashMap;
 	}
     
-    public void SetTakeAPeekContact(String takeAPeekID, ContactObject contactData, int likes)
+    public void SetTakeAPeekContact(String takeAPeekID, ProfileObject contactData, int likes)
     {
     	//Do not lock this function
     	

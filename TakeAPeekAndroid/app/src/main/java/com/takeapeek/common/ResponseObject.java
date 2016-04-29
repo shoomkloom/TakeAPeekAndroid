@@ -8,7 +8,7 @@ public class ResponseObject
 
     public String password;
 
-    public ArrayList<ContactObject> followersList;
+    public ArrayList<ProfileObject> followersList;
 
-    public ArrayList<ContactObject> contacts;
+    public ArrayList<ProfileObject> profiles;
 }

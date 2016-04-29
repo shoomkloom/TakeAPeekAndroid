@@ -83,6 +83,7 @@ public class RegistrationIntentService extends IntentService
             // on a third-party server, this ensures that we'll attempt the update at a later time.
             mSharedPreferences.edit().putBoolean(Constants.SENT_TOKEN_TO_SERVER, false).apply();
         }
+
         // Notify UI that registration has completed, so the progress indicator can be hidden.
         Intent registrationComplete = new Intent(Constants.REGISTRATION_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
@@ -98,17 +99,20 @@ public class RegistrationIntentService extends IntentService
      */
     private void sendRegistrationToServer(String token) throws Exception
     {
-        String username = Helper.GetTakeAPeekAccountUsername(this);
-        String password = Helper.GetTakeAPeekAccountPassword(this);
+        if(mSharedPreferences.getBoolean(Constants.SENT_TOKEN_TO_SERVER, false) == false)
+        {
+            String username = Helper.GetTakeAPeekAccountUsername(this);
+            String password = Helper.GetTakeAPeekAccountPassword(this);
 
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
-        nameValuePairs.add(new NameValuePair("action_type", "push_register"));
-        nameValuePairs.add(new NameValuePair("user_name", username));
-        nameValuePairs.add(new NameValuePair("password", password));
-        nameValuePairs.add(new NameValuePair("token", token));
+            nameValuePairs.add(new NameValuePair("action_type", "push_register"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("token", token));
 
-        ResponseObject responseObject = Transport.DoHTTPGetResponse(this, nameValuePairs, mSharedPreferences);
+            ResponseObject responseObject = Transport.DoHTTPGetResponse(this, nameValuePairs, mSharedPreferences);
+        }
     }
 
     /**

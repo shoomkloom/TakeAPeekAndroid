@@ -78,16 +78,17 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
-        android:name="com.takeapeek.common.TAPApplication"
+        android:name=".common.TAPApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name="com.takeapeek.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -96,7 +97,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.takeapeek.authenticator.AuthenticatorActivity"
+            android:name=".authenticator.AuthenticatorActivity"
             android:excludeFromRecents="true"
             android:label="@string/create_account_activity_title"
             android:launchMode="singleTop"
@@ -108,14 +109,12 @@
                 android:value="com.takeapeek.MainActivity"/>
         </activity>
         <activity
-            android:name="com.takeapeek.capture.CaptureClipActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:name=".capture.CaptureClipActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_capture_clip"
             android:launchMode="singleTop"
             android:noHistory="false"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="landscape"
             android:stateNotNeeded="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -124,7 +123,7 @@
 
         <!-- The authenticator service -->
         <service
-            android:name="com.takeapeek.authenticator.AuthenticationService"
+            android:name=".authenticator.AuthenticationService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
@@ -137,20 +136,20 @@
         <!-- End The authenticator service -->
 
         <service
-            android:name="com.takeapeek.syncadapter.SyncService"
-            android:exported="true"
-            android:process=":sync" >
+            android:name=".syncadapter.SyncService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
-                <meta-data
-                    android:name="android.content.SyncAdapter"
-                    android:resource="@xml/syncadapter"/>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter"/>
             <!--
                 <meta-data
                     android:name="android.provider.CONTACTS_STRUCTURE"
                     android:resource="@xml/contacts"/>
-             -->
+            -->
         </service>
 
         <!-- [START gcm_receiver] -->
@@ -169,7 +168,7 @@
 
         <!-- [START gcm_listener] -->
         <service
-            android:name="com.takeapeek.TAPGcmListenerService"
+            android:name=".TAPGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
@@ -178,7 +177,7 @@
         <!-- [END gcm_listener] -->
         <!-- [START instanceId_listener] -->
         <service
-            android:name="com.takeapeek.TAPInstanceIDListenerService"
+            android:name=".TAPInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID"/>
@@ -186,15 +185,36 @@
         </service>
         <!-- [END instanceId_listener] -->
         <service
-            android:name="com.takeapeek.RegistrationIntentService"
+            android:name=".RegistrationIntentService"
             android:exported="false">
         </service>
+
         <provider
-            android:name="com.takeapeek.syncadapter.SyncContentProvider"
+            android:name=".syncadapter.SyncContentProvider"
             android:authorities="com.takeapeek.provider"
             android:exported="true"
-            android:syncable="true" >
+            android:syncable="true">
         </provider>
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+
+        <activity
+            android:name=".UserMapActivity"
+            android:label="@string/title_activity_user_map">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.MainActivity"/>
+        </activity>
+
     </application>
 
 </manifest>

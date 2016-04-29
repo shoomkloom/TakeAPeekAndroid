@@ -157,7 +157,7 @@ public class CaptureClipFragment extends Fragment implements
 
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation = null;
-    private LocationRequest mLocationRequest;
+    private LocationRequest mLocationRequest = null;
 
     /**
      * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
@@ -387,6 +387,7 @@ public class CaptureClipFragment extends Fragment implements
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setSmallestDisplacement(10)   // 10 meter displacement
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
@@ -416,7 +417,10 @@ public class CaptureClipFragment extends Fragment implements
 
         super.onResume();
 
-        mGoogleApiClient.connect();
+        if(mGoogleApiClient != null)
+        {
+            mGoogleApiClient.connect();
+        }
 
         startBackgroundThread();
 
@@ -444,7 +448,7 @@ public class CaptureClipFragment extends Fragment implements
             lastFile.delete();
         }
 
-        if (mGoogleApiClient.isConnected())
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
@@ -1105,6 +1109,8 @@ public class CaptureClipFragment extends Fragment implements
     {
         logger.debug("HandleNewLocation() Invoked");
         logger.info(String.format("Last location is: '%s'", mLastLocation.toString()));
+
+        //@@ Update server...?
     }
 
     @Override

@@ -3,11 +3,18 @@ package com.takeapeek.syncadapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.media.ThumbnailUtils;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -23,7 +30,10 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class SyncAdapterHelper implements Runnable
+public class SyncAdapterHelper implements Runnable,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener
 {
 	static private final Logger logger = LoggerFactory.getLogger(SyncAdapterHelper.class);
 	static private ReentrantLock lock = new ReentrantLock();
@@ -36,6 +46,10 @@ public class SyncAdapterHelper implements Runnable
 	private Tracker mTracker = null;
 	
 	public Handler mHandler = new Handler();
+
+    private GoogleApiClient mGoogleApiClient = null;
+    private Location mLastLocation = null;
+    private LocationRequest mLocationRequest = null;
 	
 	public SyncAdapterHelper() 
 	{
@@ -52,6 +66,24 @@ public class SyncAdapterHelper implements Runnable
 		DatabaseManager.init(mContext);
 		
         mSharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_LOW_POWER)
+                .setSmallestDisplacement(30)   // 30 meter displacement
+                .setInterval(Constants.INTERVAL_HOUR)        // 1 hour
+                .setFastestInterval(Constants.INTERVAL_MINUTE); // 1 minute
+
+        if(mGoogleApiClient != null)
+        {
+            mGoogleApiClient.connect();
+        }
 
 		//Get app version
         String packageName = "NA";
@@ -79,8 +111,8 @@ public class SyncAdapterHelper implements Runnable
 		logger.debug("run() Invoked - before lock");
 		
 		lock.lock();
-		
-		try 
+
+		try
 		{
 			logger.debug("run() Invoked - inside lock");
 			logger.info("run: Starting scan");
@@ -106,64 +138,67 @@ public class SyncAdapterHelper implements Runnable
 		String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
 		List<TakeAPeekObject> takeAPeekObjectList = null;
-		do
-		{
-			logger.info("Getting list of pending takeAPeekObjects from takeAPeekObjectList");
-			takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectList();
 
-			if(takeAPeekObjectList != null)
-			{
-				logger.info(String.format("Found %d takeAPeekObjects pending upload", takeAPeekObjectList.size()));
+        logger.info("Getting list of pending takeAPeekObjects from takeAPeekObjectList");
+        takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectList();
 
-				for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
-				{
-					//Create objects to upload
+        if(takeAPeekObjectList != null)
+        {
+            logger.info(String.format("Found %d takeAPeekObjects pending upload", takeAPeekObjectList.size()));
 
-					String thumbnailPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
-					File thumbnailToUpload = new File(thumbnailPath);
+            for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
+            {
+                //Create objects to upload
+                File fileToUpload = new File(takeAPeekObject.FilePath);
+                if(fileToUpload.exists() == false)
+                {
+                    Helper.Error(logger, String.format("ERROR: file %s does not exist", takeAPeekObject.FilePath));
+                    DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
+                    continue;
+                }
 
-					if(thumbnailToUpload.exists() == false)
-					{
-						//Create thumbnail
-						Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
-								takeAPeekObject.FilePath,
-								MediaStore.Video.Thumbnails.MINI_KIND);
+                String thumbnailPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
+                File thumbnailToUpload = new File(thumbnailPath);
 
-						//Save the thumbnail
-						FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
-						bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
-						fileOutputStreamThumbnail.close();
-					}
+                if(thumbnailToUpload.exists() == false)
+                {
+                    //Create thumbnail
+                    Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
+                            takeAPeekObject.FilePath,
+                            MediaStore.Video.Thumbnails.MINI_KIND);
 
-					File fileToUpload = new File(takeAPeekObject.FilePath);
+                    //Save the thumbnail
+                    FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
+                    bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
+                    fileOutputStreamThumbnail.close();
+                }
 
-					long thumbnailFileLength = thumbnailToUpload.length();
-					if ( thumbnailFileLength > (long)Integer.MAX_VALUE )
-					{
-						Helper.Error(logger, "ERROR: thumbnail file length is too long to handle");
-						throw new Exception("ERROR: thumbnail file length is too long to handle");
-					}
-					takeAPeekObject.ThumbnailByteLength = (int)thumbnailFileLength;
+                long thumbnailFileLength = thumbnailToUpload.length();
+                if ( thumbnailFileLength > (long)Integer.MAX_VALUE )
+                {
+                    Helper.Error(logger, "ERROR: thumbnail file length is too long to handle");
+                    continue;
+                }
+                takeAPeekObject.ThumbnailByteLength = (int)thumbnailFileLength;
 
-					String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
+                String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
 
-					//Upload the Mutha!
-					Transport.UploadFile(
-							mContext, username, password, completedTakeAPeekJson,
-							fileToUpload, thumbnailToUpload,
-							Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
-							mSharedPreferences);
-				}
+                //Upload the Mutha!
+                Transport.UploadFile(
+                        mContext, username, password, completedTakeAPeekJson,
+                        fileToUpload, thumbnailToUpload,
+                        Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
+                        mSharedPreferences);
+            }
 
-				logger.info(String.format("Deleting %d takeAPeekObjects from takeAPeekObjectList", takeAPeekObjectList.size()));
-				for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
-				{
-					DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
-				}
-			}
-		}
-		while(takeAPeekObjectList != null && takeAPeekObjectList.size() > 0);
-		logger.info("Done uploading all pending takeAPeekObjects");
+            logger.info(String.format("Deleting %d takeAPeekObjects from takeAPeekObjectList", takeAPeekObjectList.size()));
+            for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
+            {
+                DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
+            }
+        }
+
+		logger.info("Done trying to upload all pending takeAPeekObjects");
 	}
 
 /*@@
@@ -250,6 +285,78 @@ public class SyncAdapterHelper implements Runnable
 			Helper.Error(logger, "EXCEPTION: Inside UploadChangedProfileImage", e);
 		}
 	}
+
+    @Override
+    public void onConnected(Bundle bundle)
+    {
+        logger.debug("onConnected(.) Invoked");
+        logger.info("Location services connected.");
+
+//@@        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        //Create a location request as long as this service is up
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    private void HandleNewLocation() throws Exception
+    {
+        logger.debug("HandleNewLocation() Invoked");
+
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    String username = Helper.GetTakeAPeekAccountUsername(mContext);
+                    String password = Helper.GetTakeAPeekAccountPassword(mContext);
+
+                    //Update server with my new location...
+                    Transport.UpdateLocation(mContext, username, password,
+                            mLastLocation.getLongitude(), mLastLocation.getLatitude(), mSharedPreferences);
+
+                    logger.info(String.format("Updated new location : '%s'.", mLastLocation.toString()));
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: when calling Transport.UpdateLocation", e);
+                }
+            }
+        };
+        t.start();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+        logger.debug("onConnectionSuspended(.) Invoked");
+        logger.info("Location services suspended. Please reconnect.");
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        logger.debug("onLocationChanged(.) Invoked");
+
+        mLastLocation = location;
+        try
+        {
+            HandleNewLocation();
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When calling HandleNewLocation()", e);
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult)
+    {
+        logger.debug("onConnectionFailed(.) Invoked");
+
+        Helper.Error(logger, String.format("Location services connection failed with code %d", connectionResult.getErrorCode()));
+    }
 	
 /*@@
 	private void ApplyUpdates(ArrayList<ContactObject> updatesList)

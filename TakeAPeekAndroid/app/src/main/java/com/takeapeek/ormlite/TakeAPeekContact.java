@@ -3,7 +3,7 @@ package com.takeapeek.ormlite;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.takeapeek.common.ContactObject;
+import com.takeapeek.common.ProfileObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +20,13 @@ public class TakeAPeekContact
 	public String TakeAPeekID = "-1";
 	
 	@DatabaseField(dataType=DataType.SERIALIZABLE)
-	public ContactObject ContactData;
-	
-	@DatabaseField(dataType=DataType.INTEGER, columnName = "Likes")
-	public int Likes = 0;
+	public ProfileObject ContactData;
 
-	@DatabaseField(dataType=DataType.BOOLEAN, columnName = "DidLike")
-	public boolean DidLike = false;
+    @DatabaseField(dataType= DataType.DOUBLE, columnName = "Longitude")
+    public double Longitude = 0;
+
+    @DatabaseField(dataType= DataType.DOUBLE, columnName = "Latitude")
+    public double Latitude = 0;
 	
 	//getters and setters
 	public void setId(int id) 
@@ -39,12 +39,11 @@ public class TakeAPeekContact
 	}
 	
 	public TakeAPeekContact(){}
-	public TakeAPeekContact(String takeAPeekID, ContactObject contactData, int likes)
+	public TakeAPeekContact(String takeAPeekID, ProfileObject contactData, int likes)
 	{
 		logger.debug(String.format("TakeAPeekContact: takeAPeekID=%s, likes=%d) Invoked", takeAPeekID, likes));
 		
 		TakeAPeekID = takeAPeekID;
 		ContactData = contactData;
-		Likes = likes;
 	}
 }

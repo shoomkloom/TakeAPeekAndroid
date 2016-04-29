@@ -24,15 +24,15 @@ import java.io.Serializable;
 /**
  * Represents a response SyncAdapter contact
  */
-public class ContactObject implements Serializable
+public class ProfileObject implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
 	public String contactType = ContactTypeEnum.none.name();
 
+    public String profileId = "";
     public String userNumber = "";
     public String displayName = "";
-    public String profileId = "";
 
     public long photoServerTime = 0;
     
@@ -43,32 +43,32 @@ public class ContactObject implements Serializable
     //Helper members
     public String countryCode;
     public String numberMobile;
-    public int unfollow = 0;
 
-    public int likes = 0;
-    
-    public ContactObject()
+    public double longitude = 0;
+    public double latitude = 0;
+
+    public ProfileObject()
     {
     }
     
-    public ContactObject(String userNumberValue) 
+    public ProfileObject(String userNumberValue)
     {
     	userNumber = userNumberValue;
     }
     
-    public ContactObject(ContactTypeEnum contactTypeValue, String userNumberValue) 
+    public ProfileObject(ContactTypeEnum contactTypeValue, String userNumberValue)
     {
     	contactType = contactTypeValue.name();
     	userNumber = userNumberValue;
     }
     
-    public ContactObject(ContactTypeEnum contactTypeValue) 
+    public ProfileObject(ContactTypeEnum contactTypeValue)
     {
 		contactType = contactTypeValue.name();
 	}
     
-    public boolean IsGreaterType(ContactObject contactData)
+    public boolean IsGreaterType(ProfileObject profileData)
 	{
-		return ContactTypeEnum.valueOf(contactType).ordinal() > ContactTypeEnum.valueOf(contactData.contactType).ordinal();
+		return ContactTypeEnum.valueOf(contactType).ordinal() > ContactTypeEnum.valueOf(profileData.contactType).ordinal();
 	}
 }
