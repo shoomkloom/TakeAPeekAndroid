@@ -130,10 +130,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(onClickListener);
 
+        FloatingActionButton fabmap = (FloatingActionButton) findViewById(R.id.fabmap);
+        fabmap.setOnClickListener(onClickListener);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -425,6 +428,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     {
                         Helper.Error(logger, "EXCEPTION: Exception when clicking the share button", e);
                     }
+                    break;
+
+                case R.id.fabmap:
+                    logger.info("onClick: fabmap");
+
+                    final Intent intent = new Intent(MainActivity.this, UserMapActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+
                     break;
 
                 default:
