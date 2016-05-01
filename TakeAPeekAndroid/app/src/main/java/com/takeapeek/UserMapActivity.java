@@ -54,7 +54,7 @@ public class UserMapActivity extends FragmentActivity implements
     private GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation = null;
-    Marker mMarkerMe = null;
+    Marker mMarkerCurrentShown = null;
 
     private LatLngBounds mLatLngBounds = null;
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
@@ -106,15 +106,7 @@ public class UserMapActivity extends FragmentActivity implements
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
 
-        if(mLastLocation != null && mMarkerMe == null)
-        {
-            LatLng lastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            mGoogleMap.setMyLocationEnabled(true);
-            mMarkerMe = mGoogleMap.addMarker(new MarkerOptions().position(lastLocationLatLng).title("This is me :)"));
-
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 10);
-            mGoogleMap.animateCamera(cameraUpdate);
-        }
+        InitMap();
     }
 
     @Override
@@ -157,15 +149,47 @@ public class UserMapActivity extends FragmentActivity implements
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(mLastLocation != null && mMarkerMe == null && mGoogleMap != null)
+        mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
+        mGoogleMap.setOnMarkerClickListener(MarkerClickListener);
+
+        InitMap();
+    }
+
+    private void InitMap()
+    {
+        logger.debug("InitMap() Invoked");
+
+        if(mLastLocation != null && mGoogleMap != null)
         {
             LatLng lastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            mMarkerMe = mGoogleMap.addMarker(new MarkerOptions().position(lastLocationLatLng).title("This is me :)"));
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(lastLocationLatLng));
+            mGoogleMap.setMyLocationEnabled(true);
 
-            mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 15);
+            mGoogleMap.animateCamera(cameraUpdate);
         }
     }
+
+    GoogleMap.OnMarkerClickListener MarkerClickListener = new GoogleMap.OnMarkerClickListener()
+    {
+        @Override
+        public boolean onMarkerClick(Marker marker)
+        {
+            logger.debug("OnMarkerClickListener.onMarkerClick(.) Invoked");
+
+            if (marker.equals(mMarkerCurrentShown))
+            {
+                marker.hideInfoWindow();
+                mMarkerCurrentShown = null;
+            }
+            else
+            {
+                marker.showInfoWindow();
+                mMarkerCurrentShown = marker;
+            }
+
+            return true;
+        }
+    };
 
     GoogleMap.OnCameraChangeListener CameraChangeListener = new GoogleMap.OnCameraChangeListener()
     {
