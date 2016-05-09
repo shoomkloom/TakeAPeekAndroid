@@ -2,12 +2,21 @@ package com.takeapeek;
 
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -19,6 +28,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -31,11 +41,17 @@ import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.ResponseObject;
+import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
+import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -46,6 +62,7 @@ public class UserMapActivity extends FragmentActivity implements
 {
     static private final Logger logger = LoggerFactory.getLogger(UserMapActivity.class);
     static private ReentrantLock boundsLock = new ReentrantLock();
+    static private ReentrantLock peeListLock = new ReentrantLock();
 
     SharedPreferences mSharedPreferences = null;
     public Tracker mTracker = null;
@@ -55,11 +72,21 @@ public class UserMapActivity extends FragmentActivity implements
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation = null;
     Marker mMarkerCurrentShown = null;
+    HashMap<String, ProfileObject> mHashMapMarkerToProfileObject = new HashMap<String, ProfileObject>();
 
     private LatLngBounds mLatLngBounds = null;
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
+    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskGetUserPeekList = null;
+
+    RelativeLayout mRelativeLayoutUserStack = null;
+    ImageView mImageViewUserStackThumbnail = null;
+    TextView mTextViewUserStackTime = null;
+    ImageView mImageViewUserStackPlay = null;
+    ImageView mImageViewUserStackClose = null;
+
+    private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,6 +110,16 @@ public class UserMapActivity extends FragmentActivity implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        mRelativeLayoutUserStack = (RelativeLayout)findViewById(R.id.user_peek_stack);
+        mImageViewUserStackThumbnail = (ImageView)findViewById(R.id.user_peek_stack_thumbnail);
+        mImageViewUserStackThumbnail.setOnClickListener(ClickListener);
+        mTextViewUserStackTime = (TextView)findViewById(R.id.user_peek_stack_thumbnail_time);
+        mTextViewUserStackTime.setOnClickListener(ClickListener);
+        mImageViewUserStackPlay = (ImageView)findViewById(R.id.user_peek_stack_thumbnail_play);
+        mImageViewUserStackPlay.setOnClickListener(ClickListener);
+        mImageViewUserStackClose = (ImageView)findViewById(R.id.user_peek_stack_close);
+        mImageViewUserStackClose.setOnClickListener(ClickListener);
     }
 
 
@@ -105,6 +142,7 @@ public class UserMapActivity extends FragmentActivity implements
         // remove map buttons
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setZoomControlsEnabled(true);
 
         InitMap();
     }
@@ -185,6 +223,10 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 marker.showInfoWindow();
                 mMarkerCurrentShown = marker;
+
+                ProfileObject profileObject = mHashMapMarkerToProfileObject.get(marker.getId());
+                ShowUserPeekStack(profileObject);
+
             }
 
             return true;
@@ -223,7 +265,7 @@ public class UserMapActivity extends FragmentActivity implements
                 {
                     boundsLock.lock();
 
-                    if(mAsyncTaskGetProfilesInBounds == null)
+                    if (mAsyncTaskGetProfilesInBounds == null)
                     {
                         //Start asynchronous request to server
                         mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
@@ -260,18 +302,20 @@ public class UserMapActivity extends FragmentActivity implements
                             {
                                 try
                                 {
-                                    mGoogleMap.clear();
-
                                     if (responseObject != null && responseObject.profiles != null)
                                     {
+                                        mGoogleMap.clear();
+
                                         logger.info(String.format("Got %d profiles in the bounds",
                                                 responseObject.profiles.size()));
 
                                         for (ProfileObject profileObject : responseObject.profiles)
                                         {
                                             LatLng markerLatlng = new LatLng(profileObject.latitude, profileObject.longitude);
-                                            mGoogleMap.addMarker(
+                                            Marker marker = mGoogleMap.addMarker(
                                                     new MarkerOptions().position(markerLatlng).title(profileObject.displayName));
+
+                                            mHashMapMarkerToProfileObject.put(marker.getId(), profileObject);
                                         }
                                     }
                                 }
@@ -333,5 +377,193 @@ public class UserMapActivity extends FragmentActivity implements
                 e.printStackTrace();
             }
         }
+    }
+
+    private void ShowUserPeekStack(ProfileObject profileObject)
+    {
+        logger.debug("ShowUserPeekStack(.) Invoked");
+
+        try
+        {
+            try
+            {
+                peeListLock.lock();
+
+                if(mAsyncTaskGetUserPeekList == null)
+                {
+                    //Start asynchronous request to server
+                    mAsyncTaskGetUserPeekList = new AsyncTask<ProfileObject, Void, ResponseObject>()
+                    {
+                        @Override
+                        protected ResponseObject doInBackground(ProfileObject... params)
+                        {
+                            ProfileObject profileObject = params[0];
+
+                            try
+                            {
+                                logger.info("Getting peek list for profile from server");
+
+                                //Get the list of peeks for selected profile id
+                                String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
+
+                                return Transport.GetPeeks(UserMapActivity.this,
+                                        userName, password, profileObject.profileId, mSharedPreferences);
+                            }
+                            catch (Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: When trying to get peek list for profile", e);
+                            }
+
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(ResponseObject responseObject)
+                        {
+                            try
+                            {
+                                if (responseObject != null && responseObject.peeks != null)
+                                {
+                                    logger.info(String.format("Got %d peeks", responseObject.peeks.size()));
+
+                                    //Get the first one and show it's thumbnail
+                                    if(responseObject.peeks != null && responseObject.peeks.size() > 0)
+                                    {
+                                        TakeAPeekObject takeAPeekObject = responseObject.peeks.get(0);
+
+                                        //Load the thumbnail asynchronously
+                                        mThumbnailLoader.SetThumbnail(UserMapActivity.this, takeAPeekObject, mImageViewUserStackThumbnail, mSharedPreferences);
+
+                                        long utcOffset = TimeZone.getDefault().getRawOffset();
+                                        Date date = new Date();
+                                        date.setTime(takeAPeekObject.CreationTime);
+                                        String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
+                                        mTextViewUserStackTime.setText(dateTimeStr);
+
+                                        //get the map container height
+                                        FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
+                                        int container_height = mapContainer.getHeight();
+
+                                        Projection projection = mGoogleMap.getProjection();
+
+                                        LatLng markerLatLng = new LatLng(
+                                                mMarkerCurrentShown.getPosition().latitude,
+                                                mMarkerCurrentShown.getPosition().longitude);
+
+                                        Point markerScreenPosition = projection.toScreenLocation(markerLatLng);
+
+                                        Point pointHalfScreenAbove = new Point(
+                                                markerScreenPosition.x,
+                                                markerScreenPosition.y + (container_height / 4));
+
+                                        LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
+
+                                        //Center map on marker
+                                        //@@LatLng clickedMarkerLocation = mMarkerCurrentShown.getPosition();
+                                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(aboveMarkerLatLng);
+                                        mGoogleMap.animateCamera(cameraUpdate);
+
+                                        if(mRelativeLayoutUserStack.getVisibility() == View.GONE)
+                                        {
+                                            mRelativeLayoutUserStack.setVisibility(View.VISIBLE);
+                                            Animation slideUpAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slideup);
+                                            mRelativeLayoutUserStack.setAnimation(slideUpAnimation);
+                                            slideUpAnimation.start();
+                                        }
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                mAsyncTaskGetUserPeekList = null;
+                            }
+                        }
+                    }.execute(profileObject);
+                }
+            }
+            catch (Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION: Exception when getting peek list", e);
+            }
+            finally
+            {
+                peeListLock.unlock();
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
+        }
+
+    }
+
+    private View.OnClickListener ClickListener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            logger.debug("OnClickListener:onClick(.) Invoked");
+
+            switch(v.getId())
+            {
+                case R.id.user_peek_stack_thumbnail:
+                    GotoUserPeekListActivity("user_peek_stack_thumbnail");
+                    break;
+
+                case R.id.user_peek_stack_thumbnail_time:
+                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
+                    break;
+
+                case R.id.user_peek_stack_thumbnail_play:
+                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
+                    break;
+
+                case R.id.user_peek_stack_close:
+                    logger.info("onClick: user_peek_stack_close");
+
+                    //Hide the user peek stack
+                    mRelativeLayoutUserStack.setVisibility(View.GONE);
+                    Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
+                    mRelativeLayoutUserStack.setAnimation(slideDownAnimation);
+                    slideDownAnimation.start();
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    };
+
+    private void GotoUserPeekListActivity(String viewName)
+    {
+        logger.info(String.format("onClick: %s", viewName));
+
+        try
+        {
+            if(mTracker != null)
+            {
+                mTracker.send(new HitBuilders.EventBuilder()
+                        .setCategory(Constants.GA_UI_ACTION)
+                        .setAction(Constants.GA_BUTTON_PRESS)
+                        .setLabel(viewName)
+                        .build());
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
+        }
+
+        try
+        {
+            Toast.makeText(UserMapActivity.this, "Peek clicked", Toast.LENGTH_LONG).show();
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: Exception when clicking the share button", e);
+        }
+
     }
 }
