@@ -16,7 +16,7 @@ public class TakeAPeekObject
     private int id;
 
     @DatabaseField(columnName = "TakeAPeekID")
-    public String TakeAPeekID = "-1";
+    public String TakeAPeekID = null;
 
     @DatabaseField(dataType= DataType.LONG, columnName = "CreationTime")
     public long CreationTime = 0;

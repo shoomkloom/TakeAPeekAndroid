@@ -1,5 +1,7 @@
 package com.takeapeek.common;
 
+import com.takeapeek.ormlite.TakeAPeekObject;
+
 import java.util.ArrayList;
 
 public class ResponseObject
@@ -11,4 +13,6 @@ public class ResponseObject
     public ArrayList<ProfileObject> followersList;
 
     public ArrayList<ProfileObject> profiles;
+
+    public ArrayList<TakeAPeekObject> peeks;
 }

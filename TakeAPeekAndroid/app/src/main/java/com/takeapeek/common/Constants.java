@@ -102,7 +102,7 @@ public class Constants
     public static final String PARAM_USERNAME = "username";
     
     //Sync period in seconds
-    public static final long SYNC_PERIOD = 600; // seconds per 10 minutes
+    public static final long SYNC_PERIOD = 1200; // seconds per 20 minutes
     
     //The file name to use for shared preferences between all part of the TakeAPeek project
     public static final String SHARED_PREFERENCES_FILE_NAME = "TakeAPeekSharedPreferences";

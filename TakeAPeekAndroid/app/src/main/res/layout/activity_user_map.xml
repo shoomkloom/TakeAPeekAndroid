@@ -1,20 +1,69 @@
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.takeapeek.UserMapActivity"
+    android:id="@+id/map_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="This is a test" />
-
     <fragment android:id="@+id/map"
               android:name="com.google.android.gms.maps.SupportMapFragment"
               android:layout_width="match_parent"
-              android:layout_height="match_parent" />
+              android:layout_height="match_parent"
+              android:layout_alignParentTop="true" />
 
-</LinearLayout>
+    <RelativeLayout
+        android:id = "@+id/user_peek_stack"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        android:background="@color/tap_darkgray"
+        android:visibility="gone" >
+
+        <RelativeLayout
+            android:id = "@+id/user_peek_stack_thumbnail_layout"
+            android:layout_width="250dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true" >
+
+            <ImageView
+                android:id = "@+id/user_peek_stack_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:scaleType="fitCenter" />
+
+            <ImageView
+                android:id = "@+id/user_peek_stack_thumbnail_play"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_video_play" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id = "@+id/user_peek_stack_close"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/close" />
+
+        <TextView
+            android:id = "@+id/user_peek_stack_thumbnail_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/user_peek_stack_thumbnail_layout"
+            android:layout_below="@+id/user_peek_stack_thumbnail_layout"
+            android:textSize="20sp"
+            android:textColor="@color/tap_white"
+            android:text="Some Text"
+            android:layout_marginTop="30dp" />
+
+    </RelativeLayout>
+
+</FrameLayout>

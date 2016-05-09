@@ -227,7 +227,7 @@ public class Transport
         }
         catch(Exception e)
         {
-            Helper.Error(logger, "EXCEPTION: inside GetPublicList(.....)", e);
+            Helper.Error(logger, "EXCEPTION: inside GetProfilesInBounds(........)", e);
             throw e;
         }
         finally
@@ -237,6 +237,69 @@ public class Transport
         }
 
         return responseObject;
+    }
+
+    public static ResponseObject GetPeeks(Context context, String userName, String password, String peeksProfileId, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetPeeks(....) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetPeeks(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_peeks"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peeks_profile_id", peeksProfileId));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetPeeks(....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetPeeks(....) - after unlock");
+        }
+
+        return responseObject;
+    }
+
+    public static void GetPeekThumbnail(Context context, String username, String password, String peekId) throws Exception
+    {
+        logger.debug("GetPeekThumbnail(......) Invoked - before lock");
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetPeekThumbnail(.....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_peek_thumbnail"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peek_id", peekId));
+
+            String filePath = Helper.GetPeekThumbnailFullPath(context, peekId);
+
+            DoHTTPGetFile(context, nameValuePairs, filePath);
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetPeekThumbnail(......) - after unlock");
+        }
     }
 
     public static ArrayList<ProfileObject> GetFollowersList(Context context, Tracker gaTracker, String userName, String password, SharedPreferences sharedPreferences) throws Exception
@@ -593,15 +656,15 @@ public class Transport
 		}
 	}
 	
-	private static InputStream DoHTTPGet(Context context, String requestStr, List<NameValuePair> nameValuePairs) throws Exception
+	private static ResponseObject DoHTTPGet(Context context, String requestStr, List<NameValuePair> nameValuePairs, String filePath) throws Exception
 	{
 		logger.debug("DoHTTPGet(..) Invoked - before lock");
 
-        InputStream inputStream = null;
-
 		Helper.lockHTTPRequest.lock();
 
-		try
+        ResponseObject responseObject = null;
+
+        try
 		{
 			logger.debug("DoHTTPGet(..) - inside lock");
 
@@ -633,11 +696,12 @@ public class Transport
 
 			if (IsConnected(context))
 			{
-				int responseCode = 0;
+                int responseCode = 0;
 				//@@HttpsURLConnection httpsURLConnection = null;
 				HttpURLConnection httpsURLConnection = null;
+                InputStream inputStream = null;
 
-				try
+                try
 				{
 					URL url = new URL(requestStr);
 					//@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
@@ -656,16 +720,45 @@ public class Transport
 					responseCode = httpsURLConnection.getResponseCode();
 					logger.info(String.format("responseCode = %d", responseCode));
 
-					inputStream = new BufferedInputStream(httpsURLConnection.getInputStream());
+                    inputStream = httpsURLConnection.getInputStream();
 
-					if (responseCode != 200)
-					{
-                        ResponseObject responseObject = null;
-                        String responseStr = null;
+                    if(filePath != null)
+                    {
+                        OutputStream outputStream = null;
                         try
                         {
-                            responseStr = Helper.convertStreamToString(inputStream);
-                            responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
+                            outputStream = new BufferedOutputStream(new FileOutputStream(filePath));
+                            int bufferSize = 1024;
+                            byte[] buffer = new byte[bufferSize];
+                            int len = 0;
+                            while ((len = inputStream.read(buffer)) != -1)
+                            {
+                                outputStream.write(buffer, 0, len);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: When trying to get file", e);
+                            throw e;
+                        }
+                        finally
+                        {
+                            if(outputStream != null)
+                            {
+                                outputStream.close();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        String responseStr = Helper.convertStreamToString(inputStream);
+
+                        try
+                        {
+                            if (responseStr != null && responseStr.isEmpty() == false)
+                            {
+                                responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -673,7 +766,10 @@ public class Transport
                             Helper.Error(logger, String.format("EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
                             throw e;
                         }
+                    }
 
+					if (responseCode != 200)
+					{
 						String error = responseObject == null ?
 								String.format("HTTP status code: %d", responseCode) :
 								String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
@@ -694,6 +790,11 @@ public class Transport
 				}
 				finally
 				{
+                    if(inputStream != null)
+                    {
+                        inputStream.close();
+                    }
+
 					if(httpsURLConnection != null)
 					{
 						httpsURLConnection.disconnect();
@@ -717,7 +818,7 @@ public class Transport
 			logger.debug("DoHTTPGet(..) - after unlock");
 		}
 
-		return inputStream;
+		return responseObject;
 	}
 
     private static void DoHTTPGetFile(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
@@ -726,32 +827,7 @@ public class Transport
 
         String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
 
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        try
-        {
-            inputStream = DoHTTPGet(context, requestStr, nameValuePairs);
-
-            outputStream = new BufferedOutputStream(new FileOutputStream(filePath));
-            int bufferSize = 1024;
-            byte[] buffer = new byte[bufferSize];
-            int len = 0;
-            while ((len = inputStream.read(buffer)) != -1)
-            {
-                outputStream.write(buffer, 0, len);
-            }
-        }
-        finally
-        {
-            if(inputStream != null)
-            {
-                inputStream.close();
-            }
-            if (outputStream != null)
-            {
-                outputStream.close();
-            }
-        }
+        DoHTTPGet(context, requestStr, nameValuePairs, filePath);
     }
 
 	public static ResponseObject DoHTTPGetResponse(Context context, List<NameValuePair> nameValuePairs, SharedPreferences sharedPreferences) throws Exception
@@ -759,32 +835,19 @@ public class Transport
 		logger.debug("DoHTTPGetResponse(..) Invoked");
 
 		ResponseObject responseObject = null;
-        InputStream inputStream = null;
+        String responseStr = null;
 
         try
 		{
 			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
 
-			inputStream = DoHTTPGet(context, requestStr, nameValuePairs);
-
-            String responseStr = null;
-            try
-            {
-                responseStr = Helper.convertStreamToString(inputStream);
-                responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
-            }
-            catch (Exception e)
-            {
-                String errorDetails = String.format("JSON exception for response string = '%s'", responseStr);
-                Helper.Error(logger, String.format("EXCEPTION:%s", errorDetails), e);
-                throw e;
-            }
+            responseObject = DoHTTPGet(context, requestStr, nameValuePairs, null);
 
 			if(sharedPreferences != null && responseObject != null && responseObject.error != null)
 			{
 				ProfileStateEnum profileStateEnum = ProfileStateEnum.Active; 
 				
-				if(responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
+				if(responseObject != null && responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
 				{
 					profileStateEnum = ProfileStateEnum.Blocked;
 				}
@@ -797,13 +860,6 @@ public class Transport
 			Helper.Error(logger, "EXCEPTION: Inside DoHTTPGetResponse", e);
 			throw e;
 		}
-        finally
-        {
-            if(inputStream != null)
-            {
-                inputStream.close();
-            }
-        }
 
 		return responseObject;
 	}
@@ -853,7 +909,7 @@ public class Transport
                 //@@Need to change this to HttpsURLConnection
                 HttpURLConnection httpURLConnection = null;
                 DataOutputStream dataOutputStream = null;
-                InputStream inputStream = null;
+                BufferedInputStream inputStream = null;
 
                 int bytesRead, bytesAvailable, bufferSize;
 				byte[] bufferThumbnail;
@@ -866,22 +922,15 @@ public class Transport
                 try
                 {
                     int responseCode = 0;
-
                     URL url = new URL(requestStr);
                     httpURLConnection = (HttpURLConnection) url.openConnection();
-
                     httpURLConnection.setRequestProperty("connection", "close");
-
                     httpURLConnection.setDoInput(true);
-
                     // Allow Outputs
                     httpURLConnection.setDoOutput(true);
-
                     // Don't use a cached copy.
                     httpURLConnection.setUseCaches(false);
-
-                    httpURLConnection.setChunkedStreamingMode(maxBufferSize);
-
+                    httpURLConnection.setChunkedStreamingMode(0/*@@maxBufferSize*/);
                     // Use a post method.
                     httpURLConnection.setRequestMethod("POST");
 
@@ -973,7 +1022,7 @@ public class Transport
                     {
                         responseStr = Helper.convertStreamToString(inputStream);
 
-                        if(responseStr != null && responseStr != "")
+                        if(responseStr != null && responseStr.isEmpty() == false)
                         {
                             responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
                         }
@@ -985,7 +1034,8 @@ public class Transport
                         throw e;
                     }
 
-                    if(responseObject.error != null && responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
+                    if(responseObject != null && responseObject.error != null &&
+                            responseObject.error.equalsIgnoreCase(ProfileStateEnum.Blocked.name()))
                     {
                         isBlocked = true;
                         Helper.SetProfileState(sharedPreferences.edit(), ProfileStateEnum.Blocked);
@@ -993,15 +1043,12 @@ public class Transport
 
                     if (responseCode != 200)
                     {
-                        if(isBlocked)
-                        {
-                            String error = responseObject == null ?
-                                    String.format("HTTP status code: %d", responseCode) :
-                                    String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
+                        String error = responseObject == null ?
+                                String.format("HTTP status code: %d", responseCode) :
+                                String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
 
-                            Helper.Error(logger, error);
-                            throw new Exception(error);
-                        }
+                        Helper.Error(logger, error);
+                        throw new Exception(error);
                     }
                 }
                 catch (Exception e)

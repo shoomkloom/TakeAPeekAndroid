@@ -216,6 +216,17 @@ public class Helper
 		return takeapeekDirectoryPath;
 	}
 
+    static public String GetPeekThumbnailFullPath(Context context, String peekId) throws IOException
+    {
+        logger.debug("GetPeekThumbnailFullPath(..) Invoked");
+
+        String takeAPeekPath = GetTakeAPeekPath(context);
+
+        String peekThumbnailFullPath = String.format("%s%s%s.png", takeAPeekPath, File.pathSeparator, peekId);
+
+        return peekThumbnailFullPath;
+    }
+
 /*@@
 	static public String GetTakeAPeekImagePath(Context context) throws IOException
 	{
@@ -845,16 +856,30 @@ public class Helper
          */
         if (inputStream != null)
         {
-            StringBuilder sb = new StringBuilder();
-            String line;
+            String result = null;
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-			while ((line = reader.readLine()) != null)
-			{
-				sb.append(line);
-			}
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                String line;
 
-            return sb.toString();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader reader = new BufferedReader(inputStreamReader);
+
+                while ((line = reader.readLine()) != null)
+                {
+                    sb.append(line);
+                }
+
+                result = sb.toString();
+            }
+            catch(Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION: When trying to read stream", e);
+                throw e;
+            }
+
+            return result;
         } 
         else 
         {        
