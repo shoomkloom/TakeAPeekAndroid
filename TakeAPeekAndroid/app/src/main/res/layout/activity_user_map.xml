@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.takeapeek.UserMapActivity"
+    tools:context=".UserMap.UserMapActivity"
     android:id="@+id/map_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,6 +14,20 @@
               android:layout_height="match_parent"
               android:layout_alignParentTop="true" />
 
+    <LinearLayout
+        android:id = "@+id/user_peek_stack"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:visibility="gone" >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/user_peek_stack_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+<!--
     <RelativeLayout
         android:id = "@+id/user_peek_stack"
         android:layout_width="match_parent"
@@ -65,5 +79,6 @@
             android:layout_marginTop="30dp" />
 
     </RelativeLayout>
+-->
 
 </FrameLayout>

@@ -1,6 +1,6 @@
 package com.takeapeek.common;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,16 +24,16 @@ public class ThumbnailLoader
 {
 	static private final Logger logger = LoggerFactory.getLogger(ThumbnailLoader.class);
 	
-	Activity mActivity = null;
+	Context mContext = null;
 
 	SharedPreferences mSharedPreferences = null;
 	BitmapFactory.Options mBitmapFactoryOptions = null;
 	
-	public void SetThumbnail(Activity activity, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
+	public void SetThumbnail(Context activity, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
 	{
 		logger.debug("SetThumbnail(..) Invoked");
 		
-		mActivity = activity;
+		mContext = activity;
 		mSharedPreferences = sharedPreferences;
 		
 		mBitmapFactoryOptions = new BitmapFactory.Options();
@@ -46,7 +46,7 @@ public class ThumbnailLoader
 	{
 		logger.debug("CreateThumbnail(..) Invoked");
 		
-		ThumbnailCreatorTask thumbnailCreatorTask = new ThumbnailCreatorTask(mActivity, imageView);
+		ThumbnailCreatorTask thumbnailCreatorTask = new ThumbnailCreatorTask(mContext, imageView);
 		CreateThumbnailDrawable createThumbnailDrawable = new CreateThumbnailDrawable(thumbnailCreatorTask);
 
 		if(imageView != null)
@@ -78,15 +78,15 @@ public class ThumbnailLoader
 	{
         private TakeAPeekObject mTakeAPeekObject = null;
         private final WeakReference<ImageView> mImageViewReference;
-        private Activity mActivity = null;
+        private Context mContext = null;
 
-        public ThumbnailCreatorTask(Activity activity, ImageView imageView) 
+        public ThumbnailCreatorTask(Context activity, ImageView imageView)
         {
         	logger.debug("ThumbnailCreatorTask::ThumbnailCreatorTask(..) Invoked");
         	
         	mImageViewReference = new WeakReference<ImageView>(imageView);
-        	mActivity = activity;
-        	DatabaseManager.init(mActivity);
+        	mContext = activity;
+        	DatabaseManager.init(mContext);
         }
         
         /**
@@ -101,16 +101,16 @@ public class ThumbnailLoader
 
         	try
         	{
-	    		String thumbnailFullPath = Helper.GetPeekThumbnailFullPath(mActivity, mTakeAPeekObject.TakeAPeekID);
+	    		String thumbnailFullPath = Helper.GetPeekThumbnailFullPath(mContext, mTakeAPeekObject.TakeAPeekID);
 	
 	    		Bitmap thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
 	    		if(thumbnailBitmap == null)
 	    		{
 	    			//Download the thumbnail
-	    			String accountUsername = Helper.GetTakeAPeekAccountUsername(mActivity);
-	    			String accountPassword = Helper.GetTakeAPeekAccountPassword(mActivity);
+	    			String accountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
+	    			String accountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
 	    			
-	    			Transport.GetPeekThumbnail(mActivity, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
+	    			Transport.GetPeekThumbnail(mContext, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
 
                     thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
 	    		}
@@ -150,7 +150,7 @@ public class ThumbnailLoader
                 	imageView.setBackgroundResource(0);
                     imageView.setImageBitmap(bitmap);
                     
-                	Animation zoomInAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.fadein);
+                	Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
                     imageView.setAnimation(zoomInAnimation);
                 	zoomInAnimation.start();
                 }

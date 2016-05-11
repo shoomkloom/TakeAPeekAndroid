@@ -17,8 +17,10 @@
 package com.takeapeek.common;
 
 import com.takeapeek.common.Constants.ContactTypeEnum;
+import com.takeapeek.ormlite.TakeAPeekObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 /**
@@ -46,6 +48,8 @@ public class ProfileObject implements Serializable
 
     public double longitude = 0;
     public double latitude = 0;
+
+    public ArrayList<TakeAPeekObject> peeks;
 
     public ProfileObject()
     {

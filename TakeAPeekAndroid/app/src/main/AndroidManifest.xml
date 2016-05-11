@@ -206,7 +206,7 @@
             android:value="@string/google_maps_key"/>
 
         <activity
-            android:name=".UserMapActivity"
+            android:name=".UserMap.UserMapActivity"
             android:label="@string/title_activity_user_map">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

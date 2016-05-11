@@ -1,4 +1,4 @@
-package com.takeapeek;
+package com.takeapeek.UserMap;
 
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -9,14 +9,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -36,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -43,15 +42,11 @@ import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
-import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -62,7 +57,7 @@ public class UserMapActivity extends FragmentActivity implements
 {
     static private final Logger logger = LoggerFactory.getLogger(UserMapActivity.class);
     static private ReentrantLock boundsLock = new ReentrantLock();
-    static private ReentrantLock peeListLock = new ReentrantLock();
+    static private ReentrantLock peekListLock = new ReentrantLock();
 
     SharedPreferences mSharedPreferences = null;
     public Tracker mTracker = null;
@@ -72,19 +67,24 @@ public class UserMapActivity extends FragmentActivity implements
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation = null;
     Marker mMarkerCurrentShown = null;
-    HashMap<String, ProfileObject> mHashMapMarkerToProfileObject = new HashMap<String, ProfileObject>();
+    HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
+    HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
 
     private LatLngBounds mLatLngBounds = null;
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
-    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskGetUserPeekList = null;
+    //@@private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskGetUserPeekList = null;
 
+    LinearLayout mLinearLayout = null;
+    ViewPager mViewPager = null;
+/*@@
     RelativeLayout mRelativeLayoutUserStack = null;
     ImageView mImageViewUserStackThumbnail = null;
     TextView mTextViewUserStackTime = null;
     ImageView mImageViewUserStackPlay = null;
     ImageView mImageViewUserStackClose = null;
+@@*/
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
@@ -111,6 +111,11 @@ public class UserMapActivity extends FragmentActivity implements
                 .addApi(LocationServices.API)
                 .build();
 
+        mLinearLayout = (LinearLayout)findViewById(R.id.user_peek_stack);
+
+        mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
+
+/*@@
         mRelativeLayoutUserStack = (RelativeLayout)findViewById(R.id.user_peek_stack);
         mImageViewUserStackThumbnail = (ImageView)findViewById(R.id.user_peek_stack_thumbnail);
         mImageViewUserStackThumbnail.setOnClickListener(ClickListener);
@@ -120,6 +125,7 @@ public class UserMapActivity extends FragmentActivity implements
         mImageViewUserStackPlay.setOnClickListener(ClickListener);
         mImageViewUserStackClose = (ImageView)findViewById(R.id.user_peek_stack_close);
         mImageViewUserStackClose.setOnClickListener(ClickListener);
+@@*/
     }
 
 
@@ -224,9 +230,7 @@ public class UserMapActivity extends FragmentActivity implements
                 marker.showInfoWindow();
                 mMarkerCurrentShown = marker;
 
-                ProfileObject profileObject = mHashMapMarkerToProfileObject.get(marker.getId());
-                ShowUserPeekStack(profileObject);
-
+                ShowUserPeekStack();
             }
 
             return true;
@@ -240,111 +244,136 @@ public class UserMapActivity extends FragmentActivity implements
         {
             logger.debug("OnCameraChangeListener.onCameraChange(.) Invoked");
 
-            LatLngBounds latLngBounds = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
+            ShowProfilesInBounds();
+        }
+    };
 
+    private void ShowProfilesInBounds()
+    {
+        logger.debug("ShowProfilesInBounds() Invoked");
+
+        ShowProfilesInBounds(false);
+    }
+
+    private void ShowProfilesInBounds(boolean force)
+    {
+        logger.debug("ShowProfilesInBounds(.) Invoked");
+
+        final long snap = System.currentTimeMillis();
+        LatLngBounds latLngBounds = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
+
+        if(force == false)
+        {
             // Check whether the camera changes report the same boundaries (?!), yes, it happens
             if (mLatLngBounds != null &&
-                mLatLngBounds.northeast.latitude == latLngBounds.northeast.latitude &&
-                mLatLngBounds.northeast.longitude == latLngBounds.northeast.longitude &&
-                mLatLngBounds.southwest.latitude == latLngBounds.southwest.latitude &&
-                mLatLngBounds.southwest.longitude == latLngBounds.southwest.longitude)
+                    mLatLngBounds.northeast.latitude == latLngBounds.northeast.latitude &&
+                    mLatLngBounds.northeast.longitude == latLngBounds.northeast.longitude &&
+                    mLatLngBounds.southwest.latitude == latLngBounds.southwest.latitude &&
+                    mLatLngBounds.southwest.longitude == latLngBounds.southwest.longitude)
             {
                 return;
             }
 
-            final long snap = System.currentTimeMillis();
             if (mLastCallMs + CAMERA_MOVE_REACT_THRESHOLD_MS > snap)
             {
                 mLastCallMs = snap;
                 return;
             }
+        }
 
+        try
+        {
             try
             {
-                try
-                {
-                    boundsLock.lock();
+                boundsLock.lock();
 
-                    if (mAsyncTaskGetProfilesInBounds == null)
+                if ((force == true || mLinearLayout.getVisibility() == View.GONE) &&
+                        mAsyncTaskGetProfilesInBounds == null)
+                {
+                    //Start asynchronous request to server
+                    mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
                     {
-                        //Start asynchronous request to server
-                        mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
+                        @Override
+                        protected ResponseObject doInBackground(LatLngBounds... params)
                         {
-                            @Override
-                            protected ResponseObject doInBackground(LatLngBounds... params)
+                            LatLngBounds latLngBounds = params[0];
+
+                            try
                             {
-                                LatLngBounds latLngBounds = params[0];
+                                logger.info("Getting profile list from server");
 
-                                try
-                                {
-                                    logger.info("Getting profile list from server");
+                                //Get the list of users inside the bounds
+                                String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
 
-                                    //Get the list of users inside the bounds
-                                    String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
-                                    String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
-
-                                    return Transport.GetProfilesInBounds(
-                                            UserMapActivity.this, userName, password,
-                                            latLngBounds.northeast.latitude, latLngBounds.northeast.longitude,
-                                            latLngBounds.southwest.latitude, latLngBounds.southwest.longitude,
-                                            mSharedPreferences);
-                                }
-                                catch (Exception e)
-                                {
-                                    Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
-                                }
-
-                                return null;
+                                return Transport.GetProfilesInBounds(
+                                        UserMapActivity.this, userName, password,
+                                        latLngBounds.northeast.latitude, latLngBounds.northeast.longitude,
+                                        latLngBounds.southwest.latitude, latLngBounds.southwest.longitude,
+                                        mSharedPreferences);
+                            }
+                            catch (Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
                             }
 
-                            @Override
-                            protected void onPostExecute(ResponseObject responseObject)
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(ResponseObject responseObject)
+                        {
+                            try
                             {
-                                try
+                                if (responseObject != null && responseObject.profiles != null)
                                 {
-                                    if (responseObject != null && responseObject.profiles != null)
+                                    mGoogleMap.clear();
+                                    mHashMapMarkerToIndex.clear();
+                                    mHashMapIndexToProfileObject.clear();
+
+                                    logger.info(String.format("Got %d profiles in the bounds",
+                                            responseObject.profiles.size()));
+
+                                    int i = 0;
+                                    for (ProfileObject profileObject : responseObject.profiles)
                                     {
-                                        mGoogleMap.clear();
+                                        LatLng markerLatlng = new LatLng(profileObject.latitude, profileObject.longitude);
+                                        Marker marker = mGoogleMap.addMarker(
+                                                new MarkerOptions().position(markerLatlng).title(profileObject.displayName));
 
-                                        logger.info(String.format("Got %d profiles in the bounds",
-                                                responseObject.profiles.size()));
-
-                                        for (ProfileObject profileObject : responseObject.profiles)
-                                        {
-                                            LatLng markerLatlng = new LatLng(profileObject.latitude, profileObject.longitude);
-                                            Marker marker = mGoogleMap.addMarker(
-                                                    new MarkerOptions().position(markerLatlng).title(profileObject.displayName));
-
-                                            mHashMapMarkerToProfileObject.put(marker.getId(), profileObject);
-                                        }
+                                        mHashMapMarkerToIndex.put(marker.getId(), i);
+                                        mHashMapIndexToProfileObject.put(i, profileObject);
+                                        i++;
                                     }
-                                }
-                                finally
-                                {
-                                    mAsyncTaskGetProfilesInBounds = null;
+
+                                    mViewPager.setAdapter(new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject));
                                 }
                             }
-                        }.execute(latLngBounds);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Helper.Error(logger, "EXCEPTION: Exception when applying markers to map", e);
-                }
-                finally
-                {
-                    boundsLock.unlock();
+                            finally
+                            {
+                                mAsyncTaskGetProfilesInBounds = null;
+                            }
+                        }
+                    }.execute(latLngBounds);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
+                Helper.Error(logger, "EXCEPTION: Exception when applying markers to map", e);
             }
-
-            mLastCallMs = snap;
-            mLatLngBounds = latLngBounds;
+            finally
+            {
+                boundsLock.unlock();
+            }
         }
-    };
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
+        }
+
+        mLastCallMs = snap;
+        mLatLngBounds = latLngBounds;
+    }
 
     @Override
     public void onConnectionSuspended(int i)
@@ -379,16 +408,48 @@ public class UserMapActivity extends FragmentActivity implements
         }
     }
 
-    private void ShowUserPeekStack(ProfileObject profileObject)
+    private void ShowUserPeekStack()
     {
-        logger.debug("ShowUserPeekStack(.) Invoked");
+        logger.debug("ShowUserPeekStack() Invoked");
 
         try
         {
             try
             {
-                peeListLock.lock();
+                peekListLock.lock();
 
+                int selectedMarkerIndex = mHashMapMarkerToIndex.get(mMarkerCurrentShown.getId());
+                mViewPager.setCurrentItem(selectedMarkerIndex);
+
+                //get the map container height
+                FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
+                int container_height = mapContainer.getHeight();
+
+                Projection projection = mGoogleMap.getProjection();
+
+                LatLng markerLatLng = new LatLng(
+                        mMarkerCurrentShown.getPosition().latitude,
+                        mMarkerCurrentShown.getPosition().longitude);
+
+                Point markerScreenPosition = projection.toScreenLocation(markerLatLng);
+
+                Point pointHalfScreenAbove = new Point(
+                        markerScreenPosition.x,
+                        markerScreenPosition.y - (container_height / 4));
+
+                LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
+
+                //Center map on marker
+                //@@LatLng clickedMarkerLocation = mMarkerCurrentShown.getPosition();
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(aboveMarkerLatLng);
+                mGoogleMap.animateCamera(cameraUpdate);
+
+                if(mLinearLayout.getVisibility() == View.GONE)
+                {
+                    mLinearLayout.setVisibility(View.VISIBLE);
+                }
+
+/*@@
                 if(mAsyncTaskGetUserPeekList == null)
                 {
                     //Start asynchronous request to server
@@ -481,6 +542,7 @@ public class UserMapActivity extends FragmentActivity implements
                         }
                     }.execute(profileObject);
                 }
+@@*/
             }
             catch (Exception e)
             {
@@ -488,7 +550,7 @@ public class UserMapActivity extends FragmentActivity implements
             }
             finally
             {
-                peeListLock.unlock();
+                peekListLock.unlock();
             }
         }
         catch(Exception e)
@@ -496,6 +558,19 @@ public class UserMapActivity extends FragmentActivity implements
             Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
         }
 
+    }
+
+    public void CloseUserPeekStack()
+    {
+        logger.debug("OnClickListener:onClick(.) Invoked");
+
+        //Hide the user peek stack
+        mLinearLayout.setVisibility(View.GONE);
+        Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
+        mLinearLayout.setAnimation(slideDownAnimation);
+        slideDownAnimation.start();
+
+        ShowProfilesInBounds(true);
     }
 
     private View.OnClickListener ClickListener = new View.OnClickListener()
@@ -507,6 +582,7 @@ public class UserMapActivity extends FragmentActivity implements
 
             switch(v.getId())
             {
+/*@@
                 case R.id.user_peek_stack_thumbnail:
                     GotoUserPeekListActivity("user_peek_stack_thumbnail");
                     break;
@@ -527,8 +603,8 @@ public class UserMapActivity extends FragmentActivity implements
                     Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
                     mRelativeLayoutUserStack.setAnimation(slideDownAnimation);
                     slideDownAnimation.start();
-
                     break;
+@@*/
 
                 default:
                     break;
@@ -536,34 +612,4 @@ public class UserMapActivity extends FragmentActivity implements
         }
     };
 
-    private void GotoUserPeekListActivity(String viewName)
-    {
-        logger.info(String.format("onClick: %s", viewName));
-
-        try
-        {
-            if(mTracker != null)
-            {
-                mTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(Constants.GA_UI_ACTION)
-                        .setAction(Constants.GA_BUTTON_PRESS)
-                        .setLabel(viewName)
-                        .build());
-            }
-        }
-        catch(Exception e)
-        {
-            Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        }
-
-        try
-        {
-            Toast.makeText(UserMapActivity.this, "Peek clicked", Toast.LENGTH_LONG).show();
-        }
-        catch (Exception e)
-        {
-            Helper.Error(logger, "EXCEPTION: Exception when clicking the share button", e);
-        }
-
-    }
 }

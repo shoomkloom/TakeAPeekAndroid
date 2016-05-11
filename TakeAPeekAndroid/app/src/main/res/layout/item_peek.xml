@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@color/tap_darkgray" >
+
+    <RelativeLayout
+        android:id = "@+id/user_peek_stack_thumbnail_layout"
+        android:layout_width="250dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true" >
+
+        <ImageView
+            android:id = "@+id/user_peek_stack_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id = "@+id/user_peek_stack_thumbnail_play"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_video_play" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id = "@+id/user_peek_stack_close"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/close" />
+
+    <TextView
+        android:id = "@+id/user_peek_stack_thumbnail_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/user_peek_stack_thumbnail_layout"
+        android:layout_below="@+id/user_peek_stack_thumbnail_layout"
+        android:textSize="20sp"
+        android:textColor="@color/tap_white"
+        android:text="Some Text"
+        android:layout_marginTop="30dp" />
+
+</RelativeLayout>
