@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -69,6 +70,7 @@ public class UserMapActivity extends FragmentActivity implements
     Marker mMarkerCurrentShown = null;
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
     HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
+    WeakHashMap<Integer, Marker> mHashMapIndexToMarker = new WeakHashMap<Integer, Marker>();
 
     private LatLngBounds mLatLngBounds = null;
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
@@ -111,9 +113,10 @@ public class UserMapActivity extends FragmentActivity implements
                 .addApi(LocationServices.API)
                 .build();
 
-        mLinearLayout = (LinearLayout)findViewById(R.id.user_peek_stack);
+        mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
 
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
+        mViewPager.addOnPageChangeListener(PageChangeListener);
 
 /*@@
         mRelativeLayoutUserStack = (RelativeLayout)findViewById(R.id.user_peek_stack);
@@ -163,7 +166,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         super.onResume();
 
-        if(mGoogleApiClient != null)
+        if (mGoogleApiClient != null)
         {
             mGoogleApiClient.connect();
         }
@@ -203,7 +206,7 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("InitMap() Invoked");
 
-        if(mLastLocation != null && mGoogleMap != null)
+        if (mLastLocation != null && mGoogleMap != null)
         {
             LatLng lastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mGoogleMap.setMyLocationEnabled(true);
@@ -262,7 +265,7 @@ public class UserMapActivity extends FragmentActivity implements
         final long snap = System.currentTimeMillis();
         LatLngBounds latLngBounds = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
 
-        if(force == false)
+        if (force == false)
         {
             // Check whether the camera changes report the same boundaries (?!), yes, it happens
             if (mLatLngBounds != null &&
@@ -330,6 +333,7 @@ public class UserMapActivity extends FragmentActivity implements
                                     mGoogleMap.clear();
                                     mHashMapMarkerToIndex.clear();
                                     mHashMapIndexToProfileObject.clear();
+                                    mHashMapIndexToMarker.clear();
 
                                     logger.info(String.format("Got %d profiles in the bounds",
                                             responseObject.profiles.size()));
@@ -343,6 +347,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                                         mHashMapMarkerToIndex.put(marker.getId(), i);
                                         mHashMapIndexToProfileObject.put(i, profileObject);
+                                        mHashMapIndexToMarker.put(i, marker);
                                         i++;
                                     }
 
@@ -366,7 +371,7 @@ public class UserMapActivity extends FragmentActivity implements
                 boundsLock.unlock();
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
         }
@@ -408,6 +413,34 @@ public class UserMapActivity extends FragmentActivity implements
         }
     }
 
+    private void UpdateBelowProjection(LatLng markerPosition)
+    {
+        logger.debug("UpdateBelowProjection(.) Invoked");
+
+        //get the map container height
+        FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
+        int container_height = mapContainer.getHeight();
+
+        LatLng markerLatLng = new LatLng(
+                markerPosition.latitude,
+                markerPosition.longitude);
+
+        Projection projection = mGoogleMap.getProjection();
+
+        Point markerScreenPosition = projection.toScreenLocation(markerLatLng);
+
+        Point pointHalfScreenAbove = new Point(
+                markerScreenPosition.x,
+                markerScreenPosition.y - (container_height / 4));
+
+        LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
+
+        //Center map on marker
+        //@@LatLng clickedMarkerLocation = mMarkerCurrentShown.getPosition();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(aboveMarkerLatLng);
+        mGoogleMap.animateCamera(cameraUpdate);
+    }
+
     private void ShowUserPeekStack()
     {
         logger.debug("ShowUserPeekStack() Invoked");
@@ -421,30 +454,9 @@ public class UserMapActivity extends FragmentActivity implements
                 int selectedMarkerIndex = mHashMapMarkerToIndex.get(mMarkerCurrentShown.getId());
                 mViewPager.setCurrentItem(selectedMarkerIndex);
 
-                //get the map container height
-                FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
-                int container_height = mapContainer.getHeight();
+                UpdateBelowProjection(mMarkerCurrentShown.getPosition());
 
-                Projection projection = mGoogleMap.getProjection();
-
-                LatLng markerLatLng = new LatLng(
-                        mMarkerCurrentShown.getPosition().latitude,
-                        mMarkerCurrentShown.getPosition().longitude);
-
-                Point markerScreenPosition = projection.toScreenLocation(markerLatLng);
-
-                Point pointHalfScreenAbove = new Point(
-                        markerScreenPosition.x,
-                        markerScreenPosition.y - (container_height / 4));
-
-                LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
-
-                //Center map on marker
-                //@@LatLng clickedMarkerLocation = mMarkerCurrentShown.getPosition();
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(aboveMarkerLatLng);
-                mGoogleMap.animateCamera(cameraUpdate);
-
-                if(mLinearLayout.getVisibility() == View.GONE)
+                if (mLinearLayout.getVisibility() == View.GONE)
                 {
                     mLinearLayout.setVisibility(View.VISIBLE);
                 }
@@ -553,7 +565,7 @@ public class UserMapActivity extends FragmentActivity implements
                 peekListLock.unlock();
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
         }
@@ -580,7 +592,7 @@ public class UserMapActivity extends FragmentActivity implements
         {
             logger.debug("OnClickListener:onClick(.) Invoked");
 
-            switch(v.getId())
+            switch (v.getId())
             {
 /*@@
                 case R.id.user_peek_stack_thumbnail:
@@ -612,4 +624,26 @@ public class UserMapActivity extends FragmentActivity implements
         }
     };
 
+    ViewPager.OnPageChangeListener PageChangeListener = new ViewPager.OnPageChangeListener()
+    {
+        @Override
+        public void onPageScrollStateChanged(int arg0)
+        {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2)
+        {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onPageSelected(int pos)
+        {
+            Marker marker = mHashMapIndexToMarker.get(pos);
+            marker.showInfoWindow();
+            UpdateBelowProjection(marker.getPosition());
+        }
+    };
 }
