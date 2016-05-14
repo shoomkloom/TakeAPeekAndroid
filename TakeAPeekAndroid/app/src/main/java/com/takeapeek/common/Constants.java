@@ -100,6 +100,7 @@ public class Constants
     public static final String PARAM_AUTHTOKEN_TYPE = "authtokenType";
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_USERNAME = "username";
+    public static final String PARAM_PROFILEOBJECT = "profileObject";
     
     //Sync period in seconds
     public static final long SYNC_PERIOD = 1200; // seconds per 20 minutes

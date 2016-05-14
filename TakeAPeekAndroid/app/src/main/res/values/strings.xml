@@ -90,4 +90,9 @@
     <string name="create_account_verify_sms_error">Illegal verification code</string>
     <string name="title_activity_capture_clip">CaptureClipActivity</string>
     <string name="title_activity_user_map">User Map</string>
+    <string name="textview_user_feed_empty">This user has no peeks</string>
+
+    <!-- User peek feed -->
+    <string name="error_no_profile">There was an error getting the user feed. Please try again later.</string>
+    <string name="title_activity_user_feed">User Feed</string>
 </resources>

@@ -89,8 +89,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -212,7 +212,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
         </activity>
-
+        <activity
+            android:name=".UserFeed.UserFeedActivity"
+            android:label="@string/title_activity_user_feed">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

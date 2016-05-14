@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -274,6 +274,36 @@ public class Transport
         return responseObject;
     }
 
+    public static String GetPeekVideoStreamURL(Context context, String username, String password, String peekId) throws Exception
+    {
+        logger.debug("GetPeekVideoStreamURL(......) Invoked - before lock");
+
+        lock.lock();
+
+        String requestStr = null;
+
+        try
+        {
+            logger.debug("GetPeekVideoStreamURL(.....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_peek"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peek_id", peekId));
+
+            requestStr = GetRequestUrl(nameValuePairs);
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetPeekVideoStreamURL(......) - after unlock");
+        }
+
+        return requestStr;
+    }
+
     public static void GetPeekThumbnail(Context context, String username, String password, String peekId) throws Exception
     {
         logger.debug("GetPeekThumbnail(......) Invoked - before lock");
@@ -293,7 +323,7 @@ public class Transport
 
             String filePath = Helper.GetPeekThumbnailFullPath(context, peekId);
 
-            DoHTTPGetFile(context, nameValuePairs, filePath);
+            DoHTTPGet(context, nameValuePairs, filePath);
         }
         finally
         {
@@ -567,9 +597,7 @@ public class Transport
 		{
 			logger.debug("UploadFile(.........) - inside lock");
 			
-			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
-			
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 	
 			nameValuePairs.add(new NameValuePair("action_type", "upload_file"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
@@ -577,7 +605,7 @@ public class Transport
 		
 			try
 			{
-				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, metaDataJson, fileToUpload,
+				responseObject = DoHTTPPost(context, nameValuePairs, metaDataJson, fileToUpload,
 						thumbnailToUpload, contentType, sharedPreferences);
 			}
 			catch(Exception e)
@@ -621,7 +649,7 @@ public class Transport
 			nameValuePairs.add(new NameValuePair("password", password));
 			nameValuePairs.add(new NameValuePair("contact_id", contactID));
 	
-			DoHTTPGetFile(context, nameValuePairs, filePath);
+			DoHTTPGet(context, nameValuePairs, filePath);
 		}
 		finally
 		{
@@ -647,7 +675,7 @@ public class Transport
 			nameValuePairs.add(new NameValuePair("password", password));
 			nameValuePairs.add(new NameValuePair("profile_id", profileID));
 
-			DoHTTPGetFile(context, nameValuePairs, filePath);
+			DoHTTPGet(context, nameValuePairs, filePath);
 		}
 		finally
 		{
@@ -655,8 +683,27 @@ public class Transport
 			logger.debug("DownloadFileByProfile(.....) - after unlock");
 		}
 	}
+
+    public static String GetRequestUrl(List<NameValuePair> nameValuePairs) throws UnsupportedEncodingException
+    {
+        String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
+
+        int nameValuePairsSize = nameValuePairs.size();
+        for (int i = 0; i < nameValuePairsSize; i++)
+        {
+            requestStr += nameValuePairs.get(i).Name;
+            requestStr += "=" + URLEncoder.encode(nameValuePairs.get(i).Value, "UTF-8");
+
+            if (nameValuePairsSize > 1 && i < nameValuePairsSize - 1)
+            {
+                requestStr += "&";
+            }
+        }
+
+        return requestStr;
+    }
 	
-	private static ResponseObject DoHTTPGet(Context context, String requestStr, List<NameValuePair> nameValuePairs, String filePath) throws Exception
+	private static ResponseObject DoHTTPGet(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
 	{
 		logger.debug("DoHTTPGet(..) Invoked - before lock");
 
@@ -668,17 +715,7 @@ public class Transport
 		{
 			logger.debug("DoHTTPGet(..) - inside lock");
 
-			int nameValuePairsSize = nameValuePairs.size();
-			for (int i = 0; i < nameValuePairsSize; i++)
-			{
-				requestStr += nameValuePairs.get(i).Name;
-				requestStr += "=" + URLEncoder.encode(nameValuePairs.get(i).Value, "UTF-8");
-
-				if (nameValuePairsSize > 1 && i < nameValuePairsSize - 1)
-				{
-					requestStr += "&";
-				}
-			}
+            String requestStr = GetRequestUrl(nameValuePairs);
 
 			//If the device is not connected, try 5 times, once every second
 			int trials = 5;
@@ -821,27 +858,15 @@ public class Transport
 		return responseObject;
 	}
 
-    private static void DoHTTPGetFile(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
-    {
-        logger.debug("DoHTTPGetFile(....) Invoked");
-
-        String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
-
-        DoHTTPGet(context, requestStr, nameValuePairs, filePath);
-    }
-
 	public static ResponseObject DoHTTPGetResponse(Context context, List<NameValuePair> nameValuePairs, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("DoHTTPGetResponse(..) Invoked");
 
 		ResponseObject responseObject = null;
-        String responseStr = null;
 
         try
 		{
-			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
-
-            responseObject = DoHTTPGet(context, requestStr, nameValuePairs, null);
+            responseObject = DoHTTPGet(context, nameValuePairs, null);
 
 			if(sharedPreferences != null && responseObject != null && responseObject.error != null)
 			{
@@ -864,11 +889,11 @@ public class Transport
 		return responseObject;
 	}
 
-	private static ResponseObject DoHTTPPost(Context context, String requestStr, List<NameValuePair> nameValuePairs,
+	private static ResponseObject DoHTTPPost(Context context, List<NameValuePair> nameValuePairs,
 		String metaDataJson, File fileToUpload, File thumbnailToUpload,
 		Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
-		logger.debug("DoHTTPPost(........) Invoked - before lock");
+		logger.debug("DoHTTPPost(.......) Invoked - before lock");
 
         ResponseObject responseObject = null;
 
@@ -876,19 +901,9 @@ public class Transport
 
         try
         {
-            logger.debug("DoHTTPPost(........) - inside lock");
+            logger.debug("DoHTTPPost(.......) - inside lock");
 
-            int nameValuePairsSize = nameValuePairs.size();
-            for (int i = 0; i < nameValuePairsSize; i++)
-            {
-                requestStr += nameValuePairs.get(i).Name;
-                requestStr += "=" + URLEncoder.encode(nameValuePairs.get(i).Value, "UTF-8");
-
-                if (nameValuePairsSize > 1 && i < nameValuePairsSize - 1)
-                {
-                    requestStr += "&";
-                }
-            }
+            String requestStr = GetRequestUrl(nameValuePairs);
 
             //If the device is not connected, try 5 times, once every second
             int trials = 5;
@@ -908,12 +923,14 @@ public class Transport
             {
                 //@@Need to change this to HttpsURLConnection
                 HttpURLConnection httpURLConnection = null;
-                DataOutputStream dataOutputStream = null;
+                BufferedOutputStream outputStream = null;
                 BufferedInputStream inputStream = null;
 
-                int bytesRead, bytesAvailable, bufferSize;
-				byte[] bufferThumbnail;
-                byte[] buffer;
+                int bytesRead = 0;
+                int bytesAvailable = 0;
+                int bufferSize = 0;
+				byte[] bufferThumbnail = null;
+                byte[] buffer = null;
                 int maxBufferSize = 1024*1024;
 
                 FileInputStream fileInputStream = null;
@@ -925,12 +942,13 @@ public class Transport
                     URL url = new URL(requestStr);
                     httpURLConnection = (HttpURLConnection) url.openConnection();
                     httpURLConnection.setRequestProperty("connection", "close");
+
                     httpURLConnection.setDoInput(true);
                     // Allow Outputs
                     httpURLConnection.setDoOutput(true);
                     // Don't use a cached copy.
                     httpURLConnection.setUseCaches(false);
-                    httpURLConnection.setChunkedStreamingMode(0/*@@maxBufferSize*/);
+                    //@@httpURLConnection.setChunkedStreamingMode(0/*@@maxBufferSize*/);
                     // Use a post method.
                     httpURLConnection.setRequestMethod("POST");
 
@@ -962,13 +980,14 @@ public class Transport
                             break;
                     }
 
-                    dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
+                    //@@dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
+                    outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
 
                     if(metaDataJson != null && metaDataJson != "")
                     {
                         byte[] metaDataJsonBytes = metaDataJson.getBytes("UTF-8");
-                        dataOutputStream.write(metaDataJsonBytes);
-                        dataOutputStream.writeByte('\n');
+                        outputStream.write(metaDataJsonBytes);
+                        outputStream.write('\n');
                     }
 
 					if(thumbnailToUpload != null)
@@ -982,7 +1001,7 @@ public class Transport
 
 						while (bytesRead > 0)
 						{
-							dataOutputStream.write(bufferThumbnail, 0, bufferSize);
+                            outputStream.write(bufferThumbnail, 0, bufferSize);
 							bytesAvailable = fileInputStreamThumbnail.available();
 							bufferSize = Math.min(bytesAvailable, maxBufferSize);
 							bytesRead = fileInputStreamThumbnail.read(bufferThumbnail, 0, bufferSize);
@@ -999,13 +1018,13 @@ public class Transport
 
                     while (bytesRead > 0)
                     {
-                        dataOutputStream.write(buffer, 0, bufferSize);
+                        outputStream.write(buffer, 0, bufferSize);
                         bytesAvailable = fileInputStream.available();
                         bufferSize = Math.min(bytesAvailable, maxBufferSize);
                         bytesRead = fileInputStream.read(buffer, 0, bufferSize);
                     }
 
-                    dataOutputStream.flush();
+                    outputStream.flush();
 
                     logger.info("DoHTTPPost: Calling httpsURLConnection.connect()...");
                     httpURLConnection.connect();
@@ -1064,14 +1083,9 @@ public class Transport
                         fileInputStream.close();
                     }
 
-                    if(dataOutputStream != null)
+                    if(outputStream != null)
                     {
-                        dataOutputStream.flush();
-                    }
-
-                    if(dataOutputStream != null)
-                    {
-                        dataOutputStream.close();
+                        outputStream.close();
                     }
 
                     if(inputStream != null)
@@ -1093,13 +1107,13 @@ public class Transport
         }
         catch (Exception e)
         {
-            Helper.Error(logger, "EXCEPTION: In DoHTTPPost(........)", e);
+            Helper.Error(logger, "EXCEPTION: In DoHTTPPost(.......)", e);
             throw e;
         }
         finally
         {
             Helper.lockHTTPRequest.unlock();
-            logger.debug("DoHTTPPost(........) - after unlock");
+            logger.debug("DoHTTPPost(.......) - after unlock");
         }
 
         return responseObject;

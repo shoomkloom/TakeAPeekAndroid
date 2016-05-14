@@ -1,5 +1,6 @@
 package com.takeapeek.UserMap;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
@@ -7,10 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
+import com.google.gson.Gson;
 import com.takeapeek.R;
+import com.takeapeek.UserFeed.UserFeedActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
@@ -50,7 +52,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
         ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
 
         LayoutInflater inflater = LayoutInflater.from(mUserMapActivity);
-        ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek, collection, false);
+        ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
 
         ImageView imageViewPeekThumbnail = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail);
         imageViewPeekThumbnail.setOnClickListener(ClickListener);
@@ -172,13 +174,15 @@ public class PeekStackPagerAdapter extends PagerAdapter
         try
         {
             ProfileObject profileObject = (ProfileObject)view.getTag();
-            String message = String.format("Peek from %s clicked", profileObject.displayName);
-            Toast.makeText(mUserMapActivity, message, Toast.LENGTH_SHORT).show();
+            String profileObjectJSON = new Gson().toJson(profileObject);
+
+            final Intent intent = new Intent(mUserMapActivity, UserFeedActivity.class);
+            intent.putExtra(Constants.PARAM_PROFILEOBJECT, profileObjectJSON);
+            mUserMapActivity.startActivity(intent);
         }
         catch (Exception e)
         {
             Helper.Error(logger, "EXCEPTION: Exception when clicking the share button", e);
         }
-
     }
 }
