@@ -3,24 +3,18 @@ package com.takeapeek.UserFeed;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.AnimationDrawable;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ThumbnailLoader;
-import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
@@ -53,8 +47,6 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
         ImageView mImageViewPeekThumbnail = null;
         ImageView mImageViewPeekThumbnailPlay = null;
         TextView mTextViewUserFeedTime = null;
-        ImageView mImageViewPeekVideoProgress = null;
-        VideoView mVideoViewPeekItem = null;
 
         TakeAPeekObject mTakeAPeekObject = null;
         int Position = -1;
@@ -102,8 +94,6 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mImageViewPeekThumbnailPlay = (ImageView)view.findViewById(R.id.user_peek_feed_thumbnail_play);
             viewHolder.mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
             viewHolder.mTextViewUserFeedTime = (TextView)view.findViewById(R.id.user_peek_feed_thumbnail_time);
-            viewHolder.mImageViewPeekVideoProgress = (ImageView)view.findViewById(R.id.user_peek_feed_video_progress);
-            viewHolder.mVideoViewPeekItem = (VideoView)view.findViewById(R.id.user_peek_feed_video);
 
             view.setTag(viewHolder);
         }
@@ -162,90 +152,7 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
                         Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
                     }
 
-                    //Play the streaming video
-                    finalViewHolder.mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
-                    finalViewHolder.mImageViewPeekVideoProgress.setVisibility(View.VISIBLE);
-                    //Progress animation
-                    final AnimationDrawable progressAnimation = (AnimationDrawable) finalViewHolder.mImageViewPeekVideoProgress.getBackground();
-                    finalViewHolder.mImageViewPeekVideoProgress.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if(progressAnimation != null)
-                            {
-                                progressAnimation.start();
-                            }
-                        }
-                    });
-
-                    finalViewHolder.mVideoViewPeekItem.setVisibility(View.VISIBLE);
-
-                    try
-                    {
-                        String userName = Helper.GetTakeAPeekAccountUsername(mUserFeedActivity);
-                        String password = Helper.GetTakeAPeekAccountPassword(mUserFeedActivity);
-
-                        String link = Transport.GetPeekVideoStreamURL(
-                                mUserFeedActivity, userName, password,
-                                finalViewHolder.mTakeAPeekObject.TakeAPeekID);
-                        Uri uriVideo = Uri.parse(link);
-
-/*@@
-                        MediaController mediaController = new MediaController(mUserFeedActivity);
-                        mediaController.setAnchorView(finalViewHolder.mVideoViewPeekItem);
-                        finalViewHolder.mVideoViewPeekItem.setMediaController(mediaController);
-@@*/
-                        finalViewHolder.mVideoViewPeekItem.setVideoURI(uriVideo);
-                        finalViewHolder.mVideoViewPeekItem.requestFocus();
-
-                        finalViewHolder.mVideoViewPeekItem.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-                        {
-                            @Override
-                            public void onPrepared(MediaPlayer mp)
-                            {
-                                finalViewHolder.mImageViewPeekThumbnail.setVisibility(View.GONE);
-                                progressAnimation.stop();
-                                finalViewHolder.mImageViewPeekVideoProgress.setVisibility(View.GONE);
-                                finalViewHolder.mVideoViewPeekItem.start();
-                            }
-                        });
-
-                        finalViewHolder.mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-                        {
-                           @Override
-                           public void onCompletion(MediaPlayer mp)
-                           {
-                               finalViewHolder.mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
-                               finalViewHolder.mImageViewPeekThumbnailPlay.setVisibility(View.VISIBLE);
-                               finalViewHolder.mVideoViewPeekItem.setVisibility(View.GONE);
-                               progressAnimation.stop();
-                               finalViewHolder.mImageViewPeekVideoProgress.setVisibility(View.GONE);
-                           }
-                        });
-
-                        finalViewHolder.mVideoViewPeekItem.setOnErrorListener(new MediaPlayer.OnErrorListener()
-                        {
-                            @Override
-                            public boolean onError(MediaPlayer mp, int what, int extra)
-                            {
-                                finalViewHolder.mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
-                                finalViewHolder.mImageViewPeekThumbnailPlay.setVisibility(View.VISIBLE);
-                                finalViewHolder.mVideoViewPeekItem.setVisibility(View.GONE);
-                                progressAnimation.stop();
-                                finalViewHolder.mImageViewPeekVideoProgress.setVisibility(View.GONE);
-
-                                // TODO: handle error
-                                //@@Toast.makeText(mUserFeedActivity, "Error connecting", Toast.LENGTH_SHORT).show();
-                                return false;
-                            }
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        // TODO: handle exception
-                        Toast.makeText(mUserFeedActivity, "EXCEPTION!", Toast.LENGTH_SHORT).show();
-                    }
+                    mUserFeedActivity.ShowPeek(finalViewHolder.mTakeAPeekObject);
 
                     break;
 
