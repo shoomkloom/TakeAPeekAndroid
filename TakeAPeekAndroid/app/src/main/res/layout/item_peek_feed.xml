@@ -49,11 +49,18 @@
         android:id = "@+id/user_peek_feed_thumbnail_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/user_peek_feed_thumbnail_layout"
         android:layout_below="@+id/user_peek_feed_thumbnail_layout"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textColor="@color/tap_white"
-        android:text="Some Text"
         android:layout_marginTop="30dp" />
+
+    <TextView
+        android:id = "@+id/user_peek_feed_thumbnail_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/user_peek_feed_thumbnail_time"
+        android:textSize="18sp"
+        android:textColor="@color/tap_white"
+        android:layout_marginTop="5dp" />
 
 </RelativeLayout>

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.takeapeek.R;
+import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ThumbnailLoader;
@@ -41,12 +42,14 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
     SharedPreferences mSharedPreferences = null;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
+    private final AddressLoader mAddressLoader = new AddressLoader();
 
     private class ViewHolder
     {
         ImageView mImageViewPeekThumbnail = null;
         ImageView mImageViewPeekThumbnailPlay = null;
         TextView mTextViewUserFeedTime = null;
+        TextView mTextViewUserFeedAddress = null;
 
         TakeAPeekObject mTakeAPeekObject = null;
         int Position = -1;
@@ -94,6 +97,7 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mImageViewPeekThumbnailPlay = (ImageView)view.findViewById(R.id.user_peek_feed_thumbnail_play);
             viewHolder.mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
             viewHolder.mTextViewUserFeedTime = (TextView)view.findViewById(R.id.user_peek_feed_thumbnail_time);
+            viewHolder.mTextViewUserFeedAddress = (TextView)view.findViewById(R.id.user_peek_feed_thumbnail_address);
 
             view.setTag(viewHolder);
         }
@@ -113,6 +117,8 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
         date.setTime(viewHolder.mTakeAPeekObject.CreationTime);
         String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
         viewHolder.mTextViewUserFeedTime.setText(dateTimeStr);
+
+        mAddressLoader.SetAddress(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
 
         return view;
     }

@@ -705,57 +705,89 @@ public class Transport
 	
 	private static ResponseObject DoHTTPGet(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
 	{
-		logger.debug("DoHTTPGet(..) Invoked - before lock");
-
-		Helper.lockHTTPRequest.lock();
+		logger.debug("DoHTTPGet(...) Invoked");
 
         ResponseObject responseObject = null;
 
         try
 		{
-			logger.debug("DoHTTPGet(..) - inside lock");
-
             String requestStr = GetRequestUrl(nameValuePairs);
+            String responseStr = DoHTTPGetRequest(context, requestStr, filePath);
 
-			//If the device is not connected, try 5 times, once every second
-			int trials = 5;
-			while (IsConnected(context) == false && trials-- > 0)
-			{
-				try
-				{
-					Thread.sleep(1000);
-				}
-				catch (InterruptedException e)
-				{
-					logger.warn("EXCEPTION: InterruptedException while checking IsConnected", e);
-				}
-			}
+            try
+            {
+                if (responseStr != null && responseStr.isEmpty() == false)
+                {
+                    responseObject = new Gson().fromJson(responseStr, ResponseObject.class);
+                }
+            }
+            catch (Exception e)
+            {
+                String errorDetails = String.format("JSON exception for response string = '%s'", responseStr);
+                Helper.Error(logger, String.format("EXCEPTION: %s", errorDetails), e);
+                throw e;
+            }
+		}
+		catch (Exception e)
+		{
+			Helper.Error(logger, "EXCEPTION: In DoHTTPGet(..)", e);
+			throw e;
+		}
 
-			if (IsConnected(context))
-			{
+		return responseObject;
+	}
+
+    public static String DoHTTPGetRequest(Context context, String requestStr, String filePath) throws Exception
+    {
+        logger.debug("DoHTTPGetRequest(...) Invoked - before lock");
+
+        Helper.lockHTTPRequest.lock();
+
+        String responseStr = null;
+
+        try
+        {
+            logger.debug("DoHTTPGetRequest(...) - inside lock");
+
+            //If the device is not connected, try 5 times, once every second
+            int trials = 5;
+            while (IsConnected(context) == false && trials-- > 0)
+            {
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e)
+                {
+                    logger.warn("EXCEPTION: InterruptedException while checking IsConnected", e);
+                }
+            }
+
+            if (IsConnected(context))
+            {
                 int responseCode = 0;
-				//@@HttpsURLConnection httpsURLConnection = null;
-				HttpURLConnection httpsURLConnection = null;
+                //@@HttpsURLConnection httpsURLConnection = null;
+                HttpURLConnection httpsURLConnection = null;
                 InputStream inputStream = null;
 
                 try
-				{
-					URL url = new URL(requestStr);
-					//@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
-					httpsURLConnection = (HttpURLConnection) url.openConnection();
+                {
+                    URL url = new URL(requestStr);
+                    //@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    httpsURLConnection = (HttpURLConnection) url.openConnection();
                     httpsURLConnection.setRequestProperty("connection", "close");
-					httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
-					httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
-					httpsURLConnection.setRequestMethod("GET");
-					httpsURLConnection.setDoInput(true);
+                    httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
+                    httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
+                    httpsURLConnection.setRequestMethod("GET");
+                    httpsURLConnection.setDoInput(true);
 
-					logger.info("DoHTTPGet: Calling httpsURLConnection.connect()...");
-					httpsURLConnection.connect();
+                    logger.info("DoHTTPGetRequest: Calling httpsURLConnection.connect()...");
+                    httpsURLConnection.connect();
 
                     //Get the response
                     logger.info("Sent the request, getting the response");
-					responseCode = httpsURLConnection.getResponseCode();
-					logger.info(String.format("responseCode = %d", responseCode));
+                    responseCode = httpsURLConnection.getResponseCode();
+                    logger.info(String.format("responseCode = %d", responseCode));
 
                     inputStream = httpsURLConnection.getInputStream();
 
@@ -788,7 +820,12 @@ public class Transport
                     }
                     else
                     {
-                        String responseStr = Helper.convertStreamToString(inputStream);
+                        responseStr = Helper.convertStreamToString(inputStream);
+                    }
+
+                    if (responseCode != 200)
+                    {
+                        ResponseObject responseObject = null;
 
                         try
                         {
@@ -803,60 +840,64 @@ public class Transport
                             Helper.Error(logger, String.format("EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
                             throw e;
                         }
+
+                        if (responseObject != null && responseObject.error != null && responseObject.error.isEmpty() == false)
+                        {
+                            String error = responseObject == null ?
+                                    String.format("HTTP status code: %d", responseCode) :
+                                    String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
+
+                            Helper.Error(logger, error);
+                            throw new Exception(error);
+                        }
+
+                        String error = String.format("HTTP status code: %d", responseCode);
+                        Helper.Error(logger, error);
+                        throw new Exception(error);
                     }
-
-					if (responseCode != 200)
-					{
-						String error = responseObject == null ?
-								String.format("HTTP status code: %d", responseCode) :
-								String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
-
-						Helper.Error(logger, error);
-						throw new Exception(error);
-					}
-				}
-				catch (SocketTimeoutException e)
-				{
-					Helper.Error(logger, "EXCEPTION: SocketTimeoutException when calling httpsURLConnection.connect().", e);
-					throw e;
-				}
-				catch (Exception e)
-				{
-					Helper.Error(logger, "EXCEPTION: Exception when calling httpsURLConnection.connect().", e);
-					throw e;
-				}
-				finally
-				{
+                }
+                catch (SocketTimeoutException e)
+                {
+                    Helper.Error(logger, "EXCEPTION: SocketTimeoutException when calling httpsURLConnection.connect().", e);
+                    throw e;
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: Exception when calling httpsURLConnection.connect().", e);
+                    throw e;
+                }
+                finally
+                {
                     if(inputStream != null)
                     {
                         inputStream.close();
                     }
 
-					if(httpsURLConnection != null)
-					{
-						httpsURLConnection.disconnect();
-					}
-				}
-			}
-			else
-			{
-				Helper.Error(logger, "EXCEPTION: Network connection not available");
-				throw new Exception();
-			}
-		}
-		catch (Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: In DoHTTPGet(..)", e);
-			throw e;
-		}
-		finally
-		{
-			Helper.lockHTTPRequest.unlock();
-			logger.debug("DoHTTPGet(..) - after unlock");
-		}
+                    if(httpsURLConnection != null)
+                    {
+                        httpsURLConnection.disconnect();
+                    }
+                }
+            }
+            else
+            {
+                Helper.Error(logger, "EXCEPTION: Network connection not available");
+                throw new Exception();
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: In DoHTTPGet(..)", e);
+            throw e;
+        }
+        finally
+        {
+            Helper.lockHTTPRequest.unlock();
+            logger.debug("DoHTTPGetRequest(...) - after unlock");
+        }
 
-		return responseObject;
-	}
+        return responseStr;
+    }
 
 	public static ResponseObject DoHTTPGetResponse(Context context, List<NameValuePair> nameValuePairs, SharedPreferences sharedPreferences) throws Exception
 	{
