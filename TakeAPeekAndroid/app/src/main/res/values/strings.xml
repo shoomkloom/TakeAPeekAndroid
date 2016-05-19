@@ -96,4 +96,7 @@
     <string name="error_no_profile">There was an error getting the user feed. Please try again later.</string>
     <string name="title_activity_user_feed">User Feed</string>
     <string name="error_playing_peek">There was an error playing this peek, please try again later.</string>
+
+    <!-- User Map -->
+    <string name="search_location">Search a place</string>
 </resources>

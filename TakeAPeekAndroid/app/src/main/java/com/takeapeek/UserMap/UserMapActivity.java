@@ -14,14 +14,19 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,7 +71,8 @@ public class UserMapActivity extends FragmentActivity implements
 
     private GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
-    private Location mLastLocation = null;
+
+    private boolean mFirstLoad = false;
     Marker mMarkerCurrentShown = null;
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
     HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
@@ -76,17 +82,10 @@ public class UserMapActivity extends FragmentActivity implements
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
-    //@@private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskGetUserPeekList = null;
 
     LinearLayout mLinearLayout = null;
+    ImageView mImageViewOverlay = null;
     ViewPager mViewPager = null;
-/*@@
-    RelativeLayout mRelativeLayoutUserStack = null;
-    ImageView mImageViewUserStackThumbnail = null;
-    TextView mTextViewUserStackTime = null;
-    ImageView mImageViewUserStackPlay = null;
-    ImageView mImageViewUserStackClose = null;
-@@*/
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
@@ -98,6 +97,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         setContentView(R.layout.activity_user_map);
 
+        mFirstLoad = true;
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         //Get a Tracker
@@ -113,22 +113,14 @@ public class UserMapActivity extends FragmentActivity implements
                 .addApi(LocationServices.API)
                 .build();
 
-        mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
+        //Retrieve the PlaceAutocompleteFragment.
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setOnPlaceSelectedListener(PlaceSelectionListen);
 
+        mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
+        mImageViewOverlay = (ImageView)findViewById(R.id.map_overlay_image);
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
-
-/*@@
-        mRelativeLayoutUserStack = (RelativeLayout)findViewById(R.id.user_peek_stack);
-        mImageViewUserStackThumbnail = (ImageView)findViewById(R.id.user_peek_stack_thumbnail);
-        mImageViewUserStackThumbnail.setOnClickListener(ClickListener);
-        mTextViewUserStackTime = (TextView)findViewById(R.id.user_peek_stack_thumbnail_time);
-        mTextViewUserStackTime.setOnClickListener(ClickListener);
-        mImageViewUserStackPlay = (ImageView)findViewById(R.id.user_peek_stack_thumbnail_play);
-        mImageViewUserStackPlay.setOnClickListener(ClickListener);
-        mImageViewUserStackClose = (ImageView)findViewById(R.id.user_peek_stack_close);
-        mImageViewUserStackClose.setOnClickListener(ClickListener);
-@@*/
     }
 
 
@@ -152,8 +144,6 @@ public class UserMapActivity extends FragmentActivity implements
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(true);
-
-        InitMap();
     }
 
     @Override
@@ -194,21 +184,24 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("onConnected(.) Invoked");
 
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
         mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
         mGoogleMap.setOnMarkerClickListener(MarkerClickListener);
 
-        InitMap();
+        if(mFirstLoad == true)
+        {
+            mFirstLoad = false;
+            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            InitMap(location);
+        }
     }
 
-    private void InitMap()
+    private void InitMap(Location location)
     {
-        logger.debug("InitMap() Invoked");
+        logger.debug("InitMap(.) Invoked");
 
-        if (mLastLocation != null && mGoogleMap != null)
+        if (location != null && mGoogleMap != null)
         {
-            LatLng lastLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            LatLng lastLocationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             mGoogleMap.setMyLocationEnabled(true);
 
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 15);
@@ -436,7 +429,6 @@ public class UserMapActivity extends FragmentActivity implements
         LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
 
         //Center map on marker
-        //@@LatLng clickedMarkerLocation = mMarkerCurrentShown.getPosition();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(aboveMarkerLatLng);
         mGoogleMap.animateCamera(cameraUpdate);
     }
@@ -458,103 +450,13 @@ public class UserMapActivity extends FragmentActivity implements
 
                 if (mLinearLayout.getVisibility() == View.GONE)
                 {
+                    mImageViewOverlay.setVisibility(View.GONE);
+
                     mLinearLayout.setVisibility(View.VISIBLE);
+                    Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
+                    mLinearLayout.setAnimation(slideDownAnimation);
+                    slideDownAnimation.start();
                 }
-
-/*@@
-                if(mAsyncTaskGetUserPeekList == null)
-                {
-                    //Start asynchronous request to server
-                    mAsyncTaskGetUserPeekList = new AsyncTask<ProfileObject, Void, ResponseObject>()
-                    {
-                        @Override
-                        protected ResponseObject doInBackground(ProfileObject... params)
-                        {
-                            ProfileObject profileObject = params[0];
-
-                            try
-                            {
-                                logger.info("Getting peek list for profile from server");
-
-                                //Get the list of peeks for selected profile id
-                                String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
-                                String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
-
-                                return Transport.GetPeeks(UserMapActivity.this,
-                                        userName, password, profileObject.profileId, mSharedPreferences);
-                            }
-                            catch (Exception e)
-                            {
-                                Helper.Error(logger, "EXCEPTION: When trying to get peek list for profile", e);
-                            }
-
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(ResponseObject responseObject)
-                        {
-                            try
-                            {
-                                if (responseObject != null && responseObject.peeks != null)
-                                {
-                                    logger.info(String.format("Got %d peeks", responseObject.peeks.size()));
-
-                                    //Get the first one and show it's thumbnail
-                                    if(responseObject.peeks != null && responseObject.peeks.size() > 0)
-                                    {
-                                        TakeAPeekObject takeAPeekObject = responseObject.peeks.get(0);
-
-                                        //Load the thumbnail asynchronously
-                                        mThumbnailLoader.SetThumbnail(UserMapActivity.this, takeAPeekObject, mImageViewUserStackThumbnail, mSharedPreferences);
-
-                                        long utcOffset = TimeZone.getDefault().getRawOffset();
-                                        Date date = new Date();
-                                        date.setTime(takeAPeekObject.CreationTime);
-                                        String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
-                                        mTextViewUserStackTime.setText(dateTimeStr);
-
-                                        //get the map container height
-                                        FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
-                                        int container_height = mapContainer.getHeight();
-
-                                        Projection projection = mGoogleMap.getProjection();
-
-                                        LatLng markerLatLng = new LatLng(
-                                                mMarkerCurrentShown.getPosition().latitude,
-                                                mMarkerCurrentShown.getPosition().longitude);
-
-                                        Point markerScreenPosition = projection.toScreenLocation(markerLatLng);
-
-                                        Point pointHalfScreenAbove = new Point(
-                                                markerScreenPosition.x,
-                                                markerScreenPosition.y + (container_height / 4));
-
-                                        LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
-
-                                        //Center map on marker
-                                        //@@LatLng clickedMarkerLocation = mMarkerCurrentShown.getPosition();
-                                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(aboveMarkerLatLng);
-                                        mGoogleMap.animateCamera(cameraUpdate);
-
-                                        if(mRelativeLayoutUserStack.getVisibility() == View.GONE)
-                                        {
-                                            mRelativeLayoutUserStack.setVisibility(View.VISIBLE);
-                                            Animation slideUpAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slideup);
-                                            mRelativeLayoutUserStack.setAnimation(slideUpAnimation);
-                                            slideUpAnimation.start();
-                                        }
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                mAsyncTaskGetUserPeekList = null;
-                            }
-                        }
-                    }.execute(profileObject);
-                }
-@@*/
             }
             catch (Exception e)
             {
@@ -578,9 +480,15 @@ public class UserMapActivity extends FragmentActivity implements
 
         //Hide the user peek stack
         mLinearLayout.setVisibility(View.GONE);
-        Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
-        mLinearLayout.setAnimation(slideDownAnimation);
-        slideDownAnimation.start();
+
+        Animation slideUpAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slideup);
+        mLinearLayout.setAnimation(slideUpAnimation);
+        slideUpAnimation.start();
+
+        mImageViewOverlay.setVisibility(View.VISIBLE);
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadein);
+        mImageViewOverlay.setAnimation(fadeInAnimation);
+        fadeInAnimation.start();
 
         ShowProfilesInBounds(true);
     }
@@ -594,30 +502,6 @@ public class UserMapActivity extends FragmentActivity implements
 
             switch (v.getId())
             {
-/*@@
-                case R.id.user_peek_stack_thumbnail:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail");
-                    break;
-
-                case R.id.user_peek_stack_thumbnail_time:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
-                    break;
-
-                case R.id.user_peek_stack_thumbnail_play:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
-                    break;
-
-                case R.id.user_peek_stack_close:
-                    logger.info("onClick: user_peek_stack_close");
-
-                    //Hide the user peek stack
-                    mRelativeLayoutUserStack.setVisibility(View.GONE);
-                    Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
-                    mRelativeLayoutUserStack.setAnimation(slideDownAnimation);
-                    slideDownAnimation.start();
-                    break;
-@@*/
-
                 default:
                     break;
             }
@@ -644,6 +528,35 @@ public class UserMapActivity extends FragmentActivity implements
             Marker marker = mHashMapIndexToMarker.get(pos);
             marker.showInfoWindow();
             UpdateBelowProjection(marker.getPosition());
+        }
+    };
+
+    PlaceSelectionListener PlaceSelectionListen = new PlaceSelectionListener()
+    {
+        @Override
+        public void onPlaceSelected(Place place)
+        {
+            logger.info(String.format("Place Selected: %s %s", place.getName(), place.getLatLng()));
+
+            CameraUpdate cameraUpdate = null;
+
+            LatLngBounds latLngBounds = place.getViewport();
+            if(latLngBounds != null)
+            {
+                cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 5);
+            }
+            else
+            {
+                cameraUpdate = CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15);
+            }
+
+            mGoogleMap.animateCamera(cameraUpdate);
+        }
+
+        @Override
+        public void onError(Status status)
+        {
+            Helper.Error(logger, String.format("ERROR: When trying to autocomplete a place. Error: '%s'", status));
         }
     };
 }
