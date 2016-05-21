@@ -76,7 +76,14 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
     @Override
     public int getCount()
     {
-        return mTakeAPeekObjectList.size();
+        if(mTakeAPeekObjectList == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return mTakeAPeekObjectList.size();
+        }
     }
 
     @Override
@@ -107,18 +114,21 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
         }
 
         viewHolder.Position = position;
-        viewHolder.mTakeAPeekObject = mTakeAPeekObjectList.get(position);
+        if(mTakeAPeekObjectList != null)
+        {
+            viewHolder.mTakeAPeekObject = mTakeAPeekObjectList.get(position);
 
-        //Load the thumbnail asynchronously
-        mThumbnailLoader.SetThumbnail(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
+            //Load the thumbnail asynchronously
+            mThumbnailLoader.SetThumbnail(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
 
-        long utcOffset = TimeZone.getDefault().getRawOffset();
-        Date date = new Date();
-        date.setTime(viewHolder.mTakeAPeekObject.CreationTime);
-        String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
-        viewHolder.mTextViewUserFeedTime.setText(dateTimeStr);
+            long utcOffset = TimeZone.getDefault().getRawOffset();
+            Date date = new Date();
+            date.setTime(viewHolder.mTakeAPeekObject.CreationTime);
+            String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
+            viewHolder.mTextViewUserFeedTime.setText(dateTimeStr);
 
-        mAddressLoader.SetAddress(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
+            mAddressLoader.SetAddress(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
+        }
 
         return view;
     }
