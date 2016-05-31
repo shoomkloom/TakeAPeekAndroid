@@ -99,4 +99,13 @@
 
     <!-- User Map -->
     <string name="search_location">Search a place</string>
+    <string name="error_request_peek">There was an error requesting a peek, please try again later.</string>
+    <string name="requested_peeks_to">Sent peek request to %1$d users</string>
+
+    <!-- Notifications -->
+    <string name="title_activity_notifications">Notifications</string>
+    <string name="textview_notifications_empty">There are no notifications</string>
+    <string name="textview_create_peek">Create Peek</string>
+    <string name="textview_action_title_request">Sent you a request</string>
+    <string name="textview_notification_time">%1$d minutes ago</string>
 </resources>

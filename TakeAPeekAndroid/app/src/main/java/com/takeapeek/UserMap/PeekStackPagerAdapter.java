@@ -1,4 +1,4 @@
-package com.takeapeek.UserMap;
+package com.takeapeek.usermap;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,10 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.gson.Gson;
 import com.takeapeek.R;
-import com.takeapeek.UserFeed.UserFeedActivity;
+import com.takeapeek.userfeed.UserFeedActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
@@ -154,22 +153,6 @@ public class PeekStackPagerAdapter extends PagerAdapter
     private void GotoUserPeekListActivity(View view)
     {
         logger.debug("GotoUserPeekListActivity(.) Invoked");
-
-        try
-        {
-            if(mUserMapActivity.mTracker != null)
-            {
-                mUserMapActivity.mTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(Constants.GA_UI_ACTION)
-                        .setAction(Constants.GA_BUTTON_PRESS)
-                        .setLabel("Latest Peek on map clicked")
-                        .build());
-            }
-        }
-        catch(Exception e)
-        {
-            Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        }
 
         try
         {

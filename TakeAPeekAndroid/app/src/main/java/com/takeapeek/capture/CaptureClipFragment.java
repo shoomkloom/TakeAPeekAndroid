@@ -60,8 +60,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -97,7 +95,6 @@ public class CaptureClipFragment extends Fragment implements
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
 
     SharedPreferences mSharedPreferences = null;
-    Tracker mTracker = null;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -375,7 +372,6 @@ public class CaptureClipFragment extends Fragment implements
 
         Activity activity = getActivity();
         mSharedPreferences = activity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
-        mTracker = Helper.GetAppTracker(activity);
         DatabaseManager.init(activity);
 
         mGoogleApiClient = new GoogleApiClient.Builder(activity)
@@ -468,28 +464,10 @@ public class CaptureClipFragment extends Fragment implements
             {
                 if (mIsRecordingVideo)
                 {
-                    if (mTracker != null)
-                    {
-                        mTracker.send(new HitBuilders.EventBuilder()
-                                .setCategory(Constants.GA_UI_ACTION)
-                                .setAction(Constants.GA_BUTTON_PRESS)
-                                .setLabel("Stop Recording Video")
-                                .build());
-                    }
-
                     stopRecordingVideo();
                 }
                 else
                 {
-                    if (mTracker != null)
-                    {
-                        mTracker.send(new HitBuilders.EventBuilder()
-                                .setCategory(Constants.GA_UI_ACTION)
-                                .setAction(Constants.GA_BUTTON_PRESS)
-                                .setLabel("Start Recording Video")
-                                .build());
-                    }
-
                     startRecordingVideo();
                 }
             }
@@ -497,30 +475,12 @@ public class CaptureClipFragment extends Fragment implements
 
             case R.id.preview:
             {
-                if (mTracker != null)
-                {
-                    mTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory(Constants.GA_UI_ACTION)
-                            .setAction(Constants.GA_BUTTON_PRESS)
-                            .setLabel("Preview Recorded Video")
-                            .build());
-                }
-
                 PreviewRecordedVideo();
             }
             break;
 
             case R.id.upload:
             {
-                if (mTracker != null)
-                {
-                    mTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory(Constants.GA_UI_ACTION)
-                            .setAction(Constants.GA_BUTTON_PRESS)
-                            .setLabel("Upload Recorded Video")
-                            .build());
-                }
-
                 UploadRecordedVideo(mCompletedTakeAPeekObject);
             }
             break;
@@ -627,14 +587,14 @@ public class CaptureClipFragment extends Fragment implements
                 {
                     if (result != PackageManager.PERMISSION_GRANTED)
                     {
-                        Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
+                        Helper.ErrorMessage(getActivity(), null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
                         break;
                     }
                 }
             }
             else
             {
-                Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
+                Helper.ErrorMessage(getActivity(), null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
             }
         }
         else if(requestCode == REQUEST_STORAGE_PERMISSIONS)
@@ -645,14 +605,14 @@ public class CaptureClipFragment extends Fragment implements
                 {
                     if (result != PackageManager.PERMISSION_GRANTED)
                     {
-                        Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
+                        Helper.ErrorMessage(getActivity(), null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
                         break;
                     }
                 }
             }
             else
             {
-                Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
+                Helper.ErrorMessage(getActivity(), null, getString(R.string.Error), getString(R.string.ok), getString(R.string.permission_request));
             }
         }
         else
@@ -746,7 +706,7 @@ public class CaptureClipFragment extends Fragment implements
         {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            Helper.ErrorMessage(getActivity(), mTracker, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.camera_error));
+            Helper.ErrorMessage(getActivity(), null, getString(R.string.Error), getString(R.string.ok), getString(R.string.camera_error));
         }
         catch (InterruptedException e)
         {

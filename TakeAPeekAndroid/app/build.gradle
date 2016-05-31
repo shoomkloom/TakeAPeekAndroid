@@ -8,8 +8,8 @@ android {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 8
-        versionName "0.9.8"
+        versionCode 9
+        versionName "0.9.9"
     }
     buildTypes {
         release {
@@ -32,9 +32,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:support-v13:23.4.0'
     compile 'com.android.support:design:23.4.0'
-    compile 'com.google.android.gms:play-services-analytics:8.4.0'
-    compile 'com.google.android.gms:play-services-gcm:8.4.0'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.google.firebase:firebase-core:9.0.0'
+    compile 'com.google.firebase:firebase-crash:9.0.0'
+    compile "com.google.firebase:firebase-messaging:9.0.0"
+    compile 'com.google.android.gms:play-services-location:9.0.0'
     compile 'com.android.support:support-v4:23.4.0'
 }
 

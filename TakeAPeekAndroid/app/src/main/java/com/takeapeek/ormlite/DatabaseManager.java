@@ -2,8 +2,9 @@ package com.takeapeek.ormlite;
 
 import android.content.Context;
 
-import com.takeapeek.common.ProfileObject;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.ProfileObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ public class DatabaseManager
 	static ReentrantLock lockTakeAPeekContact = new ReentrantLock();
 	static ReentrantLock lockTakeAPeekContactUpdateTimes = new ReentrantLock();
 	static ReentrantLock lockTakeAPeekObject = new ReentrantLock();
+    static ReentrantLock lockTakeAPeekNotification = new ReentrantLock();
 
 	static public void init(Context context) 
 	{
@@ -510,4 +512,178 @@ public class DatabaseManager
 			logger.debug("ClearAllTakeAPeekObjects() - after unlock");
 		}
 	}
+
+    //TakeAPeekNotification
+    public void AddTakeAPeekNotification(TakeAPeekNotification takeAPeekNotification)
+    {
+        //Do not lock this function
+
+        logger.debug("AddTakeAPeekNotification(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekNotificationDao().create(takeAPeekNotification);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public TakeAPeekNotification GetTakeAPeekNotificationWithId(int takeAPeekNotificationId)
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekNotificationWithId(.) Invoked");
+
+        TakeAPeekNotification takeAPeekNotification = null;
+
+        try
+        {
+            takeAPeekNotification = getHelper().GetTakeAPeekNotificationDao().queryForId(takeAPeekNotificationId);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekNotification;
+    }
+
+    public void DeleteTakeAPeekNotification(TakeAPeekNotification takeAPeekNotification)
+    {
+        //Do not lock this function
+
+        logger.debug("DeleteTakeAPeekNotification(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekNotificationDao().delete(takeAPeekNotification);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public void UpdateTakeAPeekNotification(TakeAPeekNotification takeAPeekNotification)
+    {
+        //Do not lock this function
+
+        logger.debug("UpdateTakeAPeekNotification(.) Invoked");
+
+        try
+        {
+            int result = getHelper().GetTakeAPeekNotificationDao().update(takeAPeekNotification);
+            logger.debug(String.format("%d rows were updated", result));
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    //TakeAPeekNotification helper functions
+    public List<TakeAPeekNotification> GetTakeAPeekNotificationList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekNotificationList() Invoked");
+
+        List<TakeAPeekNotification> takeAPeekNotificationList = null;
+
+        try
+        {
+            QueryBuilder<TakeAPeekNotification, Integer> queryBuilder = getHelper().GetTakeAPeekNotificationDao().queryBuilder();
+            queryBuilder.orderBy("creationTime", false); //descending
+            takeAPeekNotificationList = queryBuilder.query();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekNotificationList;
+    }
+
+    public HashMap<String, TakeAPeekNotification> GetTakeAPeekNotificationHash()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekNotificationHash()");
+
+        HashMap<String, TakeAPeekNotification> hashMap = new HashMap<String, TakeAPeekNotification>();
+
+        List<TakeAPeekNotification> takeAPeekNotificationList  = GetTakeAPeekNotificationList();
+
+        if(takeAPeekNotificationList != null)
+        {
+            for (TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+            {
+                hashMap.put(takeAPeekNotification.notificationId, takeAPeekNotification);
+            }
+        }
+
+        return hashMap;
+    }
+
+    public TakeAPeekNotification GetTakeAPeekNotification(String takeAPeekID)
+    {
+        logger.debug("GetTakeAPeekNotification(.) Invoked - before lock");
+
+        TakeAPeekNotification takeAPeekNotification = null;
+
+        lockTakeAPeekNotification.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekNotification(.) - inside lock");
+
+            HashMap<String, TakeAPeekNotification> takeAPeekNotificationHashMap = GetTakeAPeekNotificationHash();
+
+            TakeAPeekNotification foundTakeAPeekNotification = takeAPeekNotificationHashMap.get(takeAPeekID);
+
+            if(foundTakeAPeekNotification != null)
+            {
+                takeAPeekNotification = foundTakeAPeekNotification;
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekNotification with takeAPeekID=%s", takeAPeekID), e);
+        }
+        finally
+        {
+            lockTakeAPeekNotification.unlock();
+            logger.debug("GetTakeAPeekNotification(.) - after unlock");
+        }
+
+        return takeAPeekNotification;
+    }
+
+    public void ClearAllTakeAPeekNotifications()
+    {
+        logger.debug("ClearAllTakeAPeekNotifications() - before lock");
+
+        lockTakeAPeekNotification.lock();
+
+        try
+        {
+            logger.debug("ClearAllTakeAPeekNotifications() - inside lock");
+
+            List<TakeAPeekNotification> takeAPeekNotificationList = GetTakeAPeekNotificationList();
+
+            if(takeAPeekNotificationList != null)
+            {
+                for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+                {
+                    DeleteTakeAPeekNotification(takeAPeekNotification);
+                }
+            }
+        }
+        finally
+        {
+            lockTakeAPeekNotification.unlock();
+            logger.debug("ClearAllTakeAPeekNotifications() - after unlock");
+        }
+    }
 }

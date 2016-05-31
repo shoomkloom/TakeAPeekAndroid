@@ -1,105 +1,91 @@
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".UserMap.UserMapActivity"
-    android:id="@+id/map_container"
+    tools:context=".usermap.UserMapActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true" />
-
-    <ImageView
-        android:id="@+id/map_overlay_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerInside"
-        android:src="@drawable/overlay_image"
-        android:alpha="0.2" />
-
-    <fragment
-        android:id="@+id/autocomplete_fragment"
-        android:name="com.takeapeek.UserMap.CustomPlaceAutoCompleteFragment"
+    <RelativeLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginRight="60dp"
-        tools:layout="@layout/fragment_custom_place_auto_complete"/>
+        android:background="#ffffff">
 
-    <LinearLayout
-        android:id = "@+id/user_peek_stack"
+        <ImageView
+            android:id="@+id/notifications_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_notifications"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="15dp" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_alignParentTop="true"
-        android:visibility="gone" >
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/user_peek_stack_viewpager"
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </LinearLayout>
 
-<!--
-    <RelativeLayout
-        android:id = "@+id/user_peek_stack"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:orientation="vertical"
-        android:layout_gravity="bottom"
-        android:background="@color/tap_darkgray"
-        android:visibility="gone" >
-
-        <RelativeLayout
-            android:id = "@+id/user_peek_stack_thumbnail_layout"
-            android:layout_width="250dp"
-            android:layout_height="200dp"
-            android:layout_centerHorizontal="true" >
-
-            <ImageView
-                android:id = "@+id/user_peek_stack_thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:scaleType="fitCenter" />
-
-            <ImageView
-                android:id = "@+id/user_peek_stack_thumbnail_play"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_video_play" />
-        </RelativeLayout>
 
         <ImageView
-            android:id = "@+id/user_peek_stack_close"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="5dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/close" />
+            android:id="@+id/map_overlay_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/overlay_image"
+            android:alpha="0.2" />
 
-        <TextView
-            android:id = "@+id/user_peek_stack_thumbnail_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/user_peek_stack_thumbnail_layout"
-            android:layout_below="@+id/user_peek_stack_thumbnail_layout"
-            android:textSize="20sp"
-            android:textColor="@color/tap_white"
-            android:text="Some Text"
-            android:layout_marginTop="30dp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </RelativeLayout>
--->
+            <ImageView
+                android:id="@+id/request_peek_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/request_peek"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginBottom="25dp"
+                android:layout_marginLeft="10dp" />
 
-</FrameLayout>
+            <fragment
+                android:id="@+id/autocomplete_fragment"
+                android:name="com.takeapeek.usermap.CustomPlaceAutoCompleteFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginRight="60dp"
+                tools:layout="@layout/fragment_custom_place_auto_complete"/>
+
+            <LinearLayout
+                android:id = "@+id/user_peek_stack"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_alignParentTop="true"
+                android:visibility="gone" >
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/user_peek_stack_viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </FrameLayout>
+</LinearLayout>

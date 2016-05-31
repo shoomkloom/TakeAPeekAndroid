@@ -3,7 +3,6 @@ package com.takeapeek.authenticator;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import com.google.android.gms.analytics.Tracker;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
@@ -36,7 +35,6 @@ public class VerifySMSAsyncTask extends AsyncTask<String, Integer, String>
 		
 		try 
 		{
-			Tracker gaTracker = Helper.GetAppTracker(mAuthenticatorActivity);
 			ResponseObject responseObject = Transport.VerifySMSCode(mAuthenticatorActivity, mAuthenticatorActivity.mUsername, mSelfMeSMSCode, mSharedPreferences);
 			
 			if(responseObject.password != null)

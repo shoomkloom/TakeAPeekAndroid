@@ -1,16 +1,12 @@
 package com.takeapeek;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,11 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.takeapeek.UserMap.UserMapActivity;
+import com.takeapeek.usermap.UserMapActivity;
 import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
@@ -46,11 +40,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int RESULT_CAPTURECLIP = 9002;
 
     SharedPreferences mSharedPreferences = null;
-    public Tracker mTracker = null;
-    private String mTrackerScreenName = "MainActivity";
-
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
-    private boolean mIsReceiverRegistered;
 
     enum EnumHandlerMessage
     {
@@ -103,10 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DatabaseManager.init(this);
 
-        //Get a Tracker
-        mTracker = Helper.GetAppTracker(this);
-
-        if(Helper.DoesTakeAPeekAccountExist(this, mTracker, mHandler) == true)
+        if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true)
         {
             CreateMain();
         }
@@ -143,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+/*@@
         mRegistrationBroadcastReceiver = new BroadcastReceiver()
         {
             @Override
@@ -151,44 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Registering BroadcastReceiver
         RegisterReceiver();
-
-        if (CheckPlayServices())
-        {
-            // Start IntentService to register this application with GCM.
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
-        }
-
-        /*/@@@@@@@@@@@@@@@@@@@@ Upload test
-        //Start asynchronous request to server
-        new AsyncTask<Void, Void, Boolean>()
-        {
-            @Override
-            protected Boolean doInBackground(Void... params)
-            {
-                try
-                {
-                    String username = Helper.GetTakeAPeekAccountUsername(MainActivity.this);
-                    String password = Helper.GetTakeAPeekAccountPassword(MainActivity.this);
-
-                    String outputFilePath = Helper.GetTakeAPeekPath(MainActivity.this) + "TakeAPeek.mp4";
-                    File fileToUpload = new File(outputFilePath);
-                    long fileToUploadLength = fileToUpload.length();
-                    Transport.UploadPeek(
-                            MainActivity.this, username, password, null, fileToUpload, fileToUpload.getName(),
-                            String.format("%smp4", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX),
-                            mSharedPreferences);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Helper.Error(logger, "EXCEPTION: When trying to upload captured clip", e);
-                    return false;
-                }
-            }
-        }.execute();
-        //@@@@@@@@@@@@@@@@@@@@*/
+@@*/
     }
 
     @Override
@@ -198,11 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DatabaseManager.init(this);
 
-        mTracker.setScreenName(mTrackerScreenName);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
         super.onResume();
-        RegisterReceiver();
     }
 
     @Override
@@ -210,11 +156,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     {
         logger.debug("onPause() Invoked");
 
-        mTracker.setScreenName(null);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-        mIsReceiverRegistered = false;
         super.onPause();
     }
 
@@ -345,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+/*@@
     private void RegisterReceiver()
     {
         logger.debug("RegisterReceiver() Invoked");
@@ -355,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mIsReceiverRegistered = true;
         }
     }
+@@*/
 
     /**
      * Check the device to make sure it has the Google Play Services APK. If
@@ -377,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else
             {
-                Helper.ErrorMessage(this, mTracker, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
+                Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
                 Helper.Error(logger, "No Google Play Services. This device is not supported.");
                 finish();
             }
@@ -397,21 +340,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 case R.id.fab:
                     logger.info("onClick: fab");
-                    try
-                    {
-                        if(mTracker != null)
-                        {
-                            mTracker.send(new HitBuilders.EventBuilder()
-                                    .setCategory(Constants.GA_UI_ACTION)
-                                    .setAction(Constants.GA_BUTTON_PRESS)
-                                    .setLabel("fab")
-                                    .build());
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-                    }
 
                     try
                     {

@@ -1,4 +1,4 @@
-package com.takeapeek.UserFeed;
+package com.takeapeek.userfeed;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +14,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -34,8 +32,6 @@ public class UserFeedActivity extends AppCompatActivity
 
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
-    public Tracker mTracker = null;
-    private String mTrackerScreenName = "UserFeedActivity";
 
     ListView mListViewFeedList = null;
     PeekItemAdapter mPeekItemAdapter = null;
@@ -73,9 +69,6 @@ public class UserFeedActivity extends AppCompatActivity
         setContentView(R.layout.activity_user_feed);
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
-
-        //Get a Tracker
-        mTracker = Helper.GetAppTracker(this);
 
         //Initate members for UI elements
         //Progress animation
@@ -123,7 +116,7 @@ public class UserFeedActivity extends AppCompatActivity
         }
         else
         {
-            Helper.ErrorMessage(this, mTracker, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_profile));
+            Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_profile));
         }
 
         mThumbnailLoader = new ThumbnailLoader();
@@ -134,9 +127,6 @@ public class UserFeedActivity extends AppCompatActivity
     {
         logger.debug("onResume() Invoked");
 
-        mTracker.setScreenName(mTrackerScreenName);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
         super.onResume();
     }
 
@@ -144,9 +134,6 @@ public class UserFeedActivity extends AppCompatActivity
     public void onPause()
     {
         logger.debug("onPause() Invoked");
-
-        mTracker.setScreenName(null);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         super.onPause();
     }
@@ -213,7 +200,7 @@ public class UserFeedActivity extends AppCompatActivity
                     UpdateUI();
 
                     Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
-                    Helper.ErrorMessage(UserFeedActivity.this, mTracker, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+                    Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
                     return true;
                 }
             });
@@ -221,7 +208,7 @@ public class UserFeedActivity extends AppCompatActivity
         catch (Exception e)
         {
             Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
-            Helper.ErrorMessage(UserFeedActivity.this, mTracker, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+            Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
         }
     }
 

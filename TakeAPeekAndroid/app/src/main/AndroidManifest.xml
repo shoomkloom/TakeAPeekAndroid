@@ -57,11 +57,6 @@
         </configuration>
     </logback>
 
-    <!-- GCM permissions -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <!-- End GCM permissions -->
-
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
@@ -83,6 +78,7 @@
     <application
         android:name=".common.TAPApplication"
         android:allowBackup="true"
+        android:configChanges="orientation|screenSize"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -150,42 +146,24 @@
             -->
         </service>
 
-        <!-- [START gcm_receiver] -->
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-
-                <category android:name="com.takeapeek"/>
-            </intent-filter>
-        </receiver>
-        <!-- [END gcm_receiver] -->
-
-
-        <!-- [START gcm_listener] -->
-        <service
-            android:name=".TAPGcmListenerService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-            </intent-filter>
-        </service>
-        <!-- [END gcm_listener] -->
         <!-- [START instanceId_listener] -->
         <service
-            android:name=".TAPInstanceIDListenerService"
+            android:name=".common.TAPInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
         <!-- [END instanceId_listener] -->
-        <service
-            android:name=".RegistrationIntentService"
-            android:exported="false">
+
+
+        <!-- FCM message service -->
+        <service android:name=".common.TAPFcmListenerService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
         </service>
+        <!-- END FCM message service -->
 
         <provider
             android:name=".syncadapter.SyncContentProvider"
@@ -206,15 +184,22 @@
             android:value="@string/google_maps_key"/>
 
         <activity
-            android:name=".UserMap.UserMapActivity"
+            android:name=".usermap.UserMapActivity"
             android:label="@string/title_activity_user_map">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
         </activity>
         <activity
-            android:name=".UserFeed.UserFeedActivity"
+            android:name=".userfeed.UserFeedActivity"
             android:label="@string/title_activity_user_feed">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".notifications.NotificationsActivity"
+            android:label="@string/title_activity_notifications">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>

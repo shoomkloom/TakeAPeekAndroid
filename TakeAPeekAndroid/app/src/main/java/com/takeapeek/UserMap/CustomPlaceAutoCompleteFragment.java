@@ -1,4 +1,4 @@
-package com.takeapeek.UserMap;
+package com.takeapeek.usermap;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -114,7 +114,8 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
 
         try
         {
-            Intent var2 = (new PlaceAutocomplete.IntentBuilder(2)).setBoundsBias(this.mZzaRk).setFilter(this.mZzaRl).zzeq(this.mEditTextSearch.getText().toString()).zzig(1).build(this.getActivity());
+            Intent var2 = (new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY))
+                    .setBoundsBias(this.mZzaRk).setFilter(this.mZzaRl).build(this.getActivity());
             this.startActivityForResult(var2, 1);
         }
         catch (GooglePlayServicesRepairableException var3)

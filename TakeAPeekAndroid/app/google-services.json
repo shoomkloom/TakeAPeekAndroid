@@ -1,22 +1,25 @@
 {
   "project_info": {
-    "project_id": "takeapeek-b2444",
     "project_number": "472227973071",
-    "name": "TakeAPeek"
+    "firebase_url": "https://takeapeek-b2444.firebaseio.com",
+    "project_id": "takeapeek-b2444",
+    "storage_bucket": "takeapeek-b2444.appspot.com"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:472227973071:android:1fa578ce201b860a",
-        "client_id": "android:com.takeapeek",
-        "client_type": 1,
         "android_client_info": {
-          "package_name": "com.takeapeek",
-          "certificate_hash": []
+          "package_name": "com.takeapeek"
         }
       },
-      "oauth_client": [],
-      "api_key": [],
+      "oauth_client": [
+        {
+          "client_id": "472227973071-eg34585habqrasg3399t8702v8f8u5qk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [{ "current_key": "AIzaSyDN-rC2dCkmhNFWIbu7VcM9lkSQ6waVj_U" }],
       "services": {
         "analytics_service": {
           "status": 2,
@@ -24,16 +27,9 @@
             "tracking_id": "UA-74670434-1"
           }
         },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
-        },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -41,6 +37,5 @@
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

@@ -6,9 +6,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 
-import com.google.android.gms.analytics.Tracker;
 import com.takeapeek.common.Constants;
-import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,10 +65,8 @@ public class ActiveSyncService extends Service
     	
     	if(mScanThread == null || mScanThread.isAlive() == false)
     	{
-    		Tracker gaTracker = Helper.GetAppTracker(this);
-    		
     		com.takeapeek.syncadapter.SyncAdapterHelper syncAdapterHelper = new com.takeapeek.syncadapter.SyncAdapterHelper();
-    		syncAdapterHelper.Init(this, gaTracker, fullScan, scanOld);
+    		syncAdapterHelper.Init(this, fullScan, scanOld);
     		
     		mScanThread = new Thread(syncAdapterHelper, "ActiveSyncServiceScanThread");
     		mScanThread.start();

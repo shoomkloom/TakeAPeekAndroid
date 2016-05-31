@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.takeapeek.notifications.NotificationsActivity"
+    android:background="#ffffff">
+
+    <ListView
+        android:id="@+id/listview_notifications_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/tap_gray_faded"
+        android:dividerHeight="1dp"
+        android:orientation="vertical"
+        android:listSelector="@android:color/transparent"
+        android:drawSelectorOnTop="true"
+         />
+
+    <TextView
+        android:id="@+id/textview_notifications_empty"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="@string/textview_notifications_empty"
+        android:textColor="@color/tap_gray"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
+</RelativeLayout>

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.ormlite.DatabaseManager;
@@ -131,7 +130,7 @@ public class Transport
         return responseObject;
     }
 
-    public static ResponseObject StartVoiceVerification(Context context, Tracker gaTracker, String userName, SharedPreferences sharedPreferences) throws Exception
+    public static ResponseObject StartVoiceVerification(Context context, String userName, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("StartVoiceVerification(...) Invoked - before lock");
 		
@@ -199,6 +198,20 @@ public class Transport
         }
 
         return responseObject;
+    }
+
+    public static ResponseObject RegisterFCMToken(Context context, String userName, String password, String token, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("RegisterFCMToken(....) Invoked.");
+
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+        nameValuePairs.add(new NameValuePair("action_type", "push_register"));
+        nameValuePairs.add(new NameValuePair("user_name", userName));
+        nameValuePairs.add(new NameValuePair("password", password));
+        nameValuePairs.add(new NameValuePair("token", token));
+
+        return Transport.DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
     }
 
     public static ResponseObject GetProfilesInBounds(Context context, String userName, String password, double north, double east, double south, double west, SharedPreferences sharedPreferences) throws Exception
@@ -332,7 +345,58 @@ public class Transport
         }
     }
 
-    public static ArrayList<ProfileObject> GetFollowersList(Context context, Tracker gaTracker, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    public static ResponseObject RequestPeek(Context context, String username, String password, String metaDataJson, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("RequestPeek(.....) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        Helper.lockProfilePicture.lock();
+
+        try
+        {
+            logger.debug("RequestPeek(.....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "request_peek"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+
+            try
+            {
+                Constants.ContentTypeEnum contentType = Constants.ContentTypeEnum.json;
+
+                responseObject = DoHTTPPost(context, nameValuePairs, metaDataJson, null,
+                        null, contentType, sharedPreferences);
+            }
+            catch(Exception e)
+            {
+                String error;
+
+                if(responseObject != null)
+                {
+                    error = responseObject.error;
+                }
+                else
+                {
+                    error = "Unavailable";
+                }
+
+                Helper.Error(logger, String.format("EXCEPTION: When trying to upload a file. Response error: %s", error), e);
+                throw e;
+            }
+        }
+        finally
+        {
+            Helper.lockProfilePicture.unlock();
+            logger.debug("RequestPeek(.....) - after unlock");
+        }
+
+        return responseObject;
+    }
+
+    public static ArrayList<ProfileObject> GetFollowersList(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("GetFollowersList(.....) Invoked - before lock");
 		
@@ -483,105 +547,6 @@ public class Transport
 		
 		return responseObject;
     }
-
-/*@@
-	public static ResponseObject SendSyncRequest(Context context, Tracker gaTracker, SharedPreferences sharedPreferences, String username, String password, RequestObject requestObject) throws Exception
-	{
-		logger.debug("SendSyncRequest(.....) Invoked - before lock");
-		
-		ResponseObject responseObject = null;
-		
-		lock.lock();
-
-		try
-		{
-			logger.debug("SendSyncRequest(.....) - inside lock");
-			
-			String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
-			
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
-			nameValuePairs.add(new NameValuePair("action_type", "request"));
-			nameValuePairs.add(new NameValuePair("user_name", username));
-			nameValuePairs.add(new NameValuePair("password", password));
-			
-			if(requestObject != null)
-			{
-				String requestJSON = new Gson().toJson(requestObject);
-				
-				responseObject = DoHTTPPost(context, requestStr, nameValuePairs, requestJSON.getBytes(), "Request", Constants.ContentTypeEnum.json, sharedPreferences);
-			}
-			else
-			{
-                responseObject = DoHTTPPost(context, requestStr, nameValuePairs, null, "Request", Constants.ContentTypeEnum.json, sharedPreferences);
-			}
-			
-			if(responseObject != null)
-			{
-
-			}
-		}
-		finally
-		{
-			lock.unlock();
-			logger.debug("SendSyncRequest(.....) - after unlock");
-		}
-		
-		return responseObject;
-	}
-@@*/
-
-/*@@
-    public static void UploadFile(Context context, String username, String password, String metaDataJson, File fileToUpload, String contentName, Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
-    {
-        logger.debug("UploadFile(....) Invoked - before lock");
-
-        ResponseObject responseObject = null;
-
-        Helper.lockProfilePicture.lock();
-
-        try
-        {
-            logger.debug("UploadFile(....) - inside lock");
-
-            String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
-
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
-            nameValuePairs.add(new NameValuePair("action_type", "upload_file"));
-            nameValuePairs.add(new NameValuePair("user_name", username));
-            nameValuePairs.add(new NameValuePair("password", password));
-
-            long byteLength = fileToUpload.length();
-            byte[] bytes = new byte[(int) byteLength];
-
-            try
-            {
-                responseObject = DoHTTPPost(context, requestStr, nameValuePairs, metaDataJson, fileToUpload, contentName, contentType, sharedPreferences);
-            }
-            catch(Exception e)
-            {
-                String error;
-
-                if(responseObject != null)
-                {
-                    error = responseObject.error;
-                }
-                else
-                {
-                    error = "Unavailable";
-                }
-
-                Helper.Error(logger, String.format("EXCEPTION: When trying to upload a file. Response error: %s", error), e);
-                throw e;
-            }
-        }
-        finally
-        {
-            Helper.lockProfilePicture.unlock();
-            logger.debug("UploadPeek(....) - after unlock");
-        }
-    }
-@@*/
 
 	public static void UploadFile(Context context, String username, String password,
 		String metaDataJson, File fileToUpload, File thumbnailToUpload,
@@ -1049,20 +1014,23 @@ public class Transport
 						}
 					}
 
-                    //Write the file data
-                    fileInputStream = new FileInputStream(fileToUpload);
-                    bytesAvailable = fileInputStream.available();
-                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                    buffer = new byte[bufferSize];
-
-                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                    while (bytesRead > 0)
+                    if(fileToUpload != null)
                     {
-                        outputStream.write(buffer, 0, bufferSize);
+                        //Write the file data
+                        fileInputStream = new FileInputStream(fileToUpload);
                         bytesAvailable = fileInputStream.available();
                         bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                        buffer = new byte[bufferSize];
+
                         bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                        while (bytesRead > 0)
+                        {
+                            outputStream.write(buffer, 0, bufferSize);
+                            bytesAvailable = fileInputStream.available();
+                            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                        }
                     }
 
                     outputStream.flush();

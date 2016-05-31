@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -21,8 +19,6 @@ public class CaptureClipActivity extends AppCompatActivity
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
 
     SharedPreferences mSharedPreferences = null;
-    Tracker mTracker = null;
-    private String mTrackerScreenName = "CaptureClipActivity";
 
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -60,9 +56,6 @@ public class CaptureClipActivity extends AppCompatActivity
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //Get a Tracker
-        mTracker = Helper.GetAppTracker(this);
-
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         DatabaseManager.init(this);
@@ -90,9 +83,6 @@ public class CaptureClipActivity extends AppCompatActivity
 
         DatabaseManager.init(this);
 
-        mTracker.setScreenName(mTrackerScreenName);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
         super.onResume();
     }
 
@@ -100,9 +90,6 @@ public class CaptureClipActivity extends AppCompatActivity
     protected void onPause()
     {
         logger.debug("onPause() Invoked");
-
-        mTracker.setScreenName(null);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         super.onPause();
     }

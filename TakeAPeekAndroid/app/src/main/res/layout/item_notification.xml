@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff" >
+
+    <TextView
+        android:id = "@+id/textview_notification_src_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/tap_blue"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:id = "@+id/textview_notification_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/tap_gray_faded"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:id = "@+id/textview_notification_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textview_notification_src_name"
+        android:layout_alignParentLeft="true"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/tap_gray_faded"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:id = "@+id/textview_notification_action_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textview_notification_address"
+        android:layout_alignParentLeft="true"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/tap_blue"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:id = "@+id/textview_notification_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:padding="5dp"
+        android:textColor="@color/tap_white"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/textview_notification_action_title"
+        android:background="@drawable/button_blue" />
+
+</RelativeLayout>

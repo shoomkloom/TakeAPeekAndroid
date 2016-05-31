@@ -37,6 +37,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private Dao<TakeAPeekContact, Integer> mTakeAPeekContactDao = null;
 	private Dao<TakeAPeekContactUpdateTimes, Integer> mTakeAPeekContactUpdateTimesDao = null;
 	private Dao<TakeAPeekObject, Integer> mTakeAPeekObjectDao = null;
+    private Dao<TakeAPeekNotification, Integer> mTakeAPeekNotificationDao = null;
 
 	public DatabaseHelper(Context context) 
 	{
@@ -51,6 +52,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			TableUtils.createTable(connectionSource, TakeAPeekContact.class);
 			TableUtils.createTable(connectionSource, TakeAPeekContactUpdateTimes.class);
 			TableUtils.createTable(connectionSource, TakeAPeekObject.class);
+            TableUtils.createTable(connectionSource, TakeAPeekNotification.class);
 		}
 		catch (Exception e) 
 		{
@@ -135,4 +137,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
 		return mTakeAPeekObjectDao;
 	}
+
+    //TakeAPeekNotification
+    public Dao<TakeAPeekNotification, Integer> GetTakeAPeekNotificationDao()
+    {
+        if (null == mTakeAPeekNotificationDao)
+        {
+            try
+            {
+                mTakeAPeekNotificationDao = getDao(TakeAPeekNotification.class);
+            }
+            catch (java.sql.SQLException e)
+            {
+                Helper.Error(logger, "EXCEPTION: in GetTakeAPeekNotificationDao", e);
+            }
+        }
+
+        return mTakeAPeekNotificationDao;
+    }
 }

@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.IBinder;
 
-import com.google.android.gms.analytics.Tracker;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 
@@ -52,8 +51,6 @@ public class SyncService extends Service
     	
         synchronized (sSyncAdapterLock) 
         {
-        	Tracker gaTracker = Helper.GetAppTracker(this);
-        	
         	if(mSharedPreferences == null)
             {
             	mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
@@ -73,7 +70,7 @@ public class SyncService extends Service
         	
             if (sSyncAdapter == null) 
             {
-                sSyncAdapter = new SyncAdapter(this, gaTracker, true);
+                sSyncAdapter = new SyncAdapter(this, true);
             }
         }
     }

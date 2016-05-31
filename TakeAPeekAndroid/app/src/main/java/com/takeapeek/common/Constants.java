@@ -78,9 +78,6 @@ public class Constants
         addedPublic
     }
 
-    //@@Need to protect these
-    public static String GOOLGLE_MAP_API = "AIzaSyDN-rC2dCkmhNFWIbu7VcM9lkSQ6waVj_U";
-	
 	//TakeAPeekContact constants
 	public static String DEFAULT_CONTACT_NAME = "Default";
 	

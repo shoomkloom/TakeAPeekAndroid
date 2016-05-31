@@ -1,4 +1,4 @@
-package com.takeapeek.UserFeed;
+package com.takeapeek.userfeed;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,11 +10,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.maps.model.LatLng;
 import com.takeapeek.R;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
-import com.takeapeek.common.Helper;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
@@ -127,7 +126,11 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
             viewHolder.mTextViewUserFeedTime.setText(dateTimeStr);
 
-            mAddressLoader.SetAddress(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
+            if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
+            {
+                LatLng location = new LatLng(viewHolder.mTakeAPeekObject.Latitude, viewHolder.mTakeAPeekObject.Longitude);
+                mAddressLoader.SetAddress(mUserFeedActivity, location, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
+            }
         }
 
         return view;
@@ -152,21 +155,6 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             {
                 case R.id.user_peek_feed_thumbnail_play:
                     logger.info("onClick: user_peek_feed_thumbnail_play clicked");
-                    try
-                    {
-                        if(mUserFeedActivity.mTracker != null)
-                        {
-                            mUserFeedActivity.mTracker.send(new HitBuilders.EventBuilder()
-                                    .setCategory(Constants.GA_UI_ACTION)
-                                    .setAction(Constants.GA_LIST_ITEM_PRESS)
-                                    .setLabel("user_peek_feed_thumbnail_play")
-                                    .build());
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-                    }
 
                     mUserFeedActivity.ShowPeek(finalViewHolder.mTakeAPeekObject);
 

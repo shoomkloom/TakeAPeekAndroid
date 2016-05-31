@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -43,8 +42,7 @@ public class SyncAdapterHelper implements Runnable,
 	private SharedPreferences mSharedPreferences = null;
 	private long mBuildNumber = -1;
 	private String mAppVersion = "";
-	private Tracker mTracker = null;
-	
+
 	public Handler mHandler = new Handler();
 
     private GoogleApiClient mGoogleApiClient = null;
@@ -56,13 +54,12 @@ public class SyncAdapterHelper implements Runnable,
 		
 	}
 
-	public void Init(Context context, Tracker gaTracker, boolean fullScan, boolean scanOld) 
+	public void Init(Context context, boolean fullScan, boolean scanOld)
 	{
 		logger.debug("Init(..) Invoked");
 		
 		mContext = context;
-		mTracker = gaTracker;
-		
+
 		DatabaseManager.init(mContext);
 		
         mSharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);

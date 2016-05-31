@@ -5,7 +5,6 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -47,8 +46,7 @@ import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -84,6 +82,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Helper
@@ -114,32 +113,6 @@ public class Helper
 		logger.debug(String.format("Returning OfflineGetGlobalsImages = %b", OfflineGetGlobalsImages));
 		return OfflineGetGlobalsImages;
 	}
-	
-	static public Tracker GetAppTracker(Activity activity)
-	{
-		Tracker gaTracker = null;
-		
-		TAPApplication tapApplication = (TAPApplication)activity.getApplication();
-		if(tapApplication != null)
-		{
-			gaTracker = tapApplication.getDefaultTracker();
-		}
-		
-		return gaTracker;
-	}
-	
-	static public Tracker GetAppTracker(Service service)
-	{
-		Tracker gaTracker = null;
-		
-		TAPApplication tapApplication = (TAPApplication)service.getApplication();
-		if(tapApplication != null)
-		{
-			gaTracker = tapApplication.getDefaultTracker();
-		}
-		
-		return gaTracker;
-	}
 
 	static public synchronized int getNotificationIDCounter(SharedPreferences sharedPreferences)
 	{
@@ -162,8 +135,31 @@ public class Helper
 		 * starts the app again.              */             
 		System.exit(0); 
 	}
+
+    static public ResponseObject RefreshFCMToken(Context context, SharedPreferences sharedPreferences)
+    {
+        logger.debug("RefreshFCMToken(..) Invoked.");
+
+        // Get updated InstanceID token.
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        logger.info("Refreshed token: " + refreshedToken);
+
+        try
+        {
+            String userName = GetTakeAPeekAccountUsername(context);
+            String password = GetTakeAPeekAccountPassword(context);
+
+            return Transport.RegisterFCMToken(context, userName, password, refreshedToken, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Error(logger, "EXCEPTION: When trying to register the new Firebase messaging token", e);
+        }
+
+        return null;
+    }
 	
-	static public boolean DoesTakeAPeekAccountExist(Context context, Tracker gaTracker, Handler handler)
+	static public boolean DoesTakeAPeekAccountExist(Context context, Handler handler)
     {
     	logger.debug("DoesTakeAPeekAccountExist() Invoked");
     	
@@ -177,7 +173,7 @@ public class Helper
 		catch (Exception e) 
 		{
 			Error(logger, "EXCEPTION: More than one TakeAPeek account - exiting application.", e);
-			ErrorMessageWithExit(context, gaTracker, handler, context.getString(R.string.Error), context.getString(R.string.Exit), context.getString(R.string.error_more_than_one_account));
+			ErrorMessageWithExit(context, handler, context.getString(R.string.Error), context.getString(R.string.Exit), context.getString(R.string.error_more_than_one_account));
 		}
 		
     	if(takeAPeekAccount != null)
@@ -608,14 +604,14 @@ public class Helper
         return takeAPeekContactThumbnail;
 	}
 	
-	static public  void DownloadProfileImages(Context context, Tracker gaTracker, ArrayList<ProfileObject> takeAPeekContactList, boolean force) throws Exception
+	static public  void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force) throws Exception
 	{
 		logger.debug("DownloadProfileImages(...) Invoked");
 		
-		DownloadProfileImages(context, gaTracker, takeAPeekContactList, force, false);
+		DownloadProfileImages(context, takeAPeekContactList, force, false);
 	}
 	
-	static public void DownloadProfileImages(Context context, Tracker gaTracker, ArrayList<ProfileObject> takeAPeekContactList, boolean force, boolean checkIfPhotoFileUpdated) throws Exception
+	static public void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force, boolean checkIfPhotoFileUpdated) throws Exception
 	{
 		logger.debug("DownloadProfileImages(..) Invoked");
 		
@@ -669,7 +665,7 @@ public class Helper
 		return responseTakeAPeekPhotoFilePath;
 	}
 	
-	static public void DownloadProfileImage(Context context, Tracker gaTracker, String accountUserName, String accountPassword, ProfileObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
+	static public void DownloadProfileImage(Context context, String accountUserName, String accountPassword, ProfileObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
 	{
 		logger.debug("DownloadProfileImages(......) Invoked");
 		
@@ -1646,25 +1642,10 @@ public class Helper
     	return UserName;
     }
     
-    public static void ErrorMessageWithExit(final Context context, Tracker gaTracker, Handler handler, final String title, final String buttonText, final String message) 
+    public static void ErrorMessageWithExit(final Context context, Handler handler, final String title, final String buttonText, final String message)
 	{
     	logger.debug("ErrorMessageWithExit(.....) Invoked");
-    	try
-    	{
-    		if(gaTracker != null)
-    		{
-	    		gaTracker.send(new HitBuilders.EventBuilder()
-	    		.setCategory(Constants.GA_UI_ACTION)
-	    		.setAction("error_with_exit")
-	    		.setLabel(message)
-	    		.build());
-    		}
-    	}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-		}
-    	
+
     	handler.post(new Runnable()
         {
             @Override
@@ -1687,25 +1668,10 @@ public class Helper
         });
 	}
     
-    public static void ErrorMessage(final Context context, Tracker gaTracker, Handler handler, final String title, final String buttonText, final String message) 
+    public static void ErrorMessage(final Context context, Handler handler, final String title, final String buttonText, final String message)
 	{
     	logger.debug("ErrorMessage(.....) Invoked");
-    	try
-    	{
-    		if(gaTracker != null)
-    		{
-	    		gaTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(Constants.GA_UI_ACTION)
-                        .setAction("error")
-                        .setLabel(message)
-                        .build());
-    		}
-    	}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-		}
-    	
+
     	handler.post(new Runnable()
         {
             @Override
@@ -1721,25 +1687,9 @@ public class Helper
         });
 	}
 
-    public static void SendUpdateNotification(Context context, Tracker gaTracker, SharedPreferences sharedPreferences)
+    public static void SendUpdateNotification(Context context, SharedPreferences sharedPreferences)
     {
         logger.debug("SendUpdateNotification(...) Invoked");
-
-        try
-        {
-            if (gaTracker != null)
-            {
-                gaTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(Constants.GA_UI_ACTION)
-                        .setAction("notification")
-                        .setLabel("Update")
-                        .build());
-            }
-        }
-        catch (Exception e)
-        {
-            Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        }
 
 /*@@
         List<TakeAPeekContactUpdate> takeAPeekContactUpdateList = null;
@@ -3137,6 +3087,18 @@ public class Helper
     	
     	//@@return R.drawable.avatar01;
         return 0;
+    }
+
+    public static long GetTimeDiffInMinutes(long timeInMilliseconds)
+    {
+        logger.debug("GetTimeDiffInMinutes(.) Invoked");
+
+        //Calculate close time
+        long diffInMillisec = System.currentTimeMillis() - timeInMilliseconds;
+        long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMillisec);
+        long seconds = diffInSec % 60;
+        diffInSec/= 60;
+        return diffInSec % 60;
     }
 
     public static Drawable GetActivityIcon(Logger externalLogger, Context context, String packageName, String activityName)

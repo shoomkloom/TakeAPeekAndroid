@@ -9,8 +9,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.takeapeek.R;
-import com.takeapeek.UserMap.LocationHelper;
-import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.usermap.LocationHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +24,17 @@ public class AddressLoader
 
 	SharedPreferences mSharedPreferences = null;
 
-	public void SetAddress(Context context, TakeAPeekObject takeAPeekObject, TextView textView, SharedPreferences sharedPreferences)
+	public void SetAddress(Context context, LatLng location, TextView textView, SharedPreferences sharedPreferences)
 	{
 		logger.debug("SetAddress(....) Invoked");
 		
 		mContext = context;
 		mSharedPreferences = sharedPreferences;
 
-        CreateAddressText(takeAPeekObject, textView);
+        CreateAddressText(location, textView);
 	}
 	
-	private void CreateAddressText(TakeAPeekObject takeAPeekObject, final TextView textView)
+	private void CreateAddressText(LatLng location, final TextView textView)
 	{
 		logger.debug("CreateAddressText(..) Invoked");
 
@@ -47,7 +46,7 @@ public class AddressLoader
 
             textView.setTag(createAddressObject);
 
-            addressCreatorTask.execute(takeAPeekObject);
+            addressCreatorTask.execute(location);
         }
 	}
 
@@ -66,9 +65,9 @@ public class AddressLoader
         return null;
 	}
 	
-	class AddressCreatorTask extends AsyncTask<TakeAPeekObject, Void, String>
+	class AddressCreatorTask extends AsyncTask<LatLng, Void, String>
 	{
-        private TakeAPeekObject mTakeAPeekObject = null;
+        private LatLng mLatLng = null;
         private final WeakReference<TextView> mTextViewReference;
         private Context mContext = null;
 
@@ -84,20 +83,19 @@ public class AddressLoader
          * Actual download method.
          */
         @Override
-        protected String doInBackground(TakeAPeekObject... params)
+        protected String doInBackground(LatLng... params)
         {
         	logger.debug("AddressCreatorTask::doInBackground(.) Invoked");
         	
-        	mTakeAPeekObject = params[0];
+        	mLatLng = params[0];
 
         	try
         	{
-                LatLng location = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
-                return LocationHelper.FormattedAddressFromLocation(mContext, location);
+                return LocationHelper.FormattedAddressFromLocation(mContext, mLatLng);
         	}
         	catch(Exception e)
         	{
-        		Helper.Error(logger, String.format("EXCEPTION: When trying to get thumbnail for %s", mTakeAPeekObject.TakeAPeekID), e);
+        		Helper.Error(logger, "EXCEPTION: When trying to get address", e);
         	}
         	
         	return null;

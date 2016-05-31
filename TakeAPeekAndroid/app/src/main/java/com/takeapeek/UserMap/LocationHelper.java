@@ -1,4 +1,4 @@
-package com.takeapeek.UserMap;
+package com.takeapeek.usermap;
 
 import android.content.Context;
 import android.location.Address;

@@ -1,11 +1,13 @@
-package com.takeapeek.UserMap;
+package com.takeapeek.usermap;
 
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -16,9 +18,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
@@ -39,18 +40,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
+import com.takeapeek.notifications.NotificationsActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -64,10 +70,10 @@ public class UserMapActivity extends FragmentActivity implements
     static private final Logger logger = LoggerFactory.getLogger(UserMapActivity.class);
     static private ReentrantLock boundsLock = new ReentrantLock();
     static private ReentrantLock peekListLock = new ReentrantLock();
+    static private ReentrantLock requestPeekLock = new ReentrantLock();
 
+    Handler mHandler = new Handler();
     SharedPreferences mSharedPreferences = null;
-    public Tracker mTracker = null;
-    private String mTrackerScreenName = "UserMapActivity";
 
     private GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
@@ -82,9 +88,12 @@ public class UserMapActivity extends FragmentActivity implements
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
+    private AsyncTask<Void, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
+    ImageView mImageViewNotifications = null;
     LinearLayout mLinearLayout = null;
     ImageView mImageViewOverlay = null;
+    ImageView mImageViewRequestPeek = null;
     ViewPager mViewPager = null;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
@@ -100,9 +109,6 @@ public class UserMapActivity extends FragmentActivity implements
         mFirstLoad = true;
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
-        //Get a Tracker
-        mTracker = Helper.GetAppTracker(this);
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -117,8 +123,12 @@ public class UserMapActivity extends FragmentActivity implements
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(PlaceSelectionListen);
 
+        mImageViewNotifications = (ImageView)findViewById(R.id.notifications_image);
+        mImageViewNotifications.setOnClickListener(ClickListener);
         mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
         mImageViewOverlay = (ImageView)findViewById(R.id.map_overlay_image);
+        mImageViewRequestPeek = (ImageView)findViewById(R.id.request_peek_image);
+        mImageViewRequestPeek.setOnClickListener(ClickListener);
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
     }
@@ -151,9 +161,6 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("onResume() Invoked");
 
-        mTracker.setScreenName(mTrackerScreenName);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
         super.onResume();
 
         if (mGoogleApiClient != null)
@@ -166,9 +173,6 @@ public class UserMapActivity extends FragmentActivity implements
     public void onPause()
     {
         logger.debug("onPause() Invoked");
-
-        mTracker.setScreenName(null);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
@@ -502,6 +506,102 @@ public class UserMapActivity extends FragmentActivity implements
 
             switch (v.getId())
             {
+                case R.id.request_peek_image:
+                    logger.info("OnClickListener:onClick: request_peek_image clicked");
+
+                    try
+                    {
+                        if(mHashMapIndexToProfileObject.isEmpty() == false)
+                        {
+                            try
+                            {
+                                requestPeekLock.lock();
+
+                                if (mAsyncTaskRequestPeek == null)
+                                {
+                                    //Start asynchronous request to server
+                                    mAsyncTaskRequestPeek = new AsyncTask<Void, Void, ResponseObject>()
+                                    {
+                                        @Override
+                                        protected ResponseObject doInBackground(Void... params)
+                                        {
+                                            try
+                                            {
+                                                logger.info("Getting profile list from server");
+
+                                                Collection<ProfileObject> profileObjectCollection = mHashMapIndexToProfileObject.values();
+
+                                                RequestObject requestObject = new RequestObject();
+                                                requestObject.targetProfileList = new ArrayList<String>();
+
+                                                for(ProfileObject profileObject : profileObjectCollection)
+                                                {
+                                                    requestObject.targetProfileList.add(profileObject.profileId);
+                                                }
+
+                                                String metaDataJson = new Gson().toJson(requestObject);
+
+                                                String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                                String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
+
+                                                return Transport.RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                            }
+
+                                            return null;
+                                        }
+
+                                        @Override
+                                        protected void onPostExecute(ResponseObject responseObject)
+                                        {
+                                            try
+                                            {
+                                                if (responseObject == null)
+                                                {
+                                                    Helper.ErrorMessage(UserMapActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_request_peek));
+                                                }
+                                                else
+                                                {
+                                                    String message = String.format(getString(R.string.requested_peeks_to), mHashMapIndexToProfileObject.size());
+                                                    Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                            finally
+                                            {
+                                                mAsyncTaskRequestPeek = null;
+                                            }
+                                        }
+                                    }.execute();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+                            }
+                            finally
+                            {
+                                requestPeekLock.unlock();
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: Exception when requesting peek", e);
+                    }
+                    break;
+
+                case R.id.notifications_image:
+                    logger.info("OnClickListener:onClick: notifications_image clicked");
+
+                    //Show the notifications activity
+                    final Intent intent = new Intent(UserMapActivity.this, NotificationsActivity.class);
+                    startActivity(intent);
+
+                    break;
+
                 default:
                     break;
             }

@@ -34,9 +34,6 @@ import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -44,10 +41,11 @@ import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Constants.ContactTypeEnum;
 import com.takeapeek.common.Constants.ProfileStateEnum;
-import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.Helper.FontTypeEnum;
 import com.takeapeek.common.PhoneNumberFormattingTextWatcher;
+import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 
@@ -146,7 +144,6 @@ public class AuthenticatorActivity extends AppCompatActivity
     private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
     private Bundle mResultBundle = null;
     
-    Tracker mTracker = null;
 	private String mTrackerScreenName = "AuthenticatorActivity";
     
     /**
@@ -164,9 +161,6 @@ public class AuthenticatorActivity extends AppCompatActivity
     public void onCreate(Bundle icicle) 
     {
         super.onCreate(icicle);
-        
-        //Get a Tracker (should auto-report)
-        mTracker = Helper.GetAppTracker(this);        
         
         logger.debug("onCreate(.) Invoked");
         
@@ -226,7 +220,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 			catch (Exception e) 
 			{
 				Helper.Error(logger, "EXCEPTION: More than one Self.Me account - exiting application.", e);
-				Helper.ErrorMessageWithExit(this, mTracker, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_more_than_one_account));
+				Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_more_than_one_account));
 			}
 			
 	    	if(takeAPeekAccount != null)
@@ -394,7 +388,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 		    	catch(Exception e)
 		    	{
 		    		Helper.Error(logger, "EXCEPTION: Problem loading Authentication Activity - exiting application.", e);
-					Helper.ErrorMessageWithExit(this, mTracker, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_loading_authentication));
+					Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_loading_authentication));
 		    	}
 		    }
         }
@@ -438,9 +432,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 
 		DatabaseManager.init(this);
 
-		mTracker.setScreenName(mTrackerScreenName);
-		mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
 		super.onResume();
 	}
 
@@ -448,9 +439,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 	protected void onPause() 
 	{
 		logger.debug("onPause() Invoked");
-
-		mTracker.setScreenName(null);
-		mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
 		super.onPause();
 	}
@@ -461,17 +449,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 		logger.debug("onStart() Invoked");
 		
 		super.onStart();
-		
-		//Google Analytics
-		try
-		{
-			//Get an Analytics tracker to report app starts & uncaught exceptions etc.
-			GoogleAnalytics.getInstance(this).reportActivityStart(this);
-		}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-		}
 	}
     
     @Override
@@ -480,17 +457,6 @@ public class AuthenticatorActivity extends AppCompatActivity
     	logger.debug("onStop() Invoked");
     	
 		super.onStop();
-		
-		//Google Analytics
-		try
-		{
-			//Stop the analytics tracking
-			GoogleAnalytics.getInstance(this).reportActivityStop(this);
-		}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-		}
 	}
 	
 	public void CreateAccount() throws Exception
@@ -626,6 +592,27 @@ public class AuthenticatorActivity extends AppCompatActivity
         
         //Set Profile state as 'Active'
 		Helper.SetProfileState(mSharedPreferences.edit(), ProfileStateEnum.Active);
+
+        new AsyncTask<Void, Void, ResponseObject>()
+        {
+            @Override
+            protected ResponseObject doInBackground(Void... params)
+            {
+                try
+                {
+                    logger.info("Registering the FCM token");
+
+                    //Register the FCM token
+                    return Helper.RefreshFCMToken(AuthenticatorActivity.this, mSharedPreferences);
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                }
+
+                return null;
+            }
+        }.execute();
     }
     
     private void ShowSMSVerificationUI()
@@ -802,24 +789,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 		public void onItemSelected(AdapterView<?> parent, View v, int position, long id) 
 		{
 			logger.debug(String.format(String.format("OnItemSelectedListener:onItemSelected(Spinner=%s,Position=%d)", parent.getTag().toString(), position)));
-			try
-			{
-				if(mTracker != null)
-				{
-					mTracker.send(
-						new HitBuilders.EventBuilder()
-						.setCategory(Constants.GA_UI_ACTION)
-						.setAction(Constants.GA_SPINNER_PRESS)
-						.setLabel(parent.getTag().toString())
-						.setValue(position)
-						.build());
-				}
-			}
-			catch(Exception e)
-			{
-				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-			}
-			
+
 			mCountryArrayPosition = mCountrySpinner.getSelectedItemPosition();
 			
 			UpdateButtonCreateAccountUI();
@@ -1180,22 +1150,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             {
             	case R.id.button_create_account:
             		logger.info("OnClickListener: 'button_create_account' clicked");
-            		try
-            		{
-            			if(mTracker != null)
-        				{
-        					mTracker.send(new HitBuilders.EventBuilder()
-	                        .setCategory(Constants.GA_UI_ACTION)
-	                        .setAction(Constants.GA_BUTTON_PRESS)
-	                        .setLabel("button_create_account")
-	                        .build());
-        				}
-            		}
-        			catch(Exception e)
-        			{
-        				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        			}
-            		
+
             		try 
 					{
             			Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
@@ -1211,22 +1166,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             		
             	case R.id.login_resend_code:
             		logger.info("OnClickListener: 'login_resend_code' clicked");
-            		try
-            		{
-            			if(mTracker != null)
-        				{
-        					mTracker.send(new HitBuilders.EventBuilder()
-	                        .setCategory(Constants.GA_UI_ACTION)
-	                        .setAction(Constants.GA_BUTTON_PRESS)
-	                        .setLabel("login_resend_code")
-	                        .build());
-        				}
-            		}
-        			catch(Exception e)
-        			{
-        				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        			}
-            		
+
 					try
 					{
 						mHandlerState =  HandlerState.firstVerification;
@@ -1248,22 +1188,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             		
             	case R.id.login_resend_edit_number:
             		logger.info("OnClickListener: 'login_resend_edit_number' clicked");
-            		try
-            		{
-            			if(mTracker != null)
-        				{
-        					mTracker.send(new HitBuilders.EventBuilder()
-	                        .setCategory(Constants.GA_UI_ACTION)
-	                        .setAction(Constants.GA_BUTTON_PRESS)
-	                        .setLabel("login_resend_edit_number")
-	                        .build());
-        				}
-            		}
-        			catch(Exception e)
-        			{
-        				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        			}
-            		
+
 					try
 					{
 						mHandlerState =  HandlerState.numberEdit;
@@ -1279,22 +1204,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             		
             	case R.id.login_resend_request_call:
             		logger.info("OnClickListener: 'login_resend_request_call' clicked");
-            		try
-            		{
-            			if(mTracker != null)
-        				{
-        					mTracker.send(new HitBuilders.EventBuilder()
-	                        .setCategory(Constants.GA_UI_ACTION)
-	                        .setAction(Constants.GA_BUTTON_PRESS)
-	                        .setLabel("login_resend_request_call")
-	                        .build());
-        				}
-            		}
-        			catch(Exception e)
-        			{
-        				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        			}
-            		
+
             		try
             		{
             			mHandlerState =  HandlerState.receiveSMSTimeout;
@@ -1320,22 +1230,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             		
             	case R.id.button_verify_account_submit:
             		logger.info("OnClickListener: 'button_verify_account_submit' clicked");
-            		try
-            		{
-            			if(mTracker != null)
-        				{
-        					mTracker.send(new HitBuilders.EventBuilder()
-	                        .setCategory(Constants.GA_UI_ACTION)
-	                        .setAction(Constants.GA_BUTTON_PRESS)
-	                        .setLabel("button_verify_account_submit")
-	                        .build());
-        				}
-            		}
-        			catch(Exception e)
-        			{
-        				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        			}
-            		
+
             		Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
             		DoVerifyAccount();
             		
@@ -1343,22 +1238,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             		
             	case R.id.login_button_teaser_ok:
             		logger.info("OnClickListener: 'login_button_teaser_ok' clicked");
-            		try
-            		{
-            			if(mTracker != null)
-        				{
-        					mTracker.send(new HitBuilders.EventBuilder()
-	                        .setCategory(Constants.GA_UI_ACTION)
-	                        .setAction(Constants.GA_BUTTON_PRESS)
-	                        .setLabel("login_button_teaser_ok")
-	                        .build());
-        				}
-            		}
-        			catch(Exception e)
-        			{
-        				Helper.Error(logger, "EXCEPTION: When calling EasyTracker", e);
-        			}
-            		
+
             		setResult(RESULT_OK);
         			finish();
             		
@@ -1382,8 +1262,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
 	String mUserName = "";
 	String mPassword = "";
 	SharedPreferences mSharedPreferences = null;
-	Tracker mTracker = null;
-	
+
 	public AuthenticatorAsyncTask(AuthenticatorActivity authenticatorActivity, PhoneNumberUtil phoneNumberUtil, String mobile, String prefix, SharedPreferences sharedPreferences)
 	{
 		mAuthenticatorActivity = authenticatorActivity;
@@ -1391,7 +1270,6 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
 		mMobile = mobile;
 		mPrefix = prefix;
 		mSharedPreferences = sharedPreferences;
-		mTracker = Helper.GetAppTracker(authenticatorActivity);
 	}
 	
 	@Override
@@ -1524,14 +1402,12 @@ class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception>
 	AuthenticatorActivity mAuthenticatorActivity = null;
 	String mUserName = "";
 	SharedPreferences mSharedPreferences = null;
-	Tracker mTracker = null;
-	
+
 	public RequestCallAsyncTask(AuthenticatorActivity authenticatorActivity, String userName, SharedPreferences sharedPreferences)
 	{
 		mAuthenticatorActivity = authenticatorActivity;
 		mUserName = userName;
 		mSharedPreferences = sharedPreferences;
-		mTracker = Helper.GetAppTracker(authenticatorActivity);
 	}
 	
 	@Override    
@@ -1542,7 +1418,7 @@ class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception>
 		try
     	{
 			//Ask for voice verification
-			Transport.StartVoiceVerification(mAuthenticatorActivity, mTracker, mUserName, mSharedPreferences);
+			Transport.StartVoiceVerification(mAuthenticatorActivity, mUserName, mSharedPreferences);
     	}
     	catch(Exception e)
     	{

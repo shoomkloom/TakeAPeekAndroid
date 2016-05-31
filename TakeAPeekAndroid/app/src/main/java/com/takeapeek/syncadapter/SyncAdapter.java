@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 
-import com.google.android.gms.analytics.Tracker;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 
@@ -47,16 +46,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     private final Context mContext;
     
 	SyncAdapterHelper mSyncAdapterHelper = null;
-	Tracker mTracker = null;
-    
-    public SyncAdapter(Context context, Tracker gaTracker, boolean autoInitialize) 
+
+    public SyncAdapter(Context context, boolean autoInitialize)
     {
         super(context, autoInitialize);
         
         logger.debug("SyncAdapter(..) Invoked");
         
         mContext = context;
-        mTracker = gaTracker;
         mAccountManager = AccountManager.get(context);
         
         mSyncAdapterHelper = new com.takeapeek.syncadapter.SyncAdapterHelper();
@@ -107,7 +104,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     	
     	if(mSyncAdapterHelper != null)
     	{
-    		mSyncAdapterHelper.Init(mContext, mTracker, false, true);
+    		mSyncAdapterHelper.Init(mContext, false, true);
     		mSyncAdapterHelper.run();
     	}
     }
