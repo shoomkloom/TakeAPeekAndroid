@@ -16,10 +16,6 @@
 
 package com.takeapeek.common;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
-
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.takeapeek.ormlite.DatabaseManager;
@@ -53,15 +49,11 @@ public class TAPFcmListenerService extends FirebaseMessagingService
         {
             TakeAPeekNotification takeAPeekNotification = new TakeAPeekNotification();
             takeAPeekNotification.notificationId = remoteMessageData.get("notificationId");
-            String latitudeStr = remoteMessageData.get("latitude");
-            takeAPeekNotification.latitude = Double.parseDouble(latitudeStr);
-            String longitudeStr = remoteMessageData.get("longitude");
-            takeAPeekNotification.longitude = Double.parseDouble(longitudeStr);
             takeAPeekNotification.type = remoteMessageData.get("type");
-            takeAPeekNotification.srcProfileId = remoteMessageData.get("srcProfileId");
-            takeAPeekNotification.srcDisplayName = remoteMessageData.get("srcDisplayName");
+            takeAPeekNotification.srcProfileJson = remoteMessageData.get("srcProfileJson");
             String creationTimeStr = remoteMessageData.get("creationTime");
             takeAPeekNotification.creationTime = Long.parseLong(creationTimeStr);
+            takeAPeekNotification.relatedPeekJson = remoteMessageData.get("relatedPeekJson");
 
             DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
 

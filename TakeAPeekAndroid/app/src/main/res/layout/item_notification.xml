@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/tap_blue"
+        android:textColor="@color/tap_blue2"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
 
@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:textColor="@color/tap_gray_faded"
+        android:textColor="@color/tap_lightgray"
         android:layout_margin="10dp" />
 
     <TextView
@@ -35,7 +35,7 @@
         android:layout_alignParentLeft="true"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:textColor="@color/tap_gray_faded"
+        android:textColor="@color/tap_lightgray"
         android:layout_marginLeft="10dp" />
 
     <TextView
@@ -56,12 +56,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:textSize="18sp"
+        android:textSize="15sp"
         android:textStyle="bold"
         android:padding="5dp"
         android:textColor="@color/tap_white"
         android:layout_alignParentRight="true"
-        android:layout_alignBaseline="@+id/textview_notification_action_title"
-        android:background="@drawable/button_blue" />
+        android:layout_alignBaseline="@+id/textview_notification_action_title" />
 
 </RelativeLayout>

@@ -21,18 +21,12 @@ public class TakeAPeekNotification
     @DatabaseField(columnName = "notificationId")
     public String notificationId = null;
 
-    @DatabaseField(dataType= DataType.DOUBLE, columnName = "longitude")
-    public double longitude = 0;
-
-    @DatabaseField(dataType= DataType.DOUBLE, columnName = "latitude")
-    public double latitude = 0;
-
-    @DatabaseField(columnName = "srcProfileId")
-    public String srcProfileId = null;
-
-    @DatabaseField(columnName = "srcDisplayName")
-    public String srcDisplayName = null;
+    @DatabaseField(columnName = "srcProfileJson")
+    public String srcProfileJson = null;
 
     @DatabaseField(dataType= DataType.LONG, columnName = "creationTime")
     public long creationTime = 0;
+
+    @DatabaseField(columnName = "relatedPeekJson")
+    public String relatedPeekJson = null;
 }

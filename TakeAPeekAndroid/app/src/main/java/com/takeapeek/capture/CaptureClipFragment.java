@@ -884,7 +884,8 @@ public class CaptureClipFragment extends Fragment implements
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setOutputFile(mOutputFilePath);
-        mMediaRecorder.setVideoEncodingBitRate(1000000);
+        mMediaRecorder.setVideoEncodingBitRate(1024 * 1000);
+		//@@mMediaRecorder.setVideoEncodingBitRate(1000000);
         mMediaRecorder.setVideoFrameRate(24);
         mMediaRecorder.setMaxDuration(12000); //12 seconds
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
@@ -1040,6 +1041,7 @@ public class CaptureClipFragment extends Fragment implements
             mCompletedTakeAPeekObject.ContentType = Constants.ContentTypeEnum.mp4.toString();
             mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
             mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
+            mCompletedTakeAPeekObject.RelatedProfileID = ((CaptureClipActivity)getActivity()).GetRelatedProfileID();
         }
 
         startPreview();

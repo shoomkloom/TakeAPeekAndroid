@@ -8,7 +8,6 @@ import android.view.WindowManager;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
-import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
 
 import org.slf4j.Logger;
@@ -19,6 +18,8 @@ public class CaptureClipActivity extends AppCompatActivity
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
 
     SharedPreferences mSharedPreferences = null;
+
+    private String mRelateProfileID = null;
 
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -74,6 +75,12 @@ public class CaptureClipActivity extends AppCompatActivity
                     .replace(R.id.container, CaptureClipFragment.newInstance())
                     .commit();
         }
+
+        Intent intent = getIntent();
+        if(intent != null)
+        {
+            mRelateProfileID = intent.getStringExtra(Constants.RELATEDPROFILEIDEXTRA_KEY);
+        }
     }
 
     @Override
@@ -92,5 +99,10 @@ public class CaptureClipActivity extends AppCompatActivity
         logger.debug("onPause() Invoked");
 
         super.onPause();
+    }
+
+    public String GetRelatedProfileID()
+    {
+        return mRelateProfileID;
     }
 }

@@ -105,7 +105,9 @@
     <!-- Notifications -->
     <string name="title_activity_notifications">Notifications</string>
     <string name="textview_notifications_empty">There are no notifications</string>
-    <string name="textview_create_peek">Create Peek</string>
+    <string name="textview_send_peek">Send Peek</string>
     <string name="textview_action_title_request">Sent you a request</string>
+    <string name="textview_view_peek">View Peek</string>
+    <string name="textview_action_title_response">Sent you a Peek</string>
     <string name="textview_notification_time">%1$d minutes ago</string>
 </resources>

@@ -38,4 +38,8 @@ public class TakeAPeekObject
 
     @DatabaseField(dataType= DataType.INTEGER, columnName = "ThumbnailByteLength")
     public int ThumbnailByteLength = 0;
+
+    @DatabaseField(columnName = "RelatedProfileID")
+    public String RelatedProfileID = null;
+
 }

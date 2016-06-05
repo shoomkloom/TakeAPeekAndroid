@@ -145,47 +145,54 @@ public class SyncAdapterHelper implements Runnable,
 
             for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
             {
-                //Create objects to upload
-                File fileToUpload = new File(takeAPeekObject.FilePath);
-                if(fileToUpload.exists() == false)
+                try
                 {
-                    Helper.Error(logger, String.format("ERROR: file %s does not exist", takeAPeekObject.FilePath));
-                    DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
-                    continue;
+                    //Create objects to upload
+                    File fileToUpload = new File(takeAPeekObject.FilePath);
+                    if (fileToUpload.exists() == false)
+                    {
+                        Helper.Error(logger, String.format("ERROR: file %s does not exist", takeAPeekObject.FilePath));
+                        DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
+                        continue;
+                    }
+
+                    String thumbnailPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
+                    File thumbnailToUpload = new File(thumbnailPath);
+
+                    if (thumbnailToUpload.exists() == false)
+                    {
+                        //Create thumbnail
+                        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
+                                takeAPeekObject.FilePath,
+                                MediaStore.Video.Thumbnails.MINI_KIND);
+
+                        //Save the thumbnail
+                        FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
+                        bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
+                        fileOutputStreamThumbnail.close();
+                    }
+
+                    long thumbnailFileLength = thumbnailToUpload.length();
+                    if (thumbnailFileLength > (long) Integer.MAX_VALUE)
+                    {
+                        Helper.Error(logger, "ERROR: thumbnail file length is too long to handle");
+                        continue;
+                    }
+                    takeAPeekObject.ThumbnailByteLength = (int) thumbnailFileLength;
+
+                    String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
+
+                    //Upload the Mutha!
+                    Transport.UploadFile(
+                            mContext, username, password, completedTakeAPeekJson,
+                            fileToUpload, thumbnailToUpload,
+                            Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
+                            mSharedPreferences);
                 }
-
-                String thumbnailPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
-                File thumbnailToUpload = new File(thumbnailPath);
-
-                if(thumbnailToUpload.exists() == false)
+                catch(Exception ex)
                 {
-                    //Create thumbnail
-                    Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
-                            takeAPeekObject.FilePath,
-                            MediaStore.Video.Thumbnails.MINI_KIND);
-
-                    //Save the thumbnail
-                    FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
-                    bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
-                    fileOutputStreamThumbnail.close();
+                    Helper.Error(logger, String.format("EXCEPTION: When trying to upload %s", takeAPeekObject.FilePath), ex);
                 }
-
-                long thumbnailFileLength = thumbnailToUpload.length();
-                if ( thumbnailFileLength > (long)Integer.MAX_VALUE )
-                {
-                    Helper.Error(logger, "ERROR: thumbnail file length is too long to handle");
-                    continue;
-                }
-                takeAPeekObject.ThumbnailByteLength = (int)thumbnailFileLength;
-
-                String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
-
-                //Upload the Mutha!
-                Transport.UploadFile(
-                        mContext, username, password, completedTakeAPeekJson,
-                        fileToUpload, thumbnailToUpload,
-                        Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
-                        mSharedPreferences);
             }
 
             logger.info(String.format("Deleting %d takeAPeekObjects from takeAPeekObjectList", takeAPeekObjectList.size()));

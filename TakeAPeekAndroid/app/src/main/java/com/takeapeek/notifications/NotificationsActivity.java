@@ -49,26 +49,30 @@ public class NotificationsActivity extends AppCompatActivity
         //Sorted list by date - newest first
         List<TakeAPeekNotification> takeAPeekNotificationList = DatabaseManager.getInstance().GetTakeAPeekNotificationList();
 
-        //Delete the old notifications from the DB
-        Boolean oldNotification = false;
-        long currentMillis = System.currentTimeMillis();
-        for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+        if (takeAPeekNotificationList != null)
         {
-            if(oldNotification == false)
+            //Delete the old notifications from the DB
+            Boolean oldNotification = false;
+            long currentMillis = System.currentTimeMillis();
+
+            for (TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
             {
-                if(currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR)
+                if (oldNotification == false)
                 {
-                    takeAPeekNotificationArrayList.add(takeAPeekNotification);
+                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR)
+                    {
+                        takeAPeekNotificationArrayList.add(takeAPeekNotification);
+                    }
+                    else
+                    {
+                        oldNotification = true;
+                        DatabaseManager.getInstance().DeleteTakeAPeekNotification(takeAPeekNotification);
+                    }
                 }
                 else
                 {
-                    oldNotification = true;
                     DatabaseManager.getInstance().DeleteTakeAPeekNotification(takeAPeekNotification);
                 }
-            }
-            else
-            {
-                DatabaseManager.getInstance().DeleteTakeAPeekNotification(takeAPeekNotification);
             }
         }
 

@@ -40,8 +40,8 @@ public class Transport
 	private static ReentrantLock lock = new ReentrantLock();
 	
 	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
-	//@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-    //@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
+	//@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
+    //@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
 	//@@*/static String mServerRootURL = ""; //Staging address
 	
 	public static boolean IsConnected(Context context)

@@ -3,16 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="tap_lightgray">#4c4c4c</color>
+    <color name="tap_lightgray">#8c8c8c</color>
     <color name="tap_darkgray">#282828</color>
     <color name="tap_darkgray_faded">#AA282828</color>
     <color name="tap_gray">#303030</color>
     <color name="tap_gray_faded">#AA303030</color>
     <color name="tap_gray_extra_faded">#44303030</color>
-    <color name="tap_blue">#00B1C9</color>
+    <color name="tap_blue">#2f3e9b</color>
+    <color name="tap_blue2">#2a4999</color>
     <color name="tap_lightblue">#A8DBD8</color>
     <color name="tap_darkorange">#EF4C22</color>
     <color name="tap_darkorange_faded">#AAEF4C22</color>
-    <color name="tap_orange">#F2852E</color>
-    <color name="tap_white">#DFE4CC</color>
+    <color name="tap_orange">#ff7341</color>
+    <color name="tap_white">#ffffff</color>
 </resources>

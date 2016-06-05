@@ -81,11 +81,6 @@ public class Constants
 	//TakeAPeekContact constants
 	public static String DEFAULT_CONTACT_NAME = "Default";
 	
-    //FMResponse constants
-    public static String DETAIL_ERROR = "error";
-    public static String DETAIL_STATE = "state";
-    public static String DETAIL_UPDATES = "updates";
-	
     //Account type string.
     public static final String TAKEAPEEK_ACCOUNT_TYPE = "com.takeapeek";
     public static final String TAKEAPEEK_AUTHORITY = "com.takeapeek.provider";
@@ -118,6 +113,12 @@ public class Constants
     
     //Profile info file name
     public static final String PROFILE_INFO_FILE_NAME = "profileInfo.txt";
+
+    //CaptureClipActivity intent extra name
+    public static final String RELATEDPROFILEIDEXTRA_KEY = "RelatedProfileID";
+
+    //UserFeedActivity intent extra name
+    public static final String PARAM_PEEKOBJECT = "RelatedPeek";
     
     //ContactDetailsActivity intent extra name
     public static final String CONTACTDETAILSEXTRA_KEY = "ContactDetails";

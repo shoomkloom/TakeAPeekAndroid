@@ -1,5 +1,5 @@
 #
-# generated on 2016/05/30 10:00:30
+# generated on 2016/06/05 01:32:20
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -96,6 +96,10 @@ fieldName=ThumbnailByteLength
 columnName=ThumbnailByteLength
 dataPersister=INTEGER
 # --field-end--
+# --field-start--
+fieldName=RelatedProfileID
+columnName=RelatedProfileID
+# --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
@@ -117,27 +121,17 @@ fieldName=notificationId
 columnName=notificationId
 # --field-end--
 # --field-start--
-fieldName=longitude
-columnName=Longitude
-dataPersister=DOUBLE
-# --field-end--
-# --field-start--
-fieldName=latitude
-columnName=Latitude
-dataPersister=DOUBLE
-# --field-end--
-# --field-start--
-fieldName=srcProfileId
-columnName=srcProfileId
-# --field-end--
-# --field-start--
-fieldName=srcDisplayName
-columnName=srcDisplayName
+fieldName=srcProfileJson
+columnName=srcProfileJson
 # --field-end--
 # --field-start--
 fieldName=creationTime
 columnName=creationTime
 dataPersister=LONG
+# --field-end--
+# --field-start--
+fieldName=relatedPeekJson
+columnName=relatedPeekJson
 # --field-end--
 # --table-fields-end--
 # --table-end--

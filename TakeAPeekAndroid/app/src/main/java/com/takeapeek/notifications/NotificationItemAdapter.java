@@ -1,20 +1,25 @@
 package com.takeapeek.notifications;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 import com.takeapeek.R;
+import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.ProfileObject;
 import com.takeapeek.ormlite.TakeAPeekNotification;
+import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +41,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
     private static LayoutInflater mLayoutInflater = null;
 
     SharedPreferences mSharedPreferences = null;
+    Gson mGson = new Gson();
 
     private final AddressLoader mAddressLoader = new AddressLoader();
 
@@ -48,6 +54,8 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
         TextView mTextViewButton = null;
 
         TakeAPeekNotification mTakeAPeekNotification = null;
+        ProfileObject mProfileObject = null;
+        TakeAPeekObject mTakeAPeekObject = null;
         int Position = -1;
     }
 
@@ -94,6 +102,15 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             viewHolder = new ViewHolder();
 
             viewHolder.mTakeAPeekNotification = mTakeAPeekNotificationList.get(position);
+            try
+            {
+                viewHolder.mProfileObject = mGson.fromJson(viewHolder.mTakeAPeekNotification.srcProfileJson, ProfileObject.class);
+                viewHolder.mTakeAPeekObject = mGson.fromJson(viewHolder.mTakeAPeekNotification.relatedPeekJson, TakeAPeekObject.class);
+            }
+            catch(Exception ex)
+            {
+                Helper.Error(logger, "EXCEPTION: When tyring to parse JSON", ex);
+            }
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_notification_src_name);
             viewHolder.mTextViewNotificationTime = (TextView)view.findViewById(R.id.textview_notification_time);
@@ -101,10 +118,11 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             viewHolder.mTextViewNotificationActionTitle = (TextView)view.findViewById(R.id.textview_notification_action_title);
             viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_notification_action);
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
+            viewHolder.mTextViewButton.setTag(viewHolder);
 
-            if(viewHolder.mTakeAPeekNotification.latitude > 0 && viewHolder.mTakeAPeekNotification.longitude > 0)
+            if(viewHolder.mProfileObject.latitude > 0 && viewHolder.mProfileObject.longitude > 0)
             {
-                LatLng location = new LatLng(viewHolder.mTakeAPeekNotification.latitude, viewHolder.mTakeAPeekNotification.longitude);
+                LatLng location = new LatLng(viewHolder.mProfileObject.latitude, viewHolder.mProfileObject.longitude);
                 mAddressLoader.SetAddress(mNotificationsActivity, location, viewHolder.mTextViewNotificationAddress, mSharedPreferences);
             }
 
@@ -120,7 +138,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
         {
             viewHolder.mTakeAPeekNotification = mTakeAPeekNotificationList.get(position);
 
-            viewHolder.mTextViewSrcProfileName.setText(viewHolder.mTakeAPeekNotification.srcDisplayName);
+            viewHolder.mTextViewSrcProfileName.setText(viewHolder.mProfileObject.displayName);
 
             long minutes = Helper.GetTimeDiffInMinutes(viewHolder.mTakeAPeekNotification.creationTime);
 
@@ -139,8 +157,15 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
             if(viewHolder.mTakeAPeekNotification.type.compareTo("request") == 0)
             {
-                viewHolder.mTextViewButton.setText(R.string.textview_create_peek);
+                viewHolder.mTextViewButton.setText(R.string.textview_send_peek);
                 viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_request);
+                viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_blue);
+            }
+            else if(viewHolder.mTakeAPeekNotification.type.compareTo("response") == 0)
+            {
+                viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
+                viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_response);
+                viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
             }
         }
 
@@ -159,10 +184,27 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                 case R.id.textview_notification_action:
                     logger.info("onClick: textview_notification_action");
 
-                    /*@@*/
-                    Toast.makeText(mNotificationsActivity, "Notification Button Clicked", Toast.LENGTH_SHORT).show();
-                    /*@@*/
+                    ViewHolder viewHolder = (ViewHolder)v.getTag();
 
+                    if(viewHolder.mTakeAPeekNotification.type.compareTo("request") == 0)
+                    {
+                        logger.info(String.format("Starting CaptureClipActivity with RELATEDPROFILEIDEXTRA_KEY = %s", viewHolder.mProfileObject.profileId));
+
+                        final Intent intent = new Intent(mNotificationsActivity, CaptureClipActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mProfileObject.profileId);
+                        mNotificationsActivity.startActivity(intent);
+                    }
+                    else if(viewHolder.mTakeAPeekNotification.type.compareTo("response") == 0)
+                    {
+                        logger.info("Starting UserFeedActivity with PARAM_PEEKOBJECT");
+
+                        final Intent intent = new Intent(mNotificationsActivity, UserFeedActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra(Constants.PARAM_PROFILEOBJECT, viewHolder.mTakeAPeekNotification.srcProfileJson);
+                        intent.putExtra(Constants.PARAM_PEEKOBJECT, viewHolder.mTakeAPeekNotification.relatedPeekJson);
+                        mNotificationsActivity.startActivity(intent);
+                    }
                     break;
 
                 default:

@@ -77,6 +77,7 @@ public class UserMapActivity extends FragmentActivity implements
 
     private GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
+    //@@private ClusterManager<TapItem> mClusterManager = null;
 
     private boolean mFirstLoad = false;
     Marker mMarkerCurrentShown = null;
@@ -154,6 +155,9 @@ public class UserMapActivity extends FragmentActivity implements
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(true);
+
+        // Initialize the manager with the context and the map.
+        //@@mClusterManager = new ClusterManager<TapItem>(this, mGoogleMap);
     }
 
     @Override
@@ -660,3 +664,21 @@ public class UserMapActivity extends FragmentActivity implements
         }
     };
 }
+
+/*@@
+class TapItem implements ClusterItem
+{
+    private final LatLng mPosition;
+
+    public TapItem(double lat, double lng)
+    {
+        mPosition = new LatLng(lat, lng);
+    }
+
+    @Override
+    public LatLng getPosition()
+    {
+        return mPosition;
+    }
+}
+@@*/

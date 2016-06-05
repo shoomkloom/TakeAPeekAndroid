@@ -38,7 +38,7 @@ public class ProfileObject implements Serializable
 
     public long photoServerTime = 0;
     
-    public int blocked = 0;
+    public boolean blocked = false;
     
     public long totalFollowers = 0;
     
