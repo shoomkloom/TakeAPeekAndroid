@@ -905,7 +905,7 @@ public class CaptureClipFragment extends Fragment implements
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateAndTime = simpleDateFormat.format(currentDate);
 
-        return String.format("%s/TakeAPeek_%s.mp4", Helper.GetTakeAPeekPath(context), currentDateAndTime);
+        return String.format("%sTakeAPeek_%s.mp4", Helper.GetTakeAPeekPath(context), currentDateAndTime);
     }
 
     private String getVideoThumbnailFilePath(String videoFilePath)
