@@ -149,8 +149,8 @@ public class ThumbnailLoader
                 {
                 	imageView.setBackgroundResource(0);
                     imageView.setImageBitmap(bitmap);
-                    
-                	Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
+
+                	Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadeinquick);
                     imageView.setAnimation(zoomInAnimation);
                 	zoomInAnimation.start();
                 }

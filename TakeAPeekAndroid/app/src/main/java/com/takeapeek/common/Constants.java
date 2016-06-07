@@ -102,6 +102,7 @@ public class Constants
 
     //LocalBroadcast new push notification action
     public static final String PUSH_BROADCAST_ACTION = "PushNotificationBroadcast";
+    public static final String PUSH_BROADCAST_EXTRA_ID = "PushNotificationID";
     
     // Account preference keys
     /////////////////////////////////////////////////////////////

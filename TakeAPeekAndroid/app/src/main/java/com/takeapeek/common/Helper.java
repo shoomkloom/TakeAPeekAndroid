@@ -3101,8 +3101,19 @@ public class Helper
         long diffInMinutes = diffInSeconds % 60;
         diffInSeconds /= 60;
         long diffInHours = diffInSeconds % 24;
+        diffInSeconds /= 24;
+        long diffInDays = diffInSeconds;
 
-        if(diffInHours > 0)
+        if(diffInDays > 0)
+        {
+            formtedDiffTime = context.getString(R.string.textview_notification_time_one_day);
+
+            if(diffInDays != 1)
+            {
+                formtedDiffTime = String.format(context.getString(R.string.textview_notification_time_days), diffInDays);
+            }
+        }
+        else if(diffInHours > 0)
         {
             formtedDiffTime = context.getString(R.string.textview_notification_time_one_hour);
 

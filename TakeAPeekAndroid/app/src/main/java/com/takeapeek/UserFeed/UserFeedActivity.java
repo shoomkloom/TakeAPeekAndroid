@@ -24,12 +24,15 @@ import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 public class UserFeedActivity extends AppCompatActivity
 {
@@ -53,6 +56,8 @@ public class UserFeedActivity extends AppCompatActivity
     ThumbnailLoader mThumbnailLoader = null;
 
     TakeAPeekObject mCurrentTakeAPeekObject = null;
+
+    static public ReentrantLock lockBroadcastReceiver = new ReentrantLock();
 
     EnumActivityState mEnumActivityState = EnumActivityState.none;
 
@@ -78,11 +83,6 @@ public class UserFeedActivity extends AppCompatActivity
             if(mPeekItemAdapter != null)
             {
                 mPeekItemAdapter.notifyDataSetChanged();
-            }
-
-            if(mListViewFeedList != null)
-            {
-                mListViewFeedList.refreshDrawableState();
             }
 
             mTimerHandler.postDelayed(this, Constants.INTERVAL_MINUTE);
@@ -420,26 +420,43 @@ public class UserFeedActivity extends AppCompatActivity
 
             default: break;
         }
-
     }
-
-    Runnable RunnableUpdateNotification = new Runnable()
-    {
-        public void run()
-        {
-            //Show notification dialog
-            Toast.makeText(UserFeedActivity.this, "A notification was received!", Toast.LENGTH_SHORT).show();
-        }
-    };
 
     private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            if(intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+            logger.debug("onPushNotificationBroadcast.onReceive() Invoked - before lock");
+
+            lockBroadcastReceiver.lock();
+
+            logger.debug("onPushNotificationBroadcast.onReceive() Invoked - inside lock");
+
+            try
             {
-                runOnUiThread(RunnableUpdateNotification);
+                if (intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+                {
+                    String notificationID = intent.getStringExtra(Constants.PUSH_BROADCAST_EXTRA_ID);
+
+                    RunnableWithArg runnableWithArg = new RunnableWithArg(notificationID)
+                    {
+                        public void run()
+                        {
+                            String notificationID = (String) this.getArgs()[0];
+
+                            //Show the notification dialog
+                            Toast.makeText(UserFeedActivity.this, String.format("Notification %s was received!", notificationID), Toast.LENGTH_SHORT).show();
+                        }
+                    };
+
+                    runOnUiThread(runnableWithArg);
+                }
+            }
+            finally
+            {
+                lockBroadcastReceiver.unlock();
+                logger.debug("onPushNotificationBroadcast.onReceive() Invoked - after unlock");
             }
         }
     };

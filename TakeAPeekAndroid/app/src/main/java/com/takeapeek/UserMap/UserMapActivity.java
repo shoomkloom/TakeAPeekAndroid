@@ -52,6 +52,7 @@ import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
+import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationsActivity;
@@ -102,6 +103,8 @@ public class UserMapActivity extends FragmentActivity implements
     ViewPager mViewPager = null;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
+
+    static public ReentrantLock lockBroadcastReceiver = new ReentrantLock();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -673,23 +676,41 @@ public class UserMapActivity extends FragmentActivity implements
         }
     };
 
-    Runnable RunnableUpdateNotification = new Runnable()
-    {
-        public void run()
-        {
-            //Show notification dialog
-            Toast.makeText(UserMapActivity.this, "A notification was received!", Toast.LENGTH_SHORT).show();
-        }
-    };
-
     private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            if(intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+            logger.debug("onPushNotificationBroadcast.onReceive() Invoked - before lock");
+
+            lockBroadcastReceiver.lock();
+
+            logger.debug("onPushNotificationBroadcast.onReceive() Invoked - inside lock");
+
+            try
             {
-                runOnUiThread(RunnableUpdateNotification);
+                if (intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+                {
+                    String notificationID = intent.getStringExtra(Constants.PUSH_BROADCAST_EXTRA_ID);
+
+                    RunnableWithArg runnableWithArg = new RunnableWithArg(notificationID)
+                    {
+                        public void run()
+                        {
+                            String notificationID = (String) this.getArgs()[0];
+
+                            //Show the notification dialog
+                            Toast.makeText(UserMapActivity.this, String.format("Notification %s was received!", notificationID), Toast.LENGTH_SHORT).show();
+                        }
+                    };
+
+                    runOnUiThread(runnableWithArg);
+                }
+            }
+            finally
+            {
+                lockBroadcastReceiver.unlock();
+                logger.debug("onPushNotificationBroadcast.onReceive() Invoked - after unlock");
             }
         }
     };

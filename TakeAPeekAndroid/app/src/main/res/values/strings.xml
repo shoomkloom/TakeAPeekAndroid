@@ -114,5 +114,7 @@
     <string name="textview_notification_time_minutes">%1$d minutes ago</string>
     <string name="textview_notification_time_one_hour">1 hour ago</string>
     <string name="textview_notification_time_hours">%1$d hours ago</string>
+    <string name="textview_notification_time_one_day">1 day ago</string>
+    <string name="textview_notification_time_days">%1$d days ago</string>
 
 </resources>

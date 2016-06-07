@@ -76,6 +76,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                 //Broadcast notification
                 logger.info("Broadcasting intent: " + Constants.PUSH_BROADCAST_ACTION);
                 Intent broadcastIntent = new Intent(Constants.PUSH_BROADCAST_ACTION);
+                broadcastIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, takeAPeekNotification.notificationId);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 
                 sendNotification(remoteMessageData);
