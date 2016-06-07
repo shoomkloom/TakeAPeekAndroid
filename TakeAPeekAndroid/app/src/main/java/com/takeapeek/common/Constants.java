@@ -99,6 +99,9 @@ public class Constants
     
     //The file name to use for shared preferences between all part of the TakeAPeek project
     public static final String SHARED_PREFERENCES_FILE_NAME = "TakeAPeekSharedPreferences";
+
+    //LocalBroadcast new push notification action
+    public static final String PUSH_BROADCAST_ACTION = "PushNotificationBroadcast";
     
     // Account preference keys
     /////////////////////////////////////////////////////////////

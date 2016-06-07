@@ -109,5 +109,10 @@
     <string name="textview_action_title_request">Sent you a request</string>
     <string name="textview_view_peek">View Peek</string>
     <string name="textview_action_title_response">Sent you a Peek</string>
-    <string name="textview_notification_time">%1$d minutes ago</string>
+    <string name="textview_notification_time_justnow">Just now</string>
+    <string name="textview_notification_time_one_minute">1 minute ago</string>
+    <string name="textview_notification_time_minutes">%1$d minutes ago</string>
+    <string name="textview_notification_time_one_hour">1 hour ago</string>
+    <string name="textview_notification_time_hours">%1$d hours ago</string>
+
 </resources>

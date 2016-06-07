@@ -1,6 +1,9 @@
 package com.takeapeek.usermap;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -11,6 +14,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.animation.Animation;
@@ -171,6 +175,9 @@ public class UserMapActivity extends FragmentActivity implements
         {
             mGoogleApiClient.connect();
         }
+
+        IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
     }
 
     @Override
@@ -183,6 +190,8 @@ public class UserMapActivity extends FragmentActivity implements
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
 
         super.onPause();
     }
@@ -661,6 +670,27 @@ public class UserMapActivity extends FragmentActivity implements
         public void onError(Status status)
         {
             Helper.Error(logger, String.format("ERROR: When trying to autocomplete a place. Error: '%s'", status));
+        }
+    };
+
+    Runnable RunnableUpdateNotification = new Runnable()
+    {
+        public void run()
+        {
+            //Show notification dialog
+            Toast.makeText(UserMapActivity.this, "A notification was received!", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if(intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+            {
+                runOnUiThread(RunnableUpdateNotification);
+            }
         }
     };
 }

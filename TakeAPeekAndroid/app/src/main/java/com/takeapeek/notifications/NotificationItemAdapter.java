@@ -24,9 +24,7 @@ import com.takeapeek.userfeed.UserFeedActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by orenslev on 12/05/2016.
@@ -140,20 +138,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
             viewHolder.mTextViewSrcProfileName.setText(viewHolder.mProfileObject.displayName);
 
-            long minutes = Helper.GetTimeDiffInMinutes(viewHolder.mTakeAPeekNotification.creationTime);
-
-            if(minutes < 60)
-            {
-                String minutesAgo = String.format(mNotificationsActivity.getString(R.string.textview_notification_time), minutes);
-                viewHolder.mTextViewNotificationTime.setText(minutesAgo);
-            }
-            else
-            {
-                Date date = new Date();
-                date.setTime(viewHolder.mTakeAPeekNotification.creationTime);
-                String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
-                viewHolder.mTextViewNotificationTime.setText(dateTimeStr);
-            }
+            viewHolder.mTextViewNotificationTime.setText(Helper.GetFormttedDiffTime(mNotificationsActivity, viewHolder.mTakeAPeekNotification.creationTime));
 
             if(viewHolder.mTakeAPeekNotification.type.compareTo("request") == 0)
             {

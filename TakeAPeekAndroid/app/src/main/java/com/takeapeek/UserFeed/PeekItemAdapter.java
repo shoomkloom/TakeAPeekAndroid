@@ -14,16 +14,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.takeapeek.R;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
+import com.takeapeek.common.Helper;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created by orenslev on 12/05/2016.
@@ -120,11 +118,7 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
 
-            long utcOffset = TimeZone.getDefault().getRawOffset();
-            Date date = new Date();
-            date.setTime(viewHolder.mTakeAPeekObject.CreationTime);
-            String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
-            viewHolder.mTextViewUserFeedTime.setText(dateTimeStr);
+            viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity, viewHolder.mTakeAPeekObject.CreationTime));
 
             if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
             {

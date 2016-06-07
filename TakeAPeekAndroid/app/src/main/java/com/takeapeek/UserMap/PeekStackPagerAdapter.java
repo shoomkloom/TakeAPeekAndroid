@@ -11,20 +11,17 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.takeapeek.R;
-import com.takeapeek.userfeed.UserFeedActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 
 /**
  * Created by orenslev on 11/05/2016.
@@ -72,11 +69,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
 
-            long utcOffset = TimeZone.getDefault().getRawOffset();
-            Date date = new Date();
-            date.setTime(takeAPeekObject.CreationTime);
-            String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
-            textViewUserStackTime.setText(dateTimeStr);
+            textViewUserStackTime.setText(Helper.GetFormttedDiffTime(mUserMapActivity, takeAPeekObject.CreationTime));
         }
         else
         {

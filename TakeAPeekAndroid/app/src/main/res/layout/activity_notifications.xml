@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.takeapeek.notifications.NotificationsActivity"
-    android:background="#ffffff">
+    android:background="@color/tap_white" >
 
     <ListView
         android:id="@+id/listview_notifications_list"
@@ -16,7 +16,7 @@
         android:orientation="vertical"
         android:listSelector="@android:color/transparent"
         android:drawSelectorOnTop="true"
-         />
+        android:animateLayoutChanges="true" />
 
     <TextView
         android:id="@+id/textview_notifications_empty"

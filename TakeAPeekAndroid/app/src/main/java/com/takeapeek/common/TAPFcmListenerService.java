@@ -16,6 +16,9 @@
 
 package com.takeapeek.common;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.takeapeek.ormlite.DatabaseManager;
@@ -26,10 +29,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TAPFcmListenerService extends FirebaseMessagingService
 {
     static private final Logger logger = LoggerFactory.getLogger(TAPFcmListenerService.class);
+
+    static public ReentrantLock lockMessageReceived = new ReentrantLock();
 
     /**
      * Called when message is received.
@@ -38,27 +44,49 @@ public class TAPFcmListenerService extends FirebaseMessagingService
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage)
     {
-        final Map<String, String> remoteMessageData = remoteMessage.getData();
+        logger.debug("onMessageReceived(.) Invoked - before lock");
 
-        //Add a new notification object to our ormlite db
-        DatabaseManager.init(TAPFcmListenerService.this);
+        lockMessageReceived.lock();
 
-        HashMap<String, TakeAPeekNotification> takeAPeekNotificationHash = DatabaseManager.getInstance().GetTakeAPeekNotificationHash();
-        if(takeAPeekNotificationHash == null ||
-                takeAPeekNotificationHash.containsKey(remoteMessageData.get("notificationId")) == false)
+        logger.debug("onMessageReceived(.) - inside lock");
+
+        try
         {
-            TakeAPeekNotification takeAPeekNotification = new TakeAPeekNotification();
-            takeAPeekNotification.notificationId = remoteMessageData.get("notificationId");
-            takeAPeekNotification.type = remoteMessageData.get("type");
-            takeAPeekNotification.srcProfileJson = remoteMessageData.get("srcProfileJson");
-            String creationTimeStr = remoteMessageData.get("creationTime");
-            takeAPeekNotification.creationTime = Long.parseLong(creationTimeStr);
-            takeAPeekNotification.relatedPeekJson = remoteMessageData.get("relatedPeekJson");
+            final Map<String, String> remoteMessageData = remoteMessage.getData();
 
-            DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
+            //Add a new notification object to our ormlite db
+            DatabaseManager.init(TAPFcmListenerService.this);
 
-            sendNotification(remoteMessageData);
+            HashMap<String, TakeAPeekNotification> takeAPeekNotificationHash = DatabaseManager.getInstance().GetTakeAPeekNotificationHash();
+            if (takeAPeekNotificationHash == null ||
+                    takeAPeekNotificationHash.containsKey(remoteMessageData.get("notificationId")) == false)
+            {
+                logger.info("TakeAPeekNotification not found in DB, adding a new one");
+
+                TakeAPeekNotification takeAPeekNotification = new TakeAPeekNotification();
+                takeAPeekNotification.notificationId = remoteMessageData.get("notificationId");
+                takeAPeekNotification.type = remoteMessageData.get("type");
+                takeAPeekNotification.srcProfileJson = remoteMessageData.get("srcProfileJson");
+                String creationTimeStr = remoteMessageData.get("creationTime");
+                takeAPeekNotification.creationTime = Long.parseLong(creationTimeStr);
+                takeAPeekNotification.relatedPeekJson = remoteMessageData.get("relatedPeekJson");
+
+                DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
+
+                //Broadcast notification
+                logger.info("Broadcasting intent: " + Constants.PUSH_BROADCAST_ACTION);
+                Intent broadcastIntent = new Intent(Constants.PUSH_BROADCAST_ACTION);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+
+                sendNotification(remoteMessageData);
+            }
         }
+        finally
+        {
+            lockMessageReceived.unlock();
+            logger.debug("onMessageReceived(.) - after unlock");
+        }
+
         // TODO(developer): Handle FCM messages here.
         // If the application is in the foreground handle both data and notification messages here.
         // Also if you intend on generating your own notifications as a result of a received FCM

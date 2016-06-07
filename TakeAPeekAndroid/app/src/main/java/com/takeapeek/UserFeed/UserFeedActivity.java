@@ -1,17 +1,22 @@
 package com.takeapeek.userfeed;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.gson.Gson;
@@ -62,6 +67,28 @@ public class UserFeedActivity extends AppCompatActivity
         previewStopped
     }
 
+    Handler mTimerHandler = new Handler();
+    Runnable mTimerRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            logger.debug("mTimerRunnable.run() Invoked");
+
+            if(mPeekItemAdapter != null)
+            {
+                mPeekItemAdapter.notifyDataSetChanged();
+            }
+
+            if(mListViewFeedList != null)
+            {
+                mListViewFeedList.refreshDrawableState();
+            }
+
+            mTimerHandler.postDelayed(this, Constants.INTERVAL_MINUTE);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -86,6 +113,8 @@ public class UserFeedActivity extends AppCompatActivity
         mImageViewPeekClose = (ImageView)findViewById(R.id.user_peek_stack_close);
         mImageViewPeekClose.setOnClickListener(ClickListener);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_user_feed_empty);
+
+        mThumbnailLoader = new ThumbnailLoader();
 
         mEnumActivityState = EnumActivityState.loading;
         UpdateUI();
@@ -112,14 +141,22 @@ public class UserFeedActivity extends AppCompatActivity
                     mEnumActivityState = EnumActivityState.emptyList;
                     UpdateUI();
                 }
+
+                mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_MINUTE);
+            }
+
+            String peekObjectJSON = intent.getStringExtra(Constants.PARAM_PEEKOBJECT);
+            TakeAPeekObject takeAPeekObject = new Gson().fromJson(peekObjectJSON, TakeAPeekObject.class);
+
+            if(takeAPeekObject != null)
+            {
+                ShowPeek(takeAPeekObject);
             }
         }
         else
         {
             Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_profile));
         }
-
-        mThumbnailLoader = new ThumbnailLoader();
     }
 
     @Override
@@ -128,12 +165,19 @@ public class UserFeedActivity extends AppCompatActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
+
+        IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
     }
 
     @Override
     public void onPause()
     {
         logger.debug("onPause() Invoked");
+
+        mTimerHandler.removeCallbacks(mTimerRunnable);
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
 
         super.onPause();
     }
@@ -200,7 +244,7 @@ public class UserFeedActivity extends AppCompatActivity
                     UpdateUI();
 
                     Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
-                    Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+                    Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%d, %d)", getString(R.string.error_playing_peek), what, extra));
                     return true;
                 }
             });
@@ -378,4 +422,26 @@ public class UserFeedActivity extends AppCompatActivity
         }
 
     }
+
+    Runnable RunnableUpdateNotification = new Runnable()
+    {
+        public void run()
+        {
+            //Show notification dialog
+            Toast.makeText(UserFeedActivity.this, "A notification was received!", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if(intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+            {
+                runOnUiThread(RunnableUpdateNotification);
+            }
+        }
+    };
 }
+

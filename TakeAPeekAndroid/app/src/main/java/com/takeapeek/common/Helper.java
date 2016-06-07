@@ -3089,16 +3089,47 @@ public class Helper
         return 0;
     }
 
-    public static long GetTimeDiffInMinutes(long timeInMilliseconds)
+    public static String GetFormttedDiffTime(Context context, long timeInMiliseconds)
     {
-        logger.debug("GetTimeDiffInMinutes(.) Invoked");
+        logger.debug("GetFormttedDiffTime(..) Invoked");
 
-        //Calculate close time
-        long diffInMillisec = System.currentTimeMillis() - timeInMilliseconds;
-        long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMillisec);
-        long seconds = diffInSec % 60;
-        diffInSec/= 60;
-        return diffInSec % 60;
+        String formtedDiffTime = context.getString(R.string.textview_notification_time_justnow);
+
+        long diffInMillisec = System.currentTimeMillis() - timeInMiliseconds;
+        long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMillisec);
+        diffInSeconds /= 60;
+        long diffInMinutes = diffInSeconds % 60;
+        diffInSeconds /= 60;
+        long diffInHours = diffInSeconds % 24;
+
+        if(diffInHours > 0)
+        {
+            formtedDiffTime = context.getString(R.string.textview_notification_time_one_hour);
+
+            if(diffInHours != 1)
+            {
+                formtedDiffTime = String.format(context.getString(R.string.textview_notification_time_hours), diffInHours);
+            }
+
+/*@@
+                Date date = new Date();
+                date.setTime(viewHolder.mTakeAPeekNotification.creationTime);
+                String dateTimeStr = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(date);
+@@*/
+        }
+        else
+        {
+            if (diffInMinutes == 1)
+            {
+                formtedDiffTime = context.getString(R.string.textview_notification_time_one_minute);
+            }
+            if (diffInMinutes > 1)
+            {
+                formtedDiffTime = String.format(context.getString(R.string.textview_notification_time_minutes), diffInMinutes);
+            }
+        }
+
+        return formtedDiffTime;
     }
 
     public static Drawable GetActivityIcon(Logger externalLogger, Context context, String packageName, String activityName)
