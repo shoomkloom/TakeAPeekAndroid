@@ -627,7 +627,7 @@ public class DatabaseManager
         return hashMap;
     }
 
-    public TakeAPeekNotification GetTakeAPeekNotification(String takeAPeekID)
+    public TakeAPeekNotification GetTakeAPeekNotification(String notificationId)
     {
         logger.debug("GetTakeAPeekNotification(.) Invoked - before lock");
 
@@ -638,18 +638,19 @@ public class DatabaseManager
         {
             logger.debug("GetTakeAPeekNotification(.) - inside lock");
 
-            HashMap<String, TakeAPeekNotification> takeAPeekNotificationHashMap = GetTakeAPeekNotificationHash();
-
-            TakeAPeekNotification foundTakeAPeekNotification = takeAPeekNotificationHashMap.get(takeAPeekID);
-
-            if(foundTakeAPeekNotification != null)
+            try
             {
-                takeAPeekNotification = foundTakeAPeekNotification;
+                takeAPeekNotification = getHelper().GetTakeAPeekNotificationDao().queryBuilder().
+                        where().eq("notificationId", notificationId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
             }
         }
         catch (Exception e)
         {
-            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekNotification with takeAPeekID=%s", takeAPeekID), e);
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekNotification with takeAPeekID=%s", notificationId), e);
         }
         finally
         {

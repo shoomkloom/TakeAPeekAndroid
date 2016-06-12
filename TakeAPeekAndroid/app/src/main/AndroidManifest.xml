@@ -204,6 +204,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
         </activity>
+        <activity
+            android:name=".notifications.NotificationPopupActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" >
+        </activity>
     </application>
 
 </manifest>

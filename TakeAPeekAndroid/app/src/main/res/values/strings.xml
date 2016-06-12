@@ -106,6 +106,7 @@
     <string name="title_activity_notifications">Notifications</string>
     <string name="textview_notifications_empty">There are no notifications</string>
     <string name="textview_send_peek">Send Peek</string>
+    <string name="textview_request_peek">Request Peek</string>
     <string name="textview_action_title_request">Sent you a request</string>
     <string name="textview_view_peek">View Peek</string>
     <string name="textview_action_title_response">Sent you a Peek</string>
@@ -117,4 +118,8 @@
     <string name="textview_notification_time_one_day">1 day ago</string>
     <string name="textview_notification_time_days">%1$d days ago</string>
 
+    <!-- Notiofication popup activity -->
+    <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
+    <string name="request_big_title">%1$s is asking you for a Peek</string>
+    <string name="request_small_title">Show them why you are special</string>
 </resources>

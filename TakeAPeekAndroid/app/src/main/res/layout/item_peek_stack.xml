@@ -32,7 +32,7 @@
         android:layout_margin="5dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/close" />
+        android:src="@drawable/button_close" />
 
     <TextView
         android:id = "@+id/user_peek_stack_thumbnail_time"

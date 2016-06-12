@@ -67,7 +67,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
             TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
 
             //Load the thumbnail asynchronously
-            mThumbnailLoader.SetThumbnail(mUserMapActivity, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
+            mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
 
             textViewUserStackTime.setText(Helper.GetFormttedDiffTime(mUserMapActivity, takeAPeekObject.CreationTime));
         }

@@ -10,15 +10,6 @@
         android:layout_height="200dp"
         android:layout_centerHorizontal="true" >
 
-<!--
-        <VideoView
-            android:id = "@+id/user_peek_feed_video"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:visibility="gone" />
--->
-
         <ImageView
             android:id = "@+id/user_peek_feed_thumbnail"
             android:layout_width="match_parent"
@@ -32,16 +23,6 @@
             android:layout_height="70dp"
             android:layout_centerInParent="true"
             android:src="@drawable/ic_video_play" />
-
-<!--
-        <ImageView
-            android:id = "@+id/user_peek_feed_video_progress"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/progress"
-            android:visibility="gone" />
--->
 
     </RelativeLayout>
 

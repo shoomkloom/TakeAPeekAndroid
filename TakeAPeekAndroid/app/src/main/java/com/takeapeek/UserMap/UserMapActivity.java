@@ -55,6 +55,7 @@ import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
+import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
 
 import org.slf4j.Logger;
@@ -99,7 +100,7 @@ public class UserMapActivity extends FragmentActivity implements
     ImageView mImageViewNotifications = null;
     LinearLayout mLinearLayout = null;
     ImageView mImageViewOverlay = null;
-    ImageView mImageViewRequestPeek = null;
+    LinearLayout mLinearLayoutRequestPeek = null;
     ViewPager mViewPager = null;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
@@ -135,8 +136,8 @@ public class UserMapActivity extends FragmentActivity implements
         mImageViewNotifications.setOnClickListener(ClickListener);
         mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
         mImageViewOverlay = (ImageView)findViewById(R.id.map_overlay_image);
-        mImageViewRequestPeek = (ImageView)findViewById(R.id.request_peek_image);
-        mImageViewRequestPeek.setOnClickListener(ClickListener);
+        mLinearLayoutRequestPeek = (LinearLayout)findViewById(R.id.button_request_peek);
+        mLinearLayoutRequestPeek.setOnClickListener(ClickListener);
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
     }
@@ -158,7 +159,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         mGoogleMap = googleMap;
 
-        // remove map buttons
+        // Set map controls
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(true);
@@ -421,7 +422,7 @@ public class UserMapActivity extends FragmentActivity implements
             }
             catch (IntentSender.SendIntentException e)
             {
-                e.printStackTrace();
+                Helper.Error(logger, "EXCEPTION: When trying to resolve location connection", e);
             }
         }
     }
@@ -522,8 +523,8 @@ public class UserMapActivity extends FragmentActivity implements
 
             switch (v.getId())
             {
-                case R.id.request_peek_image:
-                    logger.info("OnClickListener:onClick: request_peek_image clicked");
+                case R.id.button_request_peek:
+                    logger.info("OnClickListener:onClick: button_request_peek clicked");
 
                     try
                     {
@@ -699,8 +700,10 @@ public class UserMapActivity extends FragmentActivity implements
                         {
                             String notificationID = (String) this.getArgs()[0];
 
-                            //Show the notification dialog
-                            Toast.makeText(UserMapActivity.this, String.format("Notification %s was received!", notificationID), Toast.LENGTH_SHORT).show();
+                            final Intent notificationPopupActivityIntent = new Intent(UserMapActivity.this, NotificationPopupActivity.class);
+                            notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, notificationID);
+                            startActivity(notificationPopupActivityIntent);
                         }
                     };
 

@@ -116,7 +116,7 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mTakeAPeekObject = mTakeAPeekObjectList.get(position);
 
             //Load the thumbnail asynchronously
-            mThumbnailLoader.SetThumbnail(mUserFeedActivity, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
+            mThumbnailLoader.SetThumbnail(mUserFeedActivity, position, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
 
             viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity, viewHolder.mTakeAPeekObject.CreationTime));
 

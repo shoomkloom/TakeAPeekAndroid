@@ -51,16 +51,33 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/request_peek_image"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/request_peek"
+            <LinearLayout
+                android:id="@+id/button_request_peek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_marginBottom="25dp"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginLeft="10dp">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/button_peek_request" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:background="@drawable/button_green"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/tap_white"
+                    android:text="@string/textview_request_peek"/>
+            </LinearLayout>
 
             <fragment
                 android:id="@+id/autocomplete_fragment"

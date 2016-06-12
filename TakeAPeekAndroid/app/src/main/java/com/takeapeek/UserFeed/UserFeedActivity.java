@@ -191,7 +191,7 @@ public class UserFeedActivity extends AppCompatActivity
         mEnumActivityState = EnumActivityState.previewLoading;
         UpdateUI();
 
-        mThumbnailLoader.SetThumbnail(this, takeAPeekObject, mImageViewPeekThumbnail, mSharedPreferences);
+        mThumbnailLoader.SetThumbnail(this, -1, takeAPeekObject, mImageViewPeekThumbnail, mSharedPreferences);
 
         //Play the streaming video
         try

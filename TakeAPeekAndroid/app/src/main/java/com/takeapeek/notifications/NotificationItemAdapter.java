@@ -140,17 +140,23 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
             viewHolder.mTextViewNotificationTime.setText(Helper.GetFormttedDiffTime(mNotificationsActivity, viewHolder.mTakeAPeekNotification.creationTime));
 
-            if(viewHolder.mTakeAPeekNotification.type.compareTo("request") == 0)
+            Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(viewHolder.mTakeAPeekNotification.type);
+
+            switch(pushNotificationTypeEnum)
             {
-                viewHolder.mTextViewButton.setText(R.string.textview_send_peek);
-                viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_request);
-                viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_blue);
-            }
-            else if(viewHolder.mTakeAPeekNotification.type.compareTo("response") == 0)
-            {
-                viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
-                viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_response);
-                viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
+                case request:
+                    viewHolder.mTextViewButton.setText(R.string.textview_send_peek);
+                    viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_request);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_blue);
+                    break;
+
+                case response:
+                    viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
+                    viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_response);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
+                    break;
+
+                default: break;
             }
         }
 
@@ -171,25 +177,32 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
                     ViewHolder viewHolder = (ViewHolder)v.getTag();
 
-                    if(viewHolder.mTakeAPeekNotification.type.compareTo("request") == 0)
-                    {
-                        logger.info(String.format("Starting CaptureClipActivity with RELATEDPROFILEIDEXTRA_KEY = %s", viewHolder.mProfileObject.profileId));
+                    Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(viewHolder.mTakeAPeekNotification.type);
 
-                        final Intent intent = new Intent(mNotificationsActivity, CaptureClipActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mProfileObject.profileId);
-                        mNotificationsActivity.startActivity(intent);
-                    }
-                    else if(viewHolder.mTakeAPeekNotification.type.compareTo("response") == 0)
+                    switch(pushNotificationTypeEnum)
                     {
-                        logger.info("Starting UserFeedActivity with PARAM_PEEKOBJECT");
+                        case request:
+                            logger.info(String.format("Starting CaptureClipActivity with RELATEDPROFILEIDEXTRA_KEY = %s", viewHolder.mProfileObject.profileId));
 
-                        final Intent intent = new Intent(mNotificationsActivity, UserFeedActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra(Constants.PARAM_PROFILEOBJECT, viewHolder.mTakeAPeekNotification.srcProfileJson);
-                        intent.putExtra(Constants.PARAM_PEEKOBJECT, viewHolder.mTakeAPeekNotification.relatedPeekJson);
-                        mNotificationsActivity.startActivity(intent);
+                            final Intent captureClipActivityIntent = new Intent(mNotificationsActivity, CaptureClipActivity.class);
+                            captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mProfileObject.profileId);
+                            mNotificationsActivity.startActivity(captureClipActivityIntent);
+                            break;
+
+                        case response:
+                            logger.info("Starting UserFeedActivity with PARAM_PEEKOBJECT");
+
+                            final Intent userFeedActivityIntent = new Intent(mNotificationsActivity, UserFeedActivity.class);
+                            userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            userFeedActivityIntent.putExtra(Constants.PARAM_PROFILEOBJECT, viewHolder.mTakeAPeekNotification.srcProfileJson);
+                            userFeedActivityIntent.putExtra(Constants.PARAM_PEEKOBJECT, viewHolder.mTakeAPeekNotification.relatedPeekJson);
+                            mNotificationsActivity.startActivity(userFeedActivityIntent);
+                            break;
+
+                        default: break;
                     }
+
                     break;
 
                 default:

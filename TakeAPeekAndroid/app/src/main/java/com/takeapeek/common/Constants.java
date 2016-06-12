@@ -63,13 +63,6 @@ public class Constants
 		AddContact
 	}
 	
-	public enum PushNotificationTypeEnum
-    {
-		none,
-        tickle,
-        like
-    }
-
     public enum UpdateTypeEnum
     {
         none,
@@ -78,7 +71,18 @@ public class Constants
         addedPublic
     }
 
-	//TakeAPeekContact constants
+    public enum PushNotificationTypeEnum
+    {
+        none,
+        tickle,
+        request,
+        response,
+        follow,
+        online
+    }
+
+
+    //TakeAPeekContact constants
 	public static String DEFAULT_CONTACT_NAME = "Default";
 	
     //Account type string.

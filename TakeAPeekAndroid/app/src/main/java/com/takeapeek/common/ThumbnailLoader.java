@@ -19,22 +19,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.Hashtable;
 
 public class ThumbnailLoader
 {
 	static private final Logger logger = LoggerFactory.getLogger(ThumbnailLoader.class);
 	
 	Context mContext = null;
+    int mPosition = -1;
 
 	SharedPreferences mSharedPreferences = null;
 	BitmapFactory.Options mBitmapFactoryOptions = null;
+
+    Hashtable mAnimationStateHash = new Hashtable();
 	
-	public void SetThumbnail(Context activity, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
+	public void SetThumbnail(Context activity, int position, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
 	{
 		logger.debug("SetThumbnail(..) Invoked");
 		
 		mContext = activity;
 		mSharedPreferences = sharedPreferences;
+        mPosition = position;
 		
 		mBitmapFactoryOptions = new BitmapFactory.Options();
         mBitmapFactoryOptions.inScaled = false;
@@ -150,9 +155,14 @@ public class ThumbnailLoader
                 	imageView.setBackgroundResource(0);
                     imageView.setImageBitmap(bitmap);
 
-                	Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadeinquick);
-                    imageView.setAnimation(zoomInAnimation);
-                	zoomInAnimation.start();
+                    if(mAnimationStateHash.containsKey(mPosition) == false)
+                    {
+                        mAnimationStateHash.put(mPosition, true);
+
+                        Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadeinquick);
+                        imageView.setAnimation(zoomInAnimation);
+                        zoomInAnimation.start();
+                    }
                 }
             }
         }
