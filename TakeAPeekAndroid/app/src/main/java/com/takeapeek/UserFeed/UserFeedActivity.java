@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.gson.Gson;
@@ -27,6 +26,7 @@ import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
+import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
@@ -445,8 +445,10 @@ public class UserFeedActivity extends AppCompatActivity
                         {
                             String notificationID = (String) this.getArgs()[0];
 
-                            //Show the notification dialog
-                            Toast.makeText(UserFeedActivity.this, String.format("Notification %s was received!", notificationID), Toast.LENGTH_SHORT).show();
+                            final Intent notificationPopupActivityIntent = new Intent(UserFeedActivity.this, NotificationPopupActivity.class);
+                            notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, notificationID);
+                            startActivity(notificationPopupActivityIntent);
                         }
                     };
 

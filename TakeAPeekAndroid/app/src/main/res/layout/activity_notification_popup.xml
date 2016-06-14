@@ -31,7 +31,6 @@
         android:layout_height="250dp"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"
-
         android:visibility="gone"/>
 
     <TextView
@@ -72,29 +71,29 @@
 
     <!-- Preview Peek -->
     <RelativeLayout
-        android:id="@+id/peek_preview"
+        android:id="@+id/peek_notification_preview"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/rounded_corners_top"
+        android:background="@color/tap_white"
         android:visibility="gone">
 
         <RelativeLayout
-            android:id = "@+id/user_peek_feed_thumbnail_layout"
+            android:id = "@+id/user_peek_notification_thumbnail_layout"
             android:layout_width="250dp"
-            android:layout_height="200dp"
+            android:layout_height="250dp"
             android:layout_centerHorizontal="true" >
 
             <ImageView
-                android:id = "@+id/user_peek_feed_thumbnail"
+                android:id = "@+id/user_peek_notification_thumbnail"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:scaleType="fitCenter" />
 
             <ImageView
-                android:id = "@+id/user_peek_feed_thumbnail_play"
+                android:id = "@+id/user_peek_notification_thumbnail_play"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerInParent="true"
@@ -103,22 +102,34 @@
         </RelativeLayout>
 
         <TextView
-            android:id = "@+id/user_peek_feed_thumbnail_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/user_peek_feed_thumbnail_layout"
-            android:textSize="18sp"
+            android:id = "@+id/user_peek_notification_thumbnail_time"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:textSize="12sp"
+            android:padding="5dp"
+            android:background="@drawable/gradient_top"
             android:textColor="@color/tap_white"
-            android:layout_marginTop="30dp" />
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"/>
 
         <TextView
-            android:id = "@+id/user_peek_feed_thumbnail_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/user_peek_feed_thumbnail_time"
-            android:textSize="18sp"
+            android:id = "@+id/user_peek_notification_thumbnail_address"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/user_peek_notification_thumbnail_layout"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal|bottom"
+            android:textSize="12sp"
             android:textColor="@color/tap_white"
-            android:layout_marginTop="5dp" />
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="5dp"
+            android:background="@drawable/gradient_bottom"/>
 
     </RelativeLayout>
     <!-- END Preview Peek -->

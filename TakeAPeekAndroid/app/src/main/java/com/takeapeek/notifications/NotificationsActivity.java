@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -198,8 +197,10 @@ public class NotificationsActivity extends AppCompatActivity
 
                             String notificationID = (String) this.getArgs()[0];
 
-                            //Show the notification dialog
-                            Toast.makeText(NotificationsActivity.this, String.format("Notification %s was received!", notificationID), Toast.LENGTH_SHORT).show();
+                            final Intent notificationPopupActivityIntent = new Intent(NotificationsActivity.this, NotificationPopupActivity.class);
+                            notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, notificationID);
+                            startActivity(notificationPopupActivityIntent);
                         }
                     };
 

@@ -122,4 +122,6 @@
     <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
     <string name="request_big_title">%1$s is asking you for a Peek</string>
     <string name="request_small_title">Show them why you are special</string>
+    <string name="response_big_title">%1$s sent you a Peek</string>
+    <string name="response_small_title">Check it out!</string>
 </resources>

@@ -35,9 +35,11 @@ import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
     Handler mHandler = new Handler();
     private boolean mFirstLoad = true;
 
-    private final AddressLoader mAddressLoader = new AddressLoader();
+    private ThumbnailLoader mThumbnailLoader = null;
+    private AddressLoader mAddressLoader = null;
 
     Gson mGson = new Gson();
 
@@ -99,6 +102,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
         LinearLayout linearLayoutButtonSend = (LinearLayout)findViewById(R.id.button_send_peek);
         LinearLayout linearLayoutButtonRequest = (LinearLayout)findViewById(R.id.button_request_peek);
 
+        RelativeLayout.LayoutParams relativeLayoutParams = null;
+
         if(mTakeAPeekNotification != null)
         {
             if(mTakeAPeekNotification.srcProfileJson != null && mTakeAPeekNotification.srcProfileJson.isEmpty() == false)
@@ -135,15 +140,20 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     TextView textViewLocation = (TextView)findViewById(R.id.request_location_on_map);
                     textViewLocation.setVisibility(View.VISIBLE);
 
-                    LatLng location = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
-                    mAddressLoader.SetAddress(this, location, textViewLocation, mSharedPreferences);
+                    if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
+                    {
+                        LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
+
+                        mAddressLoader = new AddressLoader();
+                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
+                    }
 
                     //Titles
                     textViewTitleBig.setText(String.format(getString(R.string.request_big_title), mProfileObject.displayName));
                     textViewTitleSmall.setText(R.string.request_small_title);
 
                     //Request Peek button
-                    RelativeLayout.LayoutParams relativeLayoutParams = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
+                    relativeLayoutParams = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
                     relativeLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
                     linearLayoutButtonSend.setLayoutParams(relativeLayoutParams);
 
@@ -153,6 +163,39 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     break;
 
                 case response:
+                    findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
+
+                    ImageView imageViewPeekThumbnail = (ImageView)findViewById(R.id.user_peek_notification_thumbnail);
+                    ImageView imageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_notification_thumbnail_play);
+                    imageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
+                    TextView textViewUserFeedTime = (TextView)findViewById(R.id.user_peek_notification_thumbnail_time);
+                    TextView textViewUserFeedAddress = (TextView)findViewById(R.id.user_peek_notification_thumbnail_address);
+
+                    mThumbnailLoader = new ThumbnailLoader();
+                    mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
+
+                    textViewUserFeedTime.setText(Helper.GetFormttedDiffTime(this, mTakeAPeekObject.CreationTime));
+
+                    if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
+                    {
+                        LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
+
+                        mAddressLoader = new AddressLoader();
+                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewUserFeedAddress, mSharedPreferences);
+                    }
+
+                    //Titles
+                    textViewTitleBig.setText(String.format(getString(R.string.response_big_title), mProfileObject.displayName));
+                    textViewTitleSmall.setText(R.string.response_small_title);
+
+                    //Request Peek button
+                    relativeLayoutParams = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
+                    relativeLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParams);
+
+                    linearLayoutButtonSend.setVisibility(View.VISIBLE);
+                    linearLayoutButtonSend.setOnClickListener(ClickListener);
+
                     break;
 
                 default: break;
@@ -293,6 +336,17 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mProfileObject.profileId);
                     startActivity(captureClipActivityIntent);
+                    finish();
+                    break;
+
+                case R.id.user_peek_notification_thumbnail_play:
+                    logger.info("onClick: user_peek_notification_thumbnail_play clicked");
+
+                    final Intent userFeedActivityIntent = new Intent(NotificationPopupActivity.this, UserFeedActivity.class);
+                    userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    userFeedActivityIntent.putExtra(Constants.PARAM_PROFILEOBJECT, mTakeAPeekNotification.srcProfileJson);
+                    userFeedActivityIntent.putExtra(Constants.PARAM_PEEKOBJECT, mTakeAPeekNotification.relatedPeekJson);
+                    startActivity(userFeedActivityIntent);
                     finish();
                     break;
 
