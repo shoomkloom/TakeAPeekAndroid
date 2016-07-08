@@ -81,6 +81,13 @@ public class Constants
         online
     }
 
+    public enum RelationTypeEnum
+    {
+        None,
+        Follow,
+        Block,
+        Unfollow
+    }
 
     //TakeAPeekContact constants
 	public static String DEFAULT_CONTACT_NAME = "Default";

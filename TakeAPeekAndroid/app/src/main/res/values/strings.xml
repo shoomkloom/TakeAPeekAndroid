@@ -98,9 +98,22 @@
     <string name="error_playing_peek">There was an error playing this peek, please try again later.</string>
 
     <!-- User Map -->
-    <string name="search_location">Search a place</string>
+    <string name="search_location">Search</string>
     <string name="error_request_peek">There was an error requesting a peek, please try again later.</string>
     <string name="requested_peeks_to">Sent peek request to %1$d users</string>
+    <string name="trending_locations">Trending locations</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="block">Block</string>
+    <string name="report">Report</string>
+    <string name="set_relation_follow">You are now following %1$s.</string>
+    <string name="set_relation_unfollow">You are now not following %1$s.</string>
+    <string name="set_relation_block">You are now blocking %1$s.</string>
+    <string name="set_relation_report">You have reported %1$s.</string>
+    <string name="error_set_relation_follow">There was an error following %1$s. Please try again later.</string>
+    <string name="error_set_relation_unfollow">There was an error un-following %1$s. Please try again later.</string>
+    <string name="error_set_relation_block">There was an error blocking %1$s. Please try again later.</string>
+    <string name="error_set_relation_report">There was an error reporting %1$s. Please try again later.</string>
 
     <!-- Notifications -->
     <string name="title_activity_notifications">Notifications</string>
@@ -124,4 +137,6 @@
     <string name="request_small_title">Show them why you are special</string>
     <string name="response_big_title">%1$s sent you a Peek</string>
     <string name="response_small_title">Check it out!</string>
+    <string name="follow_big_title">%1$s is now following you</string>
+    <string name="requested_peek_to">Sent peek request to %1$s users</string>
 </resources>

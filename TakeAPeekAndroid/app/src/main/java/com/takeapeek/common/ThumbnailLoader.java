@@ -152,7 +152,7 @@ public class ThumbnailLoader
                 // Change bitmap only if this process is still associated with it
                 if (this == thumbnailCreatorTask) 
                 {
-                	imageView.setBackgroundResource(0);
+                	//@@imageView.setBackgroundResource(0);
                     imageView.setImageBitmap(bitmap);
 
                     if(mAnimationStateHash.containsKey(mPosition) == false)

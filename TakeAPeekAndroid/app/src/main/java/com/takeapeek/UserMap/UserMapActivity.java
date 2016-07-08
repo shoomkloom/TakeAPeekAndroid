@@ -22,6 +22,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -50,6 +51,7 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RelationObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
@@ -101,7 +103,11 @@ public class UserMapActivity extends FragmentActivity implements
     LinearLayout mLinearLayout = null;
     ImageView mImageViewOverlay = null;
     LinearLayout mLinearLayoutRequestPeek = null;
+    LinearLayout mLinearLayoutSendPeek = null;
+    TextView mTextviewTrending = null;
+    TextView mTextViewStackUserName = null;
     ViewPager mViewPager = null;
+    PeekStackPagerAdapter mPeekStackPagerAdapter = null;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
@@ -138,6 +144,11 @@ public class UserMapActivity extends FragmentActivity implements
         mImageViewOverlay = (ImageView)findViewById(R.id.map_overlay_image);
         mLinearLayoutRequestPeek = (LinearLayout)findViewById(R.id.button_request_peek);
         mLinearLayoutRequestPeek.setOnClickListener(ClickListener);
+        mLinearLayoutSendPeek = (LinearLayout)findViewById(R.id.button_send_peek);
+        mLinearLayoutSendPeek.setOnClickListener(ClickListener);
+        mTextviewTrending = (TextView)findViewById(R.id.textview_trending);
+        mTextviewTrending.setOnClickListener(ClickListener);
+        mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
     }
@@ -162,7 +173,7 @@ public class UserMapActivity extends FragmentActivity implements
         // Set map controls
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
-        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setZoomControlsEnabled(false);
 
         // Initialize the manager with the context and the map.
         //@@mClusterManager = new ClusterManager<TapItem>(this, mGoogleMap);
@@ -244,7 +255,7 @@ public class UserMapActivity extends FragmentActivity implements
             }
             else
             {
-                marker.showInfoWindow();
+                //@@marker.showInfoWindow();
                 mMarkerCurrentShown = marker;
 
                 ShowUserPeekStack();
@@ -352,9 +363,24 @@ public class UserMapActivity extends FragmentActivity implements
                                     logger.info(String.format("Got %d profiles in the bounds",
                                             responseObject.profiles.size()));
 
+                                    //Collect
+                                    HashMap<String, RelationObject> relationObjectHash = new HashMap<String, RelationObject>();
+                                    if(responseObject.relations != null)
+                                    {
+                                        for(RelationObject relationObject : responseObject.relations)
+                                        {
+                                            relationObjectHash.put(relationObject.targetId, relationObject);
+                                        }
+                                    }
+
                                     int i = 0;
                                     for (ProfileObject profileObject : responseObject.profiles)
                                     {
+                                        if(relationObjectHash.containsKey(profileObject.profileId) == true)
+                                        {
+                                            profileObject.relationTypeEnum = Constants.RelationTypeEnum.valueOf(relationObjectHash.get(profileObject.profileId).type);
+                                        }
+
                                         LatLng markerLatlng = new LatLng(profileObject.latitude, profileObject.longitude);
                                         Marker marker = mGoogleMap.addMarker(
                                                 new MarkerOptions().position(markerLatlng).title(profileObject.displayName));
@@ -365,7 +391,8 @@ public class UserMapActivity extends FragmentActivity implements
                                         i++;
                                     }
 
-                                    mViewPager.setAdapter(new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject));
+                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
+                                    mViewPager.setAdapter(mPeekStackPagerAdapter);
                                 }
                             }
                             finally
@@ -477,6 +504,11 @@ public class UserMapActivity extends FragmentActivity implements
                     Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
                     mLinearLayout.setAnimation(slideDownAnimation);
                     slideDownAnimation.start();
+
+                    //Workaround: Set the name for the first loaded page
+                    int pos = mViewPager.getCurrentItem();
+                    ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
+                    mTextViewStackUserName.setText(profileObject.displayName);
                 }
             }
             catch (Exception e)
@@ -492,12 +524,13 @@ public class UserMapActivity extends FragmentActivity implements
         {
             Helper.Error(logger, "EXCEPTION: When trying to get profiles in bounds", e);
         }
-
     }
 
     public void CloseUserPeekStack()
     {
         logger.debug("OnClickListener:onClick(.) Invoked");
+
+        mTextViewStackUserName.setText("");
 
         //Hide the user peek stack
         mLinearLayout.setVisibility(View.GONE);
@@ -523,6 +556,14 @@ public class UserMapActivity extends FragmentActivity implements
 
             switch (v.getId())
             {
+                case R.id.button_send_peek:
+                    logger.info("OnClickListener:onClick: button_send_peek clicked");
+
+                    final Intent captureClipActivityIntent = new Intent(UserMapActivity.this, CaptureClipActivity.class);
+                    captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(captureClipActivityIntent);
+                    break;
+
                 case R.id.button_request_peek:
                     logger.info("OnClickListener:onClick: button_request_peek clicked");
 
@@ -619,6 +660,15 @@ public class UserMapActivity extends FragmentActivity implements
 
                     break;
 
+                case R.id.textview_trending:
+                    logger.info("OnClickListener:onClick: textview_trending clicked");
+
+                    //Show the trending locations activity
+                    /*@@*/
+                    Toast.makeText(UserMapActivity.this, "Show Trending Locations...", Toast.LENGTH_SHORT).show();
+
+                    break;
+
                 default:
                     break;
             }
@@ -643,8 +693,11 @@ public class UserMapActivity extends FragmentActivity implements
         public void onPageSelected(int pos)
         {
             Marker marker = mHashMapIndexToMarker.get(pos);
-            marker.showInfoWindow();
+            //@@marker.showInfoWindow();
             UpdateBelowProjection(marker.getPosition());
+
+            ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
+            mTextViewStackUserName.setText(profileObject.displayName);
         }
     };
 
@@ -704,6 +757,7 @@ public class UserMapActivity extends FragmentActivity implements
                             notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, notificationID);
                             startActivity(notificationPopupActivityIntent);
+                            overridePendingTransition(R.anim.zoominbounce, R.anim.donothing);
                         }
                     };
 

@@ -446,72 +446,42 @@ public class Transport
 		
 		return responseObject.followersList;
 	}
-	
-	public static void BlockContact(Context context, String userName, String password, String profileId, SharedPreferences sharedPreferences) throws Exception
-	{
-		logger.debug("BlockContact(.....) Invoked - before lock");
-		
-		ResponseObject responseObject = null;
-		
-		lock.lock();
-		
-		try
-		{
-			logger.debug("BlockContact(.....) - inside lock");
-			
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
-	
-			nameValuePairs.add(new NameValuePair("action_type", "block_follower_contact"));
-			nameValuePairs.add(new NameValuePair("user_name", userName));
-			nameValuePairs.add(new NameValuePair("password", password));
-			nameValuePairs.add(new NameValuePair("contact_profileid", profileId));
-			
-			responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
-		}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: inside BlockContact(.....)", e);
-			throw e;
-		}
-		finally
-		{
-			lock.unlock();
-			logger.debug("BlockContact(.....) - after unlock");
-		}
-	}
-	
-	public static void UnblockContact(Context context, String userName, String password, String profileId, SharedPreferences sharedPreferences) throws Exception
-	{
-		logger.debug("UnblockContact(.....) Invoked - before lock");
-		
-		ResponseObject responseObject = null;
-		
-		lock.lock();
-		
-		try
-		{
-			logger.debug("UnblockContact(.....) - inside lock");
-			
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
-	
-			nameValuePairs.add(new NameValuePair("action_type", "unblock_follower_contact"));
-			nameValuePairs.add(new NameValuePair("user_name", userName));
-			nameValuePairs.add(new NameValuePair("password", password));
-			nameValuePairs.add(new NameValuePair("contact_profileid", profileId));
-			
-			responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
-		}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: inside UnblockContact(.....)", e);
-			throw e;
-		}
-		finally
-		{
-			lock.unlock();
-			logger.debug("UnblockContact(.....) - after unlock");
-		}
-	}
+
+    public static ResponseObject SetRelation(Context context, String userName, String password, String targetProfileId, String relationType, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("SetRelation(......) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("SetRelation(......) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "set_relation"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("target_profile", targetProfileId));
+            nameValuePairs.add(new NameValuePair("type", relationType));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside SetRelation(......)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("SetRelation(......) - after unlock");
+        }
+
+        return responseObject;
+    }
 
 	public static ResponseObject VerifySMSCode(Context context, String username, String smsCode, SharedPreferences sharedPreferences) throws Exception
     {

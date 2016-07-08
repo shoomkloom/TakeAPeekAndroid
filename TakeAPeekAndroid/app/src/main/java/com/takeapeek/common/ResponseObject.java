@@ -15,4 +15,6 @@ public class ResponseObject
     public ArrayList<ProfileObject> profiles;
 
     public ArrayList<TakeAPeekObject> peeks;
+
+    public ArrayList<RelationObject> relations;
 }

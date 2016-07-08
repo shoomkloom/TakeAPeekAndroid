@@ -11,17 +11,27 @@
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff">
+        android:background="@color/tap_blue">
 
         <ImageView
             android:id="@+id/notifications_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_notifications"
+            android:src="@drawable/button_notifications"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_margin="15dp" />
+
+        <TextView
+            android:id="@+id/stack_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_centerInParent="true"
+            android:textColor="@color/tap_white"/>
 
     </RelativeLayout>
 
@@ -37,8 +47,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-
-
         <ImageView
             android:id="@+id/map_overlay_image"
             android:layout_width="match_parent"
@@ -52,7 +60,7 @@
             android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/button_request_peek"
+                android:id="@+id/button_send_peek"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -63,18 +71,49 @@
                 android:layout_marginLeft="10dp">
 
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginBottom="5dp"
+                    android:src="@drawable/button_peek_send" />
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:background="@drawable/button_blue"
+                    android:textStyle="bold"
+                    android:textSize="10sp"
+                    android:padding="3dp"
+                    android:textColor="@color/tap_white"
+                    android:text="@string/textview_send_peek"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/button_request_peek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="25dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginBottom="5dp"
                     android:src="@drawable/button_peek_request" />
 
                 <TextView
-                    android:layout_width="100dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:background="@drawable/button_green"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
                     android:textStyle="bold"
+                    android:textSize="10sp"
+                    android:padding="3dp"
                     android:textColor="@color/tap_white"
                     android:text="@string/textview_request_peek"/>
             </LinearLayout>
@@ -85,22 +124,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="13dp"
-                android:layout_marginRight="60dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginRight="20dp"
                 tools:layout="@layout/fragment_custom_place_auto_complete"/>
 
             <LinearLayout
                 android:id = "@+id/user_peek_stack"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="280dp"
                 android:layout_alignParentTop="true"
+                android:background="@color/tap_blue"
+                android:orientation="vertical"
                 android:visibility="gone" >
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/user_peek_stack_viewpager"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_height="250dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:alpha="0.3"
+                    android:background="@drawable/rounded_corner_bottom" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:alpha="0.1"
+                    android:background="@drawable/rounded_corner_bottom" />
+
 
             </LinearLayout>
         </RelativeLayout>

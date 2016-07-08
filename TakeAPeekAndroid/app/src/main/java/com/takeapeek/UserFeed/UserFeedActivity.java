@@ -449,6 +449,7 @@ public class UserFeedActivity extends AppCompatActivity
                             notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, notificationID);
                             startActivity(notificationPopupActivityIntent);
+                            overridePendingTransition(R.anim.zoominbounce, R.anim.donothing);
                         }
                     };
 

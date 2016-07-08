@@ -16,6 +16,7 @@
     <color name="tap_darkorange_faded">#AAEF4C22</color>
     <color name="tap_orange">#ff7341</color>
     <color name="tap_white">#ffffff</color>
+    <color name="tap_white_faded">#aaffffff</color>
     <color name="tap_green">#55af2d</color>
     <color name="tap_lightgreen">#61aa41</color>
     <color name="tap_black">#000000</color>

@@ -1,48 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@color/tap_darkgray" >
+                android:layout_height="250dp"
+                android:background="@color/tap_blue" >
 
     <RelativeLayout
         android:id = "@+id/user_peek_stack_thumbnail_layout"
-        android:layout_width="250dp"
-        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
         android:layout_centerHorizontal="true" >
 
         <ImageView
             android:id = "@+id/user_peek_stack_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:scaleType="fitCenter" />
+            android:layout_height="250dp"
+            android:layout_alignParentTop="true"
+            android:scaleType="centerCrop" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_alignBottom="@+id/user_peek_stack_thumbnail"
+            android:layout_alignLeft="@id/user_peek_stack_thumbnail"
+            android:layout_alignRight="@+id/user_peek_stack_thumbnail"
+            android:layout_alignTop="@id/user_peek_stack_thumbnail"
+            android:background="@drawable/rounded_corner_overlay_blue" />
+
+<!--
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:alpha="0.3"
+            android:layout_below="@+id/user_peek_stack_thumbnail"
+            android:background="@drawable/rounded_corner_bottom" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:alpha="0.1"
+            android:layout_below="@+id/user_peek_stack_thumbnail"
+            android:background="@drawable/rounded_corner_bottom" />
+-->
 
         <ImageView
             android:id = "@+id/user_peek_stack_thumbnail_play"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_centerInParent="true"
+            android:layout_marginTop="90dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
             android:src="@drawable/ic_video_play" />
+
+        <TextView
+            android:id = "@+id/user_peek_stack_thumbnail_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="12sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"/>
+
+        <TextView
+            android:id = "@+id/user_peek_stack_follow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:clickable="true"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/tap_blue"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_margin="10dp"
+            android:drawableLeft="@drawable/ic_follow"
+            android:drawablePadding="10dp"
+            android:background="@drawable/button_white"/>
+
+        <ImageView
+            android:id = "@+id/user_peek_stack_close"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/button_close" />
+
     </RelativeLayout>
-
-    <ImageView
-        android:id = "@+id/user_peek_stack_close"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/button_close" />
-
-    <TextView
-        android:id = "@+id/user_peek_stack_thumbnail_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/user_peek_stack_thumbnail_layout"
-        android:layout_below="@+id/user_peek_stack_thumbnail_layout"
-        android:textSize="20sp"
-        android:textColor="@color/tap_white"
-        android:text="Some Text"
-        android:layout_marginTop="30dp" />
-
 </RelativeLayout>

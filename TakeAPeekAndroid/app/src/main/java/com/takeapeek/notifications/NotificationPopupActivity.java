@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,7 +37,10 @@ import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RequestObject;
+import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.ThumbnailLoader;
+import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
@@ -43,6 +48,8 @@ import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class NotificationPopupActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -69,6 +76,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
     ProfileObject mProfileObject = null;
     TakeAPeekObject mTakeAPeekObject = null;
 
+    private AsyncTask<Void, Void, ResponseObject> mAsyncTaskRequestPeek = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -93,6 +102,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
         {
             Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_notification));
             finish();
+            overridePendingTransition(R.anim.donothing, R.anim.zoomout);
         }
 
         ImageView imageViewButtonClose = (ImageView)findViewById(R.id.button_close);
@@ -102,7 +112,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
         LinearLayout linearLayoutButtonSend = (LinearLayout)findViewById(R.id.button_send_peek);
         LinearLayout linearLayoutButtonRequest = (LinearLayout)findViewById(R.id.button_request_peek);
 
-        RelativeLayout.LayoutParams relativeLayoutParams = null;
+        RelativeLayout.LayoutParams relativeLayoutParamsSend = null;
+        RelativeLayout.LayoutParams relativeLayoutParamsRequest = null;
 
         if(mTakeAPeekNotification != null)
         {
@@ -122,8 +133,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
             {
                 case request:
                     //Map fragment: Obtain the SupportMapFragment and get notified when the map is ready to be used.
-                    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-                    mapFragment.getMapAsync(this);
+                    SupportMapFragment mapFragmentRequest = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                    mapFragmentRequest.getMapAsync(this);
 
                     mGoogleApiClient = new GoogleApiClient.Builder(this)
                             .addConnectionCallbacks(this)
@@ -133,29 +144,29 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
 
-                    TextView textViewDisplayName = (TextView)findViewById(R.id.request_displayname_on_map);
-                    textViewDisplayName.setVisibility(View.VISIBLE);
-                    textViewDisplayName.setText(mProfileObject.displayName);
+                    TextView textViewDisplayNameRequest = (TextView)findViewById(R.id.request_displayname_on_map);
+                    textViewDisplayNameRequest.setVisibility(View.VISIBLE);
+                    textViewDisplayNameRequest.setText(mProfileObject.displayName);
 
-                    TextView textViewLocation = (TextView)findViewById(R.id.request_location_on_map);
-                    textViewLocation.setVisibility(View.VISIBLE);
+                    TextView textViewLocationRequest = (TextView)findViewById(R.id.request_location_on_map);
+                    textViewLocationRequest.setVisibility(View.VISIBLE);
 
                     if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
                     {
                         LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
 
                         mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
+                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocationRequest, mSharedPreferences);
                     }
 
                     //Titles
                     textViewTitleBig.setText(String.format(getString(R.string.request_big_title), mProfileObject.displayName));
                     textViewTitleSmall.setText(R.string.request_small_title);
 
-                    //Request Peek button
-                    relativeLayoutParams = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
-                    relativeLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParams);
+                    //Send Peek button
+                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
+                    relativeLayoutParamsSend.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
 
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
                     linearLayoutButtonSend.setOnClickListener(ClickListener);
@@ -188,13 +199,63 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     textViewTitleBig.setText(String.format(getString(R.string.response_big_title), mProfileObject.displayName));
                     textViewTitleSmall.setText(R.string.response_small_title);
 
-                    //Request Peek button
-                    relativeLayoutParams = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
-                    relativeLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParams);
+                    //Send Peek button
+                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
+                    relativeLayoutParamsSend.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
 
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
                     linearLayoutButtonSend.setOnClickListener(ClickListener);
+
+                    break;
+
+                case follow:
+                    //Map fragment: Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                    SupportMapFragment mapFragmentFollow = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                    mapFragmentFollow.getMapAsync(this);
+
+                    mGoogleApiClient = new GoogleApiClient.Builder(this)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .addApi(LocationServices.API)
+                            .build();
+
+                    findViewById(R.id.map).setVisibility(View.VISIBLE);
+
+                    TextView textViewDisplayNameFollow = (TextView)findViewById(R.id.request_displayname_on_map);
+                    textViewDisplayNameFollow.setVisibility(View.VISIBLE);
+                    textViewDisplayNameFollow.setText(mProfileObject.displayName);
+
+                    TextView textViewLocationFollow = (TextView)findViewById(R.id.request_location_on_map);
+                    textViewLocationFollow.setVisibility(View.VISIBLE);
+
+                    if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
+                    {
+                        LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
+
+                        mAddressLoader = new AddressLoader();
+                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocationFollow, mSharedPreferences);
+                    }
+
+                    //Titles
+                    textViewTitleBig.setText(String.format(getString(R.string.follow_big_title), mProfileObject.displayName));
+                    textViewTitleSmall.setVisibility(View.GONE);
+
+                    //Send Peek button
+                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
+                    relativeLayoutParamsSend.addRule(RelativeLayout.ALIGN_LEFT);
+                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
+
+                    linearLayoutButtonSend.setVisibility(View.VISIBLE);
+                    linearLayoutButtonSend.setOnClickListener(ClickListener);
+
+                    //Request Peek button
+                    relativeLayoutParamsRequest = (RelativeLayout.LayoutParams) linearLayoutButtonRequest.getLayoutParams();
+                    relativeLayoutParamsRequest.addRule(RelativeLayout.ALIGN_RIGHT);
+                    linearLayoutButtonRequest.setLayoutParams(relativeLayoutParamsRequest);
+
+                    linearLayoutButtonRequest.setVisibility(View.VISIBLE);
+                    linearLayoutButtonRequest.setOnClickListener(ClickListener);
 
                     break;
 
@@ -327,6 +388,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 case R.id.button_close:
                     logger.info("onClick: button_close clicked");
                     finish();
+                    overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                     break;
 
                 case R.id.button_send_peek:
@@ -337,6 +399,75 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mProfileObject.profileId);
                     startActivity(captureClipActivityIntent);
                     finish();
+                    overridePendingTransition(R.anim.donothing, R.anim.zoomout);
+                    break;
+
+                case R.id.button_request_peek:
+                    logger.info("onClick: button_request_peek clicked");
+
+                    if(mAsyncTaskRequestPeek == null)
+                    {
+                        try
+                        {
+                            //Start asynchronous request to server
+                            mAsyncTaskRequestPeek = new AsyncTask<Void, Void, ResponseObject>()
+                            {
+                                @Override
+                                protected ResponseObject doInBackground(Void... params)
+                                {
+                                    try
+                                    {
+                                        logger.info("Sending peek request to single profile");
+
+                                        RequestObject requestObject = new RequestObject();
+                                        requestObject.targetProfileList = new ArrayList<String>();
+
+                                        requestObject.targetProfileList.add(mProfileObject.profileId);
+
+                                        String metaDataJson = new Gson().toJson(requestObject);
+
+                                        String userName = Helper.GetTakeAPeekAccountUsername(NotificationPopupActivity.this);
+                                        String password = Helper.GetTakeAPeekAccountPassword(NotificationPopupActivity.this);
+
+                                        return Transport.RequestPeek(NotificationPopupActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                    }
+
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(ResponseObject responseObject)
+                                {
+                                    try
+                                    {
+                                        if (responseObject == null)
+                                        {
+                                            Helper.ErrorMessage(NotificationPopupActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_request_peek));
+                                        }
+                                        else
+                                        {
+                                            String message = String.format(getString(R.string.requested_peek_to), mProfileObject.displayName);
+                                            Toast.makeText(NotificationPopupActivity.this, message, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    finally
+                                    {
+                                        finish();
+                                        overridePendingTransition(R.anim.donothing, R.anim.zoomout);
+                                    }
+                                }
+                            }.execute();
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+                        }
+                    }
+
                     break;
 
                 case R.id.user_peek_notification_thumbnail_play:
@@ -348,6 +479,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     userFeedActivityIntent.putExtra(Constants.PARAM_PEEKOBJECT, mTakeAPeekNotification.relatedPeekJson);
                     startActivity(userFeedActivityIntent);
                     finish();
+                    overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                     break;
 
                 default: break;

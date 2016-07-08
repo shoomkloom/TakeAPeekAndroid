@@ -1203,14 +1203,14 @@ public class Helper
 	    return paint.measureText(text);
     }
     
-    public static Bitmap GetRoundedCornerBitmap(Bitmap bitmap, float roundPx) 
+    public static Bitmap GetRoundedCornerBitmap(Context context, Bitmap bitmap, float roundPx)
     {
     	logger.debug("GetRoundedCornerBitmap(..) Invoked");
     	
 	    Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 	    Canvas canvas = new Canvas(output);
 	 
-	    final int color = 0xff424242;
+	    final int color = context.getResources().getColor(R.color.tap_blue);
 	    final Paint paint = new Paint();
 	    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 	    final RectF rectF = new RectF(rect);
