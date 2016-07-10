@@ -3,11 +3,14 @@ package com.takeapeek.notifications;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
@@ -17,6 +20,9 @@ import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RequestObject;
+import com.takeapeek.common.ResponseObject;
+import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.userfeed.UserFeedActivity;
@@ -25,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by orenslev on 12/05/2016.
@@ -42,6 +49,11 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
     Gson mGson = new Gson();
 
     private final AddressLoader mAddressLoader = new AddressLoader();
+
+    static private ReentrantLock requestPeekLock = new ReentrantLock();
+    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskRequestPeek = null;
+
+    Handler mHandler = new Handler();
 
     private class ViewHolder
     {
@@ -156,6 +168,18 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                     viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
                     break;
 
+                case peek:
+                    viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
+                    viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_peek);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
+                    break;
+
+                case follow:
+                    viewHolder.mTextViewButton.setText(R.string.textview_request_peek);
+                    viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_follow);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_green);
+                    break;
+
                 default: break;
             }
         }
@@ -191,6 +215,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                             break;
 
                         case response:
+                        case peek:
                             logger.info("Starting UserFeedActivity with PARAM_PEEKOBJECT");
 
                             final Intent userFeedActivityIntent = new Intent(mNotificationsActivity, UserFeedActivity.class);
@@ -201,6 +226,87 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                             break;
 
                         default: break;
+
+                        case follow:
+                            try
+                            {
+                                try
+                                {
+                                    requestPeekLock.lock();
+
+                                    if (mAsyncTaskRequestPeek == null)
+                                    {
+                                        //Start asynchronous request to server
+                                        mAsyncTaskRequestPeek = new AsyncTask<ProfileObject, Void, ResponseObject>()
+                                        {
+                                            ProfileObject mProfileObject = null;
+
+                                            @Override
+                                            protected ResponseObject doInBackground(ProfileObject... params)
+                                            {
+                                                mProfileObject = params[0];
+
+                                                try
+                                                {
+                                                    logger.info("Getting profile list from server");
+
+                                                    RequestObject requestObject = new RequestObject();
+                                                    requestObject.targetProfileList = new ArrayList<String>();
+                                                    requestObject.targetProfileList.add(mProfileObject.profileId);
+
+                                                    String metaDataJson = new Gson().toJson(requestObject);
+
+                                                    String userName = Helper.GetTakeAPeekAccountUsername(mNotificationsActivity);
+                                                    String password = Helper.GetTakeAPeekAccountPassword(mNotificationsActivity);
+
+                                                    return Transport.RequestPeek(mNotificationsActivity, userName, password, metaDataJson, mSharedPreferences);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                                }
+
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void onPostExecute(ResponseObject responseObject)
+                                            {
+                                                try
+                                                {
+                                                    if (responseObject == null)
+                                                    {
+                                                        Helper.ErrorMessage(mNotificationsActivity, mHandler, mNotificationsActivity.getString(R.string.Error), mNotificationsActivity.getString(R.string.ok), mNotificationsActivity.getString(R.string.error_request_peek));
+                                                    }
+                                                    else
+                                                    {
+                                                        String message = String.format(mNotificationsActivity.getString(R.string.notifications_requested_peek_to), mProfileObject.displayName);
+                                                        Toast.makeText(mNotificationsActivity, message, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                                finally
+                                                {
+                                                    mAsyncTaskRequestPeek = null;
+                                                }
+                                            }
+                                        }.execute(viewHolder.mProfileObject);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+                                }
+                                finally
+                                {
+                                    requestPeekLock.unlock();
+                                }
+                            }
+                            catch(Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: Exception when requesting peek", e);
+                            }
+
+                            break;
                     }
 
                     break;

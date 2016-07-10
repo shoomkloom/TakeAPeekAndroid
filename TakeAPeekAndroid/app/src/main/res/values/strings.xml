@@ -100,7 +100,7 @@
     <!-- User Map -->
     <string name="search_location">Search</string>
     <string name="error_request_peek">There was an error requesting a peek, please try again later.</string>
-    <string name="requested_peeks_to">Sent peek request to %1$d users</string>
+    <string name="user_map_requested_peeks_to">Sent peek request to %1$d users</string>
     <string name="trending_locations">Trending locations</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
@@ -123,6 +123,8 @@
     <string name="textview_action_title_request">Sent you a request</string>
     <string name="textview_view_peek">View Peek</string>
     <string name="textview_action_title_response">Sent you a Peek</string>
+    <string name="textview_action_title_peek">Created a Peek</string>
+    <string name="textview_action_title_follow">is now following you</string>
     <string name="textview_notification_time_justnow">Just now</string>
     <string name="textview_notification_time_one_minute">1 minute ago</string>
     <string name="textview_notification_time_minutes">%1$d minutes ago</string>
@@ -130,6 +132,7 @@
     <string name="textview_notification_time_hours">%1$d hours ago</string>
     <string name="textview_notification_time_one_day">1 day ago</string>
     <string name="textview_notification_time_days">%1$d days ago</string>
+    <string name="notifications_requested_peek_to">Sent peek request to %1$s</string>
 
     <!-- Notiofication popup activity -->
     <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
@@ -137,6 +140,8 @@
     <string name="request_small_title">Show them why you are special</string>
     <string name="response_big_title">%1$s sent you a Peek</string>
     <string name="response_small_title">Check it out!</string>
+    <string name="peek_big_title">%1$s created a Peek just now</string>
+    <string name="peek_small_title">Check it out!</string>
     <string name="follow_big_title">%1$s is now following you</string>
-    <string name="requested_peek_to">Sent peek request to %1$s users</string>
+    <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s users</string>
 </resources>

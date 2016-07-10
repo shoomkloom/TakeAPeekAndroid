@@ -129,6 +129,13 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
             mPushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(mTakeAPeekNotification.type);
 
+            //Prepare common UI elements
+            ImageView imageViewPeekThumbnail = (ImageView)findViewById(R.id.user_peek_notification_thumbnail);
+            ImageView imageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_notification_thumbnail_play);
+            imageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
+            TextView textViewUserFeedTime = (TextView)findViewById(R.id.user_peek_notification_thumbnail_time);
+            TextView textViewUserFeedAddress = (TextView)findViewById(R.id.user_peek_notification_thumbnail_address);
+
             switch(mPushNotificationTypeEnum)
             {
                 case request:
@@ -176,12 +183,6 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 case response:
                     findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
 
-                    ImageView imageViewPeekThumbnail = (ImageView)findViewById(R.id.user_peek_notification_thumbnail);
-                    ImageView imageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_notification_thumbnail_play);
-                    imageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
-                    TextView textViewUserFeedTime = (TextView)findViewById(R.id.user_peek_notification_thumbnail_time);
-                    TextView textViewUserFeedAddress = (TextView)findViewById(R.id.user_peek_notification_thumbnail_address);
-
                     mThumbnailLoader = new ThumbnailLoader();
                     mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
 
@@ -198,6 +199,36 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     //Titles
                     textViewTitleBig.setText(String.format(getString(R.string.response_big_title), mProfileObject.displayName));
                     textViewTitleSmall.setText(R.string.response_small_title);
+
+                    //Send Peek button
+                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
+                    relativeLayoutParamsSend.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
+
+                    linearLayoutButtonSend.setVisibility(View.VISIBLE);
+                    linearLayoutButtonSend.setOnClickListener(ClickListener);
+
+                    break;
+
+                case peek:
+                    findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
+
+                    mThumbnailLoader = new ThumbnailLoader();
+                    mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
+
+                    textViewUserFeedTime.setText(Helper.GetFormttedDiffTime(this, mTakeAPeekObject.CreationTime));
+
+                    if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
+                    {
+                        LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
+
+                        mAddressLoader = new AddressLoader();
+                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewUserFeedAddress, mSharedPreferences);
+                    }
+
+                    //Titles
+                    textViewTitleBig.setText(String.format(getString(R.string.peek_big_title), mProfileObject.displayName));
+                    textViewTitleSmall.setText(R.string.peek_small_title);
 
                     //Send Peek button
                     relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
@@ -450,7 +481,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                                         }
                                         else
                                         {
-                                            String message = String.format(getString(R.string.requested_peek_to), mProfileObject.displayName);
+                                            String message = String.format(getString(R.string.notification_popup_requested_peeks_to), mProfileObject.displayName);
                                             Toast.makeText(NotificationPopupActivity.this, message, Toast.LENGTH_SHORT).show();
                                         }
                                     }

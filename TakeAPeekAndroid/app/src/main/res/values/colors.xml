@@ -18,6 +18,6 @@
     <color name="tap_white">#ffffff</color>
     <color name="tap_white_faded">#aaffffff</color>
     <color name="tap_green">#55af2d</color>
-    <color name="tap_lightgreen">#61aa41</color>
+    <color name="tap_lightgreen">#55cc41</color>
     <color name="tap_black">#000000</color>
 </resources>

@@ -58,7 +58,10 @@
         android:layout_margin="5dp"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:padding="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:textColor="@color/tap_white"
         android:layout_alignParentRight="true"
         android:layout_alignBaseline="@+id/textview_notification_action_title" />

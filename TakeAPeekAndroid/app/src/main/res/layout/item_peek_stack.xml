@@ -80,7 +80,7 @@
             android:clickable="true"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:textColor="@color/tap_blue"
+            android:textColor="@drawable/button_white"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:paddingTop="5dp"

@@ -52,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerInside"
+            android:padding="20dp"
             android:src="@drawable/overlay_image"
             android:alpha="0.2" />
 
@@ -68,11 +69,11 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_marginBottom="25dp"
-                android:layout_marginLeft="10dp">
+                android:layout_marginLeft="30dp">
 
                 <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_marginBottom="5dp"
                     android:src="@drawable/button_peek_send" />
 
@@ -97,12 +98,11 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginBottom="25dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp">
+                android:layout_marginRight="30dp">
 
                 <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_marginBottom="5dp"
                     android:src="@drawable/button_peek_request" />
 
@@ -125,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 tools:layout="@layout/fragment_custom_place_auto_complete"/>
 

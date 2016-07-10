@@ -174,6 +174,7 @@ public class UserMapActivity extends FragmentActivity implements
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(false);
+        uiSettings.setMyLocationButtonEnabled(false);
 
         // Initialize the manager with the context and the map.
         //@@mClusterManager = new ClusterManager<TapItem>(this, mGoogleMap);
@@ -623,7 +624,7 @@ public class UserMapActivity extends FragmentActivity implements
                                                 }
                                                 else
                                                 {
-                                                    String message = String.format(getString(R.string.requested_peeks_to), mHashMapIndexToProfileObject.size());
+                                                    String message = String.format(getString(R.string.user_map_requested_peeks_to), mHashMapIndexToProfileObject.size());
                                                     Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
                                                 }
                                             }

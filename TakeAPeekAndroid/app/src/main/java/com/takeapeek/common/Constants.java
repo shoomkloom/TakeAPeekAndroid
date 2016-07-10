@@ -77,6 +77,7 @@ public class Constants
         tickle,
         request,
         response,
+        peek,
         follow,
         online
     }
