@@ -1,18 +1,431 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.takeapeek.CaptureClipActivity">
+    tools:context=".MainActivity" >
 
     <FrameLayout
-        android:id="@+id/container"
+        android:id="@+id/preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
+    
+    <ImageButton
+        android:id="@+id/take_photo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedTakePhoto"
+        android:layout_centerVertical="true"
+		android:background="@null"
+        android:visibility="invisible"
+        />
+
+    <ZoomControls
+        android:id="@+id/zoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.5"
+        />
+
+    <SeekBar
+        android:id="@+id/zoom_seekbar"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:rotation="90"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="190dp"
+        android:layout_marginRight="-50dp"
+        />
+
+    <SeekBar
+        android:id="@+id/focus_seekbar"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:visibility="invisible"
+        />
+
+    <Button
+        android:id="@+id/gui_anchor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="1dp"
+        android:scaleType="fitCenter"
+        />
+
+<!--
+<ImageButton
+    android:id="@+id/settings"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:padding="10dp"
+    android:scaleType="fitCenter"
+    android:contentDescription="@string/action_settings"
+    android:src="@drawable/settings"
+    android:onClick="clickedSettings"
+    />
+
+<ImageButton
+    android:id="@+id/gallery"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:padding="10dp"
+    android:scaleType="fitCenter"
+    android:contentDescription="@string/gallery"
+    android:src="@drawable/gallery"
+    android:onClick="clickedGallery"
+    />
+-->
+
+    <ImageButton
+        android:id="@+id/popup"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedPopupSettings"
+        />
+
+    <ImageButton
+        android:id="@+id/exposure_lock"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedExposureLock"
+        />
+
+    <ImageButton
+        android:id="@+id/exposure"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedExposure"
+        />
+
+    <ImageButton
+        android:id="@+id/switch_video"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedSwitchVideo"
+        />
+
+    <ImageButton
+        android:id="@+id/switch_camera"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/switch_camera"
+        android:onClick="clickedSwitchCamera"
+        />
+
+    <ImageButton
+        android:id="@+id/audio_control"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedAudioControl"
+        />
+
+<!-- should be at left-most -->
+    <ImageButton
+        android:id="@+id/trash"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedTrash"
+        android:visibility="gone"
+        />
+
+    <ImageButton
+        android:id="@+id/share"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:onClick="clickedShare"
+        android:visibility="gone"
+        />
+
+    <SeekBar
+        android:id="@+id/exposure_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        />
+
+    <ZoomControls
+        android:id="@+id/exposure_seekbar_zoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        />
+
+    <SeekBar
+        android:id="@+id/iso_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        />
+
+    <SeekBar
+        android:id="@+id/exposure_time_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        />
+
+    <FrameLayout
+        android:id="@+id/prefs_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000"
-        tools:context="com.takeapeek" />
+        android:layout_centerInParent="true"
+        />
 
-</android.support.design.widget.CoordinatorLayout>
+    <FrameLayout
+        android:id="@+id/locker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+<!--
+<ScrollView
+    android:id="@+id/popup_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_toLeftOf="@+id/settings"
+    android:layout_below="@+id/settings"
+    />
+-->
+    
+    <ScrollView
+        android:id="@+id/hide_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <!-- TAP specific layout -->
+    <ImageView
+        android:id="@+id/imageview_flash"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/button_flash"
+        android:onClick="clickedToggleFlash"/>
+
+    <ImageView
+        android:id="@+id/imageview_switch_camera"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/button_switch_camera"
+        android:onClick="clickedSwitchCamera"/>
+
+    <ImageView
+        android:id="@+id/imageview_intro_close"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="30dp"
+        android:src="@drawable/button_close"
+        android:onClick="clickedIntroDetailsClose"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/linearlayout_intro_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/imageview_intro_close"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:background="@drawable/dark_rounded_corner_small"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textview_intro_details_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/intro_details_title"
+            android:textColor="#ffffff"
+            android:gravity="center_horizontal"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+
+        <TextView
+            android:id="@+id/textview_intro_details_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/intro_details_text"
+            android:textColor="#ffffff"
+            android:gravity="center_horizontal"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_tap_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="22dp"
+        android:paddingBottom="22dp"
+        android:background="#992E3E9B">
+
+        <TextView
+            android:id="@+id/textview_button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/back"
+            android:textSize="25sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:onClick="clickedBack"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/textview_button_video"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:text="10s"
+            android:textSize="25sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="@drawable/button_take_video"
+            android:layout_centerInParent="true"
+            android:onClick="clickedTakePhoto" />
+
+        <TextView
+            android:id="@+id/textview_button_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/done"
+            android:textSize="25sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:onClick="clickedDone"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_intro"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        android:layout_above="@+id/relativelayout_tap_bar"
+        android:layout_centerHorizontal="true" >
+
+        <TextView
+            android:id="@+id/textview_intro_line1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/intro_create_peek"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="#ffffff"
+            android:gravity="center_horizontal"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:background="@drawable/dark_rounded_corner"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:visibility="invisible"/>
+
+        <ImageView
+            android:id="@+id/imageview_intro_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="160dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/intro_arrow_down"
+            android:layout_below="@+id/textview_intro_line1"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/textview_intro_line2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/intro_why"
+            android:layout_below="@+id/textview_intro_line1"
+            android:layout_centerHorizontal="true"
+            android:textColor="#ffffff"
+            android:gravity="center_horizontal"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:background="@drawable/dark_rounded_corner"
+            android:layout_marginTop="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:onClick="clickedIntroWhy"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/textview_intro_line3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/intro_record_till_0"
+            android:layout_below="@+id/imageview_intro_arrow"
+            android:layout_centerHorizontal="true"
+            android:textColor="#ffffff"
+            android:gravity="center_horizontal"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:background="@drawable/dark_rounded_corner"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+
+
+    </RelativeLayout>
+
+
+
+    <!-- END TAP specific layout -->
+    
+</RelativeLayout>

@@ -14,6 +14,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Sign in</string>
 
+    <string name="error_map_googleapi_connection">There was an error connecting to Google Maps. Please try again later when you have a better connection.\nError message: %1$s</string>
+
     <!-- Strings related to Capture -->
     <string name="record">Record</string>
     <string name="preview">Preview</string>
@@ -23,6 +25,17 @@
     <string name="permission_request">TakeAPeek needs permission for camera and audio recording.</string>
     <string name="camera_error">This device doesn\'t is not supported.</string>
     <string name="error_cannot_get_location">Could not get current location.\nPlease try again later.</string>
+	
+	<!-- ...from opencamera... -->
+    <string name="back">&lt; Back</string>
+    <string name="next">Next &gt;</string>
+    <string name="done">Done &gt;</string>
+    <string name="intro_create_peek">Create a Peek to Enter</string>
+    <string name="intro_record_till_0">Record till you reach 0 seconds</string>
+    <string name="intro_why">Why do I need to create a peek to enter?</string>
+    <string name="intro_details_title">Why do I need to create a peek to enter?</string>
+    <string name="intro_details_text">TakeAPeek lets you see peeks from other people. By creating a peek you help them discover you and your surroundings.\n\n Only 1 peek is needed (we won\'t ask you again while you are here).</string>
+	<string name="zoom">Zoom</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

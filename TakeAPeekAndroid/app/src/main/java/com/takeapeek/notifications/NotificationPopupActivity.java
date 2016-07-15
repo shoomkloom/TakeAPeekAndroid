@@ -1,7 +1,6 @@
 package com.takeapeek.notifications;
 
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -393,17 +392,17 @@ public class NotificationPopupActivity extends FragmentActivity implements
     {
         logger.debug("onConnectionFailed(.) Invoked");
 
-        if (connectionResult.hasResolution())
+        try
         {
-            try
-            {
-                // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(this, CaptureClipActivity.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            }
-            catch (IntentSender.SendIntentException e)
-            {
-                Helper.Error(logger, "EXCEPTION: When trying to resolve location connection", e);
-            }
+            String error = String.format("onConnectionFailed called with error=%s", connectionResult.getErrorMessage());
+            Helper.Error(logger, error);
+
+            String message = String.format(getString(R.string.error_map_googleapi_connection), connectionResult.getErrorMessage());
+            Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), message);
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to resolve location connection", e);
         }
     }
 

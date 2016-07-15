@@ -109,7 +109,9 @@
             android:launchMode="singleTop"
             android:noHistory="false"
             android:parentActivityName=".MainActivity"
-            android:stateNotNeeded="true">
+            android:stateNotNeeded="true"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|screenSize|keyboardHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>

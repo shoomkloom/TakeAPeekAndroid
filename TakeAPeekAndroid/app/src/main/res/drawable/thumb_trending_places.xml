@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" >
+        <shape>
+		     <!--
+		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
+		      -->  
+		    <solid android:color="@color/tap_lightblue" />
+		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <size
+                android:width="100dp"
+                android:height="40dp" />
+		</shape>
+	</item>
+    <item android:state_focused="true" >
+        <shape>
+		     <!--
+		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
+		      -->  
+		    <solid android:color="@color/tap_blue" />
+		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <size
+                android:width="100dp"
+                android:height="40dp" />
+		</shape>
+	</item>
+	
+    <item android:color="@color/tap_white">
+        <shape>
+		     <!--
+		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
+		      -->  
+		    <solid android:color="@color/tap_blue" />
+		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <size
+                android:width="100dp"
+                android:height="40dp" />
+		</shape>
+	</item>
+    
+</selector>
