@@ -98,7 +98,6 @@ public class ImageSaver extends Thread
 			boolean is_front_facing,
 			Date current_date,
 			String preference_stamp, String preference_textstamp, int font_size, int color, String pref_style, String preference_stamp_dateformat, String preference_stamp_timeformat, String preference_stamp_gpsformat,
-			boolean store_location, Location location, boolean store_geo_direction, double geo_direction,
 			boolean has_thumbnail_animation)
         {
             logger.debug("() Invoked.");
@@ -170,7 +169,6 @@ public class ImageSaver extends Thread
 							request.is_front_facing,
 							request.current_date,
 							request.preference_stamp, request.preference_textstamp, request.font_size, request.color, request.pref_style, request.preference_stamp_dateformat, request.preference_stamp_timeformat, request.preference_stamp_gpsformat,
-							request.store_location, request.location, request.store_geo_direction, request.geo_direction,
 							request.has_thumbnail_animation);
 				}
 
@@ -187,7 +185,7 @@ public class ImageSaver extends Thread
                 {
 					n_images_to_save--;
 					logger.info("ImageSaver thread processed new request from queue, images to save is now: " + n_images_to_save);
-					if( com.takeapeek.capture.MyDebug.LOG && n_images_to_save < 0 )
+					if( n_images_to_save < 0 )
                     {
 						Helper.Error(logger, "images to save has become negative");
 						throw new RuntimeException();
@@ -216,7 +214,6 @@ public class ImageSaver extends Thread
 			boolean is_front_facing,
 			Date current_date,
 			String preference_stamp, String preference_textstamp, int font_size, int color, String pref_style, String preference_stamp_dateformat, String preference_stamp_timeformat, String preference_stamp_gpsformat,
-			boolean store_location, Location location, boolean store_geo_direction, double geo_direction,
 			boolean has_thumbnail_animation)
     {
         logger.debug("() Invoked.");
@@ -233,7 +230,6 @@ public class ImageSaver extends Thread
 				is_front_facing,
 				current_date,
 				preference_stamp, preference_textstamp, font_size, color, pref_style, preference_stamp_dateformat, preference_stamp_timeformat, preference_stamp_gpsformat,
-				store_location, location, store_geo_direction, geo_direction,
 				has_thumbnail_animation);
 	}
 
@@ -261,7 +257,6 @@ public class ImageSaver extends Thread
 				false,
 				current_date,
 				null, null, 0, 0, null, null, null, null,
-				false, null, false, 0.0,
 				false);
 	}
 
@@ -277,7 +272,6 @@ public class ImageSaver extends Thread
 			boolean is_front_facing,
 			Date current_date,
 			String preference_stamp, String preference_textstamp, int font_size, int color, String pref_style, String preference_stamp_dateformat, String preference_stamp_timeformat, String preference_stamp_gpsformat,
-			boolean store_location, Location location, boolean store_geo_direction, double geo_direction,
 			boolean has_thumbnail_animation)
     {
         logger.debug("() Invoked.");
@@ -299,7 +293,6 @@ public class ImageSaver extends Thread
 					is_front_facing,
 					current_date,
 					preference_stamp, preference_textstamp, font_size, color, pref_style, preference_stamp_dateformat, preference_stamp_timeformat, preference_stamp_gpsformat,
-					store_location, location, store_geo_direction, geo_direction,
 					has_thumbnail_animation);
 			// this should not be synchronized on "this": BlockingQueue is thread safe, and if it's blocking in queue.put(), we'll hang because
 			// the saver queue will need to synchronize on "this" in order to notifyAll() the main thread
@@ -341,7 +334,6 @@ public class ImageSaver extends Thread
 						is_front_facing,
 						current_date,
 						preference_stamp, preference_textstamp, font_size, color, pref_style, preference_stamp_dateformat, preference_stamp_timeformat, preference_stamp_gpsformat,
-						store_location, location, store_geo_direction, geo_direction,
 						has_thumbnail_animation);
 			}
 		}
@@ -391,8 +383,14 @@ public class ImageSaver extends Thread
 			boolean do_auto_stabilise, double level_angle,
 			boolean is_front_facing,
 			Date current_date,
-			String preference_stamp, String preference_textstamp, int font_size, int color, String pref_style, String preference_stamp_dateformat, String preference_stamp_timeformat, String preference_stamp_gpsformat,
-			boolean store_location, Location location, boolean store_geo_direction, double geo_direction,
+			String preference_stamp,
+            String preference_textstamp,
+            int font_size,
+            int color,
+            String pref_style,
+            String preference_stamp_dateformat,
+            String preference_stamp_timeformat,
+            String preference_stamp_gpsformat,
 			boolean has_thumbnail_animation)
     {
         logger.debug("() Invoked.");
@@ -655,42 +653,6 @@ public class ImageSaver extends Thread
     					applicationInterface.drawTextWithBackground(canvas, p, datetime_stamp, color, Color.BLACK, width - offset_x, ypos, false, null, draw_shadowed);
         			}
     				ypos -= diff_y;
-    				String gps_stamp = "";
-        			if( !preference_stamp_gpsformat.equals("preference_stamp_gpsformat_none") )
-                    {
-	    				if( store_location )
-                        {
-	            			if( preference_stamp_gpsformat.equals("preference_stamp_gpsformat_dms") )
-	            				gps_stamp += com.takeapeek.capture.LocationSupplier.locationToDMS(location.getLatitude()) + ", " + com.takeapeek.capture.LocationSupplier.locationToDMS(location.getLongitude());
-            				else
-            					gps_stamp += Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + ", " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
-	    					if( location.hasAltitude() )
-                            {
-	    						//@@gps_stamp += ", " + decimalFormat.format(location.getAltitude()) + main_activity.getResources().getString(R.string.metres_abbreviation);
-	    					}
-	    				}
-				    	if( store_geo_direction )
-                        {
-							float geo_angle = (float)Math.toDegrees(geo_direction);
-							if( geo_angle < 0.0f )
-                            {
-								geo_angle += 360.0f;
-							}
-
-	        				logger.info("geo_angle: " + geo_angle);
-
-	    			    	if( gps_stamp.length() > 0 )
-	    			    		gps_stamp += ", ";
-	    			    	gps_stamp += "" + Math.round(geo_angle) + (char)0x00B0;
-				    	}
-        			}
-			    	if( gps_stamp.length() > 0 )
-                    {
-        				logger.info("stamp with location_string: " + gps_stamp);
-
-	        			applicationInterface.drawTextWithBackground(canvas, p, gps_stamp, color, Color.BLACK, width - offset_x, ypos, false, null, draw_shadowed);
-	    				ypos -= diff_y;
-			    	}
     	        }
     	        if( text_stamp )
                 {
@@ -915,42 +877,10 @@ public class ImageSaver extends Thread
         	            	exif_new.setAttribute(ExifInterface.TAG_ORIENTATION, "" + exif_orientation);
         	            if( exif_white_balance != null )
         	            	exif_new.setAttribute(ExifInterface.TAG_WHITE_BALANCE, exif_white_balance);
-        	            setGPSDirectionExif(exif_new, store_geo_direction, geo_direction);
         	            setDateTimeExif(exif_new);
-        	            if( needGPSTimestampHack(using_camera2, store_location) )
-                        {
-        	            	fixGPSTimestamp(exif_new);
-        	            }
     	            	exif_new.saveAttributes();
 
        	    			logger.info("now saved EXIF data");
-	            	}
-	            	else if( store_geo_direction )
-                    {
-       	    			logger.info("add GPS direction exif info");
-
-    	            	long time_s = System.currentTimeMillis();
-    	            	ExifInterface exif = new ExifInterface(picFile.getAbsolutePath());
-        	            setGPSDirectionExif(exif, store_geo_direction, geo_direction);
-        	            setDateTimeExif(exif);
-        	            if( needGPSTimestampHack(using_camera2, store_location) )
-                        {
-        	            	fixGPSTimestamp(exif);
-        	            }
-    	            	exif.saveAttributes();
-
-       	    			logger.info("done adding GPS direction exif info, time taken: " + (System.currentTimeMillis() - time_s));
-	            	}
-	            	else if( needGPSTimestampHack(using_camera2, store_location) )
-                    {
-       	    			logger.info("remove GPS timestamp hack");
-
-    	            	long time_s = System.currentTimeMillis();
-    	            	ExifInterface exif = new ExifInterface(picFile.getAbsolutePath());
-    	            	fixGPSTimestamp(exif);
-    	            	exif.saveAttributes();
-
-       	    			logger.info("done removing GPS timestamp exif info, time taken: " + (System.currentTimeMillis() - time_s));
 	            	}
 
     	            if( saveUri == null )
@@ -1164,13 +1094,6 @@ public class ImageSaver extends Thread
     		dngCreator = null;
     		output.close();
     		output = null;
-
-    		Location location = null;
-    		if( main_activity.getApplicationInterface().getGeotaggingPref() )
-            {
-    			location = main_activity.getApplicationInterface().getLocation();
-    			logger.info("location: " + location);
-    		}
 
     		if( saveUri == null )
             {

@@ -3,7 +3,6 @@ package com.takeapeek.capture.Preview;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.hardware.camera2.DngCreator;
-import android.location.Location;
 import android.media.CamcorderProfile;
 import android.media.Image;
 import android.net.Uri;
@@ -31,7 +30,6 @@ public interface ApplicationInterface
 	Context getContext(); // get the application context
     CaptureClipActivity getMainActivity();
 	boolean useCamera2(); // should Android 5's Camera 2 API be used?
-	Location getLocation(); // get current location - null if not available (or you don't care about geotagging)
 	int createOutputVideoMethod(); // return a VIDEOMETHOD_* value to specify how to create a video file
 	File createOutputVideoFile() throws IOException; // will be called if createOutputVideoUsingSAF() returns VIDEOMETHOD_FILE
 	Uri createOutputVideoSAF() throws IOException; // will be called if createOutputVideoUsingSAF() returns VIDEOMETHOD_SAF

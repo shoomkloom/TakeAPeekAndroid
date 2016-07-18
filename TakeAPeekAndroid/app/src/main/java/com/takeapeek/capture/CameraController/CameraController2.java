@@ -34,7 +34,6 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.takeapeek.capture.MyDebug;
 import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
@@ -171,11 +170,10 @@ public class CameraController2 extends CameraController
 							ExifInterface.ORIENTATION_ROTATE_270;
 					break;
 			}
-			if( MyDebug.LOG )
-            {
-				logger.info("rotation: " + rotation);
-				logger.info("exif_orientation: " + exif_orientation);
-			}
+
+			logger.info("rotation: " + rotation);
+			logger.info("exif_orientation: " + exif_orientation);
+
 			return exif_orientation;
 		}
 

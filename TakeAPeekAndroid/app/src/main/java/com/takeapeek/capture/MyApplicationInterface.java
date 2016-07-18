@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.hardware.camera2.DngCreator;
-import android.location.Location;
 import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.MediaMetadataRetriever;
@@ -55,7 +54,6 @@ public class MyApplicationInterface implements ApplicationInterface
     SharedPreferences mSharedPreferences = null;
 	
 	private CaptureClipActivity main_activity = null;
-	private LocationSupplier locationSupplier = null;
 	private com.takeapeek.capture.StorageUtils storageUtils = null;
 	private DrawPreview drawPreview = null;
 	private ImageSaver imageSaver = null;
@@ -78,7 +76,6 @@ public class MyApplicationInterface implements ApplicationInterface
 		logger.info("MyApplicationInterface");
 
 		this.main_activity = main_activity;
-		this.locationSupplier = new LocationSupplier(main_activity);
 
         mSharedPreferences = this.main_activity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
@@ -113,13 +110,6 @@ public class MyApplicationInterface implements ApplicationInterface
     	state.putFloat("focus_distance", focus_distance);
 	}
 
-	LocationSupplier getLocationSupplier()
-    {
-        logger.debug("getLocationSupplier() Invoked.");
-
-        return locationSupplier;
-	}
-	
 	com.takeapeek.capture.StorageUtils getStorageUtils()
     {
         logger.debug("getStorageUtils() Invoked.");
@@ -162,14 +152,6 @@ public class MyApplicationInterface implements ApplicationInterface
         return false;
     }
     
-	@Override
-	public Location getLocation()
-    {
-        logger.debug("getLocation() Invoked.");
-
-        return locationSupplier.getLocation();
-	}
-	
 	@Override
 	public int createOutputVideoMethod()
     {
@@ -1003,10 +985,7 @@ public class MyApplicationInterface implements ApplicationInterface
 				logger.info("max filesize reached");
 				//@@message_id = R.string.video_max_filesize;
 			}
-			if( message_id != 0 )
-            {
-                main_activity.getPreview().showToast(null, message_id);
-            }
+
 			// in versions 1.24 and 1.24, there was a bug where we had "info_" for onVideoError and "error_" for onVideoInfo!
 			// fixed in 1.25; also was correct for 1.23 and earlier
 			String debug_value = "info_" + what + "_" + extra;
@@ -1058,19 +1037,6 @@ public class MyApplicationInterface implements ApplicationInterface
 	public void onVideoRecordStartError(CamcorderProfile profile)
     {
         logger.debug("onVideoRecordStartError(.) Invoked.");
-
-		String error_message = "";
-		String features = main_activity.getPreview().getErrorFeatures(profile);
-		if( features.length() > 0 )
-        {
-			//@@error_message = getContext().getResources().getString(R.string.sorry) + ", " + features + " " + getContext().getResources().getString(R.string.not_supported);
-		}
-		else
-        {
-			//@@error_message = getContext().getResources().getString(R.string.failed_to_record_video);
-		}
-		main_activity.getPreview().showToast(null, error_message);
-		ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
 	}
 
 	@Override
@@ -1552,8 +1518,6 @@ public class MyApplicationInterface implements ApplicationInterface
 		String preference_stamp_dateformat = this.getStampDateFormatPref();
 		String preference_stamp_timeformat = this.getStampTimeFormatPref();
 		String preference_stamp_gpsformat = this.getStampGPSFormatPref();
-		boolean store_location = getGeotaggingPref() && getLocation() != null;
-		Location location = store_location ? getLocation() : null;
 		boolean store_geo_direction = main_activity.getPreview().hasGeoDirection() && getGeodirectionPref();
 		double geo_direction = store_geo_direction ? main_activity.getPreview().getGeoDirection() : 0.0;
 		boolean has_thumbnail_animation = getThumbnailAnimationPref();
@@ -1567,7 +1531,6 @@ public class MyApplicationInterface implements ApplicationInterface
 				is_front_facing,
 				current_date,
 				preference_stamp, preference_textstamp, font_size, color, pref_style, preference_stamp_dateformat, preference_stamp_timeformat, preference_stamp_gpsformat,
-				store_location, location, store_geo_direction, geo_direction,
 				has_thumbnail_animation);
 		
 		logger.info("onPictureTaken complete, success: " + success);

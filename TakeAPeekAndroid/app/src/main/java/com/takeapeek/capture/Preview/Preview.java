@@ -8,9 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -18,7 +16,6 @@ import android.graphics.SurfaceTexture;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.hardware.camera2.DngCreator;
-import android.location.Location;
 import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.MediaRecorder;
@@ -56,7 +53,6 @@ import com.takeapeek.capture.Preview.CameraSurface.CameraSurface;
 import com.takeapeek.capture.Preview.CameraSurface.MySurfaceView;
 import com.takeapeek.capture.Preview.CameraSurface.MyTextureView;
 import com.takeapeek.capture.TakePhoto;
-import com.takeapeek.capture.ToastBoxer;
 import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
@@ -202,11 +198,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 	private Rect location_dest = new Rect();*/
 
 	private Toast last_toast = null;
-	private ToastBoxer flash_toast = new ToastBoxer();
-	private ToastBoxer focus_toast = new ToastBoxer();
-	private ToastBoxer take_photo_toast = new ToastBoxer();
-	private ToastBoxer seekbar_toast = new ToastBoxer();
-	
+
 	private int ui_rotation = 0;
 
 	private boolean supports_face_detection = false;
@@ -942,7 +934,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 					takePicture(due_to_max_filesize);
 					if( !due_to_max_filesize )
                     {
-						showToast(null, toast); // show the toast afterwards, as we're hogging the UI thread here, and media recorder takes time to start up
 						// must decrement after calling takePicture(), so that takePicture() doesn't reset the value of remaining_restart_video
 						remaining_restart_video--;
 					}
@@ -2901,7 +2892,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             {
 				// now save
 				applicationInterface.setExposureTimePref(new_exposure_time);
-	    		showToast(seekbar_toast, getExposureTimeString(new_exposure_time), 96);
 			}
 		}
 	}
@@ -3827,27 +3817,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			return;
 		}
 
-		boolean store_location = applicationInterface.getGeotaggingPref();
-		if( store_location )
-        {
-			boolean require_location = applicationInterface.getRequireLocationPref();
-			if( require_location )
-            {
-				if( applicationInterface.getLocation() != null )
-                {
-					// fine, we have location
-				}
-				else
-                {
-	    			logger.info("location data required, but not available");
-		    	    //@@showToast(null, R.string.location_not_available);
-					this.phase = PHASE_NORMAL;
-					applicationInterface.cameraInOperation(false);
-		    	    return;
-				}
-			}
-		}
-
 		if( is_video )
         {
    			logger.info("start video recording");
@@ -3999,16 +3968,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			}
    			logger.info("set video source");
 			video_recorder.setVideoSource(using_android_l ? MediaRecorder.VideoSource.SURFACE : MediaRecorder.VideoSource.CAMERA);
-
-    		boolean store_location = applicationInterface.getGeotaggingPref();
-			if( store_location && applicationInterface.getLocation() != null )
-            {
-				Location location = applicationInterface.getLocation();
-
-    			logger.info("set video location: lat " + location.getLatitude() + " long " + location.getLongitude() + " accuracy " + location.getAccuracy());
-
-				video_recorder.setLocation((float)location.getLatitude(), (float)location.getLongitude());
-			}
 
    			logger.info("set video profile");
 			if( record_audio )
@@ -4358,7 +4317,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			cancelAutoFocus();
 		}
 		removePendingContinuousFocusReset(); // to avoid switching back to continuous focus mode while taking a photo - instead we'll always make sure we switch back after taking a photo
-		updateParametersFromLocation(); // do this now, not before, so we don't set location parameters during focus (sometimes get RuntimeException)
 
 		focus_success = FOCUS_DONE; // clear focus rectangle if not already done
 		successfully_focused = false; // so next photo taken will require an autofocus
@@ -5191,151 +5149,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         logger.debug("onSaveInstanceState(.) Invoked.");
 	}
 
-    public void showToast(final ToastBoxer clear_toast, final int message_id)
-    {
-        logger.debug("showToast(.int) Invoked.");
-
-        showToast(clear_toast, getResources().getString(message_id));
-    }
-
-    public void showToast(final ToastBoxer clear_toast, final String message)
-    {
-        logger.debug("showToast(.String) Invoked.");
-
-        showToast(clear_toast, message, 32);
-    }
-
-    public void showToast(final ToastBoxer clear_toast, final String message, final int offset_y_dp)
-    {
-        logger.debug("showToast(...) Invoked.");
-
-		if( !applicationInterface.getShowToastsPref() )
-        {
-			return;
-		}
-    	
-		class RotatedTextView extends View
-        {
-			private String [] lines = null;
-			private Paint paint = new Paint();
-			private Rect bounds = new Rect();
-			private Rect sub_bounds = new Rect();
-			private RectF rect = new RectF();
-
-			public RotatedTextView(String text, Context context)
-            {
-				super(context);
-
-                logger.debug("RotatedTextView:RotatedTextView(..) Invoked.");
-
-				this.lines = text.split("\n");
-			}
-
-			@Override 
-			protected void onDraw(Canvas canvas)
-            {
-                logger.debug("RotatedTextView:onDraw(.) Invoked.");
-
-				final float scale = Preview.this.getResources().getDisplayMetrics().density;
-				paint.setTextSize(14 * scale + 0.5f); // convert dps to pixels
-				paint.setShadowLayer(1, 0, 1, Color.BLACK);
-				//paint.getTextBounds(text, 0, text.length(), bounds);
-				boolean first_line = true;
-				for(String line : lines)
-                {
-					paint.getTextBounds(line, 0, line.length(), sub_bounds);
-
-					if( first_line )
-                    {
-						bounds.set(sub_bounds);
-						first_line = false;
-					}
-					else
-                    {
-						bounds.top = Math.min(sub_bounds.top, bounds.top);
-						bounds.bottom = Math.max(sub_bounds.bottom, bounds.bottom);
-						bounds.left = Math.min(sub_bounds.left, bounds.left);
-						bounds.right = Math.max(sub_bounds.right, bounds.right);
-					}
-				}
-
-				int height = bounds.bottom - bounds.top + 2;
-				bounds.bottom += ((lines.length-1) * height)/2;
-				bounds.top -= ((lines.length-1) * height)/2;
-				final int padding = (int) (14 * scale + 0.5f); // convert dps to pixels
-				final int offset_y = (int) (offset_y_dp * scale + 0.5f); // convert dps to pixels
-				canvas.save();
-				canvas.rotate(ui_rotation, canvas.getWidth()/2.0f, canvas.getHeight()/2.0f);
-
-				rect.left = canvas.getWidth()/2 - bounds.width()/2 + bounds.left - padding;
-				rect.top = canvas.getHeight()/2 + bounds.top - padding + offset_y;
-				rect.right = canvas.getWidth()/2 - bounds.width()/2 + bounds.right + padding;
-				rect.bottom = canvas.getHeight()/2 + bounds.bottom + padding + offset_y;
-
-				paint.setStyle(Paint.Style.FILL);
-				paint.setColor(Color.rgb(50, 50, 50));
-				//canvas.drawRect(rect, paint);
-				final float radius = (24 * scale + 0.5f); // convert dps to pixels
-				canvas.drawRoundRect(rect, radius, radius, paint);
-
-				paint.setColor(Color.WHITE);
-				int ypos = canvas.getHeight()/2 + offset_y - ((lines.length-1) * height)/2;
-				for(String line : lines)
-                {
-					canvas.drawText(line, canvas.getWidth()/2 - bounds.width()/2, ypos, paint);
-					ypos += height;
-				}
-				canvas.restore();
-			} 
-		}
-
-		logger.info("showToast: " + message);
-		final Activity activity = (Activity)this.getContext();
-		// We get a crash on emulator at least if Toast constructor isn't run on main thread (e.g., the toast for taking a photo when on timer).
-		// Also see http://stackoverflow.com/questions/13267239/toast-from-a-non-ui-thread
-		activity.runOnUiThread(new Runnable()
-        {
-			public void run()
-            {
-                logger.debug("Runnable:run() Invoked.");
-
-				/*if( clear_toast != null && clear_toast.toast != null )
-					clear_toast.toast.cancel();
-
-				Toast toast = new Toast(activity);
-				if( clear_toast != null )
-					clear_toast.toast = toast;*/
-				// This method is better, as otherwise a previous toast (with different or no clear_toast) never seems to clear if we repeatedly issue new toasts - this doesn't happen if we reuse existing toasts if possible
-				// However should only do this if the previous toast was the most recent toast (to avoid messing up ordering)
-				Toast toast = null;
-				if( clear_toast != null && clear_toast.toast != null && clear_toast.toast == last_toast )
-                {
-					logger.info("reuse last toast: " + last_toast);
-					toast = clear_toast.toast;
-				}
-				else
-                {
-					if( clear_toast != null && clear_toast.toast != null )
-                    {
-						logger.info("cancel last toast: " + clear_toast.toast);
-						clear_toast.toast.cancel();
-					}
-					toast = new Toast(activity);
-					logger.info("created new toast: " + toast);
-					if( clear_toast != null )
-                    {
-                        clear_toast.toast = toast;
-                    }
-				}
-				View text = new RotatedTextView(message, activity);
-				toast.setView(text);
-				toast.setDuration(Toast.LENGTH_SHORT);
-				toast.show();
-				last_toast = toast;
-			}
-		});
-	}
-	
 	public void setUIRotation(int ui_rotation)
     {
         logger.debug("setUIRotation(.) Invoked.");
@@ -5350,32 +5163,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         return this.ui_rotation;
 	}
 
-	/** If geotagging is enabled, pass the location info to the camera controller (for photos).
-	 */
-    private void updateParametersFromLocation()
-    {
-        logger.debug("updateParametersFromLocation() Invoked.");
-
-    	if( camera_controller != null )
-        {
-    		boolean store_location = applicationInterface.getGeotaggingPref();
-    		if( store_location && applicationInterface.getLocation() != null )
-            {
-    			Location location = applicationInterface.getLocation();
-
-    			logger.info("updating parameters from location...");
-    			logger.info("lat " + location.getLatitude() + " long " + location.getLongitude() + " accuracy " + location.getAccuracy() + " timestamp " + location.getTime());
-
-	    		camera_controller.setLocationInfo(location);
-    		}
-    		else
-            {
-    			logger.info("removing location data from parameters...");
-	    		camera_controller.removeLocationInfo();
-    		}
-    	}
-    }
-	
 	public boolean isVideo()
     {
         logger.debug("isVideo() Invoked.");

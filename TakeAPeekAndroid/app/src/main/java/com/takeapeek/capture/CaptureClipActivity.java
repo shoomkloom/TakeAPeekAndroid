@@ -114,11 +114,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 	
 	//private boolean ui_placement_right = true;
 
-	private com.takeapeek.capture.ToastBoxer switch_video_toast = new com.takeapeek.capture.ToastBoxer();
-    private ToastBoxer screen_locked_toast = new com.takeapeek.capture.ToastBoxer();
-    private ToastBoxer changed_auto_stabilise_toast = new com.takeapeek.capture.ToastBoxer();
-	private ToastBoxer exposure_lock_toast = new com.takeapeek.capture.ToastBoxer();
-	private ToastBoxer audio_control_toast = new com.takeapeek.capture.ToastBoxer();
 	private boolean block_startup_toast = false; // used when returning from Settings/Popup - if we're displaying a toast anyway, don't want to display the info toast too
     
 	// for testing:
@@ -637,7 +632,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 	        	// needed to support hardware menu button
 	        	// tested successfully on Samsung S3 (via RTL)
 	        	// see http://stackoverflow.com/questions/8264611/how-to-detect-when-user-presses-menu-key-on-their-android-device
-				openSettings();
 	            return true;
 			}
 
@@ -761,7 +755,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         orientationEventListener.enable();
 
         initSpeechRecognizer();
-        initLocation();
         initSound();
 
 		mainUI.layoutUI();
@@ -805,8 +798,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 
         freeAudioListener(false);
         freeSpeechRecognizer();
-
-        applicationInterface.getLocationSupplier().freeLocationListeners();
 
 		releaseSound();
 
@@ -918,10 +909,8 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 
 		int cameraId = preview.getCameraId();
 
-		if( com.takeapeek.capture.MyDebug.LOG )
-        {
-            logger.info("current cameraId: " + cameraId);
-        }
+        logger.info("current cameraId: " + cameraId);
+
 		if( this.preview.canSwitchCamera() )
         {
 			int n_cameras = preview.getCameraControllerManager().getNumberOfCameras();
@@ -1020,13 +1009,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
     	this.preview.toggleExposureLock();
     }
     
-    public void clickedSettings(View view)
-    {
-        logger.debug("clickedSettings(.) Invoked.");
-
-		openSettings();
-    }
-
     public boolean popupIsOpen()
     {
         logger.debug("popupIsOpen() Invoked.");
@@ -1054,145 +1036,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         logger.debug("clickedPopupSettings(.) Invoked.");
 
 		mainUI.togglePopupSettings();
-    }
-    
-    private void openSettings()
-    {
-        logger.debug("openSettings() Invoked.");
-
-		waitUntilImageQueueEmpty(); // in theory not needed as we could continue running in the background, but best to be safe
-
-		closePopup();
-
-		preview.cancelTimer(); // best to cancel any timer, in case we take a photo while settings window is open, or when changing settings
-		preview.stopVideo(false); // important to stop video, as we'll be changing camera parameters when the settings window closes
-
-		stopAudioListeners();
-		
-		Bundle bundle = new Bundle();
-		bundle.putInt("cameraId", this.preview.getCameraId());
-		bundle.putString("camera_api", this.preview.getCameraAPI());
-		bundle.putBoolean("using_android_l", this.preview.usingCamera2API());
-		bundle.putBoolean("supports_auto_stabilise", this.supports_auto_stabilise);
-		bundle.putBoolean("supports_force_video_4k", this.supports_force_video_4k);
-		bundle.putBoolean("supports_camera2", this.supports_camera2);
-		bundle.putBoolean("supports_face_detection", this.preview.supportsFaceDetection());
-		bundle.putBoolean("supports_raw", this.preview.supportsRaw());
-		bundle.putBoolean("supports_video_stabilization", this.preview.supportsVideoStabilization());
-		bundle.putBoolean("can_disable_shutter_sound", this.preview.canDisableShutterSound());
-
-		putBundleExtra(bundle, "color_effects", this.preview.getSupportedColorEffects());
-		putBundleExtra(bundle, "scene_modes", this.preview.getSupportedSceneModes());
-		putBundleExtra(bundle, "white_balances", this.preview.getSupportedWhiteBalances());
-		putBundleExtra(bundle, "isos", this.preview.getSupportedISOs());
-		bundle.putString("iso_key", this.preview.getISOKey());
-
-		if( this.preview.getCameraController() != null )
-        {
-			bundle.putString("parameters_string", preview.getCameraController().getParametersString());
-		}
-
-		List<CameraController.Size> preview_sizes = this.preview.getSupportedPreviewSizes();
-
-        if( preview_sizes != null )
-        {
-			int [] widths = new int[preview_sizes.size()];
-			int [] heights = new int[preview_sizes.size()];
-			int i=0;
-			for(CameraController.Size size: preview_sizes)
-            {
-				widths[i] = size.width;
-				heights[i] = size.height;
-				i++;
-			}
-
-            bundle.putIntArray("preview_widths", widths);
-			bundle.putIntArray("preview_heights", heights);
-		}
-
-        bundle.putInt("preview_width", preview.getCurrentPreviewSize().width);
-		bundle.putInt("preview_height", preview.getCurrentPreviewSize().height);
-
-		List<CameraController.Size> sizes = this.preview.getSupportedPictureSizes();
-
-        if( sizes != null )
-        {
-			int [] widths = new int[sizes.size()];
-			int [] heights = new int[sizes.size()];
-			int i=0;
-			for(CameraController.Size size: sizes)
-            {
-				widths[i] = size.width;
-				heights[i] = size.height;
-				i++;
-			}
-
-            bundle.putIntArray("resolution_widths", widths);
-			bundle.putIntArray("resolution_heights", heights);
-		}
-
-        if( preview.getCurrentPictureSize() != null )
-        {
-			bundle.putInt("resolution_width", preview.getCurrentPictureSize().width);
-			bundle.putInt("resolution_height", preview.getCurrentPictureSize().height);
-		}
-		
-		List<String> video_quality = this.preview.getSupportedVideoQuality();
-
-        if( video_quality != null && this.preview.getCameraController() != null )
-        {
-			String [] video_quality_arr = new String[video_quality.size()];
-			String [] video_quality_string_arr = new String[video_quality.size()];
-			int i=0;
-			for(String value: video_quality)
-            {
-				video_quality_arr[i] = value;
-				video_quality_string_arr[i] = this.preview.getCamcorderProfileDescription(value);
-				i++;
-			}
-
-            bundle.putStringArray("video_quality", video_quality_arr);
-			bundle.putStringArray("video_quality_string", video_quality_string_arr);
-		}
-
-        if( preview.getCurrentVideoQuality() != null )
-        {
-			bundle.putString("current_video_quality", preview.getCurrentVideoQuality());
-		}
-
-        CamcorderProfile camcorder_profile = preview.getCamcorderProfile();
-		bundle.putInt("video_frame_width", camcorder_profile.videoFrameWidth);
-		bundle.putInt("video_frame_height", camcorder_profile.videoFrameHeight);
-		bundle.putInt("video_bit_rate", camcorder_profile.videoBitRate);
-		bundle.putInt("video_frame_rate", camcorder_profile.videoFrameRate);
-
-		List<CameraController.Size> video_sizes = this.preview.getSupportedVideoSizes();
-
-        if( video_sizes != null )
-        {
-			int [] widths = new int[video_sizes.size()];
-			int [] heights = new int[video_sizes.size()];
-			int i=0;
-			for(CameraController.Size size: video_sizes)
-            {
-				widths[i] = size.width;
-				heights[i] = size.height;
-				i++;
-			}
-
-            bundle.putIntArray("video_widths", widths);
-			bundle.putIntArray("video_heights", heights);
-		}
-		
-		putBundleExtra(bundle, "flash_values", this.preview.getSupportedFlashValues());
-		putBundleExtra(bundle, "focus_values", this.preview.getSupportedFocusValues());
-
-		setWindowFlagsForSettings();
-		com.takeapeek.capture.MyPreferenceFragment fragment = new com.takeapeek.capture.MyPreferenceFragment();
-		fragment.setArguments(bundle);
-		// use commitAllowingStateLoss() instead of commit(), does to "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState" crash seen on Google Play
-		// see http://stackoverflow.com/questions/7575921/illegalstateexception-can-not-perform-this-action-after-onsaveinstancestate-wit
-        getFragmentManager().beginTransaction().add(R.id.prefs_container, fragment, "PREFERENCE_FRAGMENT").addToBackStack(null).commitAllowingStateLoss();
     }
 
     public void updateForSettings()
@@ -1256,7 +1099,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 		}
 
         initSpeechRecognizer(); // in case we've enabled or disabled speech recognizer
-		initLocation(); // in case we've enabled or disabled GPS
 
         if( toast_message != null )
         {
@@ -1276,11 +1118,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 
         block_startup_toast = false;
 
-        if( toast_message != null && toast_message.length() > 0 )
-        {
-            preview.showToast(null, toast_message);
-        }
-
     	if( saved_focus_value != null )
         {
             logger.info("switch focus back to: " + saved_focus_value);
@@ -1289,20 +1126,10 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
     	}
     }
     
-    com.takeapeek.capture.MyPreferenceFragment getPreferenceFragment()
-    {
-        logger.debug("getPreferenceFragment() Invoked.");
-
-        com.takeapeek.capture.MyPreferenceFragment fragment = (com.takeapeek.capture.MyPreferenceFragment)getFragmentManager().findFragmentByTag("PREFERENCE_FRAGMENT");
-        return fragment;
-    }
-    
     @Override
     public void onBackPressed()
     {
         logger.debug("onBackPressed() Invoked.");
-
-        final com.takeapeek.capture.MyPreferenceFragment fragment = getPreferenceFragment();
 
         if( screen_is_locked )
         {
@@ -1310,20 +1137,10 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         	return;
         }
 
-        if( fragment != null )
+        if( popupIsOpen() )
         {
-            logger.info("close settings");
-
-			setWindowFlagsForCamera();
-			updateForSettings();
-        }
-        else
-        {
-			if( popupIsOpen() )
-            {
-    			closePopup();
-    			return;
-    		}
+            closePopup();
+            return;
         }
 
         super.onBackPressed();
@@ -2481,13 +2298,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
     	return this.applicationInterface.getStorageUtils().getImageFolder();
     }
 
-    public ToastBoxer getChangedAutoStabiliseToastBoxer()
-    {
-        logger.debug("getChangedAutoStabiliseToastBoxer() Invoked.");
-
-    	return changed_auto_stabilise_toast;
-    }
-
     /** Displays a toast with information about the current preferences.
      *  If always_show is true, the toast is always displayed; otherwise, we only display
      *  a toast if it's important to notify the user (i.e., unusual non-default settings are
@@ -2636,51 +2446,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
     		//@@toast_string += "\n" + getResources().getString(R.string.color_effect) + ": " + color_effect;
 			simple = false;
     	}
-
-        String lock_orientation = "Lock to portrait";//@@sharedPreferences.getString(PreferenceKeys.getLockOrientationPreferenceKey(), "none");
-
-        /*@@
-        if( !lock_orientation.equals("none") ) {
-			String [] entries_array = getResources().getStringArray(R.array.preference_lock_orientation_entries);
-			String [] values_array = getResources().getStringArray(R.array.preference_lock_orientation_values);
-			int index = Arrays.asList(values_array).indexOf(lock_orientation);
-			if( index != -1 ) { // just in case!
-				String entry = entries_array[index];
-				toast_string += "\n" + entry;
-				simple = false;
-			}
-		}
-
-		String timer = sharedPreferences.getString(PreferenceKeys.getTimerPreferenceKey(), "0");
-		if( !timer.equals("0") ) {
-			String [] entries_array = getResources().getStringArray(R.array.preference_timer_entries);
-			String [] values_array = getResources().getStringArray(R.array.preference_timer_values);
-			int index = Arrays.asList(values_array).indexOf(timer);
-			if( index != -1 ) { // just in case!
-				String entry = entries_array[index];
-				toast_string += "\n" + getResources().getString(R.string.preference_timer) + ": " + entry;
-				simple = false;
-			}
-		}
-		String repeat = "0";//@@applicationInterface.getRepeatPref();
-		if( !repeat.equals("1") ) {
-			String [] entries_array = getResources().getStringArray(R.array.preference_burst_mode_entries);
-			String [] values_array = getResources().getStringArray(R.array.preference_burst_mode_values);
-			int index = Arrays.asList(values_array).indexOf(repeat);
-			if( index != -1 ) { // just in case!
-				String entry = entries_array[index];
-				toast_string += "\n" + getResources().getString(R.string.preference_burst_mode) + ": " + entry;
-				simple = false;
-			}
-		}
-		/*if( audio_listener != null ) {
-			toast_string += "\n" + getResources().getString(R.string.preference_audio_noise_control);
-		}*/
-
-		if( !simple || always_show )
-        {
-            preview.showToast(switch_video_toast, toast_string);
-        }
 	}
 
 	private void freeAudioListener(boolean wait_until_done)
@@ -2850,8 +2615,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 							String toast = list.get(0) + "?";
 
                             logger.info("unrecognised: " + toast);
-
-							preview.showToast(audio_control_toast, toast);
 						}
 					}
 
@@ -2920,22 +2683,6 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         	// no need to free the speech recognizer, just stop it
         	speechRecognizer.stopListening();
         	speechRecognizerStopped();
-        }
-	}
-	
-	private void initLocation()
-    {
-        logger.debug("initLocation() Invoked.");
-
-        if( !applicationInterface.getLocationSupplier().setupLocationListener() )
-        {
-            logger.info("location permission not available, so switch location off");
-
-    		//@@preview.showToast(null, R.string.permission_location_not_available);
-    		// now switch off so we don't keep showing this message
-			SharedPreferences.Editor editor = mSharedPreferences.edit();
-			editor.putBoolean(PreferenceKeys.getLocationPreferenceKey(), false);
-			editor.apply();
         }
 	}
 	
