@@ -21,7 +21,8 @@ import java.util.Date;
  *  into a new application, by providing an appropriate implementation of this
  *  ApplicationInterface.
  */
-public interface ApplicationInterface {
+public interface ApplicationInterface
+{
 	final int VIDEOMETHOD_FILE = 0; // video will be saved to a file
 	final int VIDEOMETHOD_SAF = 1; // video will be saved using Android 5's Storage Access Framework
 	final int VIDEOMETHOD_URI = 2; // video will be written to the supplied Uri

@@ -6,10 +6,10 @@ import android.hardware.camera2.DngCreator;
 import android.location.Location;
 import android.media.Image;
 import android.media.MediaRecorder;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.takeapeek.capture.MyDebug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -23,8 +23,10 @@ import java.util.List;
  *  otherwise the calling application still controls the behaviour of the
  *  camera.
  */
-public abstract class CameraController {
-	private static final String TAG = "CameraController";
+public abstract class CameraController
+{
+    static private final Logger logger = LoggerFactory.getLogger(CameraController.class);
+
 	int cameraId = 0;
 
 	public static final long EXPOSURE_TIME_DEFAULT = 1000000000l/30;
@@ -33,7 +35,8 @@ public abstract class CameraController {
 	public int count_camera_parameters_exception = 0;
 	public int count_precapture_timeout = 0;
 
-	public static class CameraFeatures {
+	public static class CameraFeatures
+    {
 		public boolean is_zoom_supported = false;
 		public int max_zoom = 0;
 		public List<Integer> zoom_ratios = null;
@@ -60,25 +63,33 @@ public abstract class CameraController {
 		public boolean supports_raw = false;
 	}
 
-	public static class Size {
+	public static class Size
+    {
 		public int width = 0;
 		public int height = 0;
 		
-		public Size(int width, int height) {
+		public Size(int width, int height)
+        {
 			this.width = width;
 			this.height = height;
 		}
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+        {
 			if( !(o instanceof Size) )
-				return false;
-			Size that = (Size)o;
-			return this.width == that.width && this.height == that.height;
+            {
+                return false;
+            }
+
+            Size that = (Size)o;
+
+            return this.width == that.width && this.height == that.height;
 		}
 		
 		@Override
-		public int hashCode() {
+		public int hashCode()
+        {
 			// must override this, as we override equals()
 			// can't use:
 			//return Objects.hash(width, height);
@@ -91,21 +102,25 @@ public abstract class CameraController {
 	/** An area has values from [-1000,-1000] (for top-left) to [1000,1000] (for bottom-right) for whatever is
 	 * the current field of view (i.e., taking zoom into account).
 	 */
-	public static class Area {
+	public static class Area
+    {
 		public Rect rect = null;
 		public int weight = 0;
 		
-		public Area(Rect rect, int weight) {
+		public Area(Rect rect, int weight)
+        {
 			this.rect = rect;
 			this.weight = weight;
 		}
 	}
 	
-	public static interface FaceDetectionListener {
+	public static interface FaceDetectionListener
+    {
 		public abstract void onFaceDetection(Face[] faces);
 	}
 	
-	public static interface PictureCallback {
+	public static interface PictureCallback
+    {
 		public abstract void onCompleted(); // called after all relevant on*PictureTaken() callbacks have been called and returned
 		public abstract void onPictureTaken(byte[] data);
 		/** Only called if RAW is requested.
@@ -114,35 +129,43 @@ public abstract class CameraController {
 		public abstract void onRawPictureTaken(DngCreator dngCreator, Image image);
 	}
 	
-	public static interface AutoFocusCallback {
+	public static interface AutoFocusCallback
+    {
 		public abstract void onAutoFocus(boolean success);
 	}
 	
-	public static interface ContinuousFocusMoveCallback {
+	public static interface ContinuousFocusMoveCallback
+    {
 		public abstract void onContinuousFocusMove(boolean start);
 	}
 	
-	public static interface ErrorCallback {
+	public static interface ErrorCallback
+    {
 		public abstract void onError();
 	}
 	
-	public static class Face {
+	public static class Face
+    {
 		public int score = 0;
 		/* The has values from [-1000,-1000] (for top-left) to [1000,1000] (for bottom-right) for whatever is
 		 * the current field of view (i.e., taking zoom into account).
 		 */
 		public Rect rect = null;
 
-		Face(int score, Rect rect) {
+		Face(int score, Rect rect)
+        {
 			this.score = score;
 			this.rect = rect;
 		}
 	}
 	
-	public static class SupportedValues {
+	public static class SupportedValues
+    {
 		public List<String> values = null;
 		public String selected_value = null;
-		SupportedValues(List<String> values, String selected_value) {
+
+        SupportedValues(List<String> values, String selected_value)
+        {
 			this.values = values;
 			this.selected_value = selected_value;
 		}
@@ -268,24 +291,34 @@ public abstract class CameraController {
 	}
 
 	// gets the available values of a generic mode, e.g., scene, color etc, and makes sure the requested mode is available
-	protected SupportedValues checkModeIsSupported(List<String> values, String value, String default_value) {
-		if( values != null && values.size() > 1 ) { // n.b., if there is only 1 supported value, we also return null, as no point offering the choice to the user (there are some devices, e.g., Samsung, that only have a scene mode of "auto")
-			if( MyDebug.LOG ) {
-				for(int i=0;i<values.size();i++) {
-		        	Log.d(TAG, "supported value: " + values.get(i));
-				}
-			}
+	protected SupportedValues checkModeIsSupported(List<String> values, String value, String default_value)
+    {
+        logger.debug("checkModeIsSupported(...) Invoked");
+
+		if( values != null && values.size() > 1 )
+        { // n.b., if there is only 1 supported value, we also return null, as no point offering the choice to the user (there are some devices, e.g., Samsung, that only have a scene mode of "auto")
+            for(int i=0;i<values.size();i++)
+            {
+                logger.info("supported value: " + values.get(i));
+            }
+
 			// make sure result is valid
-			if( !values.contains(value) ) {
-				if( MyDebug.LOG )
-					Log.d(TAG, "value not valid!");
+			if( !values.contains(value) )
+            {
+                logger.info("value not valid!");
+
 				if( values.contains(default_value) )
-					value = default_value;
+                {
+                    value = default_value;
+                }
 				else
-					value = values.get(0);
-				if( MyDebug.LOG )
-					Log.d(TAG, "value is now: " + value);
+                {
+                    value = values.get(0);
+                }
+
+                logger.info("value is now: " + value);
 			}
+
 			return new SupportedValues(values, value);
 		}
 		return null;
