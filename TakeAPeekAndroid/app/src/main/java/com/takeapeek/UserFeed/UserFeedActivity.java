@@ -7,9 +7,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -32,6 +32,8 @@ import com.takeapeek.ormlite.TakeAPeekObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserFeedActivity extends AppCompatActivity
@@ -89,6 +91,46 @@ public class UserFeedActivity extends AppCompatActivity
         }
     };
 
+    IncomingHandler mIncomingHandler = new IncomingHandler(this);
+
+    static class IncomingHandler extends Handler
+    {
+        private final WeakReference<UserFeedActivity> mActivityWeakReference;
+
+        IncomingHandler(UserFeedActivity activity)
+        {
+            mActivityWeakReference = new WeakReference<UserFeedActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            UserFeedActivity activity = mActivityWeakReference.get();
+            if (activity != null)
+            {
+                activity.HandleMessage(msg);
+            }
+        }
+    }
+
+    public void HandleMessage(Message msg)
+    {
+        logger.debug("HandleMessage(.) Invoked");
+
+        int messageType = msg.arg1;
+
+        switch(messageType)
+        {
+            case Constants.HANDLER_MESSAGE_PEEK_DOWNLOADED:
+                ShowPeek(true, (TakeAPeekObject)msg.obj);
+                break;
+
+            default:
+                logger.info("HandleMessage: default");
+                break;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -127,6 +169,9 @@ public class UserFeedActivity extends AppCompatActivity
 
             if(profileObject != null)
             {
+                //Set the name in the Action bar
+                getSupportActionBar().setTitle(profileObject.displayName);
+
                 // Setting adapter
                 mPeekItemAdapter = new PeekItemAdapter(this, R.layout.item_peek_feed, profileObject.peeks);
                 mListViewFeedList.setAdapter(mPeekItemAdapter);
@@ -186,6 +231,13 @@ public class UserFeedActivity extends AppCompatActivity
     {
         logger.debug("ShowPeek(.) Invoked");
 
+        ShowPeek(false, takeAPeekObject);
+    }
+
+    public void ShowPeek(boolean fromHandler, TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("ShowPeek(..) Invoked");
+
         mCurrentTakeAPeekObject = takeAPeekObject;
 
         mEnumActivityState = EnumActivityState.previewLoading;
@@ -193,23 +245,31 @@ public class UserFeedActivity extends AppCompatActivity
 
         mThumbnailLoader.SetThumbnail(this, -1, takeAPeekObject, mImageViewPeekThumbnail, mSharedPreferences);
 
-        //Play the streaming video
+        //Play the video, download if required
         try
         {
-            String userName = Helper.GetTakeAPeekAccountUsername(this);
-            String password = Helper.GetTakeAPeekAccountPassword(this);
+            String peekFilePath = Helper.GetVideoPeekFilePath(this, takeAPeekObject.TakeAPeekID);
+            File peekFile = new File(peekFilePath);
+            if(peekFile.exists() == false)
+            {
+                if(fromHandler == true)
+                {
+                    Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_download_peek));
 
-            String link = Transport.GetPeekVideoStreamURL(
-                    this, userName, password,
-                    takeAPeekObject.TakeAPeekID);
+                    Helper.ClearFullscreen(UserFeedActivity.this);
+                    getSupportActionBar().show();
 
-            Uri uriVideo = Uri.parse(link);
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+                }
+                else
+                {
+                    Transport.PreparePeekFile(this, mIncomingHandler, takeAPeekObject);
+                }
+                return;
+            }
 
 /*@@
-                        MediaController mediaController = new MediaController(this);
-                        mediaController.setAnchorView(finalViewHolder.mVideoViewPeekItem);
-                        finalViewHolder.mVideoViewPeekItem.setMediaController(mediaController);
-@@*/
             mVideoViewPeekItem.setVideoURI(uriVideo);
             mVideoViewPeekItem.requestFocus();
 
@@ -221,16 +281,24 @@ public class UserFeedActivity extends AppCompatActivity
                     mEnumActivityState = EnumActivityState.previewPlaying;
                     UpdateUI();
 
+                    getSupportActionBar().hide();
+                    Helper.SetFullscreen(UserFeedActivity.this);
+
                     mVideoViewPeekItem.start();
+                    mVideoViewPeekItem.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
                 }
             });
+*/
 
             mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
             {
                 @Override
                 public void onCompletion(MediaPlayer mp)
                 {
-                    mEnumActivityState = EnumActivityState.previewStopped;
+                    Helper.ClearFullscreen(UserFeedActivity.this);
+                    getSupportActionBar().show();
+
+                    mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
                 }
             });
@@ -240,7 +308,10 @@ public class UserFeedActivity extends AppCompatActivity
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra)
                 {
-                    mEnumActivityState = EnumActivityState.previewStopped;
+                    Helper.ClearFullscreen(UserFeedActivity.this);
+                    getSupportActionBar().show();
+
+                    mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
 
                     Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
@@ -248,9 +319,24 @@ public class UserFeedActivity extends AppCompatActivity
                     return true;
                 }
             });
+
+            mEnumActivityState = EnumActivityState.previewPlaying;
+            UpdateUI();
+
+            mVideoViewPeekItem.setVideoPath(peekFilePath);
+            mVideoViewPeekItem.requestFocus();
+
+            getSupportActionBar().hide();
+            Helper.SetFullscreen(UserFeedActivity.this);
+
+            mVideoViewPeekItem.start();
+            mVideoViewPeekItem.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         catch (Exception e)
         {
+            Helper.ClearFullscreen(UserFeedActivity.this);
+            getSupportActionBar().show();
+
             Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
             Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
         }

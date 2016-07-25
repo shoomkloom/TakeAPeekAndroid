@@ -174,6 +174,9 @@ public class Constants
     //Widget image content uri string
     public static final String WIDGET_IMAGE_URI = "WidgetImageURI";
 
+    //IncomingHandler message types
+    public static final int HANDLER_MESSAGE_PEEK_DOWNLOADED = 10001;
+
     //flags in preferences
     public static final String PROFILE_DETAILS_CHANGED = "ProfileDetailsChanged";
     public static final String PROFILE_APPVERSION = "ProfileAppVersion";

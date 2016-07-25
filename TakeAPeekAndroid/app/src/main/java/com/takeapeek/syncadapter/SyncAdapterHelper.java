@@ -2,12 +2,9 @@ package com.takeapeek.syncadapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.location.Location;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -25,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -156,21 +152,8 @@ public class SyncAdapterHelper implements Runnable,
                         continue;
                     }
 
-                    String thumbnailPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
-                    File thumbnailToUpload = new File(thumbnailPath);
-
-                    if (thumbnailToUpload.exists() == false)
-                    {
-                        //Create thumbnail
-                        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
-                                takeAPeekObject.FilePath,
-                                MediaStore.Video.Thumbnails.MINI_KIND);
-
-                        //Save the thumbnail
-                        FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
-                        bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
-                        fileOutputStreamThumbnail.close();
-                    }
+                    String thumbnailToUploadPath = Helper.CreatePeekThumbnail(takeAPeekObject.FilePath);
+                    File thumbnailToUpload = new File(thumbnailToUploadPath);
 
                     long thumbnailFileLength = thumbnailToUpload.length();
                     if (thumbnailFileLength > (long) Integer.MAX_VALUE)

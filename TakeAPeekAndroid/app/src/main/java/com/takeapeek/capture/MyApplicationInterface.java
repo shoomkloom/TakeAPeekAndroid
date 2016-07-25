@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /** Our implementation of ApplicationInterface, see there for details.
@@ -185,8 +186,28 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("createOutputVideoFile() Invoked.");
 
-		return storageUtils.createOutputMediaFile(com.takeapeek.capture.StorageUtils.MEDIA_TYPE_VIDEO, "mp4", new Date());
+		//@@return storageUtils.createOutputMediaFile(com.takeapeek.capture.StorageUtils.MEDIA_TYPE_VIDEO, "mp4", new Date());
+
+        //Give the current date instead of peekId, because we don't have one...
+        Date currentDate = new Date(System.currentTimeMillis());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateAndTime = simpleDateFormat.format(currentDate);
+
+        return new File(Helper.GetVideoPeekFilePath(main_activity, currentDateAndTime));
 	}
+
+/*@@
+    private String getVideoFilePath(Context context) throws IOException
+    {
+        logger.debug("getVideoFilePath(.) Invoked");
+
+        Date currentDate = new Date(System.currentTimeMillis());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateAndTime = simpleDateFormat.format(currentDate);
+
+        return String.format("%sTakeAPeek_%s.mp4", Helper.GetTakeAPeekPath(context), currentDateAndTime);
+    }
+*/
 
 	@Override
 	public Uri createOutputVideoSAF() throws IOException

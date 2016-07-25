@@ -34,15 +34,18 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -221,6 +224,15 @@ public class Helper
         String peekThumbnailFullPath = String.format("%s%s%s.png", takeAPeekPath, File.pathSeparator, peekId);
 
         return peekThumbnailFullPath;
+    }
+
+    public static String GetVideoPeekFilePath(Context context, String peekId) throws IOException
+    {
+        logger.debug("GetVideoPeekFilePath(..) Invoked");
+
+        String takeAPeekPath = GetTakeAPeekPath(context);
+
+        return String.format("%s%s.mp4", takeAPeekPath, peekId);
     }
 
 /*@@
@@ -1210,7 +1222,7 @@ public class Helper
 	    Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 	    Canvas canvas = new Canvas(output);
 	 
-	    final int color = context.getResources().getColor(R.color.tap_blue);
+	    final int color = ContextCompat.getColor(context, R.color.tap_blue);
 	    final Paint paint = new Paint();
 	    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 	    final RectF rectF = new RectF(rect);
@@ -3141,6 +3153,45 @@ public class Helper
         }
 
         return formtedDiffTime;
+    }
+
+    public static String CreatePeekThumbnail(String peekFullPath) throws IOException
+    {
+        logger.debug("CreatePeekThumbnail(.) Invoked");
+
+        String thumbnailPath = peekFullPath.replace(".mp4", "_thumbnail.png");
+        File thumbnailToUpload = new File(thumbnailPath);
+
+        if (thumbnailToUpload.exists() == false)
+        {
+            //Create thumbnail
+            Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(
+                    peekFullPath,
+                    MediaStore.Video.Thumbnails.MINI_KIND);
+
+            //Save the thumbnail
+            FileOutputStream fileOutputStreamThumbnail = new FileOutputStream(thumbnailPath);
+            bitmapThumbnail.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStreamThumbnail);
+            fileOutputStreamThumbnail.close();
+        }
+
+        return thumbnailPath;
+    }
+
+    public static void SetFullscreen(Activity activity)
+    {
+        logger.debug("SetFullscreen(.) Invoked");
+
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    public static void ClearFullscreen(Activity activity)
+    {
+        logger.debug("ClearFullscreen(.) Invoked");
+
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
     }
 
     public static Drawable GetActivityIcon(Logger externalLogger, Context context, String packageName, String activityName)

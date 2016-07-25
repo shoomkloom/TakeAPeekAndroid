@@ -42,4 +42,6 @@ public class TakeAPeekObject
     @DatabaseField(columnName = "RelatedProfileID")
     public String RelatedProfileID = null;
 
+    @DatabaseField(columnName = "Title")
+    public String Title = null;
 }

@@ -869,6 +869,13 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			video_filename = null;
 		}
 	}
+
+    public String GetVideoFilename()
+    {
+        logger.debug("GetVideoFilename() Invoked.");
+
+        return video_filename;
+    }
 	
 	private Context getContext()
     {
@@ -1708,7 +1715,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				logger.info("check video quality: " + video_quality.get(i));
 
 				CamcorderProfile profile = getCamcorderProfile(video_quality.get(i));
-				if( profile.videoFrameWidth == 1280 && profile.videoFrameHeight == 720 )
+				//@@if( profile.videoFrameWidth == 1280 && profile.videoFrameHeight == 720 )
+                if( profile.videoFrameWidth == 1024 && profile.videoFrameHeight == 768 )
                 {
 					current_video_quality = i;
 					break;
@@ -3589,7 +3597,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
     			}
     			else
                 {
-    				stopVideo(false);
+                    String videoFilePath = video_filename;
+                    stopVideo(false);
+                    applicationInterface.getMainActivity().RecordingTimeDone(videoFilePath);
     			}
     		}
     		else
@@ -3771,8 +3781,11 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		}
 		else if( what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED || what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED )
         {
-            applicationInterface.getMainActivity().RecordingTimeDone();
-			stopVideo(false);
+            String videoFilePath = video_filename;
+
+            stopVideo(false);
+
+            applicationInterface.getMainActivity().RecordingTimeDone(videoFilePath);
 		}
 		applicationInterface.onVideoInfo(what, extra); // call this last, so that toasts show up properly (as we're hogging the UI thread here, and mediarecorder takes time to stop)
 	}
@@ -4085,7 +4098,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
     							public void run()
 
                                 {
-                                    applicationInterface.getMainActivity().RecordingTimeDone();
+                                    String videoFilePath = video_filename;
 
                                     // we run on main thread to avoid problem of camera closing at the same time
     								// but still need to check that the camera hasn't closed or the task halted, since TimerTask.run() started
@@ -4098,6 +4111,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                                     {
    										logger.info("finishVideoTimerTask: don't restart video, as already cancelled");
     								}
+
+                                    applicationInterface.getMainActivity().RecordingTimeDone(videoFilePath);
     							}
     						});
     					}

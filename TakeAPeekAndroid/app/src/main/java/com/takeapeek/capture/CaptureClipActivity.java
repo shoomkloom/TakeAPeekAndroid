@@ -14,15 +14,18 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.CamcorderProfile;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,6 +40,10 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.SparseIntArray;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -48,6 +55,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -55,8 +63,15 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.VideoView;
 import android.widget.ZoomControls;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.takeapeek.R;
 import com.takeapeek.capture.CameraController.CameraController;
 import com.takeapeek.capture.CameraController.CameraControllerManager2;
@@ -64,6 +79,8 @@ import com.takeapeek.capture.Preview.Preview;
 import com.takeapeek.capture.UI.MainUI;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,11 +95,16 @@ import java.util.Map;
 
 /** The main Activity for Open Camera.
  */
-public class CaptureClipActivity extends Activity implements AudioListener.AudioListenerCallback
+public class CaptureClipActivity extends Activity implements
+        AudioListener.AudioListenerCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener
 {
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
 
     SharedPreferences mSharedPreferences = null;
+    Handler mHandler = new Handler();
 
 	private SensorManager mSensorManager = null;
 	private Sensor mSensorAccelerometer = null;
@@ -136,6 +158,11 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
     TextView mTextviewButtonBack = null;
     TextView mTextviewButtonVideo = null;
     TextView mTextviewButtonDone = null;
+    TextView mCapturePreviewTitleBar = null;
+    EditText mCapturePreviewTitle = null;
+    RelativeLayout mCapturePreviewThumbnailLayout = null;
+    ImageView mCapturePreviewThumbnail = null;
+    VideoView mCapturePreviewVideo = null;
 
     enum VideoCaptureStateEnum
     {
@@ -147,6 +174,13 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
     }
 
     private VideoCaptureStateEnum mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+
+    private String mRelateProfileID = null;
+    private TakeAPeekObject mCompletedTakeAPeekObject = null;
+
+    private GoogleApiClient mGoogleApiClient = null;
+    private Location mLastLocation = null;
+    private LocationRequest mLocationRequest = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -157,12 +191,28 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 
         setContentView(R.layout.activity_capture_clip);
 
-		if( getIntent() != null && getIntent().getExtras() != null )
-        {
+        DatabaseManager.init(this);
 
-		}
+        Intent intent = getIntent();
+        if(intent != null)
+        {
+            mRelateProfileID = intent.getStringExtra(Constants.RELATEDPROFILEIDEXTRA_KEY);
+        }
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setSmallestDisplacement(10)   // 10 meter displacement
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
 		// determine whether we should support "auto stabilise" feature
 		// risk of running out of memory on lower end devices, due to manipulation of large bitmaps
@@ -303,6 +353,27 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         mTextviewButtonBack = (TextView)findViewById(R.id.textview_button_back);
         mTextviewButtonVideo = (TextView)findViewById(R.id.textview_button_video);
         mTextviewButtonDone = (TextView)findViewById(R.id.textview_button_done);
+        mCapturePreviewTitleBar = (TextView)findViewById(R.id.capture_preview_title_bar);
+
+        mCapturePreviewTitle = (EditText)findViewById(R.id.capture_preview_title);
+        mCapturePreviewTitle.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3){}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int arg1, int arg2, int arg3) {}
+
+            @Override
+            public void afterTextChanged(Editable arg0)
+            {
+                mCapturePreviewTitleBar.setText(arg0.toString().trim());
+            }
+        });
+
+        mCapturePreviewThumbnailLayout = (RelativeLayout)findViewById(R.id.capture_preview_thumbnail_layout);
+        mCapturePreviewThumbnail = (ImageView)findViewById(R.id.capture_preview_thumbnail);
+        mCapturePreviewVideo = (VideoView)findViewById(R.id.capture_preview_video);
 
         UpdateUI();
         //End TAP specific code
@@ -746,6 +817,11 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
 
         super.onResume();
 
+        if(mGoogleApiClient != null)
+        {
+            mGoogleApiClient.connect();
+        }
+
         // Set black window background; also needed if we hide the virtual buttons in immersive mode
         // Note that we do it here rather than customising the theme's android:windowBackground, so this doesn't affect other views - in particular, the MyPreferenceFragment settings
 		getWindow().getDecorView().getRootView().setBackgroundColor(Color.BLACK);
@@ -800,6 +876,12 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         freeSpeechRecognizer();
 
 		releaseSound();
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+        {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
 
 		preview.onPause();
     }
@@ -2854,21 +2936,117 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         UpdateUI();
     }
 
+    public void clickedPreviewPlay(View view)
+    {
+        logger.debug("clickedPreviewPlay(.) Invoked.");
+
+        //Play the clip
+        ShowPeek();
+    }
+
+    public void ShowPeek()
+    {
+        logger.debug("ShowPeek() Invoked");
+
+        //Play the streaming video
+        try
+        {
+            mCapturePreviewVideo.setVideoPath(mCompletedTakeAPeekObject.FilePath);
+            mCapturePreviewVideo.requestFocus();
+
+            mCapturePreviewVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+            {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    //Exit full screen
+                    Helper.ClearFullscreen(CaptureClipActivity.this);
+
+                    mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+                    UpdateUI();
+                }
+            });
+
+            mCapturePreviewVideo.setOnErrorListener(new MediaPlayer.OnErrorListener()
+            {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra)
+                {
+                    mCapturePreviewVideo.seekTo(0);
+
+                    //Exit full screen
+                    Helper.ClearFullscreen(CaptureClipActivity.this);
+
+                    mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+                    UpdateUI();
+
+                    Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
+                    Helper.ErrorMessage(CaptureClipActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%d, %d)", getString(R.string.error_playing_peek), what, extra));
+                    return true;
+                }
+            });
+
+            //Set full screen
+            Helper.SetFullscreen(this);
+
+            findViewById(R.id.capture_preview_container).setVisibility(View.VISIBLE);
+            mCapturePreviewVideo.start();
+            mCapturePreviewVideo.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        catch (Exception e)
+        {
+            //Exit full screen
+            Helper.ClearFullscreen(CaptureClipActivity.this);
+
+            mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+            UpdateUI();
+
+            Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
+            Helper.ErrorMessage(CaptureClipActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+        }
+    }
+
     public void clickedDone(View view)
     {
         logger.debug("clickedDone(.) Invoked.");
 
-        //Right now, go back to start...
-        mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
-        UpdateUI();
+        mCompletedTakeAPeekObject.Title = mCapturePreviewTitleBar.getText().toString();
+
+        UploadRecordedVideo(mCompletedTakeAPeekObject);
+
+        Toast.makeText(this, R.string.clip_will_be_sent, Toast.LENGTH_LONG).show();
+
+        finish();
     }
 
-    public void RecordingTimeDone()
+    public void RecordingTimeDone(String videoFilePath)
     {
         logger.debug("RecordingTimeDone() Invoked.");
 
         mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
         UpdateUI();
+
+        mCompletedTakeAPeekObject = new TakeAPeekObject();
+        mCompletedTakeAPeekObject.FilePath = videoFilePath;
+        mCompletedTakeAPeekObject.CreationTime = System.currentTimeMillis();
+        mCompletedTakeAPeekObject.ContentType = Constants.ContentTypeEnum.mp4.toString();
+        mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
+        mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
+        mCompletedTakeAPeekObject.RelatedProfileID = mRelateProfileID;
+
+        try
+        {
+            //Create the thumbnail
+            String thumbnailFullPath = Helper.CreatePeekThumbnail(mCompletedTakeAPeekObject.FilePath);
+            Bitmap thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath);
+
+            //Set the thumbnail bitmap
+            mCapturePreviewThumbnail.setImageBitmap(thumbnailBitmap);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when creating the thumbnail", e);
+        }
     }
 
     public void RecordingError()
@@ -2878,6 +3056,90 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
         //@@Helper.ErrorMessage();...
         mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
         UpdateUI();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle)
+    {
+        logger.debug("onConnected(.) Invoked");
+        logger.info("Location services connected.");
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation == null)
+        {
+            logger.warn("mLastLocation == null, creating a location update request.");
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+        else
+        {
+            logger.info("mLastLocation received.");
+            HandleNewLocation();
+        }
+    }
+
+    private void HandleNewLocation()
+    {
+        logger.debug("HandleNewLocation() Invoked");
+        logger.info(String.format("Last location is: '%s'", mLastLocation.toString()));
+
+        //@@ Update server...?
+    }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+        logger.debug("onConnectionSuspended(.) Invoked");
+        logger.info("Location services suspended. Please reconnect.");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+        logger.debug("onConnectionFailed(.) Invoked");
+
+        try
+        {
+            String error = String.format("onConnectionFailed called with error=%s", connectionResult.getErrorMessage());
+            Helper.Error(logger, error);
+
+            String message = String.format(getString(R.string.error_map_googleapi_connection), connectionResult.getErrorMessage());
+            Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), message);
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to resolve location connection", e);
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        logger.debug("onLocationChanged(.) Invoked");
+
+        mLastLocation = location;
+        HandleNewLocation();
+    }
+
+    private void UploadRecordedVideo(TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("UploadRecordedVideo(.) Invoked");
+
+        try
+        {
+            if(mCompletedTakeAPeekObject != null)
+            {
+                DatabaseManager.getInstance().AddTakeAPeekObject(mCompletedTakeAPeekObject);
+
+                //Run the sync adapter
+                logger.info("Requesting sync from sync adapter");
+                ContentResolver.requestSync(Helper.GetTakeAPeekAccount(this), Constants.TAKEAPEEK_AUTHORITY, Bundle.EMPTY);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: Exception when clicking the upload button", e);
+        }
     }
 
     private void UpdateUI()
@@ -2899,6 +3161,15 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
                 mTextviewButtonVideo.setText("10s");
                 mTextviewButtonDone.setVisibility(View.GONE);
+                mCapturePreviewTitleBar.setVisibility(View.GONE);
+                mCapturePreviewTitle.setVisibility(View.GONE);
+                mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+
+                findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.tap_black));
+
+                findViewById(R.id.preview).setVisibility(View.VISIBLE);
+                findViewById(R.id.zoom_seekbar).setVisibility(View.VISIBLE);
+                findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
                 break;
 
@@ -2915,18 +3186,28 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
                 mTextviewButtonVideo.setText("10s");
                 mTextviewButtonDone.setVisibility(View.GONE);
+                mCapturePreviewTitleBar.setVisibility(View.GONE);
+                mCapturePreviewTitle.setVisibility(View.GONE);
+                mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+
+                findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
                 break;
 
             case Capture:
                 mImageviewFlash.setVisibility(View.VISIBLE);
-                mImageviewSwitchCamera.setVisibility(View.VISIBLE);
+                mImageviewSwitchCamera.setVisibility(View.GONE);
                 mRelativelayoutIntro.setVisibility(View.GONE);
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
                 mTextviewButtonBack.setVisibility(View.GONE);
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
                 mTextviewButtonDone.setVisibility(View.GONE);
+                mCapturePreviewTitleBar.setVisibility(View.GONE);
+                mCapturePreviewTitle.setVisibility(View.GONE);
+                mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+
+                findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
                 break;
 
@@ -2942,6 +3223,14 @@ public class CaptureClipActivity extends Activity implements AudioListener.Audio
                 mTextviewButtonBack.setVisibility(View.VISIBLE);
                 mTextviewButtonVideo.setVisibility(View.GONE);
                 mTextviewButtonDone.setVisibility(View.VISIBLE);
+                mCapturePreviewTitleBar.setVisibility(View.VISIBLE);
+                mCapturePreviewTitle.setVisibility(View.VISIBLE);
+                mCapturePreviewThumbnailLayout.setVisibility(View.VISIBLE);
+
+                findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.tap_white));
+                findViewById(R.id.preview).setVisibility(View.INVISIBLE);
+                findViewById(R.id.zoom_seekbar).setVisibility(View.INVISIBLE);
+                findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
                 FlashOff();
                 break;

@@ -1,5 +1,5 @@
 #
-# generated on 2016/06/05 01:32:20
+# generated on 2016/07/19 09:51:17
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -99,6 +99,10 @@ dataPersister=INTEGER
 # --field-start--
 fieldName=RelatedProfileID
 columnName=RelatedProfileID
+# --field-end--
+# --field-start--
+fieldName=Title
+columnName=Title
 # --field-end--
 # --table-fields-end--
 # --table-end--

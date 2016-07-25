@@ -4,11 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 
 import com.google.gson.Gson;
+import com.takeapeek.R;
 import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekContact;
+import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -315,6 +320,104 @@ public class Transport
         }
 
         return requestStr;
+    }
+
+    public static void GetPeek(Context context, String username, String password, String peekId) throws Exception
+    {
+        logger.debug("GetPeek(......) Invoked - before lock");
+
+        lock.lock();
+
+        String requestStr = null;
+
+        try
+        {
+            logger.debug("GetPeek(.....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_peek"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peek_id", peekId));
+
+//@@            String filePath = Helper.GetPeekThumbnailFullPath(context, peekId);
+            String filePath = Helper.GetVideoPeekFilePath(context, peekId);
+
+            DoHTTPGet(context, nameValuePairs, filePath);
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetPeek(......) - after unlock");
+        }
+    }
+
+    public static void PreparePeekFile(Context context, Handler handler, TakeAPeekObject takeAPeekObject)
+    {
+        new AsyncTask<Object, Void, String>()
+        {
+            Context mContext = null;
+            TakeAPeekObject mTakeAPeekObject = null;
+            Handler mHandler = null;
+
+            @Override
+            protected String doInBackground(Object... params)
+            {
+                mContext = (Context)params[0];
+                mHandler = (Handler)params[1];
+                mTakeAPeekObject = (TakeAPeekObject)params[2];
+
+                try
+                {
+                    logger.info("Download peek from server");
+
+                    RequestObject requestObject = new RequestObject();
+
+                    String username = Helper.GetTakeAPeekAccountUsername(mContext);
+                    String password = Helper.GetTakeAPeekAccountPassword(mContext);
+
+                    Transport.GetPeek(mContext, username, password, mTakeAPeekObject.TakeAPeekID);
+
+                    return "success";
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                }
+
+                return "fail";
+            }
+
+            @Override
+            protected void onPostExecute(String response)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                try
+                {
+                    if (response == "fail")
+                    {
+                        logger.error(String.format("ERROR: When trying to download peek '%s'", mTakeAPeekObject.TakeAPeekID));
+                        Helper.ErrorMessage(mContext, mHandler, mContext.getString(R.string.Error), mContext.getString(R.string.ok), mContext.getString(R.string.error_download_peek));
+                    }
+                    else
+                    {
+                        logger.info(String.format("Success downloading peek '%s'. Sending handler message.", mTakeAPeekObject.TakeAPeekID));
+
+                        Message msg = new Message();
+                        msg.arg1 = Constants.HANDLER_MESSAGE_PEEK_DOWNLOADED;
+                        msg.obj = mTakeAPeekObject;
+
+                        mHandler.sendMessage(msg);
+                    }
+                }
+                finally
+                {
+
+                }
+            }
+        }.execute(context, handler, takeAPeekObject);
     }
 
     public static void GetPeekThumbnail(Context context, String username, String password, String peekId) throws Exception
@@ -711,6 +814,7 @@ public class Transport
                     //@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
                     httpsURLConnection = (HttpURLConnection) url.openConnection();
                     httpsURLConnection.setRequestProperty("connection", "close");
+                    httpsURLConnection.setRequestProperty("Cache-Control", "no-cache");
                     httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
                     httpsURLConnection.setConnectTimeout(20000 /* milliseconds */);
                     httpsURLConnection.setRequestMethod("GET");

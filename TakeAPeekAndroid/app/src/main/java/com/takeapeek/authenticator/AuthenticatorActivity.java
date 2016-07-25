@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -252,7 +253,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        	}
 			        	
 			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
-			        	int selfmeColor = getResources().getColor(R.color.tap_blue);
+			        	int selfmeColor = ContextCompat.getColor(this, R.color.tap_blue);
 			        	String toUse = getString(R.string.to_use);
 			        	String takeapeek = getString(R.string.app_name_lower);
 			        	String toUseTakeAPeek = String.format("%s %s", toUse, takeapeek);
