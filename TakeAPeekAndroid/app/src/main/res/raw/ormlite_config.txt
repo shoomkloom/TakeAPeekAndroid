@@ -1,5 +1,5 @@
 #
-# generated on 2016/07/19 09:51:17
+# generated on 2016/07/27 02:48:11
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -67,6 +67,10 @@ columnName=TakeAPeekID
 # --field-start--
 fieldName=ProfileID
 columnName=ProfileID
+# --field-end--
+# --field-start--
+fieldName=ProfileDisplayName
+columnName=ProfileDisplayName
 # --field-end--
 # --field-start--
 fieldName=CreationTime

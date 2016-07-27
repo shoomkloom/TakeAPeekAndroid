@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -415,6 +416,9 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
+
                 break;
 
             case list:
@@ -430,6 +434,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
                 break;
 
             case emptyList:
@@ -445,6 +451,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
                 break;
 
             case previewLoading:
@@ -470,6 +478,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
                 mImageViewPeekClose.setVisibility(View.GONE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
                 break;
 
             case previewPlaying:
@@ -486,6 +496,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
                 mImageViewPeekClose.setVisibility(View.GONE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
                 break;
 
             case previewStopped:
@@ -502,6 +514,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.VISIBLE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
                 break;
 
             default: break;

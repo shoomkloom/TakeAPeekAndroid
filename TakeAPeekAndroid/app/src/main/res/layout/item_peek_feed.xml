@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@color/tap_darkgray" >
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:background="@color/tap_white"
+    android:padding="10dp">
 
     <RelativeLayout
         android:id = "@+id/user_peek_feed_thumbnail_layout"
-        android:layout_width="250dp"
-        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true" >
 
         <ImageView
             android:id = "@+id/user_peek_feed_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
+            android:layout_height="300dp"
             android:scaleType="centerCrop" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/user_peek_feed_thumbnail"
+            android:layout_alignLeft="@id/user_peek_feed_thumbnail"
+            android:layout_alignRight="@+id/user_peek_feed_thumbnail"
+            android:layout_alignTop="@id/user_peek_feed_thumbnail"
+            android:background="@drawable/rounded_corner_overlay_white" />
 
         <ImageView
             android:id = "@+id/user_peek_feed_thumbnail_play"
@@ -24,24 +33,65 @@
             android:layout_centerInParent="true"
             android:src="@drawable/ic_video_play" />
 
+        <TextView
+            android:id = "@+id/user_peek_feed_displayname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="20sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:id = "@+id/user_peek_feed_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_peek_feed_displayname"
+            android:layout_alignParentLeft="true"
+            android:textSize="18sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:id = "@+id/user_peek_feed_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:textSize="15sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"/>
+
+        <TextView
+            android:id = "@+id/user_peek_feed_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:textSize="15sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:gravity="center"
+            android:paddingBottom="10dp" />
+
     </RelativeLayout>
-
-    <TextView
-        android:id = "@+id/user_peek_feed_thumbnail_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/user_peek_feed_thumbnail_layout"
-        android:textSize="18sp"
-        android:textColor="@color/tap_white"
-        android:layout_marginTop="30dp" />
-
-    <TextView
-        android:id = "@+id/user_peek_feed_thumbnail_address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/user_peek_feed_thumbnail_time"
-        android:textSize="18sp"
-        android:textColor="@color/tap_white"
-        android:layout_marginTop="5dp" />
 
 </RelativeLayout>

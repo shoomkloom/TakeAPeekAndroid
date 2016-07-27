@@ -45,6 +45,8 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
     {
         ImageView mImageViewPeekThumbnail = null;
         ImageView mImageViewPeekThumbnailPlay = null;
+        TextView mTextViewUserFeedDisplayname = null;
+        TextView mTextViewUserFeedTitle = null;
         TextView mTextViewUserFeedTime = null;
         TextView mTextViewUserFeedAddress = null;
 
@@ -100,8 +102,10 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mImageViewPeekThumbnail = (ImageView)view.findViewById(R.id.user_peek_feed_thumbnail);
             viewHolder.mImageViewPeekThumbnailPlay = (ImageView)view.findViewById(R.id.user_peek_feed_thumbnail_play);
             viewHolder.mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
-            viewHolder.mTextViewUserFeedTime = (TextView)view.findViewById(R.id.user_peek_feed_thumbnail_time);
-            viewHolder.mTextViewUserFeedAddress = (TextView)view.findViewById(R.id.user_peek_feed_thumbnail_address);
+            viewHolder.mTextViewUserFeedDisplayname = (TextView)view.findViewById(R.id.user_peek_feed_displayname);
+            viewHolder.mTextViewUserFeedTitle = (TextView)view.findViewById(R.id.user_peek_feed_title);
+            viewHolder.mTextViewUserFeedTime = (TextView)view.findViewById(R.id.user_peek_feed_time);
+            viewHolder.mTextViewUserFeedAddress = (TextView)view.findViewById(R.id.user_peek_feed_address);
 
             view.setTag(viewHolder);
         }
@@ -117,6 +121,10 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
 
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserFeedActivity, position, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
+
+            viewHolder.mTextViewUserFeedDisplayname.setText(viewHolder.mTakeAPeekObject.ProfileDisplayName);
+
+            viewHolder.mTextViewUserFeedTitle.setText(viewHolder.mTakeAPeekObject.Title);
 
             viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity, viewHolder.mTakeAPeekObject.CreationTime));
 

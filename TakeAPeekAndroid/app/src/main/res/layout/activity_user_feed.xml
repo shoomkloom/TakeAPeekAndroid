@@ -2,10 +2,11 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id = "@+id/user_peek_feed_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".userfeed.UserFeedActivity"
-    android:background="@color/tap_darkgray" >
+    android:background="@color/tap_white" >
 
     <VideoView
         android:id = "@+id/user_peek_feed_video"
@@ -44,8 +45,8 @@
         android:id="@+id/listview_user_feed_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@color/tap_lightgray"
-        android:dividerHeight="2dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         android:orientation="vertical"
         android:listSelector="@android:color/transparent"
         android:drawSelectorOnTop="true"

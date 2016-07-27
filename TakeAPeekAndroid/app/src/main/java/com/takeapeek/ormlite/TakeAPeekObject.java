@@ -21,6 +21,9 @@ public class TakeAPeekObject
     @DatabaseField(columnName = "ProfileID")
     public String ProfileID = null;
 
+    @DatabaseField(columnName = "ProfileDisplayName")
+    public String ProfileDisplayName;
+
     @DatabaseField(dataType= DataType.LONG, columnName = "CreationTime")
     public long CreationTime = 0;
 
