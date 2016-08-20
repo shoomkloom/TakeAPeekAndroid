@@ -100,41 +100,6 @@ public class Transport
 		return responseObject;
     }
 
-    public static ResponseObject Test(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
-    {
-        logger.debug("Test(....) Invoked - before lock");
-
-        ResponseObject responseObject = null;
-
-        lock.lock();
-
-        try
-        {
-            logger.debug("Test(....) - inside lock");
-
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
-            nameValuePairs.add(new NameValuePair("action_type", "simpletest"));
-            nameValuePairs.add(new NameValuePair("user_name", userName));
-            nameValuePairs.add(new NameValuePair("password", password));
-            nameValuePairs.add(new NameValuePair("text", "This is a test"));
-
-            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
-        }
-        catch(Exception e)
-        {
-            Helper.Error(logger, "EXCEPTION: inside Test(....)", e);
-            throw e;
-        }
-        finally
-        {
-            lock.unlock();
-            logger.debug("Test(....) - after unlock");
-        }
-
-        return responseObject;
-    }
-
     public static ResponseObject StartVoiceVerification(Context context, String userName, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("StartVoiceVerification(...) Invoked - before lock");
@@ -168,6 +133,42 @@ public class Transport
 		
 		return responseObject;
 	}
+
+    public static String GetDisplayName(Context context, String userName, String password, String proposedDisplayName, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetDisplayName(....) Invoked - before lock");
+
+        String displayName = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetDisplayName(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_profile_display_name"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("proposed_display_name", proposedDisplayName));
+
+            ResponseObject responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+            displayName = responseObject.validDisplayName;
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetDisplayName(....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetDisplayName(....) - after unlock");
+        }
+
+        return displayName;
+    }
 
     public static ResponseObject UpdateLocation(Context context, String userName, String password, double longitude, double latitude, SharedPreferences sharedPreferences) throws Exception
     {
@@ -203,6 +204,37 @@ public class Transport
         }
 
         return responseObject;
+    }
+
+    public static ArrayList<TrendingPlaceObject> GetTrendingPlaces(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetTrendingPlaces(....) Invoked - before lock");
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetTrendingPlaces(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_trending_places"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+
+            ResponseObject responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+            return responseObject.trendingPlaces;
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetTrendingPlaces(....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetTrendingPlaces(....) - after unlock");
+        }
     }
 
     public static ResponseObject RegisterFCMToken(Context context, String userName, String password, String token, SharedPreferences sharedPreferences) throws Exception

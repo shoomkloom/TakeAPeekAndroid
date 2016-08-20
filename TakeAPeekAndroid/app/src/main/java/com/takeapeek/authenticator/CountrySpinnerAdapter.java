@@ -3,15 +3,6 @@
  */
 package com.takeapeek.authenticator;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.takeapeek.R;
-import com.takeapeek.common.Helper;
-import com.takeapeek.common.Helper.FontTypeEnum;
-
 import android.app.Activity;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -19,6 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.takeapeek.R;
+import com.takeapeek.common.Helper;
+import com.takeapeek.common.Helper.FontTypeEnum;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author Dev
@@ -71,7 +71,7 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		}
 		else
 		{
-			labelText = String.format("%s(+%d)", mCountryISOCodes.get(position), countryPrefix);
+			labelText = String.format("%s (+%d)", mCountryNames[position], countryPrefix);
 		}
 		label.setText(labelText);  
 		Helper.setTypeface(mActivity, label, FontTypeEnum.lightFont);

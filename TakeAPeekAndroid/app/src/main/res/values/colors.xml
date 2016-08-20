@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#3f51b5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
     <color name="tap_lightgray">#8c8c8c</color>
+    <color name="tap_lightlightgray">#afafaf</color>
     <color name="tap_darkgray">#323232</color>
-    <color name="tap_darkgray_faded">#AA282828</color>
+    <color name="tap_darkgray_faded">#DD282828</color>
     <color name="tap_gray">#303030</color>
     <color name="tap_gray_faded">#AA303030</color>
     <color name="tap_gray_extra_faded">#44303030</color>
     <color name="tap_blue">#2f3e9b</color>
     <color name="tap_blue2">#2a4999</color>
     <color name="tap_lightblue">#4f5fbd</color>
-    <color name="tap_transparentblue">#992E3E9B</color>
+    <color name="tap_blue_faded">#992E3E9B</color>
     <color name="tap_darkorange">#EF4C22</color>
     <color name="tap_darkorange_faded">#AAEF4C22</color>
     <color name="tap_orange">#ff7341</color>
     <color name="tap_white">#ffffff</color>
-    <color name="tap_white_faded">#aaffffff</color>
+    <color name="tap_white_faded">#ddffffff</color>
+    <color name="tap_darkgreen">#4c9c29</color>
     <color name="tap_green">#55af2d</color>
     <color name="tap_lightgreen">#55cc41</color>
+    <color name="tap_yellow_faded">#ccffeb5f</color>
+    <color name="tap_dark_yellow_faded">#ccffd755</color>
     <color name="tap_black">#000000</color>
+
 </resources>

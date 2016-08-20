@@ -64,6 +64,8 @@
         android:paddingRight="10dp"
         android:textColor="@color/tap_white"
         android:layout_alignParentRight="true"
+        android:translationZ="4dp"
+        android:stateListAnimator="@anim/button_elevation"
         android:layout_alignBaseline="@+id/textview_notification_action_title" />
 
 </RelativeLayout>

@@ -10,6 +10,8 @@ public class ResponseObject
 
     public String password;
 
+    public String validDisplayName; //Will be null if not valid
+
     public ArrayList<ProfileObject> followersList;
 
     public ArrayList<ProfileObject> profiles;
@@ -17,4 +19,6 @@ public class ResponseObject
     public ArrayList<TakeAPeekObject> peeks;
 
     public ArrayList<RelationObject> relations;
+
+    public ArrayList<TrendingPlaceObject> trendingPlaces;
 }

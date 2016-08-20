@@ -1,38 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<selector
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:state_pressed="true" >
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
         <shape>
-		     <!--
-		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
-		      -->  
-		    <solid android:color="@color/tap_lightgreen" />
-		    <corners android:bottomRightRadius="20dp" android:bottomLeftRadius="20dp"
-		     android:topLeftRadius="20dp" android:topRightRadius="20dp"/>
-		</shape>
-	</item>
-
-    <item android:state_focused="true" >
+            <solid android:color="@color/tap_lightgray" />
+            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+        </shape>
+    </item>
+    <item android:state_pressed="false">
         <shape>
-		     <!--
-		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
-		      -->  
-		    <solid android:color="@color/tap_green" />
-		    <corners android:bottomRightRadius="20dp" android:bottomLeftRadius="20dp"
-		     android:topLeftRadius="20dp" android:topRightRadius="20dp"/>
-		</shape>
-	</item>
-	
-    <item>        
+            <solid android:color="@color/tap_green" />
+            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+        </shape>
+    </item>
+    <!-- pressed -->
+    <item android:state_pressed="true">
         <shape>
-		     <!--
-		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
-		      -->  
-		    <solid android:color="@color/tap_green" />
-		    <corners android:bottomRightRadius="20dp" android:bottomLeftRadius="20dp"
-		     android:topLeftRadius="20dp" android:topRightRadius="20dp"/>
-		</shape>
-	</item>
-    
+            <solid android:color="@color/tap_darkgreen" />
+            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+        </shape>
+    </item>
+    <!-- focused -->
+    <item android:state_enabled="true">
+        <shape>
+            <solid android:color="@color/tap_green" />
+            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
+                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+        </shape>
+    </item>
 </selector>

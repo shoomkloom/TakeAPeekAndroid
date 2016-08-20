@@ -434,7 +434,7 @@
         android:paddingRight="15dp"
         android:paddingTop="22dp"
         android:paddingBottom="22dp"
-        android:background="@color/tap_transparentblue">
+        android:background="@color/tap_blue_faded">
 
         <TextView
             android:id="@+id/textview_button_back"

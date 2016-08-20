@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.takeapeek.trendingplaces.TrendingPlacesActivity"
+    android:background="@color/tap_white">
+
+    <ImageView
+        android:id = "@+id/places_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/listview_places_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:orientation="vertical"
+        android:listSelector="@android:color/transparent"
+        android:drawSelectorOnTop="true"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/textview_places_empty"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="@string/textview_places_empty"
+        android:textColor="@color/tap_white"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/places_progress"
+        android:padding="10dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/progress" />
+
+</RelativeLayout>

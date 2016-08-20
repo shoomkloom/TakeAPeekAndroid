@@ -221,7 +221,7 @@ public class Helper
 
         String takeAPeekPath = GetTakeAPeekPath(context);
 
-        String peekThumbnailFullPath = String.format("%s%s%s.png", takeAPeekPath, File.pathSeparator, peekId);
+        String peekThumbnailFullPath = String.format("%s%s.png", takeAPeekPath, peekId);
 
         return peekThumbnailFullPath;
     }
@@ -2696,6 +2696,40 @@ public class Helper
         sharedPreferencesEditor.commit();
     }
     //End Unique Index
+
+    //User Number
+    public static String GetUserNumber(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetUniqueIndex(.) Invoked");
+
+        return sharedPreferences.getString(Constants.USER_NUMBER, "");
+    }
+
+    public static void SetUserNumber(Editor sharedPreferencesEditor, String userNumber)
+    {
+        logger.debug("SetUniqueIndex(..) Invoked");
+
+        sharedPreferencesEditor.putString(Constants.USER_NUMBER, userNumber);
+        sharedPreferencesEditor.commit();
+    }
+    //End User Number
+
+    //Display Name Success
+    public static Boolean GetDisplayNameSuccess(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetUniqueIndex(.) Invoked");
+
+        return sharedPreferences.getBoolean(Constants.DISPLAY_NAME_SUCCESS, false);
+    }
+
+    public static void SetDisplayNameSuccess(Editor sharedPreferencesEditor, Boolean displayNameSuccess)
+    {
+        logger.debug("SetUniqueIndex(..) Invoked");
+
+        sharedPreferencesEditor.putBoolean(Constants.DISPLAY_NAME_SUCCESS, displayNameSuccess);
+        sharedPreferencesEditor.commit();
+    }
+    //Display Name Success
     
     public static ProfileStateEnum GetProfileState(SharedPreferences sharedPreferences)
     {

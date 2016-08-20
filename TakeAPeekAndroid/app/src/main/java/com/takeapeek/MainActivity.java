@@ -19,12 +19,13 @@ import android.view.View.OnClickListener;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.takeapeek.usermap.UserMapActivity;
 import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.trendingplaces.TrendingPlacesActivity;
+import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,14 +93,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DatabaseManager.init(this);
 
-        if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true)
+        if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
+                Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
         {
             CreateMain();
         }
         else
         {
             final Intent intent = new Intent(this, AuthenticatorActivity.class);
-            intent.putExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN, "MainActivity");
+            intent.putExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN, Constants.PARAM_AUTH_REQUEST_ORIGIN_MAIN);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivityForResult(intent, RESULT_AUTHENTICATE);
         }
@@ -119,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         FloatingActionButton fabmap = (FloatingActionButton) findViewById(R.id.fabmap);
         fabmap.setOnClickListener(onClickListener);
+
+        FloatingActionButton fabtrending = (FloatingActionButton) findViewById(R.id.fabtrending);
+        fabtrending.setOnClickListener(onClickListener);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -362,9 +367,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.fabmap:
                     logger.info("onClick: fabmap");
 
-                    final Intent intent = new Intent(MainActivity.this, UserMapActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    final Intent intentUserMapActivity = new Intent(MainActivity.this, UserMapActivity.class);
+                    intentUserMapActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentUserMapActivity);
+
+                    break;
+
+                case R.id.fabtrending:
+                    logger.info("onClick: fabtrending");
+
+                    final Intent intentTrendingPlacesActivity = new Intent(MainActivity.this, TrendingPlacesActivity.class);
+                    intentTrendingPlacesActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentTrendingPlacesActivity);
 
                     break;
 

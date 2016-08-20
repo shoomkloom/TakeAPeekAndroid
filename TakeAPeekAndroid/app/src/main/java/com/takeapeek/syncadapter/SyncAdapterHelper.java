@@ -110,7 +110,14 @@ public class SyncAdapterHelper implements Runnable,
 			logger.debug("run() Invoked - inside lock");
 			logger.info("run: Starting scan");
 
-			UploadPendingPeeks();
+            try
+            {
+                UploadPendingPeeks();
+            }
+            catch(Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION! When calling UploadPendingPeeks()", e);
+            }
 		} 
 		catch (Exception e) 
 		{
@@ -175,6 +182,7 @@ public class SyncAdapterHelper implements Runnable,
                 catch(Exception ex)
                 {
                     Helper.Error(logger, String.format("EXCEPTION: When trying to upload %s", takeAPeekObject.FilePath), ex);
+                    throw ex;
                 }
             }
 

@@ -93,6 +93,7 @@ public class UserMapActivity extends FragmentActivity implements
     WeakHashMap<Integer, Marker> mHashMapIndexToMarker = new WeakHashMap<Integer, Marker>();
 
     private LatLngBounds mLatLngBounds = null;
+    private LatLngBounds mLatLngBoundsIntent = null;
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
@@ -150,8 +151,14 @@ public class UserMapActivity extends FragmentActivity implements
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
-    }
 
+        final Intent intent = getIntent();
+        if(intent != null)
+        {
+            Bundle bundle = getIntent().getExtras();
+            mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -231,13 +238,23 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("InitMap(.) Invoked");
 
-        if (location != null && mGoogleMap != null)
+        if (mGoogleMap != null)
         {
-            LatLng lastLocationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            mGoogleMap.setMyLocationEnabled(true);
+            if(mLatLngBoundsIntent != null)
+            {
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mLatLngBoundsIntent, 50));
+                mLatLngBoundsIntent = null;
 
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 15);
-            mGoogleMap.animateCamera(cameraUpdate);
+                ShowProfilesInBounds(true);
+            }
+            else if (location != null)
+            {
+                LatLng lastLocationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                mGoogleMap.setMyLocationEnabled(true);
+
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 15);
+                mGoogleMap.moveCamera(cameraUpdate);
+            }
         }
     }
 

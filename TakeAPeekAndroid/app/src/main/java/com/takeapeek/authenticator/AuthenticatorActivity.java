@@ -6,25 +6,44 @@ import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Matrix;
+import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.AnimationDrawable;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.Html;
-import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
-import android.text.style.ForegroundColorSpan;
+import android.util.Size;
+import android.util.SparseIntArray;
+import android.view.KeyEvent;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
@@ -32,13 +51,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.takeapeek.R;
+import com.takeapeek.common.AutoFitTextureView;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Constants.ContactTypeEnum;
 import com.takeapeek.common.Constants.ProfileStateEnum;
@@ -53,10 +72,14 @@ import com.takeapeek.ormlite.DatabaseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Activity which displays login screen to the user.
@@ -71,8 +94,21 @@ public class AuthenticatorActivity extends AppCompatActivity
 		firstVerification,
 		receiveSMSTimeout,
 		verificationSuccess,
-		accountCreationSuccess
+		accountCreationSuccess,
+        displayNameVerify
 	}
+
+    ValidateDisplayNameAsyncTask mValidateDisplayNameAsyncTask = null;
+    Runnable mDisplayNameVerifyRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Message msg = Message.obtain();
+            msg.arg1 = HandlerState.displayNameVerify.ordinal();
+            mHandler.sendMessage(msg);
+        }
+    };
 	
 	HandlerState mHandlerState = HandlerState.numberEdit;
 	
@@ -123,6 +159,149 @@ public class AuthenticatorActivity extends AppCompatActivity
             }
         }
     }
+
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
+    static
+    {
+        ORIENTATIONS.append(Surface.ROTATION_0, 90);
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+    }
+
+    /**
+     * An {@link AutoFitTextureView} for camera preview.
+     */
+    private AutoFitTextureView mTextureView;
+
+    /**
+     * A refernce to the opened {@link android.hardware.camera2.CameraDevice}.
+     */
+    private CameraDevice mCameraDevice;
+
+    /**
+     * A reference to the current {@link android.hardware.camera2.CameraCaptureSession} for
+     * preview.
+     */
+    private CameraCaptureSession mPreviewSession;
+
+    /**
+     * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
+     * {@link TextureView}.
+     */
+    private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener()
+    {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height)
+        {
+            logger.debug("SurfaceTextureListener.onSurfaceTextureAvailable(...) Invoked");
+
+            openCamera(width, height);
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height)
+        {
+            logger.debug("SurfaceTextureListener.onSurfaceTextureSizeChanged(...) Invoked");
+
+            configureTransform(width, height);
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture)
+        {
+            logger.debug("SurfaceTextureListener.onSurfaceTextureDestroyed(.) Invoked");
+
+            return true;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {}
+    };
+
+    /**
+     * The {@link android.util.Size} of camera preview.
+     */
+    private Size mPreviewSize;
+
+    /**
+     * The {@link android.util.Size} of video recording.
+     */
+    private Size mVideoSize;
+
+    /**
+     * Camera preview.
+     */
+    private CaptureRequest.Builder mPreviewBuilder;
+
+    /**
+     * MediaRecorder
+     */
+    private MediaRecorder mMediaRecorder;
+
+    /**
+     * Whether the app is recording video now
+     */
+    private boolean mIsRecordingVideo;
+
+    /**
+     * An additional thread for running tasks that shouldn't block the UI.
+     */
+    private HandlerThread mBackgroundThread;
+
+    /**
+     * A {@link Handler} for running tasks in the background.
+     */
+    private Handler mBackgroundHandler;
+
+    /**
+     * A {@link Semaphore} to prevent the app from exiting before closing the camera.
+     */
+    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
+
+    /**
+     * {@link CameraDevice.StateCallback} is called when {@link CameraDevice} changes its status.
+     */
+    private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback()
+    {
+        @Override
+        public void onOpened(CameraDevice cameraDevice)
+        {
+            logger.debug("CameraDevice.onOpened(.) Invoked");
+
+            mCameraDevice = cameraDevice;
+            startPreview();
+            mCameraOpenCloseLock.release();
+
+            if (null != mTextureView)
+            {
+                configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+            }
+        }
+
+        @Override
+        public void onDisconnected(CameraDevice cameraDevice)
+        {
+            logger.debug("CameraDevice.onDisconnected(.) Invoked");
+
+            mCameraOpenCloseLock.release();
+            cameraDevice.close();
+            mCameraDevice = null;
+        }
+
+        @Override
+        public void onError(CameraDevice cameraDevice, int error)
+        {
+            logger.error("CameraDevice.onError(.) Invoked");
+
+            mCameraOpenCloseLock.release();
+            cameraDevice.close();
+            mCameraDevice = null;
+
+            //@@finish();
+        }
+    };
     
     private AccountManager mAccountManager = null;
     public String mUsername = "";
@@ -134,11 +313,15 @@ public class AuthenticatorActivity extends AppCompatActivity
     public SharedPreferences mSharedPreferences = null;
     public EditText mMobileNumber = null;
     public EditText mEditTextSMSCode = null;
+    public EditText mEditTextDisplayName = null;
     private String mVerificationCode = null;
     
     public TextView mVerificationMessageHeader = null;
     public TextView mVerificationMessage = null;
     public TextView mLoginTextviewProgressBottom = null;
+
+    ImageView mDisplayNameValidationProgess = null;
+    TextView mButtonCreateDisplayName = null;
     
     private ScanSMSAsyncTask mScanSMSAsyncTask = null;
     
@@ -161,6 +344,8 @@ public class AuthenticatorActivity extends AppCompatActivity
     @Override
     public void onCreate(Bundle icicle) 
     {
+        setTheme(R.style.AppThemeNoActionBar);
+
         super.onCreate(icicle);
         
         logger.debug("onCreate(.) Invoked");
@@ -214,6 +399,8 @@ public class AuthenticatorActivity extends AppCompatActivity
 	        mAccountManager = AccountManager.get(this);
 	        
 	        Account takeAPeekAccount = null;
+            Boolean displayNameSuccess = Helper.GetDisplayNameSuccess(mSharedPreferences);
+
 			try 
 			{
 				takeAPeekAccount = Helper.GetTakeAPeekAccount(this);
@@ -224,9 +411,9 @@ public class AuthenticatorActivity extends AppCompatActivity
 				Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_more_than_one_account));
 			}
 			
-	    	if(takeAPeekAccount != null)
+	    	if(takeAPeekAccount != null && displayNameSuccess == true)
 	    	{
-	    		logger.info("onCreate: A Self.Me account already exists");
+	    		logger.info("onCreate: A TakeAPeek account already exists");
 	    		
 	    		Toast.makeText(this, R.string.account_already_exists, Toast.LENGTH_LONG).show();
 	    		
@@ -242,9 +429,17 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        final Intent intent = getIntent();
 			        String authRequestOriginator = intent.getStringExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN);
 			        
-			        if(authRequestOriginator != null && authRequestOriginator.compareTo("MainActivity") == 0)
+			        if(authRequestOriginator != null && authRequestOriginator.compareTo(Constants.PARAM_AUTH_REQUEST_ORIGIN_MAIN) == 0)
 			        {
 			        	setContentView(R.layout.activity_login);
+
+                        if(takeAPeekAccount != null && displayNameSuccess == false)
+                        {
+                            logger.info("Account exists but display name failed.");
+
+                            mHandlerState = HandlerState.verificationSuccess;
+                            UpdateUI();
+                        }
 			        	
 			    		ProfileObject takeAPeekContact = Helper.LoadTakeAPeekContact(this, Constants.DEFAULT_CONTACT_NAME);
 			        	if(takeAPeekContact == null)
@@ -253,15 +448,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        	}
 			        	
 			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
-			        	int selfmeColor = ContextCompat.getColor(this, R.color.tap_blue);
-			        	String toUse = getString(R.string.to_use);
-			        	String takeapeek = getString(R.string.app_name_lower);
-			        	String toUseTakeAPeek = String.format("%s %s", toUse, takeapeek);
-			        	loginTextviewToUse.setText(toUseTakeAPeek, BufferType.SPANNABLE);
-			        	Spannable s = (Spannable)loginTextviewToUse.getText();
-			        	int start = toUse.length() + 1;
-			        	int end = toUseTakeAPeek.length();
-			        	s.setSpan(new ForegroundColorSpan(selfmeColor), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			        	Helper.setTypeface(this, loginTextviewToUse, FontTypeEnum.lightFont);
 			        	
 			        	TextView loginTextviewTypeYourPhone = (TextView)findViewById(R.id.login_textview_type_your_phone_number);
@@ -313,7 +499,23 @@ public class AuthenticatorActivity extends AppCompatActivity
 			            Helper.setTypeface(this, mMobileNumber, FontTypeEnum.lightFont); 
 			            mMobileNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher(mNumberFormattingTextHandler));
 		            	mMobileNumber.setText(takeAPeekContact.numberMobile);
-		            	mMobileNumber.requestFocus();
+		            	//@@MobileNumber.requestFocus();
+                        mMobileNumber.setText(Helper.GetUserNumber(mSharedPreferences));
+                        mMobileNumber.setOnEditorActionListener(new EditText.OnEditorActionListener()
+                        {
+                            @Override
+                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+                            {
+                                if (actionId == EditorInfo.IME_ACTION_DONE)
+                                {
+                                    OnButtonCreateAccount();
+                                    return true;
+                                }
+                                return false;
+                            }
+                        });
+
+                        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
 			            
 			            //Apply underline to the terms and conditions link
 		            	TextView termAndConditionsLink = (TextView) findViewById(R.id.terms_and_conditions);
@@ -322,10 +524,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 		            	String text = String.format(formatString, Constants.TERMS_AND_CONDITIONS_URL);
 		            	termAndConditionsLink.setText(Html.fromHtml(text)); 
 			        	
-		            	Button buttonCreateAccountDisabled = (Button)findViewById(R.id.button_create_account_disabled);
-			        	Helper.setTypeface(this, buttonCreateAccountDisabled, FontTypeEnum.boldFont);
-		            	
-			        	Button buttonCreateAccount = (Button)findViewById(R.id.button_create_account);
+			        	TextView buttonCreateAccount = (TextView)findViewById(R.id.button_create_account);
 			        	buttonCreateAccount.setOnClickListener(onClickListener);
 			        	Helper.setTypeface(this, buttonCreateAccount, FontTypeEnum.boldFont);
 			        	
@@ -343,14 +542,11 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        	TextView loginResendEditNumber = (TextView)findViewById(R.id.login_resend_edit_number);
 			        	loginResendEditNumber.setOnClickListener(onClickListener);
 			        	Helper.setTypeface(this, loginResendEditNumber, FontTypeEnum.lightFont);
-			        	
-			        	Button buttonVerifyAccountDisabled = (Button)findViewById(R.id.button_verify_account_submit_disabled);
-			        	Helper.setTypeface(this, buttonVerifyAccountDisabled, FontTypeEnum.boldFont);
-			        	
-			        	Button buttonVerifyAccount = (Button)findViewById(R.id.button_verify_account_submit);
+
+                        TextView buttonVerifyAccount = (TextView)findViewById(R.id.button_verify_account_submit);
 			        	buttonVerifyAccount.setOnClickListener(onClickListener);
 			        	Helper.setTypeface(this, buttonVerifyAccount, FontTypeEnum.boldFont);
-			        	
+
 			        	Button buttonTeaserOK = (Button)findViewById(R.id.login_button_teaser_ok);
 			        	buttonTeaserOK.setOnClickListener(onClickListener);
 			        	Helper.setTypeface(this, buttonTeaserOK, FontTypeEnum.normalFont);
@@ -366,8 +562,29 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        	
 			        	mEditTextSMSCode = (EditText)findViewById(R.id.editText_SMS_code);
 			        	Helper.setTypeface(this, mEditTextSMSCode, FontTypeEnum.lightFont);
-			        	mEditTextSMSCode.addTextChangedListener(onTextChanged);
-			        	
+			        	mEditTextSMSCode.addTextChangedListener(onTextChangedVerifyAccount);
+                        mEditTextSMSCode.setOnEditorActionListener(new EditText.OnEditorActionListener()
+                        {
+                            @Override
+                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+                            {
+                                if (actionId == EditorInfo.IME_ACTION_DONE)
+                                {
+                                    DoVerifyAccount();
+                                    return true;
+                                }
+                                return false;
+                            }
+                        });
+
+                        mEditTextDisplayName = (EditText)findViewById(R.id.edittext_display_name);
+                        Helper.setTypeface(this, mEditTextDisplayName, FontTypeEnum.lightFont);
+                        mEditTextDisplayName.addTextChangedListener(onTextChangedDisplayName);
+
+                        mDisplayNameValidationProgess = (ImageView)findViewById(R.id.imageview_display_name_validation_progess);
+                        mButtonCreateDisplayName = (TextView)findViewById(R.id.button_create_display_name);
+                        mButtonCreateDisplayName.setOnClickListener(onClickListener);
+
 			        	mLoginTextviewProgressBottom = (TextView)findViewById(R.id.login_textview_progress_bottom);
 			        	Helper.setTypeface(this, mLoginTextviewProgressBottom, FontTypeEnum.lightFont);
 			        	
@@ -431,15 +648,32 @@ public class AuthenticatorActivity extends AppCompatActivity
 	{
 		logger.debug("onResume() Invoked");
 
+        super.onResume();
+
 		DatabaseManager.init(this);
 
-		super.onResume();
+        startBackgroundThread();
+
+        if(mTextureView != null)
+        {
+            if (mTextureView.isAvailable())
+            {
+                openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+            }
+            else
+            {
+                mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+            }
+        }
 	}
 
 	@Override
 	protected void onPause() 
 	{
 		logger.debug("onPause() Invoked");
+
+        closeCamera();
+        stopBackgroundThread();
 
 		super.onPause();
 	}
@@ -459,6 +693,39 @@ public class AuthenticatorActivity extends AppCompatActivity
     	
 		super.onStop();
 	}
+
+    /**
+     * Starts a background thread and its {@link Handler}.
+     */
+    private void startBackgroundThread()
+    {
+        logger.debug("startBackgroundThread() Invoked");
+
+        mBackgroundThread = new HandlerThread("CameraBackground");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    /**
+     * Stops the background thread and its {@link Handler}.
+     */
+    private void stopBackgroundThread()
+    {
+        logger.debug("stopBackgroundThread() Invoked");
+
+        mBackgroundThread.quitSafely();
+
+        try
+        {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        }
+        catch (InterruptedException e)
+        {
+            Helper.Error(logger, "Exception: When calling stopBackgroundThread", e);
+        }
+    }
 	
 	public void CreateAccount() throws Exception
     {
@@ -503,10 +770,9 @@ public class AuthenticatorActivity extends AppCompatActivity
 		else
 		{
 			mEditTextSMSCode.setEnabled(false);
-			Button buttonVerifyAccount = (Button)findViewById(R.id.button_verify_account_submit);
-			buttonVerifyAccount.setVisibility(View.INVISIBLE);
-			buttonVerifyAccount.setBackgroundResource(R.drawable.button_border_disabled);
-        	
+			TextView buttonVerifyAccount = (TextView)findViewById(R.id.button_verify_account_submit);
+			buttonVerifyAccount.setEnabled(false);
+
         	ShowCreateAccountProgressDialog(getText(R.string.verify_account_progress_message).toString());
 			
         	try 
@@ -663,6 +929,8 @@ public class AuthenticatorActivity extends AppCompatActivity
     	
     	try
 		{
+            Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
+
 			StopScanSMSAsyncTask();
 			
 			VerifyAccount();
@@ -812,7 +1080,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     	switch(handlerMessage)
     	{
     		case firstVerification:
-    			logger.info("HandleMessage::firstVerificationFlyIn");
+    			logger.info("HandleMessage::firstVerification");
     			
     			mHandlerState = HandlerState.firstVerification;
     			UpdateUI();
@@ -847,11 +1115,12 @@ public class AuthenticatorActivity extends AppCompatActivity
     			break;
     			
     		case verificationSuccess:
-    			logger.info("HandleMessage::verificationSuccessZoomIn");
+    			logger.info("HandleMessage::verificationSuccess");
     			
     			mHandlerState = HandlerState.verificationSuccess;
     			UpdateUI();
-    	        
+
+/*@@
       	        //Set a 3 second timeout for going to teaser
             	mHandler.postDelayed(new Runnable() 
             	{
@@ -862,22 +1131,55 @@ public class AuthenticatorActivity extends AppCompatActivity
                         mHandler.sendMessage(msg);
                     }
                 }, 3000);
-            	
-    	        break;
+*/
+                break;
     	        
     		case accountCreationSuccess:
-    			logger.info("HandleMessage::activitySuccessFinish");
+    			logger.info("HandleMessage::accountCreationSuccess");
     			
     			mHandlerState = HandlerState.accountCreationSuccess;
     			UpdateUI();
     			break;
+
+            case displayNameVerify:
+                logger.info("HandleMessage::displayNameVerify");
+
+                mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
+                mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
+                Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
+                mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
+                zoomInAnimation.start();
+                AnimationDrawable progressDrawable = (AnimationDrawable)mDisplayNameValidationProgess.getDrawable();
+                progressDrawable.start();
+
+                String proposedDisplayName = mEditTextDisplayName.getText().toString();
+
+                mValidateDisplayNameAsyncTask = new ValidateDisplayNameAsyncTask(this, proposedDisplayName, mSharedPreferences);
+                mValidateDisplayNameAsyncTask.execute();
+
+                break;
     			
     		default: 
     			logger.info("HandleMessage::default");
     			break;
     	}
     }
-    
+
+    private void StopValidateDisplayNameAsyncTask()
+    {
+        logger.debug("StopValidateDisplayNameAsyncTask() Invoked");
+
+        //Stop the background thread if it is not yet stopped
+        if(mValidateDisplayNameAsyncTask != null)
+        {
+            if(mValidateDisplayNameAsyncTask.isCancelled() == false)
+            {
+                mValidateDisplayNameAsyncTask.cancel(true);
+            }
+            mValidateDisplayNameAsyncTask = null;
+        }
+    }
+
     private void StopScanSMSAsyncTask()
     {
     	logger.debug("StopScanSMSAsyncTask() Invoked");
@@ -907,43 +1209,61 @@ public class AuthenticatorActivity extends AppCompatActivity
     private void UpdateButtonCreateAccountUI()
     {
     	logger.debug("UpdateButtonCreateAccountUI() Invoked");
-    	
-    	Button buttonCreateAccount = (Button)findViewById(R.id.button_create_account);
-    	Button buttonCreateAccountDisabled = (Button)findViewById(R.id.button_create_account_disabled);
+
+        TextView buttonCreateAccount = (TextView)findViewById(R.id.button_create_account);
+
 		if(this.mMobileNumber.getText().length() > 0 && mCountryArrayPosition > 0)
     	{
     		//Enable
-			buttonCreateAccountDisabled.setVisibility(View.GONE);
-			buttonCreateAccount.setVisibility(View.VISIBLE);
+            buttonCreateAccount.setEnabled(true);
     	}
     	else
     	{
     		//Disable
-    		buttonCreateAccount.setVisibility(View.GONE);
-			buttonCreateAccountDisabled.setVisibility(View.VISIBLE);
+            buttonCreateAccount.setEnabled(false);
     	}
     }
     
     private void UpdateButtonVerifyAccountUI()
     {
     	logger.debug("UpdateButtonVerifyAccountUI() Invoked");
-    	
-    	Button buttonVerifyAccount = (Button)findViewById(R.id.button_verify_account_submit);
-    	Button buttonVerifyAccountDisabled = (Button)findViewById(R.id.button_verify_account_submit_disabled);
+
+        TextView buttonVerifyAccount = (TextView)findViewById(R.id.button_verify_account_submit);
+
 		if(mEditTextSMSCode.getText().toString().length() > 0)
     	{
-    		//Enable
-			buttonVerifyAccountDisabled.setVisibility(View.GONE);
-			buttonVerifyAccount.setVisibility(View.VISIBLE);
+            //Enable
+            buttonVerifyAccount.setEnabled(true);
     	}
     	else
     	{
-    		//Disable
-    		buttonVerifyAccount.setVisibility(View.GONE);
-			buttonVerifyAccountDisabled.setVisibility(View.VISIBLE);
+            //Disable
+            buttonVerifyAccount.setEnabled(false);
     	}
     }
-    
+
+    public void DoValidatedDisplayName(String validatedDisplayName)
+    {
+        logger.debug("DoValidatedDisplayName(.) Invoked");
+
+        if(validatedDisplayName == null)
+        {
+            mDisplayNameValidationProgess.setImageResource(R.drawable.ic_displayname_verify_fail);
+            Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
+            mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
+            zoomInAnimation.start();
+            mButtonCreateDisplayName.setEnabled(false);
+        }
+        else
+        {
+            mDisplayNameValidationProgess.setImageResource(R.drawable.ic_displayname_verify_success);
+            Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
+            mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
+            zoomInAnimation.start();
+            mButtonCreateDisplayName.setEnabled(true);
+        }
+    }
+
     private void UpdateUI()
     {
     	logger.debug("UpdateUI() Invoked");
@@ -968,34 +1288,31 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		//Show enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.VISIBLE);
             	
-            	//Hide verification UI and progress bottom UI
-            	findViewById(R.id.login_linearlayout_auth_progress).setVisibility(View.GONE);
 	    		break;
 	    		
 	    	case firstVerification:
 	    		UpdateButtonVerifyAccountUI();
-	    		
-    			//Hide enter number UI
-            	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
-            	
-            	//Show verification UI and progress bottom UI
-            	findViewById(R.id.login_linearlayout_auth_progress).setVisibility(View.VISIBLE);
-            	findViewById(R.id.login_textview_progress_bottom).setVisibility(View.VISIBLE);
-            	findViewById(R.id.progress_verify).setVisibility(View.VISIBLE);
-            	findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
-            	
-            	mVerificationMessageHeader.setText(R.string.for_your_protection);
-            	
-            	mLoginTextviewProgressBottom.setText(R.string.create_account_verify_message);
-            	
-            	//Start progress animation
-            	ImageView progressBar = (ImageView)findViewById(R.id.progress_verify);
-            	AnimationDrawable progressAnimation = (AnimationDrawable) progressBar.getBackground();
-            	progressAnimation.start();
-            	
-            	numberStr = String.format("+%s %s", Helper.GetCountryPrefixCode(mSharedPreferences), mMobileNumber.getText().toString());
-	        	text = String.format(getString(R.string.sms_sent_to_number_message), numberStr);
-	        	mVerificationMessage.setText(text);
+
+                //Hide big title
+                findViewById(R.id.login_textview_to_use).setVisibility(View.GONE);
+
+                //Hide Terms and Conditions
+                findViewById(R.id.terms_and_conditions).setVisibility(View.GONE);
+
+                //Disable coutry dropdown
+                mCountrySpinner.setEnabled(false);
+
+                //Disable number
+                mMobileNumber.setEnabled(false);
+
+                //Show sms code edittext
+                findViewById(R.id.editText_SMS_code).setVisibility(View.VISIBLE);
+
+                //Hide Create Account button
+                findViewById(R.id.button_create_account).setVisibility(View.GONE);
+
+                //Show Verify Acount button
+                findViewById(R.id.button_verify_account_submit).setVisibility(View.VISIBLE);
 	    		break;
 			
 	    	case receiveSMSTimeout:
@@ -1003,7 +1320,6 @@ public class AuthenticatorActivity extends AppCompatActivity
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
             	
             	//Show verification UI and resend bottom UI
-            	findViewById(R.id.login_linearlayout_auth_progress).setVisibility(View.VISIBLE);
             	findViewById(R.id.login_textview_progress_bottom).setVisibility(View.GONE);
             	findViewById(R.id.progress_verify).setVisibility(View.GONE);
             	findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.VISIBLE);
@@ -1023,32 +1339,17 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		//Hide enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
             	
-            	//Show verification UI
-            	findViewById(R.id.login_linearlayout_auth_progress).setVisibility(View.VISIBLE);
-            	findViewById(R.id.login_textview_progress_bottom).setVisibility(View.GONE);
-            	findViewById(R.id.progress_verify).setVisibility(View.GONE);
-            	findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
-	    		
-    			mVerificationMessageHeader.setText(R.string.verification_verified);
-    			
-    			//The 'almost done' text is only one line, so add 2 more to position the code line properly...
-    			String almostDoneMessage = String.format("%s\n\n", getString(R.string.almost_done));
-				mVerificationMessage.setText(almostDoneMessage);
-				
-				//Hide verify button
-				findViewById(R.id.button_verify_account_submit).setVisibility(View.INVISIBLE);
-				
-				//Make the code edit text disabled
-				mEditTextSMSCode.setEnabled(false);
+            	//Show Display Name UI
+                findViewById(R.id.login_linearlayout_display_name).setVisibility(View.VISIBLE);
+
+
+
 	    		break;
 	    		
 	    	case accountCreationSuccess:
 	    		//Hide enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
             	
-            	//Hide verification UI
-            	findViewById(R.id.login_linearlayout_auth_progress).setVisibility(View.GONE);
-
             	//Show Teaser UI
             	findViewById(R.id.login_relativelayout_teaser).setVisibility(View.VISIBLE);
             	
@@ -1125,19 +1426,46 @@ public class AuthenticatorActivity extends AppCompatActivity
     };
 @@*/
     
-    private TextWatcher onTextChanged = new TextWatcher()
+    private TextWatcher onTextChangedVerifyAccount = new TextWatcher()
     {
-		@Override
-		public void afterTextChanged(Editable arg0)
-		{
-			UpdateButtonVerifyAccountUI();
-		}
+        @Override
+        public void afterTextChanged(Editable arg0)
+        {
+            UpdateButtonVerifyAccountUI();
+        }
 
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after){}
 
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count){}
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count){}
+    };
+
+    private TextWatcher onTextChangedDisplayName = new TextWatcher()
+    {
+        @Override
+        public void afterTextChanged(Editable arg0)
+        {
+            if(mEditTextDisplayName.getText().toString().isEmpty() == false)
+            {
+                mDisplayNameValidationProgess.setVisibility(View.GONE);
+                Animation zoomOutAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomout);
+                mDisplayNameValidationProgess.setAnimation(zoomOutAnimation);
+                zoomOutAnimation.start();
+
+                StopValidateDisplayNameAsyncTask();
+
+                //Set a timeout for validating display name
+                mHandler.removeCallbacks(mDisplayNameVerifyRunnable);
+                mHandler.postDelayed(mDisplayNameVerifyRunnable, 3000);
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count){}
     };
     
     private OnClickListener onClickListener = new OnClickListener() 
@@ -1152,17 +1480,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             	case R.id.button_create_account:
             		logger.info("OnClickListener: 'button_create_account' clicked");
 
-            		try 
-					{
-            			Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
-						CreateAccount();
-					} 
-					catch (Exception e) 
-					{
-						ShowCreateAccountErrorDialog(R.string.error_create_account);
-						
-						Helper.Error(logger, "EXCEPTION: Problem creating account", e);
-					}
+                    OnButtonCreateAccount();
             		break;
             		
             	case R.id.login_resend_code:
@@ -1172,9 +1490,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 					{
 						mHandlerState =  HandlerState.firstVerification;
 						UpdateUI();
-						
-						//Hide progress section till progress dialog disappears
-						findViewById(R.id.login_linearlayout_auth_progress).setVisibility(View.GONE);
 						
 						Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
 						CreateAccount();
@@ -1244,11 +1559,314 @@ public class AuthenticatorActivity extends AppCompatActivity
         			finish();
             		
             		break;
+
+                case R.id.button_create_display_name:
+                    logger.info("OnClickListener: 'button_create_display_name' clicked");
+
+                    setResult(RESULT_OK);
+
+                    Helper.SetDisplayNameSuccess(mSharedPreferences.edit(), true);
+
+                    finish();
+
+                    break;
             		
             	default: break;
             } 
         } 
-    }; 
+    };
+
+    private void OnButtonCreateAccount()
+    {
+        logger.debug("OnButtonCreateAccount() Invoked");
+
+        try
+        {
+            Helper.SetUserNumber(mSharedPreferences.edit(), mMobileNumber.getText().toString());
+            Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
+            CreateAccount();
+        }
+        catch (Exception e)
+        {
+            ShowCreateAccountErrorDialog(R.string.error_create_account);
+
+            Helper.Error(logger, "EXCEPTION: Problem creating account", e);
+        }
+    }
+
+    /**
+     * Tries to open a {@link CameraDevice}. The result is listened by `mStateCallback`.
+     */
+    private void openCamera(int width, int height)
+    {
+        logger.debug("openCamera(..) Invoked");
+
+        if (isFinishing() == true)
+        {
+            return;
+        }
+
+        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        try
+        {
+            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS))
+            {
+                throw new RuntimeException("Time out waiting to lock camera opening.");
+            }
+
+            String cameraId = manager.getCameraIdList()[1]; //camera [1] is front facing camera
+
+            int screenWidth = mTextureView.getWidth();
+            int screenHeight = mTextureView.getHeight();
+
+            Size screenSize = new Size(screenWidth, screenHeight);
+
+            // Choose the sizes for camera preview and video recording
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            mVideoSize = screenSize;//@@chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
+            mPreviewSize = screenSize;//@@chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
+
+            mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+
+            configureTransform(width, height);
+
+            mMediaRecorder = new MediaRecorder();
+            manager.openCamera(cameraId, mStateCallback, null);
+        }
+        catch (CameraAccessException e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to open camera.", e);
+        }
+        catch (NullPointerException e)
+        {
+            // Currently an NPE is thrown when the Camera2API is used but not supported on the
+            // device this code runs.
+            Helper.ErrorMessage(this, null, getString(R.string.Error), getString(R.string.ok), getString(R.string.camera_error));
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException("Interrupted while trying to lock camera opening.");
+        }
+    }
+
+    private void closeCamera()
+    {
+        logger.debug("closeCamera() Invoked");
+
+        try
+        {
+            mCameraOpenCloseLock.acquire();
+
+            if (null != mCameraDevice)
+            {
+                mCameraDevice.close();
+                mCameraDevice = null;
+            }
+            if (null != mMediaRecorder)
+            {
+                mMediaRecorder.release();
+                mMediaRecorder = null;
+            }
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException("Interrupted while trying to lock camera closing.");
+        }
+        finally
+        {
+            mCameraOpenCloseLock.release();
+        }
+    }
+
+    /**
+     * Start the camera preview.
+     */
+    private void startPreview()
+    {
+        logger.debug("startPreview() Invoked");
+
+        if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize)
+        {
+            return;
+        }
+        try
+        {
+            setUpMediaRecorder();
+            SurfaceTexture texture = mTextureView.getSurfaceTexture();
+            assert texture != null;
+            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            List<Surface> surfaces = new ArrayList<Surface>();
+
+            Surface previewSurface = new Surface(texture);
+            surfaces.add(previewSurface);
+            mPreviewBuilder.addTarget(previewSurface);
+
+            mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback()
+            {
+                @Override
+                public void onConfigured(CameraCaptureSession cameraCaptureSession)
+                {
+                    mPreviewSession = cameraCaptureSession;
+                    updatePreview();
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession cameraCaptureSession)
+                {
+                    Toast.makeText(AuthenticatorActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                }
+            }, mBackgroundHandler);
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "Exception: When calling startPreview", e);
+        }
+    }
+
+    /**
+     * Update the camera preview. {@link #startPreview()} needs to be called in advance.
+     */
+    private void updatePreview()
+    {
+        logger.debug("updatePreview() Invoked");
+
+        if (null == mCameraDevice)
+        {
+            return;
+        }
+        try
+        {
+            setUpCaptureRequestBuilder(mPreviewBuilder);
+
+            HandlerThread thread = new HandlerThread("CameraPreview");
+            thread.start();
+
+            mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, mBackgroundHandler);
+        }
+        catch (CameraAccessException e)
+        {
+            Helper.Error(logger, "Exception: When calling updatePreview", e);
+        }
+    }
+
+    private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder)
+    {
+        logger.debug("setUpCaptureRequestBuilder(.) Invoked");
+
+        builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+    }
+
+    /**
+     * Configures the necessary {@link android.graphics.Matrix} transformation to `mTextureView`.
+     * This method should not to be called until the camera preview size is determined in
+     * openCamera, or until the size of `mTextureView` is fixed.
+     *
+     * @param viewWidth  The width of `mTextureView`
+     * @param viewHeight The height of `mTextureView`
+     */
+    private void configureTransform(int viewWidth, int viewHeight)
+    {
+        logger.debug("configureTransform(..) Invoked");
+
+        if (null == mTextureView || null == mPreviewSize)
+        {
+            return;
+        }
+
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        Matrix matrix = new Matrix();
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        float centerX = viewRect.centerX();
+        float centerY = viewRect.centerY();
+
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation)
+        {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+            float scale = Math.max((float) viewHeight / mPreviewSize.getHeight(), (float) viewWidth / mPreviewSize.getWidth());
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        }
+
+        mTextureView.setTransform(matrix);
+    }
+
+    private void setUpMediaRecorder() throws IOException
+    {
+        logger.debug("setUpMediaRecorder() Invoked");
+
+        String videoFilePath = String.format("%sTempVideoFile.mp4", Helper.GetTakeAPeekPath(this));
+
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mMediaRecorder.setOutputFile(videoFilePath);
+        mMediaRecorder.setVideoEncodingBitRate(1024 * 1000);
+        mMediaRecorder.setVideoFrameRate(24);
+        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int orientation = ORIENTATIONS.get(rotation);
+        mMediaRecorder.setOrientationHint(orientation);
+        mMediaRecorder.prepare();
+    }
+}
+
+class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
+{
+    static private final Logger logger = LoggerFactory.getLogger(ValidateDisplayNameAsyncTask.class);
+
+    AuthenticatorActivity mAuthenticatorActivity = null;
+    String mProposedDisplayName = null;
+    SharedPreferences mSharedPreferences = null;
+
+    public ValidateDisplayNameAsyncTask(AuthenticatorActivity authenticatorActivity, String proposedDisplayName, SharedPreferences sharedPreferences)
+    {
+        logger.debug("ValidateDisplayNameAsyncTask(..) Invoked");
+
+        mAuthenticatorActivity = authenticatorActivity;
+        mProposedDisplayName = proposedDisplayName;
+        mSharedPreferences = sharedPreferences;
+    }
+
+    @Override
+    protected String doInBackground(String... params)
+    {
+        logger.debug("doInBackground(...) Invoked");
+
+        try
+        {
+            String userName = Helper.GetTakeAPeekAccountUsername(mAuthenticatorActivity);
+            String password = Helper.GetTakeAPeekAccountPassword(mAuthenticatorActivity);
+
+            return Transport.GetDisplayName(mAuthenticatorActivity, userName, password, mProposedDisplayName, mSharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When calling GetDisplayName", e);
+            return null;
+        }
+    }
+
+    @Override
+    protected void onPostExecute(String validatedDisplayName)
+    {
+        logger.debug(String.format("onPostExecute(%s) Invoked", validatedDisplayName));
+
+        try
+        {
+            mAuthenticatorActivity.DoValidatedDisplayName(validatedDisplayName);
+
+            super.onPostExecute(validatedDisplayName);
+        }
+        finally
+        {
+            mAuthenticatorActivity.mValidateDisplayNameAsyncTask = null;
+        }
+    }
 }
 
 class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>

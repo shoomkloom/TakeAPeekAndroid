@@ -101,6 +101,7 @@ public class Constants
     public static final String TAKEAPEEK_AUTHTOKEN_TYPE = "com.takeapeek";
     
     public static final String PARAM_AUTH_REQUEST_ORIGIN = "authRequestOrigin";
+    public static final String PARAM_AUTH_REQUEST_ORIGIN_MAIN = "MainActivity";
     public static final String PARAM_AUTHTOKEN_TYPE = "authtokenType";
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_USERNAME = "username";
@@ -224,6 +225,8 @@ public class Constants
     public static final String FRIENDS_OPEN_TAB_INDEX = "FriendsOpenTabIndex";
     public static final String CURRENT_BUILD_NUMBER = "CurrentBuildNumber";
     public static final String CURRENT_UNIQUE_INDEX = "CurrentUniqueIndex";
+    public static final String USER_NUMBER = "UserNumber";
+    public static final String DISPLAY_NAME_SUCCESS = "DisplayNameSuccess";
     
     public static final int OLDCURSOR_CONTACT_QUATA = 100;
     public static final int UPDATECURSOR_CONTACT_QUATA = 100;
@@ -262,7 +265,9 @@ public class Constants
     public static final String GROUP_TITLE = "TakeAPeek";
     
     public static final String CONTACT_IMAGE_FILE_NAME = "contactImage.png";
-    
+
+    public static final long INTERVAL_FIVESECONDS = 5000L; //Millis per 5 seconds
+    public static final long INTERVAL_TENSECONDS = 10000L; //Millis per 10 seconds
     public static final long INTERVAL_MINUTE = 60000L; //Millis per minute
     public static final long INTERVAL_HOUR = 3600000L; //Millis per hour
     public static final long INTERVAL_DAY = 86400000L; //Millis per day;

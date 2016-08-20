@@ -17,8 +17,6 @@
 
     <string name="error_map_googleapi_connection">There was an error connecting to Google Maps. Please try again later when you have a better connection.\nError message: %1$s</string>
 
-
-
     <!-- Strings related to Capture -->
     <string name="record">Record</string>
     <string name="preview">Preview</string>
@@ -35,8 +33,10 @@
     <string name="intro_record_till_0">Record till you reach 0 seconds</string>
     <string name="intro_why">Why do I need to create a peek to enter?</string>
     <string name="intro_details_title">Why do I need to create a peek to enter?</string>
-    <string name="intro_details_text">TakeAPeek lets you see peeks from other people. By creating a peek you help them discover you and your surroundings.\n\n Only 1 peek is needed (we won\'t ask you again while you are here).</string>
-	<string name="zoom">Zoom</string>
+    <string name="intro_details_text">TakeAPeek lets you see peeks from other people. By creating a peek you help them discover you and your surroundings.\n\n Only 1 peek is needed (we won\'t ask you
+        again while you are here).
+    </string>
+    <string name="zoom">Zoom</string>
     <string name="clip_will_be_sent">Your Peek will be sent as soon as possible.</string>
     <string name="enter_peek_title_here">Enter Peek title here...</string>
 
@@ -59,7 +59,7 @@
     <string name="create_account_your_name">Your Name\u003a</string>
     <string name="create_account_country_spinner_prompt">Country</string>
     <string name="create_account_country_spinner_long_prompt">Select your Country\u003a</string>
-    <string name="create_account_terms_and_conditions">By proceeding you agree&lt;br&gt; to TakeAPeek &lt;a href="%1$s"&gt;Terms &amp; Conditions&lt;/a&gt;</string>
+    <string name="create_account_terms_and_conditions">We will NEVER show your mobile number to other Peekers. Read our &lt;a href="%1$s"&gt;Privacy Policy&lt;/a&gt; to learn more.</string>
     <string name="create_account_check_terms_and_conditions">I accept the terms and conditions</string>
     <string name="create_account_ok_button">Signup</string>
     <string name="create_account_message_bottom">By proceeding you agree to TakeAPeek</string>
@@ -73,7 +73,8 @@
     <string name="error_verify_account">Could not verify TakeAPeek account at this time. Please make sure you can receive SMS messages and try again.</string>
     <string name="error_loading_authentication">There was a problem loading the Authentication view.\n\nTry running TakeAPeek again.</string>
     <string name="error_authentication_no_connection">Cannot create a new account at this time, no available internet connection.\n\nPlease try again later.</string>
-    <string name="error_non_valid_number">The number you filled in is not a valid mobile phone number.\n\nPlease make sure you fill in your correct number so that your friends can connect to you.</string>
+    <string name="error_non_valid_number">The number you filled in is not a valid mobile phone number.\n\nPlease make sure you fill in your correct number so that your friends can connect to you.
+    </string>
     <string name="error_sms_timeout">SMS message not identified.\nPlease do one of the following\u003a</string>
     <string name="message_check_phone">If the number is incorrect, fix it</string>
     <string name="request_call">Call me</string>
@@ -85,20 +86,28 @@
     <string name="sms_sent_to_number_message">We\'ve sent you a code to\n%1$s\nto verify that this is your number</string>
     <string name="sms_no_verification_message">We couldn\'t detect the code.\nPlease check your number\nor request a new code</string>
     <string name="code">Code\u003a</string>
-    <string name="message_edit_phone"><u>Change phone number</u></string>
-    <string name="resend_sms_code"><u>Request SMS code</u></string>
-    <string name="message_request_call"><u>Request voice code</u></string>
+    <string name="message_edit_phone">
+        <u>Change phone number</u>
+    </string>
+    <string name="resend_sms_code">
+        <u>Request SMS code</u>
+    </string>
+    <string name="message_request_call">
+        <u>Request voice code</u>
+    </string>
     <string name="verification_verified">Verified User</string>
     <string name="almost_done">Welcome\u2026</string>
     <string name="creating_selfme_account">Creating your TakeAPeek account</string>
     <string name="teaser_line_1">Take a picture.</string>
-    <string name="teaser_line_2">Post to <b>TakeAPeek</b>.</string>
+    <string name="teaser_line_2">Post to<b>TakeAPeek</b>.
+    </string>
     <string name="teaser_line_3">Done!</string>
     <string name="teaser_ok">Ok\u2026</string>
     <string name="login_resend_edit_number_message">Your number\n%1$s</string>
-    <string name="code_hint">\?\u0020\?\u0020\?\u0020\?\u0020\?\u0020\?</string>
+    <string name="code_hint">Verification code</string>
     <string name="profile_mobile_number">Mobile Number</string>
-    <string name="submit">Submit</string>
+    <string name="button_verify">Verify</string>
+    <string name="button_continue">Continue</string>
     <string name="create_account_verify_message">Detecting verification SMS\nThis might take a few moments\u2026</string>
     <string name="error_more_than_one_account">There is more than one Self.Me account. Please delete all of them and run the Self.Me app again.</string>
     <string name="account_already_exists">TakeAPeek account already exists.</string>
@@ -106,12 +115,17 @@
     <string name="create_account_verify_sms_error">Illegal verification code</string>
     <string name="title_activity_capture_clip">CaptureClipActivity</string>
     <string name="title_activity_user_map">User Map</string>
-    <string name="textview_user_feed_empty">This user has no peeks</string>
+    <string name="verify_mobile_number">Verify mobile number</string>
+    <string name="verify_mobile_number_explain">Please verify your mobile number so we know this works!</string>
+    <string name="display_name_pick_a_name">Pick a User Name</string>
+    <string name="display_name_explain">Your User Name is your identity on TakeAPeek</string>
+    <string name="display_name_hint">User Name</string>
 
     <!-- User peek feed -->
     <string name="error_no_profile">There was an error getting the user feed. Please try again later.</string>
     <string name="title_activity_user_feed">User Feed</string>
     <string name="error_playing_peek">There was an error playing this peek, please try again later.</string>
+    <string name="textview_user_feed_empty">This user has no peeks</string>
 
     <!-- User Map -->
     <string name="search_location">Search</string>
@@ -150,7 +164,7 @@
     <string name="textview_notification_time_days">%1$d days ago</string>
     <string name="notifications_requested_peek_to">Sent peek request to %1$s</string>
 
-    <!-- Notiofication popup activity -->
+    <!-- Notification popup activity -->
     <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
     <string name="request_big_title">%1$s is asking you for a Peek</string>
     <string name="request_small_title">Show them why you are special</string>
@@ -160,4 +174,8 @@
     <string name="peek_small_title">Check it out!</string>
     <string name="follow_big_title">%1$s is now following you</string>
     <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s users</string>
+
+    <!-- Trending Places -->
+    <string name="error_request_trending_places">There was an error getting Trending Places, please try again later.</string>
+    <string name="textview_places_empty">Could not get the list of Trending Places right now, please try again later.</string>
 </resources>

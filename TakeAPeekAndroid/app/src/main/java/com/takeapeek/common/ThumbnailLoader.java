@@ -56,7 +56,8 @@ public class ThumbnailLoader
 
 		if(imageView != null)
 		{
-			imageView.setImageDrawable(createThumbnailDrawable);
+			//@@imageView.setImageDrawable(createThumbnailDrawable);
+            /*@@*/imageView.setTag(createThumbnailDrawable);
 		}
 		
 		thumbnailCreatorTask.execute(takeAPeekObject);
@@ -68,9 +69,10 @@ public class ThumbnailLoader
 		
 		if (imageView != null) 
 		{
-            Drawable drawable = imageView.getDrawable();
+            //@@Drawable drawable = imageView.getDrawable();
+            /*@@*/Drawable drawable = (Drawable)imageView.getTag();
             
-            if (drawable instanceof CreateThumbnailDrawable) 
+            if (drawable instanceof CreateThumbnailDrawable)
             {
             	CreateThumbnailDrawable createThumbnailDrawable = (CreateThumbnailDrawable)drawable;
                 return createThumbnailDrawable.GetThumbnailCreatorTask();
@@ -153,8 +155,16 @@ public class ThumbnailLoader
                 if (this == thumbnailCreatorTask) 
                 {
                 	//@@imageView.setBackgroundResource(0);
+                    //*@@*/imageView.setVisibility(View.INVISIBLE);
                     imageView.setImageBitmap(bitmap);
+                    //*@@*/imageView.setVisibility(View.VISIBLE);
+/*@@/
+                    Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
+                    imageView.setAnimation(zoomInAnimation);
+                    zoomInAnimation.start();
+/*@@*/
 
+/*@@*/
                     if(mAnimationStateHash.containsKey(mPosition) == false)
                     {
                         mAnimationStateHash.put(mPosition, true);
@@ -163,6 +173,7 @@ public class ThumbnailLoader
                         imageView.setAnimation(zoomInAnimation);
                         zoomInAnimation.start();
                     }
+/*@@*/
                 }
             }
         }

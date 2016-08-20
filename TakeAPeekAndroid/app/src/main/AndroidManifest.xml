@@ -100,18 +100,20 @@
             android:launchMode="singleTop"
             android:noHistory="false"
             android:screenOrientation="portrait"
-            android:stateNotNeeded="true">
+            android:stateNotNeeded="true"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name=".capture.CaptureClipActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_capture_clip"
             android:launchMode="singleTop"
             android:noHistory="false"
             android:parentActivityName=".MainActivity"
-            android:stateNotNeeded="true"
-			android:screenOrientation="portrait"
-			android:configChanges="orientation|screenSize|keyboardHidden">
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
@@ -208,7 +210,9 @@
         </activity>
         <activity
             android:name=".notifications.NotificationPopupActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        </activity>
+        <activity android:name=".trendingplaces.TrendingPlacesActivity">
         </activity>
     </application>
 

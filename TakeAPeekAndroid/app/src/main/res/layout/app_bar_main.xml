@@ -10,15 +10,13 @@
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="wrap_content" >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            android:background="?attr/colorPrimary" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -44,5 +42,16 @@
         android:src="@drawable/ic_menu_map"
         android:tint="@color/tap_white"
         />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabtrending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginRight="145dp"
+        android:src="@drawable/ic_trending_places"
+        android:tint="@color/tap_white"
+    />
 
 </android.support.design.widget.CoordinatorLayout>
