@@ -7,6 +7,37 @@
     tools:context="com.takeapeek.trendingplaces.TrendingPlacesActivity"
     android:background="@color/tap_white">
 
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/tap_blue">
+
+        <ImageView
+            android:id="@+id/imageview_map_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:src="@drawable/button_notifications"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="15dp"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/textview_places_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:text="@string/places_title"
+            android:layout_centerInParent="true"
+            android:textColor="@color/tap_white"/>
+
+    </RelativeLayout>
+
+<!--
     <ImageView
         android:id = "@+id/places_thumbnail"
         android:layout_width="match_parent"
@@ -14,11 +45,13 @@
         android:layout_centerInParent="true"
         android:scaleType="centerCrop"
         android:visibility="gone" />
+-->
 
     <ListView
         android:id="@+id/listview_places_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/top_bar"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:orientation="vertical"
@@ -30,6 +63,7 @@
         android:id="@+id/textview_places_empty"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/top_bar"
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_places_empty"
@@ -40,6 +74,7 @@
     <ImageView
         android:id="@+id/places_progress"
         android:padding="10dp"
+        android:layout_below="@+id/top_bar"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginTop="30dp"

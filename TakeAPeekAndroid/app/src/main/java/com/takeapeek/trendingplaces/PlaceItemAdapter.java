@@ -45,8 +45,9 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 
     private class ViewHolder
     {
-        ImageView mImageViewPeekThumbnail = null;
-        TextView mTextViewUserFeedAddress = null;
+        ImageView mImagePlaceThumbnail = null;
+        TextView mTextViewPlaceAddress = null;
+        TextView mTextViewNumberOfPeeks = null;
 
         TrendingPlaceObject mTrendingPlaceObject = null;
         int Position = -1;
@@ -98,10 +99,11 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 
             viewHolder = new ViewHolder();
 
-            viewHolder.mImageViewPeekThumbnail = (ImageView)view.findViewById(R.id.place_thumbnail);
-            viewHolder.mImageViewPeekThumbnail.setOnClickListener(ClickListener);
+            viewHolder.mImagePlaceThumbnail = (ImageView)view.findViewById(R.id.place_thumbnail);
+            viewHolder.mImagePlaceThumbnail.setOnClickListener(ClickListener);
 
-            viewHolder.mTextViewUserFeedAddress = (TextView)view.findViewById(R.id.place_address);
+            viewHolder.mTextViewPlaceAddress = (TextView)view.findViewById(R.id.place_address);
+            viewHolder.mTextViewNumberOfPeeks = (TextView)view.findViewById(R.id.place_number_of_peeks);
 
             view.setTag(viewHolder);
         }
@@ -123,8 +125,8 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
             }
 
             //Load the thumbnail asynchronously
-            viewHolder.mImageViewPeekThumbnail.setTag("Thumbnail_" + viewHolder.Position);
-            mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity, position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
+            viewHolder.mImagePlaceThumbnail.setTag("Thumbnail_" + viewHolder.Position);
+            mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity, position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
 
             if(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude > 0 &&
                     viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude > 0)
@@ -132,8 +134,11 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
                 LatLng location = new LatLng(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude,
                         viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude);
 
-                mAddressLoader.SetAddress(mTrendingPlacesActivity, location, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
+                mAddressLoader.SetAddress(mTrendingPlacesActivity, location, viewHolder.mTextViewPlaceAddress, mSharedPreferences);
             }
+
+            String numberOfPeeks = String.format(mTrendingPlacesActivity.getString(R.string.place_number_of_peeks), viewHolder.mTrendingPlaceObject.Peeks.size());
+            viewHolder.mTextViewNumberOfPeeks.setText(numberOfPeeks);
         }
 
         return view;

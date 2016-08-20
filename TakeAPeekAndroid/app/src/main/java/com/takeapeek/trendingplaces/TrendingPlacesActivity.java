@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,14 +46,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
     ImageView mImageViewProgressAnimation = null;
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
-    ImageView mImageViewPeekThumbnail = null;
-    //@@VideoView mVideoViewPeekItem = null;
-    //@@ImageView mImageViewPeekVideoProgress = null;
-    //@@AnimationDrawable mAnimationDrawableVideoProgressAnimation = null;
-    //@@ImageView mImageViewPeekThumbnailPlay = null;
-    //@@ImageView mImageViewPeekClose = null;
     TextView mTextViewEmptyList = null;
-    //@@ThumbnailLoader mThumbnailLoader = null;
 
     TakeAPeekObject mCurrentTakeAPeekObject = null;
 
@@ -71,7 +65,6 @@ public class TrendingPlacesActivity extends AppCompatActivity
         previewStopped
     }
 
-    //@@Hashtable<Integer, Integer> mPositionToPeekIndexHash = new Hashtable<Integer, Integer>();
     Handler mTimerHandler = new Handler();
     Runnable mTimerRunnable = new Runnable()
     {
@@ -83,43 +76,6 @@ public class TrendingPlacesActivity extends AppCompatActivity
             if(mPlaceItemAdapter != null)
             {
                 mPlaceItemAdapter.notifyDataSetChanged();
-
-/*@@
-                ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
-
-                int firstPosition = mListViewFeedList.getFirstVisiblePosition();
-                int lastPosition = mListViewFeedList.getLastVisiblePosition();
-
-                for(int position = firstPosition; position <= lastPosition; position++)
-                {
-                    TrendingPlaceObject trendingPlaceObject = mPlaceItemAdapter.getItem(position);
-
-                    int peekIndex = 0;
-                    if(mPositionToPeekIndexHash.containsKey(position) == true)
-                    {
-                        peekIndex = mPositionToPeekIndexHash.get(position);
-
-                        if(peekIndex + 1 == trendingPlaceObject.Peeks.size())
-                        {
-                            mPositionToPeekIndexHash.put(position, 0);
-                        }
-                        else
-                        {
-                            mPositionToPeekIndexHash.put(position, peekIndex + 1);
-                        }
-                    }
-                    else
-                    {
-                        mPositionToPeekIndexHash.put(position, peekIndex + 1);
-                    }
-
-                    ImageView thumbnailView = (ImageView) mListViewFeedList.findViewWithTag("Thumbnail_" + position);
-                    mThumbnailLoader.SetThumbnail(
-                            TrendingPlacesActivity.this, position,
-                            trendingPlaceObject.Peeks.get(peekIndex),
-                            thumbnailView, mSharedPreferences);
-                }
-@@*/
             }
 
             mTimerHandler.postDelayed(this, Constants.INTERVAL_FIVESECONDS);
@@ -167,6 +123,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trending_places);
+        getWindow().getDecorView().getRootView().setBackgroundColor(Color.BLACK);
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
@@ -177,10 +134,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
         //List View
         mListViewFeedList = (ListView)findViewById(R.id.listview_places_list);
 
-        mImageViewPeekThumbnail = (ImageView)findViewById(R.id.places_thumbnail);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_places_empty);
-
-        //@@mThumbnailLoader = new ThumbnailLoader();
 
         mEnumActivityState = EnumActivityState.loading;
         UpdateUI();
@@ -292,20 +246,6 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
                     break;
 
-/*@@
-
-
-                case R.id.user_peek_stack_thumbnail_time:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
-                    break;
-
-                case R.id.user_peek_stack_thumbnail_play:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
-                    break;
-
-
-@@*/
-
                 default:
                     break;
             }
@@ -334,16 +274,6 @@ public class TrendingPlacesActivity extends AppCompatActivity
                 mListViewFeedList.setVisibility(View.GONE);
                 mTextViewEmptyList.setVisibility(View.GONE);
 
-                mImageViewPeekThumbnail.setVisibility(View.GONE);
-/*@@
-                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
-                mImageViewPeekVideoProgress.setVisibility(View.GONE);
-
-                mVideoViewPeekItem.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
-@@*/
-                //@@findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
-
                 break;
 
             case list:
@@ -353,17 +283,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
                 mListViewFeedList.setVisibility(View.VISIBLE);
                 mTextViewEmptyList.setVisibility(View.GONE);
 
-                mImageViewPeekThumbnail.setVisibility(View.GONE);
-
-/*@@
-                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
-                mImageViewPeekVideoProgress.setVisibility(View.GONE);
-
-                mVideoViewPeekItem.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
-@@*/
-                //@@findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
-                break;
+            break;
 
             case emptyList:
                 mImageViewProgressAnimation.setVisibility(View.GONE);
@@ -372,82 +292,8 @@ public class TrendingPlacesActivity extends AppCompatActivity
                 mListViewFeedList.setVisibility(View.GONE);
                 mTextViewEmptyList.setVisibility(View.VISIBLE);
 
-                mImageViewPeekThumbnail.setVisibility(View.GONE);
-
-/*@@
-                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
-                mImageViewPeekVideoProgress.setVisibility(View.GONE);
-
-                mVideoViewPeekItem.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
-@@*/
-                //@@findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
                 break;
 
-/*@@
-            case previewLoading:
-                mImageViewProgressAnimation.setVisibility(View.GONE);
-                mAnimationDrawableProgressAnimation.stop();
-
-                mListViewFeedList.setVisibility(View.GONE);
-                mTextViewEmptyList.setVisibility(View.GONE);
-
-                mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
-                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
-                mImageViewPeekVideoProgress.setVisibility(View.VISIBLE);
-
-                //Progress animation
-                mImageViewPeekVideoProgress.post(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        mAnimationDrawableVideoProgressAnimation.start();
-                    }
-                });
-
-                mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mImageViewPeekClose.setVisibility(View.GONE);
-
-                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
-                break;
-
-            case previewPlaying:
-                mImageViewProgressAnimation.setVisibility(View.GONE);
-                mAnimationDrawableProgressAnimation.stop();
-
-                mListViewFeedList.setVisibility(View.GONE);
-                mTextViewEmptyList.setVisibility(View.GONE);
-
-                mImageViewPeekThumbnail.setVisibility(View.GONE);
-                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
-                mImageViewPeekVideoProgress.setVisibility(View.GONE);
-                mAnimationDrawableVideoProgressAnimation.stop();
-
-                mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mImageViewPeekClose.setVisibility(View.GONE);
-
-                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
-                break;
-
-            case previewStopped:
-                mImageViewProgressAnimation.setVisibility(View.GONE);
-                mAnimationDrawableProgressAnimation.stop();
-
-                mListViewFeedList.setVisibility(View.GONE);
-                mTextViewEmptyList.setVisibility(View.GONE);
-
-                mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
-                mImageViewPeekThumbnailPlay.setVisibility(View.VISIBLE);
-                mImageViewPeekVideoProgress.setVisibility(View.GONE);
-                mAnimationDrawableVideoProgressAnimation.stop();
-
-                mVideoViewPeekItem.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.VISIBLE);
-
-                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
-                break;
-@@*/
             default: break;
         }
     }

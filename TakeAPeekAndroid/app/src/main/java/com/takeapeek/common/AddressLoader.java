@@ -3,6 +3,7 @@ package com.takeapeek.common;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -119,6 +120,7 @@ public class AddressLoader
                 if (this == addressCreatorTask)
                 {
                 	textView.setText(text);
+                    textView.setVisibility(View.VISIBLE);
 
                 	Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
                     textView.setAnimation(zoomInAnimation);

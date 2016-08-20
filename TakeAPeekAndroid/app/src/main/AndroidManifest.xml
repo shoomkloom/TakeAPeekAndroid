@@ -212,7 +212,8 @@
             android:name=".notifications.NotificationPopupActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         </activity>
-        <activity android:name=".trendingplaces.TrendingPlacesActivity">
+        <activity android:name=".trendingplaces.TrendingPlacesActivity"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

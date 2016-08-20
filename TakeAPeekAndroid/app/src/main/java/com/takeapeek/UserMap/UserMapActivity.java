@@ -156,7 +156,10 @@ public class UserMapActivity extends FragmentActivity implements
         if(intent != null)
         {
             Bundle bundle = getIntent().getExtras();
-            mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+            if(bundle != null)
+            {
+                mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+            }
         }
     }
 
