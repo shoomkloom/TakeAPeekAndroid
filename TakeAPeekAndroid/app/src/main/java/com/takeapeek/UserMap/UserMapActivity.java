@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -39,12 +41,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.Algorithm;
+import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
@@ -58,6 +67,7 @@ import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
+import com.takeapeek.trendingplaces.TrendingPlacesActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,14 +75,17 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener
+        LocationListener,
+        ClusterManager.OnClusterClickListener<TAPClusterItem>,
+        ClusterManager.OnClusterInfoWindowClickListener<TAPClusterItem>,
+        ClusterManager.OnClusterItemClickListener<TAPClusterItem>,
+        ClusterManager.OnClusterItemInfoWindowClickListener<TAPClusterItem>
 {
     static private final Logger logger = LoggerFactory.getLogger(UserMapActivity.class);
     static private ReentrantLock boundsLock = new ReentrantLock();
@@ -82,15 +95,16 @@ public class UserMapActivity extends FragmentActivity implements
     Handler mHandler = new Handler();
     SharedPreferences mSharedPreferences = null;
 
-    private GoogleMap mGoogleMap = null;
+    GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
-    //@@private ClusterManager<TapItem> mClusterManager = null;
+    ClusterManager<TAPClusterItem> mClusterManager = null;
+    private Algorithm<TAPClusterItem> mClusterManagerAlgorithm = null;
 
     private boolean mFirstLoad = false;
     Marker mMarkerCurrentShown = null;
-    HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
-    HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
-    WeakHashMap<Integer, Marker> mHashMapIndexToMarker = new WeakHashMap<Integer, Marker>();
+    //@@HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
+    //@@HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
+    //@@WeakHashMap<Integer, Marker> mHashMapIndexToMarker = new WeakHashMap<Integer, Marker>();
 
     private LatLngBounds mLatLngBounds = null;
     private LatLngBounds mLatLngBoundsIntent = null;
@@ -186,7 +200,17 @@ public class UserMapActivity extends FragmentActivity implements
         uiSettings.setMyLocationButtonEnabled(false);
 
         // Initialize the manager with the context and the map.
-        //@@mClusterManager = new ClusterManager<TapItem>(this, mGoogleMap);
+        mClusterManager = new ClusterManager<TAPClusterItem>(this, mGoogleMap);
+        mClusterManagerAlgorithm = new NonHierarchicalDistanceBasedAlgorithm();
+        mClusterManager.setAlgorithm(mClusterManagerAlgorithm);
+        mClusterManager.setRenderer(new TAPClusterItemRenderer(this, mGoogleMap, mClusterManager, mSharedPreferences));
+        mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
+        mGoogleMap.setOnMarkerClickListener(mClusterManager);
+        mGoogleMap.setOnInfoWindowClickListener(mClusterManager);
+        mClusterManager.setOnClusterClickListener(this);
+        mClusterManager.setOnClusterInfoWindowClickListener(this);
+        mClusterManager.setOnClusterItemClickListener(this);
+        mClusterManager.setOnClusterItemInfoWindowClickListener(this);
     }
 
     @Override
@@ -226,8 +250,8 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("onConnected(.) Invoked");
 
-        mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
-        mGoogleMap.setOnMarkerClickListener(MarkerClickListener);
+        //@@mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
+        //@@mGoogleMap.setOnMarkerClickListener(MarkerClickListener);
 
         if(mFirstLoad == true)
         {
@@ -261,6 +285,41 @@ public class UserMapActivity extends FragmentActivity implements
         }
     }
 
+    @Override
+    public boolean onClusterClick(Cluster<TAPClusterItem> cluster)
+    {
+        // Show a toast with some info when the cluster is clicked.
+        String names = "Found: ";
+        for(TAPClusterItem tapClusterItem : cluster.getItems())
+        {
+            names += tapClusterItem.mProfileObject.displayName + " ";
+        }
+
+        names = names.trim();
+
+        Toast.makeText(this, names, Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    @Override
+    public void onClusterInfoWindowClick(Cluster<TAPClusterItem> cluster)
+    {
+        // Does nothing, but you could go to a list of the users.
+    }
+
+    @Override
+    public boolean onClusterItemClick(TAPClusterItem item)
+    {
+        // Does nothing, but you could go into the user's profile page, for example.
+        return false;
+    }
+
+    @Override
+    public void onClusterItemInfoWindowClick(TAPClusterItem item)
+    {
+        // Does nothing, but you could go into the user's profile page, for example.
+    }
+
     GoogleMap.OnMarkerClickListener MarkerClickListener = new GoogleMap.OnMarkerClickListener()
     {
         @Override
@@ -275,7 +334,6 @@ public class UserMapActivity extends FragmentActivity implements
             }
             else
             {
-                //@@marker.showInfoWindow();
                 mMarkerCurrentShown = marker;
 
                 ShowUserPeekStack();
@@ -376,12 +434,9 @@ public class UserMapActivity extends FragmentActivity implements
                                 if (responseObject != null && responseObject.profiles != null)
                                 {
                                     mGoogleMap.clear();
-                                    mHashMapMarkerToIndex.clear();
-                                    mHashMapIndexToProfileObject.clear();
-                                    mHashMapIndexToMarker.clear();
+                                    mClusterManager.clearItems();
 
-                                    logger.info(String.format("Got %d profiles in the bounds",
-                                            responseObject.profiles.size()));
+                                    logger.info(String.format("Got %d profiles in the bounds", responseObject.profiles.size()));
 
                                     //Collect
                                     HashMap<String, RelationObject> relationObjectHash = new HashMap<String, RelationObject>();
@@ -401,18 +456,14 @@ public class UserMapActivity extends FragmentActivity implements
                                             profileObject.relationTypeEnum = Constants.RelationTypeEnum.valueOf(relationObjectHash.get(profileObject.profileId).type);
                                         }
 
-                                        LatLng markerLatlng = new LatLng(profileObject.latitude, profileObject.longitude);
-                                        Marker marker = mGoogleMap.addMarker(
-                                                new MarkerOptions().position(markerLatlng).title(profileObject.displayName));
-
-                                        mHashMapMarkerToIndex.put(marker.getId(), i);
-                                        mHashMapIndexToProfileObject.put(i, profileObject);
-                                        mHashMapIndexToMarker.put(i, marker);
+                                        mClusterManager.addItem(new TAPClusterItem(i, profileObject));
                                         i++;
                                     }
 
-                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
-                                    mViewPager.setAdapter(mPeekStackPagerAdapter);
+                                    mClusterManager.cluster();
+
+                                    //@@@mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
+                                    //@@@mViewPager.setAdapter(mPeekStackPagerAdapter);
                                 }
                             }
                             finally
@@ -439,6 +490,21 @@ public class UserMapActivity extends FragmentActivity implements
 
         mLastCallMs = snap;
         mLatLngBounds = latLngBounds;
+    }
+
+    TAPClusterItem GetTAPClusterItemByPosition(int position)
+    {
+        Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
+
+        for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
+        {
+            if(tapClusterItem.mIndex == position)
+            {
+                return tapClusterItem;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -511,8 +577,8 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 peekListLock.lock();
 
-                int selectedMarkerIndex = mHashMapMarkerToIndex.get(mMarkerCurrentShown.getId());
-                mViewPager.setCurrentItem(selectedMarkerIndex);
+//@@@                int selectedMarkerIndex = mHashMapMarkerToIndex.get(mMarkerCurrentShown.getId());
+//@@@                mViewPager.setCurrentItem(selectedMarkerIndex);
 
                 UpdateBelowProjection(mMarkerCurrentShown.getPosition());
 
@@ -526,8 +592,10 @@ public class UserMapActivity extends FragmentActivity implements
                     slideDownAnimation.start();
 
                     //Workaround: Set the name for the first loaded page
-                    int pos = mViewPager.getCurrentItem();
-                    ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
+                    int position = mViewPager.getCurrentItem();
+                    //@@ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
+
+                    ProfileObject profileObject = GetTAPClusterItemByPosition(position).mProfileObject;
                     mTextViewStackUserName.setText(profileObject.displayName);
                 }
             }
@@ -589,7 +657,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                     try
                     {
-                        if(mHashMapIndexToProfileObject.isEmpty() == false)
+                        if(mClusterManagerAlgorithm.getItems().size() > 0)
                         {
                             try
                             {
@@ -607,14 +675,14 @@ public class UserMapActivity extends FragmentActivity implements
                                             {
                                                 logger.info("Getting profile list from server");
 
-                                                Collection<ProfileObject> profileObjectCollection = mHashMapIndexToProfileObject.values();
+                                                Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
 
                                                 RequestObject requestObject = new RequestObject();
                                                 requestObject.targetProfileList = new ArrayList<String>();
 
-                                                for(ProfileObject profileObject : profileObjectCollection)
+                                                for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
                                                 {
-                                                    requestObject.targetProfileList.add(profileObject.profileId);
+                                                    requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
                                                 }
 
                                                 String metaDataJson = new Gson().toJson(requestObject);
@@ -643,7 +711,7 @@ public class UserMapActivity extends FragmentActivity implements
                                                 }
                                                 else
                                                 {
-                                                    String message = String.format(getString(R.string.user_map_requested_peeks_to), mHashMapIndexToProfileObject.size());
+                                                    String message = String.format(getString(R.string.user_map_requested_peeks_to), mClusterManagerAlgorithm.getItems().size());
                                                     Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
                                                 }
                                             }
@@ -675,8 +743,8 @@ public class UserMapActivity extends FragmentActivity implements
                     logger.info("OnClickListener:onClick: notifications_image clicked");
 
                     //Show the notifications activity
-                    final Intent intent = new Intent(UserMapActivity.this, NotificationsActivity.class);
-                    startActivity(intent);
+                    final Intent notificationsIntent = new Intent(UserMapActivity.this, NotificationsActivity.class);
+                    startActivity(notificationsIntent);
 
                     break;
 
@@ -684,8 +752,8 @@ public class UserMapActivity extends FragmentActivity implements
                     logger.info("OnClickListener:onClick: textview_trending clicked");
 
                     //Show the trending locations activity
-                    /*@@*/
-                    Toast.makeText(UserMapActivity.this, "Show Trending Locations...", Toast.LENGTH_SHORT).show();
+                    final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
+                    startActivity(trendingIntent);
 
                     break;
 
@@ -712,12 +780,10 @@ public class UserMapActivity extends FragmentActivity implements
         @Override
         public void onPageSelected(int pos)
         {
-            Marker marker = mHashMapIndexToMarker.get(pos);
-            //@@marker.showInfoWindow();
-            UpdateBelowProjection(marker.getPosition());
+            TAPClusterItem tapClusterItem = GetTAPClusterItemByPosition(pos);
+            UpdateBelowProjection(tapClusterItem.getPosition());
 
-            ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
-            mTextViewStackUserName.setText(profileObject.displayName);
+            mTextViewStackUserName.setText(tapClusterItem.mProfileObject.displayName);
         }
     };
 
@@ -793,20 +859,87 @@ public class UserMapActivity extends FragmentActivity implements
     };
 }
 
-/*@@
-class TapItem implements ClusterItem
+class TAPClusterItem implements ClusterItem
 {
-    private final LatLng mPosition;
+    ProfileObject mProfileObject = null;
+    int mIndex = -1;
 
-    public TapItem(double lat, double lng)
+    public TAPClusterItem(int index, ProfileObject profileObject)
     {
-        mPosition = new LatLng(lat, lng);
+        mIndex = index;
+        mProfileObject = profileObject;
     }
 
     @Override
     public LatLng getPosition()
     {
-        return mPosition;
+        return new LatLng(mProfileObject.latitude, mProfileObject.longitude);
     }
 }
-@@*/
+
+/**
+ * Class for rendering custom markers and clusters
+ */
+class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
+{
+    static private final Logger logger = LoggerFactory.getLogger(TAPClusterItemRenderer.class);
+
+    UserMapActivity mUserMapActivity = null;
+
+    Bitmap mItemSizedBitmap = null;
+    Bitmap mItemSizedBitmapRequest = null;
+    Point mPointCenter = new Point(60, 90);
+
+    public TAPClusterItemRenderer(UserMapActivity userMapActivity, GoogleMap googleMap, ClusterManager clusterManager, SharedPreferences sharedPreferences)
+    {
+        super(userMapActivity, googleMap, clusterManager);
+
+        mUserMapActivity = userMapActivity;
+
+        //Get sized images
+        try
+        {
+            String itemSizedBitmapPath = String.format("%sItemSizedBitmap.png", Helper.GetTakeAPeekPath(mUserMapActivity));
+            mItemSizedBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_blue, itemSizedBitmapPath, 25, 25);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When getting sized bitmap mItemSizedBitmap", e);
+        }
+
+        try
+        {
+            String itemSizedBitmapRequestPath = String.format("%sItemSizedBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
+            mItemSizedBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_green, itemSizedBitmapRequestPath, 25, 25);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When getting sized bitmap mItemSizedBitmapRequest", e);
+        }
+    }
+
+    @Override
+    protected void onBeforeClusterItemRendered(TAPClusterItem tapClusterItem, MarkerOptions markerOptions)
+    {
+        Bitmap iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        markerOptions.anchor((float)0.0, (float)1.0);
+    }
+
+    @Override
+    protected void onBeforeClusterRendered(Cluster<TAPClusterItem> cluster, MarkerOptions markerOptions)
+    {
+        Bitmap iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        markerOptions.anchor((float)0.0, (float)1.0);
+    }
+
+    @Override
+    protected boolean shouldRenderAsCluster(Cluster cluster)
+    {
+        // Render clusters for more than one person.
+        return cluster.getSize() > 1;
+    }
+}

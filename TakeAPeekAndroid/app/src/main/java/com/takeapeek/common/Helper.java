@@ -545,6 +545,54 @@ public class Helper
 			logger.debug("SaveBitmapToProfileImage(.) - after unlock");
 		}
 	}
+
+    static public Bitmap GetSizedBitmapFromResource(Context context, SharedPreferences sharedPreferences, int resourceId, String sizedBitmapPath, int widthInDip, int heightInDip)
+    {
+        logger.debug("GetSizedBitmapFromResource(.....) Invoked");
+
+        Bitmap sizedBitmap = null;
+
+        try
+        {
+            BitmapFactory.Options bitmapFactoryOptions = new BitmapFactory.Options();
+            bitmapFactoryOptions.inScaled = false;
+
+            File sizedBitmapFile = new File(sizedBitmapPath);
+
+            if(sizedBitmapFile != null && sizedBitmapFile.exists())
+            {
+                sizedBitmap = BitmapFactory.decodeFile(sizedBitmapPath, bitmapFactoryOptions);
+            }
+            else
+            {
+                sizedBitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, bitmapFactoryOptions);
+
+                if (sizedBitmap != null)
+                {
+                    sizedBitmap = Helper.DecodeSampledBitmap(context, sharedPreferences, sizedBitmap, widthInDip, heightInDip, true);
+
+                    if (sizedBitmap != null)
+                    {
+                        try
+                        {
+                            FileOutputStream fileOutputStream = new FileOutputStream(sizedBitmapPath);
+                            sizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: when trying to save", e);
+                        }
+                    }
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to resize a bitmap", e);
+        }
+
+        return sizedBitmap;
+    }
 	
 	static public Bitmap CreateThumbnailBitmap(Context context, SharedPreferences sharedPreferences, String contactBitmapPath, String takeAPeekContactThumbnailPath, int likes, int widthInDip, int heightInDip)
 	{
@@ -1194,8 +1242,8 @@ public class Helper
 //@@        paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
        	paint.setTextAlign(textAlign);
        	
-       	Typeface boldTypeface = getBoldFont(context);
-       	paint.setTypeface(boldTypeface);
+       	//@@Typeface boldTypeface = getBoldFont(context);
+       	//@@paint.setTypeface(boldTypeface);
 
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(backgroundBmp, new Matrix(), null); 
