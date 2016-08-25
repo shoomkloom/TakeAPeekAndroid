@@ -34,7 +34,6 @@
         android:progressDrawable="@android:color/holo_red_dark"
         android:thumb="@drawable/thumb_trending_places" >
     </com.takeapeek.common.SlideButton>
--->
 
     <TextView
         android:id="@+id/textview_trending"
@@ -45,7 +44,9 @@
         android:textStyle="bold"
         android:textSize="14sp"
         android:padding="3dp"
+        android:translationZ="4dp"
+        android:stateListAnimator="@anim/button_elevation"
         android:textColor="@color/tap_white"
         android:text="@string/trending_locations"/>
-
+-->
 </LinearLayout>
