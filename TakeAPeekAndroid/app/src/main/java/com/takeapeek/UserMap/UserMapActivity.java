@@ -45,7 +45,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.maps.android.clustering.Cluster;
@@ -101,8 +100,8 @@ public class UserMapActivity extends FragmentActivity implements
     private Algorithm<TAPClusterItem> mClusterManagerAlgorithm = null;
 
     private boolean mFirstLoad = false;
-    Marker mMarkerCurrentShown = null;
-    //@@HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
+    HashMap<String, Integer> mHashMapProfileObjectToIndex = new HashMap<String, Integer>();
+    HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
     //@@HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
     //@@WeakHashMap<Integer, Marker> mHashMapIndexToMarker = new WeakHashMap<Integer, Marker>();
 
@@ -288,16 +287,12 @@ public class UserMapActivity extends FragmentActivity implements
     @Override
     public boolean onClusterClick(Cluster<TAPClusterItem> cluster)
     {
-        // Show a toast with some info when the cluster is clicked.
-        String names = "Found: ";
-        for(TAPClusterItem tapClusterItem : cluster.getItems())
-        {
-            names += tapClusterItem.mProfileObject.displayName + " ";
-        }
+        logger.debug("onClusterClick(.) Invoked");
 
-        names = names.trim();
+        //Show peek for first profile
+        int position = cluster.getItems().iterator().next().mIndex;
+        ShowUserPeekStack(position);
 
-        Toast.makeText(this, names, Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -310,8 +305,9 @@ public class UserMapActivity extends FragmentActivity implements
     @Override
     public boolean onClusterItemClick(TAPClusterItem item)
     {
-        // Does nothing, but you could go into the user's profile page, for example.
-        return false;
+        ShowUserPeekStack(item.mIndex);
+
+        return true;
     }
 
     @Override
@@ -319,29 +315,6 @@ public class UserMapActivity extends FragmentActivity implements
     {
         // Does nothing, but you could go into the user's profile page, for example.
     }
-
-    GoogleMap.OnMarkerClickListener MarkerClickListener = new GoogleMap.OnMarkerClickListener()
-    {
-        @Override
-        public boolean onMarkerClick(Marker marker)
-        {
-            logger.debug("OnMarkerClickListener.onMarkerClick(.) Invoked");
-
-            if (marker.equals(mMarkerCurrentShown))
-            {
-                marker.hideInfoWindow();
-                mMarkerCurrentShown = null;
-            }
-            else
-            {
-                mMarkerCurrentShown = marker;
-
-                ShowUserPeekStack();
-            }
-
-            return true;
-        }
-    };
 
     GoogleMap.OnCameraChangeListener CameraChangeListener = new GoogleMap.OnCameraChangeListener()
     {
@@ -433,8 +406,7 @@ public class UserMapActivity extends FragmentActivity implements
                             {
                                 if (responseObject != null && responseObject.profiles != null)
                                 {
-                                    mGoogleMap.clear();
-                                    mClusterManager.clearItems();
+                                    ClusterManagerClear();
 
                                     logger.info(String.format("Got %d profiles in the bounds", responseObject.profiles.size()));
 
@@ -456,14 +428,14 @@ public class UserMapActivity extends FragmentActivity implements
                                             profileObject.relationTypeEnum = Constants.RelationTypeEnum.valueOf(relationObjectHash.get(profileObject.profileId).type);
                                         }
 
-                                        mClusterManager.addItem(new TAPClusterItem(i, profileObject));
+                                        ClusterManagerAddItem(i, profileObject);
                                         i++;
                                     }
 
                                     mClusterManager.cluster();
 
-                                    //@@@mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
-                                    //@@@mViewPager.setAdapter(mPeekStackPagerAdapter);
+                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
+                                    mViewPager.setAdapter(mPeekStackPagerAdapter);
                                 }
                             }
                             finally
@@ -492,19 +464,45 @@ public class UserMapActivity extends FragmentActivity implements
         mLatLngBounds = latLngBounds;
     }
 
-    TAPClusterItem GetTAPClusterItemByPosition(int position)
+    private void ClusterManagerSingleItem(int position)
     {
-        Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
+        logger.debug("ClusterManagerSingleItem(int) Invoked");
 
-        for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
-        {
-            if(tapClusterItem.mIndex == position)
-            {
-                return tapClusterItem;
-            }
-        }
+        ClusterManagerSingleItem(new TAPClusterItem(position, mHashMapIndexToProfileObject.get(position)));
+    }
 
-        return null;
+    private void ClusterManagerSingleItem(TAPClusterItem tapClusterItem)
+    {
+        logger.debug("ClusterManagerSingleItem(tapClusterItem) Invoked");
+
+        mClusterManager.clearItems();
+        mClusterManager.addItem(tapClusterItem);
+        mClusterManager.cluster();
+    }
+
+    private void ClusterManagerAddItem(int i, ProfileObject profileObject)
+    {
+        logger.debug("ClusterManagerAddItem(..) Invoked");
+
+        mHashMapIndexToProfileObject.put(i, profileObject);
+        mHashMapProfileObjectToIndex.put(profileObject.profileId, i);
+        mClusterManager.addItem(new TAPClusterItem(i, profileObject));
+    }
+
+    private void ClusterManagerClear()
+    {
+        logger.debug("ClusterManagerClear() Invoked");
+
+        mHashMapIndexToProfileObject.clear();
+        mHashMapProfileObjectToIndex.clear();
+        mClusterManager.clearItems();
+    }
+
+    ProfileObject GetProfileObjectByPosition(int position)
+    {
+        logger.debug("GetProfileObjectByPosition(.) Invoked");
+
+        return mHashMapIndexToProfileObject.get(position);
     }
 
     @Override
@@ -548,13 +546,9 @@ public class UserMapActivity extends FragmentActivity implements
         FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
         int container_height = mapContainer.getHeight();
 
-        LatLng markerLatLng = new LatLng(
-                markerPosition.latitude,
-                markerPosition.longitude);
-
         Projection projection = mGoogleMap.getProjection();
 
-        Point markerScreenPosition = projection.toScreenLocation(markerLatLng);
+        Point markerScreenPosition = projection.toScreenLocation(markerPosition);
 
         Point pointHalfScreenAbove = new Point(
                 markerScreenPosition.x,
@@ -567,7 +561,7 @@ public class UserMapActivity extends FragmentActivity implements
         mGoogleMap.animateCamera(cameraUpdate);
     }
 
-    private void ShowUserPeekStack()
+    private void ShowUserPeekStack(int position)
     {
         logger.debug("ShowUserPeekStack() Invoked");
 
@@ -577,10 +571,16 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 peekListLock.lock();
 
-//@@@                int selectedMarkerIndex = mHashMapMarkerToIndex.get(mMarkerCurrentShown.getId());
-//@@@                mViewPager.setCurrentItem(selectedMarkerIndex);
+                mViewPager.setCurrentItem(position);
 
-                UpdateBelowProjection(mMarkerCurrentShown.getPosition());
+                ProfileObject currentProfileObject = mHashMapIndexToProfileObject.get(position);
+                LatLng markerLatLng = new LatLng(
+                        currentProfileObject.latitude,
+                        currentProfileObject.longitude);
+
+                ClusterManagerSingleItem(position);
+
+                UpdateBelowProjection(markerLatLng);
 
                 if (mLinearLayout.getVisibility() == View.GONE)
                 {
@@ -592,10 +592,10 @@ public class UserMapActivity extends FragmentActivity implements
                     slideDownAnimation.start();
 
                     //Workaround: Set the name for the first loaded page
-                    int position = mViewPager.getCurrentItem();
+                    //@@int position = mViewPager.getCurrentItem();
                     //@@ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
 
-                    ProfileObject profileObject = GetTAPClusterItemByPosition(position).mProfileObject;
+                    ProfileObject profileObject = GetProfileObjectByPosition(position);
                     mTextViewStackUserName.setText(profileObject.displayName);
                 }
             }
@@ -778,12 +778,16 @@ public class UserMapActivity extends FragmentActivity implements
         }
 
         @Override
-        public void onPageSelected(int pos)
+        public void onPageSelected(int index)
         {
-            TAPClusterItem tapClusterItem = GetTAPClusterItemByPosition(pos);
-            UpdateBelowProjection(tapClusterItem.getPosition());
+            ProfileObject profileObject = GetProfileObjectByPosition(index);
 
-            mTextViewStackUserName.setText(tapClusterItem.mProfileObject.displayName);
+            ClusterManagerSingleItem(index);
+
+            LatLng profileObjectLocation = new LatLng(profileObject.latitude, profileObject.longitude);
+            UpdateBelowProjection(profileObjectLocation);
+
+            mTextViewStackUserName.setText(profileObject.displayName);
         }
     };
 
@@ -863,17 +867,19 @@ class TAPClusterItem implements ClusterItem
 {
     ProfileObject mProfileObject = null;
     int mIndex = -1;
+    LatLng mPosition = null;
 
     public TAPClusterItem(int index, ProfileObject profileObject)
     {
         mIndex = index;
         mProfileObject = profileObject;
+        mPosition = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
     }
 
     @Override
     public LatLng getPosition()
     {
-        return new LatLng(mProfileObject.latitude, mProfileObject.longitude);
+        return mPosition;
     }
 }
 
