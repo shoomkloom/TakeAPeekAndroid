@@ -24,7 +24,6 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
-import com.takeapeek.trendingplaces.TrendingPlacesActivity;
 import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
@@ -121,9 +120,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         FloatingActionButton fabmap = (FloatingActionButton) findViewById(R.id.fabmap);
         fabmap.setOnClickListener(onClickListener);
-
-        FloatingActionButton fabtrending = (FloatingActionButton) findViewById(R.id.fabtrending);
-        fabtrending.setOnClickListener(onClickListener);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -370,15 +366,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final Intent intentUserMapActivity = new Intent(MainActivity.this, UserMapActivity.class);
                     intentUserMapActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentUserMapActivity);
-
-                    break;
-
-                case R.id.fabtrending:
-                    logger.info("onClick: fabtrending");
-
-                    final Intent intentTrendingPlacesActivity = new Intent(MainActivity.this, TrendingPlacesActivity.class);
-                    intentTrendingPlacesActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intentTrendingPlacesActivity);
 
                     break;
 
