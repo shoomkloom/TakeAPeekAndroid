@@ -62,6 +62,7 @@ import com.takeapeek.common.RelationObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
+import com.takeapeek.common.SlideButton;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
@@ -121,6 +122,7 @@ public class UserMapActivity extends FragmentActivity implements
     TextView mTextViewStackUserName = null;
     ViewPager mViewPager = null;
     PeekStackPagerAdapter mPeekStackPagerAdapter = null;
+    SlideButton mSlideButton = null;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
@@ -161,6 +163,8 @@ public class UserMapActivity extends FragmentActivity implements
         mLinearLayoutSendPeek.setOnClickListener(ClickListener);
         mTextviewTrending = (TextView)findViewById(R.id.textview_trending);
         mTextviewTrending.setOnClickListener(ClickListener);
+        //@@mSlideButton = (SlideButton)findViewById(R.id.slidebutton_trending);
+        //@@mSlideButton.setSlideButtonListener(SlideListener);
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
@@ -634,6 +638,36 @@ public class UserMapActivity extends FragmentActivity implements
 
         ShowProfilesInBounds(true);
     }
+
+/*@@
+    private SlideButtonListener SlideListener = new SlideButtonListener()
+    {
+        @Override
+        public void handleSlide(boolean hide)
+        {
+            logger.info("SlideListener:handleSlide(.) invoked.");
+
+            if(hide)
+            {
+                mTextviewTrending.setVisibility(View.INVISIBLE);
+            }
+            else
+            {
+                mTextviewTrending.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void handleFullSlide()
+        {
+            logger.info("SlideListener:handleFullSlide() invoked.");
+
+            //Show the trending locations activity
+            final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
+            startActivity(trendingIntent);
+        }
+    };
+@@*/
 
     private View.OnClickListener ClickListener = new View.OnClickListener()
     {

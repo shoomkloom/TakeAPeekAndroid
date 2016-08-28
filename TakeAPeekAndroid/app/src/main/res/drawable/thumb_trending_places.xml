@@ -6,11 +6,11 @@
 		     <!--
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
 		      -->  
-		    <solid android:color="@color/tap_lightblue" />
+		    <solid android:color="@color/tap_blue" />
 		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
 		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
             <size
-                android:width="100dp"
+                android:width="110dp"
                 android:height="40dp" />
 		</shape>
 	</item>
@@ -23,7 +23,7 @@
 		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
 		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
             <size
-                android:width="100dp"
+                android:width="110dp"
                 android:height="40dp" />
 		</shape>
 	</item>
@@ -37,7 +37,7 @@
 		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
 		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
             <size
-                android:width="100dp"
+                android:width="110dp"
                 android:height="40dp" />
 		</shape>
 	</item>

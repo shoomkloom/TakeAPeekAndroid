@@ -129,6 +129,23 @@
                 android:layout_marginRight="20dp"
                 tools:layout="@layout/fragment_custom_place_auto_complete"/>
 
+<!--
+            <com.takeapeek.common.SlideButton
+                android:id="@+id/slidebutton_trending"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignTop="@+id/autocomplete_fragment"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:clickable="false"
+                android:max="100"
+                android:progress="81"
+                android:progressDrawable="@android:color/transparent"
+                android:thumb="@drawable/thumb_trending_places" >
+            </com.takeapeek.common.SlideButton>
+-->
+
             <TextView
                 android:id="@+id/textview_trending"
                 android:layout_width="110dp"

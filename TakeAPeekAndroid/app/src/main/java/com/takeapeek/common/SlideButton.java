@@ -1,6 +1,7 @@
 package com.takeapeek.common;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -10,6 +11,9 @@ public class SlideButton extends SeekBar
 {
     private Drawable thumb;
     private SlideButtonListener listener;
+
+    private int mMax = 81;
+    private int mMin = 19;
 
     public SlideButton(Context context, AttributeSet attrs)
     {
@@ -28,18 +32,15 @@ public class SlideButton extends SeekBar
     {
         if (event.getAction() == MotionEvent.ACTION_DOWN)
         {
-            if (thumb.getBounds().contains((int) event.getX(), (int) event.getY()))
+            float eventX = event.getX();
+            float eventY = event.getY();
+            Rect thumbBounds = thumb.getBounds();
+
+            if (thumbBounds.contains((int) eventX, (int) eventY))
             {
                 super.onTouchEvent(event);
 
-                if (getProgress() < 50)
-                {
-                    setProgress(50);
-                }
-                else if (getProgress() > 70)
-                {
-                    setProgress(70);
-                }
+                handleSlide(true);
             }
             else
             {
@@ -48,12 +49,28 @@ public class SlideButton extends SeekBar
         }
         else if (event.getAction() == MotionEvent.ACTION_UP)
         {
-            if (getProgress() < 20)
+            handleSlide(false);
+
+            if (getProgress() < mMin + 5)
             {
-                handleSlide();
+                handleFullSlide();
             }
 
-            setProgress(82);
+            setProgress(mMax);
+        }
+        else if (event.getAction() == MotionEvent.ACTION_MOVE)
+        {
+            super.onTouchEvent(event);
+
+            int progress = getProgress();
+            if (progress < mMin)
+            {
+                setProgress(mMin);
+            }
+            else if (progress > mMax)
+            {
+                setProgress(mMax);
+            }
         }
         else
         {
@@ -63,11 +80,19 @@ public class SlideButton extends SeekBar
         return true;
     }
 
-    private void handleSlide()
+    private void handleSlide(boolean hide)
     {
         if(listener != null)
         {
-            listener.handleSlide();
+            listener.handleSlide(hide);
+        }
+    }
+
+    private void handleFullSlide()
+    {
+        if(listener != null)
+        {
+            listener.handleFullSlide();
         }
     }
 
