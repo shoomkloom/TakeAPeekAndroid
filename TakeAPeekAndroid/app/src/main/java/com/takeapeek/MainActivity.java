@@ -19,6 +19,7 @@ import android.view.View.OnClickListener;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.takeapeek.Walkthrough.WalkthroughActivity;
 import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
@@ -120,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         FloatingActionButton fabmap = (FloatingActionButton) findViewById(R.id.fabmap);
         fabmap.setOnClickListener(onClickListener);
+
+        FloatingActionButton fabwalkthrough = (FloatingActionButton) findViewById(R.id.fabwalkthrough);
+        fabwalkthrough.setOnClickListener(onClickListener);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -366,6 +370,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final Intent intentUserMapActivity = new Intent(MainActivity.this, UserMapActivity.class);
                     intentUserMapActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentUserMapActivity);
+
+                    break;
+
+
+                case R.id.fabwalkthrough:
+                    logger.info("onClick: fabwalkthrough");
+
+                    final Intent intentWalkthroughActivity = new Intent(MainActivity.this, WalkthroughActivity.class);
+                    intentWalkthroughActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentWalkthroughActivity);
 
                     break;
 

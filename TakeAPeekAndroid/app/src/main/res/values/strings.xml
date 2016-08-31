@@ -163,6 +163,14 @@
     <string name="textview_notification_time_one_day">1 day ago</string>
     <string name="textview_notification_time_days">%1$d days ago</string>
     <string name="notifications_requested_peek_to">Sent peek request to %1$s</string>
+    <string name="notification_content_title_request">Peek Request</string>
+    <string name="notification_content_text_request">%1$s sent you a peek request</string>
+    <string name="notification_content_title_response">Peek Response</string>
+    <string name="notification_content_text_response">%1$s sent you a peek response</string>
+    <string name="notification_content_title_peek">New Peek</string>
+    <string name="notification_content_text_peek">%1$s created a new peek</string>
+    <string name="notification_content_title_follow">New Follower</string>
+    <string name="notification_content_text_follow">%1$s is following you</string>
 
     <!-- Notification popup activity -->
     <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
@@ -180,4 +188,15 @@
     <string name="error_request_trending_places">There was an error getting Trending Places, please try again later.</string>
     <string name="textview_places_empty">Could not get the list of Trending Places right now, please try again later.</string>
     <string name="place_number_of_peeks">%1$d peeks</string>
+
+    <!-- Walkthrough -->
+    <string name="walkthrough01"><b>TakeAPeek</b> lets you see what\npeople are doing right now,\nin places you care about</string>
+    <string name="walkthrough02">Peek short clips that\nwere created in the last hour</string>
+    <string name="walkthrough03">Anonymously view,\nrequest and create Peeks</string>
+    <string name="walkthrough04">Find places to peek</string>
+    <string name="walkthrough05">Peek with a simple click</string>
+    <string name="walkthrough06">We\'ll do the rest</string>
+    <string name="skip">Skip</string>
+    <string name="lets_go">Let\'s go!</string>
+
 </resources>

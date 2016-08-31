@@ -43,4 +43,15 @@
         android:tint="@color/tap_white"
         />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabwalkthrough"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginRight="145dp"
+        android:src="@drawable/ic_trending_places"
+        android:tint="@color/tap_white"
+    />
+
 </android.support.design.widget.CoordinatorLayout>

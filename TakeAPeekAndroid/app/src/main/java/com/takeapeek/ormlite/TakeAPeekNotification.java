@@ -29,4 +29,10 @@ public class TakeAPeekNotification
 
     @DatabaseField(columnName = "relatedPeekJson")
     public String relatedPeekJson = null;
+
+    @DatabaseField(columnName = "notificationIntId")
+    public int notificationIntId = 0;
+
+    @DatabaseField(dataType= DataType.BOOLEAN, columnName = "notified")
+    public boolean notified = false;
 }

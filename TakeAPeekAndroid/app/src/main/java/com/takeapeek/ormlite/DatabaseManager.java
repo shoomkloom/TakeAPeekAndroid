@@ -75,27 +75,27 @@ public class DatabaseManager
 		}
 	}
 	
-	public TakeAPeekContact GetTakeAPeekContactWithId(int takeAPeekContactId) 
+	public TakeAPeekContact GetTakeAPeekContactWithId(int takeAPeekContactId)
 	{
 		//Do not lock this function
-		
+
 		logger.debug("GetTakeAPeekContactWithId(.) Invoked");
-		
+
 		TakeAPeekContact takeAPeekContact = null;
-		
-		try 
+
+		try
 		{
 			takeAPeekContact = getHelper().GetTakeAPeekContactDao().queryForId(takeAPeekContactId);
 		}
-		catch (SQLException e) 
+		catch (SQLException e)
 		{
 			Helper.Error(logger, "SQLException", e);
 		}
-		
+
 		return takeAPeekContact;
 	}
-	
-	public void DeleteTakeAPeekContact(TakeAPeekContact takeAPeekContact) 
+
+	public void DeleteTakeAPeekContact(TakeAPeekContact takeAPeekContact)
 	{
 		//Do not lock this function
 		

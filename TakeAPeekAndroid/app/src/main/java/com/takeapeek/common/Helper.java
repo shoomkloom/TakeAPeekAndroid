@@ -17,6 +17,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -119,10 +120,20 @@ public class Helper
 
 	static public synchronized int getNotificationIDCounter(SharedPreferences sharedPreferences)
 	{
-		int uniqueIndex = GetUniqueIndex(sharedPreferences);
-		uniqueIndex++;
-		SetUniqueIndex(sharedPreferences.edit(), uniqueIndex);
-		
+        lockNotifications.lock();
+        int uniqueIndex = 0;
+
+        try
+        {
+            uniqueIndex = GetUniqueIndex(sharedPreferences);
+            uniqueIndex++;
+            SetUniqueIndex(sharedPreferences.edit(), uniqueIndex);
+        }
+        finally
+        {
+            lockNotifications.unlock();
+        }
+
 		return uniqueIndex;
 	}
 	
@@ -1261,6 +1272,16 @@ public class Helper
 	    paint.setTextSize(scaledPx);
 	    
 	    return paint.measureText(text);
+    }
+
+    public static int dipToPx(int dp)
+    {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static int pxToDip(int px)
+    {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
     
     public static Bitmap GetRoundedCornerBitmap(Context context, Bitmap bitmap, float roundPx)

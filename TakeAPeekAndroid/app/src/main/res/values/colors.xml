@@ -7,7 +7,8 @@
     <color name="tap_lightgray">#8c8c8c</color>
     <color name="tap_lightlightgray">#afafaf</color>
     <color name="tap_darkgray">#323232</color>
-    <color name="tap_darkgray_faded">#DD282828</color>
+    <color name="tap_darkgray_faded">#AA282828</color>
+    <color name="tap_black_faded">#55000000</color>
     <color name="tap_gray">#303030</color>
     <color name="tap_gray_faded">#AA303030</color>
     <color name="tap_gray_extra_faded">#44303030</color>
