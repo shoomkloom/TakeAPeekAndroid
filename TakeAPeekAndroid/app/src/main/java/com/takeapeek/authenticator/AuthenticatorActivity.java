@@ -327,9 +327,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     
     private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
     private Bundle mResultBundle = null;
-    
-	private String mTrackerScreenName = "AuthenticatorActivity";
-    
+
     /**
      * Set the result that is to be sent as the result of the request that caused this
      * Activity to be launched. If result is null or this method is never called then
