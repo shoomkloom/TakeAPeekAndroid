@@ -19,7 +19,7 @@ import android.view.View.OnClickListener;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.takeapeek.Walkthrough.WalkthroughActivity;
+import com.takeapeek.walkthrough.WalkthroughActivity;
 import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;

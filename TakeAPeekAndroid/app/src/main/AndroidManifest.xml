@@ -216,7 +216,7 @@
             android:name=".trendingplaces.TrendingPlacesActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".Walkthrough.WalkthroughActivity"
+        <activity android:name=".walkthrough.WalkthroughActivity"
                   android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
