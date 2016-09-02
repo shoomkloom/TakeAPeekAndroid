@@ -6,7 +6,7 @@
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           tools:context="com.takeapeek.notifications.NotificationPopupActivity"
-          android:background="#aa000000"
+          android:background="@color/tap_yellow_faded2"
           android:padding="30dp">
 
     <ImageView
@@ -16,18 +16,11 @@
         android:src="@drawable/button_close"
         android:layout_alignParentRight="true" />
 
-    <View
-        android:layout_width="250dp"
-        android:layout_height="10dp"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/rounded_corners_top"/>
-
     <!-- Map and overlays -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"
@@ -35,7 +28,7 @@
 
     <TextView
         android:id = "@+id/request_displayname_on_map"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:textSize="20sp"
         android:textColor="@color/tap_white"
@@ -52,7 +45,7 @@
 
     <TextView
         android:id = "@+id/request_location_on_map"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:textSize="12sp"
         android:textColor="@color/tap_white"
@@ -67,21 +60,30 @@
         android:background="@drawable/gradient_bottom"
         android:visibility="gone"/>
 
+    <View
+        android:id = "@+id/corner_overlay_on_map"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginTop="60dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_corner_overlay_yellow"
+        android:visibility="gone" />
+
     <!-- END Map and overlays -->
 
     <!-- Preview Peek -->
     <RelativeLayout
         android:id="@+id/peek_notification_preview"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"
         android:background="@color/tap_white"
-        android:visibility="gone">
+        android:visibility="gone" >
 
         <RelativeLayout
             android:id = "@+id/user_peek_notification_thumbnail_layout"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_centerHorizontal="true" >
 
@@ -103,7 +105,7 @@
 
         <TextView
             android:id = "@+id/user_peek_notification_thumbnail_time"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textSize="12sp"
             android:padding="5dp"
@@ -116,7 +118,7 @@
 
         <TextView
             android:id = "@+id/user_peek_notification_thumbnail_address"
-            android:layout_width="250dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignBottom="@+id/user_peek_notification_thumbnail_layout"
             android:layout_centerHorizontal="true"
@@ -131,12 +133,19 @@
             android:paddingBottom="5dp"
             android:background="@drawable/gradient_bottom"/>
 
+        <View
+            android:id = "@+id/corner_overlay_on_preview"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/rounded_corner_overlay_yellow" />
+
     </RelativeLayout>
     <!-- END Preview Peek -->
 
     <RelativeLayout
         android:id="@+id/titles"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_marginTop="310dp"
         android:layout_centerHorizontal="true"
@@ -173,7 +182,7 @@
 
     <RelativeLayout
         android:id="@+id/buttons"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/titles"
         android:layout_centerHorizontal="true"

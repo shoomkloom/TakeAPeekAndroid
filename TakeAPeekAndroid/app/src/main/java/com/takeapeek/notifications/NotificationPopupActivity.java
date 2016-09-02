@@ -149,6 +149,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                             .build();
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
+                    findViewById(R.id.corner_overlay_on_map).setVisibility(View.VISIBLE);
 
                     TextView textViewDisplayNameRequest = (TextView)findViewById(R.id.request_displayname_on_map);
                     textViewDisplayNameRequest.setVisibility(View.VISIBLE);
@@ -251,6 +252,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                             .build();
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
+                    findViewById(R.id.corner_overlay_on_map).setVisibility(View.VISIBLE);
 
                     TextView textViewDisplayNameFollow = (TextView)findViewById(R.id.request_displayname_on_map);
                     textViewDisplayNameFollow.setVisibility(View.VISIBLE);

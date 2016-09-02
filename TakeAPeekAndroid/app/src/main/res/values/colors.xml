@@ -25,6 +25,8 @@
     <color name="tap_green">#55af2d</color>
     <color name="tap_lightgreen">#55cc41</color>
     <color name="tap_yellow_faded">#ccffeb5f</color>
+    <color name="tap_yellow_faded2">#eeffeb5f</color>
+    <color name="tap_yellow">#ffeb5f</color>
     <color name="tap_dark_yellow_faded">#ccffd755</color>
     <color name="tap_black">#000000</color>
 
