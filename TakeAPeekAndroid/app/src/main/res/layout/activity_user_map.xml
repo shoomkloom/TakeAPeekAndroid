@@ -159,8 +159,6 @@
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:padding="3dp"
-                android:translationZ="4dp"
-                android:stateListAnimator="@anim/button_elevation"
                 android:textColor="@color/tap_white"
                 android:text="@string/trending_locations"/>
 
