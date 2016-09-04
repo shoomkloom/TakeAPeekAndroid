@@ -662,6 +662,21 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 
                 return null;
             }
+
+            @Override
+            protected void onPostExecute(ResponseObject responseObject)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                try
+                {
+                    String responseError = responseObject.error;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When trying to register FCM token", e);
+                }
+            }
         }.execute();
     }
     

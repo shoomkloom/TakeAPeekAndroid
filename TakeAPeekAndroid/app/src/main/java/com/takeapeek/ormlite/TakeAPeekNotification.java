@@ -35,4 +35,8 @@ public class TakeAPeekNotification
 
     @DatabaseField(dataType= DataType.BOOLEAN, columnName = "notified")
     public boolean notified = false;
+
+    //Helper members
+    public String srcProfileId = null;
+    public String relatedPeekId = null;
 }

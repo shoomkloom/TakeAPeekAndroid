@@ -1,5 +1,6 @@
 package com.takeapeek.common;
 
+import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import java.util.ArrayList;
@@ -21,4 +22,6 @@ public class ResponseObject
     public ArrayList<RelationObject> relations;
 
     public ArrayList<TrendingPlaceObject> trendingPlaces;
+
+    public TakeAPeekNotification pushNotificationData;
 }

@@ -1,5 +1,7 @@
 package com.takeapeek.notifications;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -96,6 +98,11 @@ public class NotificationPopupActivity extends FragmentActivity implements
             String notificationID = intent.getStringExtra(Constants.PUSH_BROADCAST_EXTRA_ID);
 
             mTakeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotification(notificationID);
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.cancel(mTakeAPeekNotification.notificationIntId);
         }
         else
         {

@@ -76,29 +76,50 @@ public class TAPFcmListenerService extends FirebaseMessagingService
             if (takeAPeekNotificationHash == null ||
                     takeAPeekNotificationHash.containsKey(remoteMessageData.get("notificationId")) == false)
             {
-                logger.info("TakeAPeekNotification not found in DB, adding a new one");
+                try
+                {
+                    logger.info("TakeAPeekNotification not found in DB, adding a new one");
 
-                int notificationIntId = Helper.getNotificationIDCounter(sharedPreferences);
+                    int notificationIntId = Helper.getNotificationIDCounter(sharedPreferences);
 
-                TakeAPeekNotification takeAPeekNotification = new TakeAPeekNotification();
-                takeAPeekNotification.notificationId = remoteMessageData.get("notificationId");
-                takeAPeekNotification.type = remoteMessageData.get("type");
-                takeAPeekNotification.srcProfileJson = remoteMessageData.get("srcProfileJson");
-                String creationTimeStr = remoteMessageData.get("creationTime");
-                takeAPeekNotification.creationTime = Long.parseLong(creationTimeStr);
-                takeAPeekNotification.relatedPeekJson = remoteMessageData.get("relatedPeekJson");
-                takeAPeekNotification.notificationIntId = notificationIntId;
+                    TakeAPeekNotification takeAPeekNotification = new TakeAPeekNotification();
+                    takeAPeekNotification.notificationId = remoteMessageData.get("notificationId");
+                    takeAPeekNotification.type = remoteMessageData.get("type");
+                    takeAPeekNotification.srcProfileId = remoteMessageData.get("srcProfileId");
+                    String creationTimeStr = remoteMessageData.get("creationTime");
+                    takeAPeekNotification.creationTime = Long.parseLong(creationTimeStr);
+                    takeAPeekNotification.relatedPeekId = remoteMessageData.get("relatedPeekId");
+                    takeAPeekNotification.notificationIntId = notificationIntId;
 
-                DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
+                    //Get the Push Notification Data with these srcProfileId and relatedPeekId
+                    String accountUsername = Helper.GetTakeAPeekAccountUsername(TAPFcmListenerService.this);
+                    String accountPassword = Helper.GetTakeAPeekAccountPassword(TAPFcmListenerService.this);
 
-                //Show notification
-                sendNotification(takeAPeekNotification.notificationId);
+                    ResponseObject responseObject = Transport.GetPushNotifcationData(
+                            TAPFcmListenerService.this, accountUsername, accountPassword,
+                            takeAPeekNotification.srcProfileId, takeAPeekNotification.relatedPeekId, sharedPreferences);
 
-                //Broadcast notification
-                logger.info("Broadcasting intent: " + Constants.PUSH_BROADCAST_ACTION);
-                Intent broadcastIntent = new Intent(Constants.PUSH_BROADCAST_ACTION);
-                broadcastIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, takeAPeekNotification.notificationId);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+                    if(responseObject != null && responseObject.pushNotificationData != null)
+                    {
+                        takeAPeekNotification.srcProfileJson = responseObject.pushNotificationData.srcProfileJson;
+                        takeAPeekNotification.relatedPeekJson = responseObject.pushNotificationData.relatedPeekJson;
+
+                        DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
+
+                        //Show notification
+                        sendNotification(takeAPeekNotification.notificationId);
+
+                        //Broadcast notification
+                        logger.info("Broadcasting intent: " + Constants.PUSH_BROADCAST_ACTION);
+                        Intent broadcastIntent = new Intent(Constants.PUSH_BROADCAST_ACTION);
+                        broadcastIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, takeAPeekNotification.notificationId);
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+                    }
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When handling new notification.", e);
+                }
             }
         }
         finally
@@ -166,7 +187,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        notificationBuilder.setSmallIcon(R.mipmap.ic_notification);
 
         if(thumbnailBitmap != null)
         {

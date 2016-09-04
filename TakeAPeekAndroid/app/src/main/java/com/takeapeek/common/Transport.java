@@ -324,6 +324,47 @@ public class Transport
         return responseObject;
     }
 
+    public static ResponseObject GetPushNotifcationData(Context context, String userName, String password, String srcProfileId, String relatedPeekId, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetPushNotifcationData(......) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetPushNotifcationData(......) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_push_notification_data"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("src_profile_id", srcProfileId));
+
+            if(relatedPeekId == null)
+            {
+                relatedPeekId = "";
+            }
+            nameValuePairs.add(new NameValuePair("related_peek_id", relatedPeekId));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetPushNotifcationData(......)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetPushNotifcationData(......) - after unlock");
+        }
+
+        return responseObject;
+    }
+
     public static String GetPeekVideoStreamURL(Context context, String username, String password, String peekId) throws Exception
     {
         logger.debug("GetPeekVideoStreamURL(......) Invoked - before lock");
@@ -761,8 +802,8 @@ public class Transport
         int nameValuePairsSize = nameValuePairs.size();
         for (int i = 0; i < nameValuePairsSize; i++)
         {
-            requestStr += nameValuePairs.get(i).Name;
-            requestStr += "=" + URLEncoder.encode(nameValuePairs.get(i).Value, "UTF-8");
+            requestStr += nameValuePairs.get(i).Name + "=";
+            requestStr += URLEncoder.encode(nameValuePairs.get(i).Value, "UTF-8");
 
             if (nameValuePairsSize > 1 && i < nameValuePairsSize - 1)
             {
