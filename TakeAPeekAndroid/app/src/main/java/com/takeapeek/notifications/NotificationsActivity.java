@@ -1,5 +1,6 @@
 package com.takeapeek.notifications;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -83,7 +84,6 @@ public class NotificationsActivity extends AppCompatActivity
         mListViewNotificationList = (ListView)findViewById(R.id.listview_notifications_list);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_notifications_empty);
 
-
         if(takeAPeekNotificationArrayList.size() == 0)
         {
             mListViewNotificationList.setVisibility(View.GONE);
@@ -100,6 +100,12 @@ public class NotificationsActivity extends AppCompatActivity
 
             mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_MINUTE);
         }
+
+        //Cancel all notifications on taskbar
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.cancelAll();
     }
 
     private ArrayList<TakeAPeekNotification> GetTakeAPeekNotificationArray()
