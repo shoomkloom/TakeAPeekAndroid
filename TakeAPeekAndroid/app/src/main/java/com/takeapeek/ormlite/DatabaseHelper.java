@@ -38,6 +38,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 	private Dao<TakeAPeekContactUpdateTimes, Integer> mTakeAPeekContactUpdateTimesDao = null;
 	private Dao<TakeAPeekObject, Integer> mTakeAPeekObjectDao = null;
     private Dao<TakeAPeekNotification, Integer> mTakeAPeekNotificationDao = null;
+    private Dao<TakeAPeekRelation, Integer> mTakeAPeekRelationDao = null;
+    private Dao<TakeAPeekSendObject, Integer> mTakeAPeekSendObjectDao = null;
 
 	public DatabaseHelper(Context context) 
 	{
@@ -53,6 +55,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 			TableUtils.createTable(connectionSource, TakeAPeekContactUpdateTimes.class);
 			TableUtils.createTable(connectionSource, TakeAPeekObject.class);
             TableUtils.createTable(connectionSource, TakeAPeekNotification.class);
+            TableUtils.createTable(connectionSource, TakeAPeekRelation.class);
+            TableUtils.createTable(connectionSource, TakeAPeekSendObject.class);
 		}
 		catch (Exception e) 
 		{
@@ -154,5 +158,41 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
         }
 
         return mTakeAPeekNotificationDao;
+    }
+
+    //TakeAPeekRelation
+    public Dao<TakeAPeekRelation, Integer> GetTakeAPeekRelationDao()
+    {
+        if (null == mTakeAPeekRelationDao)
+        {
+            try
+            {
+                mTakeAPeekRelationDao = getDao(TakeAPeekRelation.class);
+            }
+            catch (java.sql.SQLException e)
+            {
+                Helper.Error(logger, "EXCEPTION: in GetTakeAPeekRelationDao", e);
+            }
+        }
+
+        return mTakeAPeekRelationDao;
+    }
+
+    //TakeAPeekSendObject
+    public Dao<TakeAPeekSendObject, Integer> GetTakeAPeekSendObjectDao()
+    {
+        if (null == mTakeAPeekSendObjectDao)
+        {
+            try
+            {
+                mTakeAPeekSendObjectDao = getDao(TakeAPeekSendObject.class);
+            }
+            catch (java.sql.SQLException e)
+            {
+                Helper.Error(logger, "EXCEPTION: in GetTakeAPeekSendObjectDao", e);
+            }
+        }
+
+        return mTakeAPeekSendObjectDao;
     }
 }

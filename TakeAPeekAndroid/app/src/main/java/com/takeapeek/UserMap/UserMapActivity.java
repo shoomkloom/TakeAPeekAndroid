@@ -58,7 +58,7 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
-import com.takeapeek.common.RelationObject;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
@@ -415,12 +415,12 @@ public class UserMapActivity extends FragmentActivity implements
                                     logger.info(String.format("Got %d profiles in the bounds", responseObject.profiles.size()));
 
                                     //Collect
-                                    HashMap<String, RelationObject> relationObjectHash = new HashMap<String, RelationObject>();
+                                    HashMap<String, TakeAPeekRelation> relationObjectHash = new HashMap<String, TakeAPeekRelation>();
                                     if(responseObject.relations != null)
                                     {
-                                        for(RelationObject relationObject : responseObject.relations)
+                                        for(TakeAPeekRelation takeAPeekRelation : responseObject.relations)
                                         {
-                                            relationObjectHash.put(relationObject.targetId, relationObject);
+                                            relationObjectHash.put(takeAPeekRelation.targetId, takeAPeekRelation);
                                         }
                                     }
 

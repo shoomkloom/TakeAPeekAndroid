@@ -118,6 +118,15 @@ public class SyncAdapterHelper implements Runnable,
             {
                 Helper.Error(logger, "EXCEPTION! When calling UploadPendingPeeks()", e);
             }
+
+            try
+            {
+                Helper.UpdateRelations(mContext, mSharedPreferences);
+            }
+            catch(Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
+            }
 		} 
 		catch (Exception e) 
 		{

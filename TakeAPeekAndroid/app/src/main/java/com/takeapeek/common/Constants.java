@@ -87,7 +87,8 @@ public class Constants
         None,
         Follow,
         Block,
-        Unfollow
+        Unfollow,
+        Unblock
     }
 
     //TakeAPeekContact constants
@@ -227,6 +228,8 @@ public class Constants
     public static final String CURRENT_UNIQUE_INDEX = "CurrentUniqueIndex";
     public static final String USER_NUMBER = "UserNumber";
     public static final String DISPLAY_NAME_SUCCESS = "DisplayNameSuccess";
+    public static final String PROFILE_ID = "ProfileId";
+    public static final String DISPLAY_NAME = "DisplayName";
     
     public static final int OLDCURSOR_CONTACT_QUATA = 100;
     public static final int UPDATECURSOR_CONTACT_QUATA = 100;

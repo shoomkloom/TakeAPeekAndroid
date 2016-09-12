@@ -41,12 +41,10 @@ import com.takeapeek.R;
 import com.takeapeek.common.AutoFitTextureView;
 import com.takeapeek.common.CameraPreviewBGActivity;
 import com.takeapeek.common.Constants;
-import com.takeapeek.common.Constants.ContactTypeEnum;
 import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.Helper.FontTypeEnum;
 import com.takeapeek.common.PhoneNumberFormattingTextWatcher;
-import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
@@ -274,12 +272,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                             UpdateUI();
                         }
 			        	
-			    		ProfileObject takeAPeekContact = Helper.LoadTakeAPeekContact(this, Constants.DEFAULT_CONTACT_NAME);
-			        	if(takeAPeekContact == null)
-			        	{
-			        		takeAPeekContact = new ProfileObject(ContactTypeEnum.profile);
-			        	}
-			        	
 			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
 			        	Helper.setTypeface(this, loginTextviewToUse, FontTypeEnum.lightFont);
 			        	
@@ -295,27 +287,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			        	mCountrySpinner.setAdapter(new CountrySpinnerAdapter(this, R.layout.country_spinner_item, countryNames, mCountryPrefixCodes, countryISOCodes));
 			        	mCountrySpinner.setOnItemSelectedListener(onItemSelectedListener);
 
-			        	// Get the current code and select the right one from the spinner.
-			        	if(takeAPeekContact != null && takeAPeekContact.countryCode != null)
-			        	{
-			        		try
-			        		{
-				        		int countryCodeInteger = Integer.decode(takeAPeekContact.countryCode);
-				        		for (int i=0;i<mCountryPrefixCodes.length;i++) 
-				        		{
-				        			if(mCountryPrefixCodes[i] == countryCodeInteger)
-				        			{
-				        				mCountryArrayPosition = i;
-				        				break;
-				        			}
-				        		}
-			        		}
-			        		catch(Exception e)
-			        		{
-			        			Helper.Error(logger, "EXCEPTION: When trying to set previous country prefix spinner selection", e);
-			        		}
-			        	}
-			        	
 			        	if(mCountryArrayPosition == 0)
 			        	{
 				        	TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE); 
@@ -331,8 +302,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			            mMobileNumber = (EditText)(findViewById(R.id.edittext_number));
 			            Helper.setTypeface(this, mMobileNumber, FontTypeEnum.lightFont); 
 			            mMobileNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher(mNumberFormattingTextHandler));
-		            	mMobileNumber.setText(takeAPeekContact.numberMobile);
-		            	//@@MobileNumber.requestFocus();
                         mMobileNumber.setText(Helper.GetUserNumber(mSharedPreferences));
                         mMobileNumber.setOnEditorActionListener(new EditText.OnEditorActionListener()
                         {
@@ -420,8 +389,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 
 			        	mLoginTextviewProgressBottom = (TextView)findViewById(R.id.login_textview_progress_bottom);
 			        	Helper.setTypeface(this, mLoginTextviewProgressBottom, FontTypeEnum.lightFont);
-			        	
-			        	Helper.SaveTakeAPeekContact(this, Constants.DEFAULT_CONTACT_NAME, takeAPeekContact);
 			        	
 			        	new PhoneNumberUtilInitAsyncTask(mPhoneNumberUtil).execute();
 			        	
@@ -1308,6 +1275,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                     setResult(RESULT_OK);
 
                     Helper.SetDisplayNameSuccess(mSharedPreferences.edit(), true);
+                    Helper.SetProfileDisplayName(mSharedPreferences.edit(), mEditTextDisplayName.getText().toString());
 
                     finish();
 
@@ -1455,24 +1423,6 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
 	    	}
 		}
     		
-		try
-		{
-			ProfileObject takeAPeekContact = Helper.LoadTakeAPeekContact(mAuthenticatorActivity, Constants.DEFAULT_CONTACT_NAME);
-			if(takeAPeekContact != null)
-			{
-	    		//Update the Mobile Number, National Significant Number and Country Prefix in the profile
-    			takeAPeekContact.numberMobile = mMobile;
-    			takeAPeekContact.countryCode = mPrefix;
-				
-				Helper.SaveTakeAPeekContact(mAuthenticatorActivity, Constants.DEFAULT_CONTACT_NAME, takeAPeekContact);
-			}
-		}
-		catch(Exception e)
-		{
-			Helper.Error(logger, "EXCEPTION: when updating profile contact", e);
-			return Constants.AUTHENTICATION_FAIL;
-		}
-
     	try
 		{
     		//Create the profile and ask for SMS with verification code

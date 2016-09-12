@@ -1,0 +1,149 @@
+package com.takeapeek.profile;
+
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.takeapeek.R;
+import com.takeapeek.common.Constants;
+import com.takeapeek.common.Helper;
+import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekRelation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class BlockedActivity extends AppCompatActivity
+{
+    static private final Logger logger = LoggerFactory.getLogger(BlockedActivity.class);
+
+    SharedPreferences mSharedPreferences = null;
+    Handler mHandler = new Handler();
+
+    ListView mListViewBlockedList = null;
+    TextView mTextViewEmptyList = null;
+
+    BlockedItemAdapter mBlockedItemAdapter = null;
+
+    static public ReentrantLock lockBroadcastReceiver = new ReentrantLock();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_blocked);
+
+        logger.debug("onCreate(.) Invoked");
+
+        mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        DatabaseManager.init(this);
+
+        //List View
+        mListViewBlockedList = (ListView)findViewById(R.id.listview_blocked_list);
+        mTextViewEmptyList = (TextView)findViewById(R.id.textview_blocked_empty);
+
+        RefreshAdapterData();
+
+        //Get the updated relation list and update the list
+        new AsyncTask<BlockedActivity, Void, Boolean>()
+        {
+            BlockedActivity mBlockedActivity = null;
+
+            @Override
+            protected Boolean doInBackground(BlockedActivity... params)
+            {
+                mBlockedActivity = params[0];
+
+                try
+                {
+                    Helper.UpdateRelations(mBlockedActivity, mSharedPreferences);
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                if(result == true)
+                {
+                    RefreshAdapterData();
+                }
+            }
+        }.execute(BlockedActivity.this);
+    }
+
+    public void RefreshAdapterData()
+    {
+        logger.debug("RefreshAdapterData() Invoked");
+
+        List<TakeAPeekRelation> takeAPeekBlockedList = GetTakeAPeekBlockedList();
+
+        if(mBlockedItemAdapter == null)
+        {
+            mBlockedItemAdapter = new BlockedItemAdapter(this, R.layout.item_blocked, takeAPeekBlockedList);
+            mListViewBlockedList.setAdapter(mBlockedItemAdapter);
+        }
+        else
+        {
+            //Refresh adapter list
+            mBlockedItemAdapter.clear();
+            mBlockedItemAdapter.addAll(takeAPeekBlockedList);
+            mBlockedItemAdapter.notifyDataSetChanged();
+        }
+
+        if(takeAPeekBlockedList == null || takeAPeekBlockedList.size() == 0)
+        {
+            mListViewBlockedList.setVisibility(View.GONE);
+            mTextViewEmptyList.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mListViewBlockedList.setVisibility(View.VISIBLE);
+            mTextViewEmptyList.setVisibility(View.GONE);
+        }
+    }
+
+    private List<TakeAPeekRelation> GetTakeAPeekBlockedList()
+    {
+        logger.debug("GetTakeAPeekBlockedArray() Invoked");
+
+        List<TakeAPeekRelation> takeAPeekBlockedArrayList =
+                DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(
+                        Helper.GetProfileId(mSharedPreferences));
+
+        return takeAPeekBlockedArrayList;
+    }
+
+    @Override
+    public void onPause()
+    {
+        logger.debug("onPause() Invoked");
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        logger.debug("onResume() Invoked");
+
+        super.onResume();
+    }
+}

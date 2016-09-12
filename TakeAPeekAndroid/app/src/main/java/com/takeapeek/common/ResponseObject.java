@@ -1,5 +1,6 @@
 package com.takeapeek.common;
 
+import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
@@ -11,6 +12,8 @@ public class ResponseObject
 
     public String password;
 
+    public String profileId;
+
     public String validDisplayName; //Will be null if not valid
 
     public ArrayList<ProfileObject> followersList;
@@ -19,7 +22,7 @@ public class ResponseObject
 
     public ArrayList<TakeAPeekObject> peeks;
 
-    public ArrayList<RelationObject> relations;
+    public ArrayList<TakeAPeekRelation> relations;
 
     public ArrayList<TrendingPlaceObject> trendingPlaces;
 

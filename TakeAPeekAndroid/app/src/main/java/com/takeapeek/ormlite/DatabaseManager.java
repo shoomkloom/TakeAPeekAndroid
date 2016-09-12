@@ -3,6 +3,7 @@ package com.takeapeek.ormlite;
 import android.content.Context;
 
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
 
@@ -24,6 +25,8 @@ public class DatabaseManager
 	static ReentrantLock lockTakeAPeekContactUpdateTimes = new ReentrantLock();
 	static ReentrantLock lockTakeAPeekObject = new ReentrantLock();
     static ReentrantLock lockTakeAPeekNotification = new ReentrantLock();
+    static ReentrantLock lockTakeAPeekRelation = new ReentrantLock();
+    static ReentrantLock lockTakeAPeekSendObject = new ReentrantLock();
 
 	static public void init(Context context) 
 	{
@@ -686,5 +689,445 @@ public class DatabaseManager
             lockTakeAPeekNotification.unlock();
             logger.debug("ClearAllTakeAPeekNotifications() - after unlock");
         }
+    }
+
+    //TakeAPeekRelation
+    public void AddTakeAPeekRelation(TakeAPeekRelation takeAPeekRelation)
+    {
+        //Do not lock this function
+
+        logger.debug("AddTakeAPeekRelation(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekRelationDao().create(takeAPeekRelation);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public TakeAPeekRelation GetTakeAPeekRelationWithId(int takeAPeekRelationId)
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekRelationWithId(.) Invoked");
+
+        TakeAPeekRelation takeAPeekRelation = null;
+
+        try
+        {
+            takeAPeekRelation = getHelper().GetTakeAPeekRelationDao().queryForId(takeAPeekRelationId);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekRelation;
+    }
+
+    public void DeleteTakeAPeekRelation(TakeAPeekRelation takeAPeekRelation)
+    {
+        //Do not lock this function
+
+        logger.debug("DeleteTakeAPeekRelation(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekRelationDao().delete(takeAPeekRelation);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public void UpdateTakeAPeekRelation(TakeAPeekRelation takeAPeekRelation)
+    {
+        //Do not lock this function
+
+        logger.debug("UpdateTakeAPeekRelation(.) Invoked");
+
+        try
+        {
+            int result = getHelper().GetTakeAPeekRelationDao().update(takeAPeekRelation);
+            logger.debug(String.format("%d rows were updated", result));
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    //TakeAPeekRelation helper functions
+    public List<TakeAPeekRelation> GetTakeAPeekRelationList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekRelationList() Invoked");
+
+        List<TakeAPeekRelation> takeAPeekRelationList = null;
+
+        try
+        {
+            takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryForAll();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekRelationList;
+    }
+
+    public TakeAPeekRelation GetTakeAPeekRelation(String relationId)
+    {
+        logger.debug("GetTakeAPeekRelation(.) Invoked - before lock");
+
+        TakeAPeekRelation takeAPeekRelation = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelation(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelation = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("notificationId", relationId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekRelation with relationID=%s", relationId), e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelation(.) - after unlock");
+        }
+
+        return takeAPeekRelation;
+    }
+
+    public List<TakeAPeekRelation> GetTakeAPeekRelationFollowing(String profileId)
+    {
+        logger.debug("GetTakeAPeekRelationFollowing(.) Invoked - before lock");
+
+        List<TakeAPeekRelation> takeAPeekRelationList = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelationFollowing(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("sourceId", profileId).query();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to query for Following", e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelationFollowing(.) - after unlock");
+        }
+
+        return takeAPeekRelationList;
+    }
+
+    public List<TakeAPeekRelation> GetTakeAPeekRelationFollowers(String profileId)
+    {
+        logger.debug("GetTakeAPeekRelationFollowers(.) Invoked - before lock");
+
+        List<TakeAPeekRelation> takeAPeekRelationList = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelationFollowers(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("targetId", profileId).query();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to query for Followers", e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelationFollowers(.) - after unlock");
+        }
+
+        return takeAPeekRelationList;
+    }
+
+    public List<TakeAPeekRelation> GetTakeAPeekRelationBlocked(String profileId)
+    {
+        logger.debug("GetTakeAPeekRelationBlocked(.) Invoked - before lock");
+
+        List<TakeAPeekRelation> takeAPeekRelationList = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelationBlocked(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("type", Constants.RelationTypeEnum.Block.name()).and().eq("targetId", profileId).query();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to query for Followers", e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelationBlocked(.) - after unlock");
+        }
+
+        return takeAPeekRelationList;
+    }
+
+    public void ClearAllTakeAPeekRelations()
+    {
+        logger.debug("ClearAllTakeAPeekRelations() - before lock");
+
+        lockTakeAPeekRelation.lock();
+
+        try
+        {
+            logger.debug("ClearAllTakeAPeekRelations() - inside lock");
+
+            List<TakeAPeekRelation> takeAPeekRelationList = GetTakeAPeekRelationList();
+
+            if(takeAPeekRelationList != null)
+            {
+                for(TakeAPeekRelation takeAPeekRelation : takeAPeekRelationList)
+                {
+                    DeleteTakeAPeekRelation(takeAPeekRelation);
+                }
+            }
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("ClearAllTakeAPeekRelations() - after unlock");
+        }
+    }
+
+    //TakeAPeekSendObject helper functions
+    public void AddTakeAPeekSendObject(TakeAPeekSendObject takeAPeekSendObject)
+    {
+        //Do not lock this function
+        logger.debug("AddTakeAPeekSendObject(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekSendObjectDao().create(takeAPeekSendObject);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public TakeAPeekSendObject GetTakeAPeekSendObjectWithId(int takeAPeekSendObjectId)
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekSendObjectWithId(.) Invoked");
+
+        TakeAPeekSendObject takeAPeekSendObject = null;
+
+        try
+        {
+            takeAPeekSendObject = getHelper().GetTakeAPeekSendObjectDao().queryForId(takeAPeekSendObjectId);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekSendObject;
+    }
+
+    public void DeleteTakeAPeekSendObject(TakeAPeekSendObject takeAPeekSendObject)
+    {
+        //Do not lock this function
+        logger.debug("DeleteTakeAPeekSendObject(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekSendObjectDao().delete(takeAPeekSendObject);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public void UpdateTakeAPeekSendObject(TakeAPeekSendObject takeAPeekSendObject)
+    {
+        //Do not lock this function
+        logger.debug("UpdateTakeAPeekSendObject(.) Invoked");
+
+        try
+        {
+            int result = getHelper().GetTakeAPeekSendObjectDao().update(takeAPeekSendObject);
+            logger.debug(String.format("%d rows were updated", result));
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    //TakeAPeekSendObject helper functions
+    public List<TakeAPeekSendObject> GetTakeAPeekSendObjectList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekSendObjectList() Invoked");
+
+        List<TakeAPeekSendObject> takeAPeekSendObjectList = null;
+
+        try
+        {
+            takeAPeekSendObjectList = getHelper().GetTakeAPeekSendObjectDao().queryForAll();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekSendObjectList;
+    }
+
+    public List<TakeAPeekSendObject> GetTakeAPeekSendObjectListByPositionDesc()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekSendObjectListByPositionDesc() Invoked");
+
+        List<TakeAPeekSendObject> takeAPeekSendObjectList = null;
+
+        try
+        {
+            QueryBuilder<TakeAPeekSendObject, Integer> queryBuilder = getHelper().GetTakeAPeekSendObjectDao().queryBuilder();
+            queryBuilder.orderBy("Position", false); //descending
+            takeAPeekSendObjectList = queryBuilder.query();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekSendObjectList;
+    }
+
+    public List<TakeAPeekSendObject> GetTakeAPeekSendObjectListByNumOfUsesDesc()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekSendObjectListByNumOfUsesDesc() Invoked");
+
+        List<TakeAPeekSendObject> takeAPeekSendObjectList = null;
+
+        try
+        {
+            QueryBuilder<TakeAPeekSendObject, Integer> queryBuilder = getHelper().GetTakeAPeekSendObjectDao().queryBuilder();
+            queryBuilder.orderBy("NumberOfUses", false); //descending
+            takeAPeekSendObjectList = queryBuilder.query();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekSendObjectList;
+    }
+
+    public HashMap<String, TakeAPeekSendObject> GetTakeAPeekSendObjectHash()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekSendObjectHash()");
+
+        HashMap<String, TakeAPeekSendObject> hashMap = new HashMap<String, TakeAPeekSendObject>();
+
+        List<TakeAPeekSendObject> takeAPeekSendObjectList  = GetTakeAPeekSendObjectList();
+
+        if(takeAPeekSendObjectList != null)
+        {
+            for (TakeAPeekSendObject takeAPeekSendObject : takeAPeekSendObjectList)
+            {
+                hashMap.put(takeAPeekSendObject.ActivityName, takeAPeekSendObject);
+            }
+        }
+
+        return hashMap;
+    }
+
+    public TakeAPeekSendObject GetTakeAPeekSendObject(String packageName)
+    {
+        logger.debug("GetTakeAPeekSendObject(.) Invoked - before lock");
+
+        TakeAPeekSendObject takeAPeekSendObject = null;
+
+        lockTakeAPeekSendObject.lock();
+        try
+        {
+            logger.debug("GetContactUpdateTimes(.) - inside lock");
+
+            HashMap<String, TakeAPeekSendObject> takeAPeekSendObjectHashMap = GetTakeAPeekSendObjectHash();
+
+            TakeAPeekSendObject foundTakeAPeekSendObject = takeAPeekSendObjectHashMap.get(packageName);
+
+            if(foundTakeAPeekSendObject != null)
+            {
+                takeAPeekSendObject = foundTakeAPeekSendObject;
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekSendObject with packageName=%s", packageName), e);
+        }
+        finally
+        {
+            lockTakeAPeekSendObject.unlock();
+            logger.debug("GetContactUpdateTimes(.) - after unlock");
+        }
+
+        return takeAPeekSendObject;
     }
 }

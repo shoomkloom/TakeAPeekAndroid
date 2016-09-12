@@ -1,5 +1,5 @@
 #
-# generated on 2016/09/02 08:06:54
+# generated on 2016/09/12 09:56:56
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -149,6 +149,87 @@ columnName=notificationIntId
 fieldName=notified
 columnName=notified
 dataPersister=BOOLEAN
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.takeapeek.ormlite.TakeAPeekRelation
+tableName=takeapeekrelation
+# --table-fields-start--
+# --field-start--
+fieldName=id
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=relationId
+columnName=relationId
+dataPersister=LONG
+# --field-end--
+# --field-start--
+fieldName=sourceId
+columnName=sourceId
+# --field-end--
+# --field-start--
+fieldName=sourceDisplayName
+columnName=sourceDisplayName
+# --field-end--
+# --field-start--
+fieldName=targetId
+columnName=targetId
+# --field-end--
+# --field-start--
+fieldName=targetDisplayName
+columnName=targetDisplayName
+# --field-end--
+# --field-start--
+fieldName=type
+columnName=type
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.takeapeek.ormlite.TakeAPeekSendObject
+tableName=takeapeeksendobject
+# --table-fields-start--
+# --field-start--
+fieldName=id
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=NumberOfUses
+columnName=NumberOfUses
+dataPersister=INTEGER
+# --field-end--
+# --field-start--
+fieldName=Position
+columnName=Position
+dataPersister=INTEGER
+# --field-end--
+# --field-start--
+fieldName=IntentSendType
+columnName=IntentSendType
+dataPersister=INTEGER
+# --field-end--
+# --field-start--
+fieldName=PackageName
+columnName=PackageName
+# --field-end--
+# --field-start--
+fieldName=ActivityName
+columnName=ActivityName
+# --field-end--
+# --field-start--
+fieldName=Label
+columnName=Label
+# --field-end--
+# --field-start--
+fieldName=IconData
+columnName=IconData
+dataPersister=BYTE_ARRAY
 # --field-end--
 # --table-fields-end--
 # --table-end--

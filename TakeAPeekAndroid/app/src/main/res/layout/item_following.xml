@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:background="#ffffff" >
+
+    <TextView
+        android:id = "@+id/textview_following_src_name"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/tap_gray"/>
+
+    <TextView
+        android:id = "@+id/textview_following_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/tap_white"
+        android:layout_alignParentRight="true"
+        android:text="@string/following_unfollow"
+        android:translationZ="4dp"
+        android:stateListAnimator="@anim/button_elevation"
+        android:background="@drawable/button_blue" />
+
+</RelativeLayout>

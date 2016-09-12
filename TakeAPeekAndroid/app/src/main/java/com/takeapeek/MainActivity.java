@@ -19,12 +19,12 @@ import android.view.View.OnClickListener;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.takeapeek.walkthrough.WalkthroughActivity;
 import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.profile.ProfileActivity;
 import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
@@ -377,9 +377,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.fabwalkthrough:
                     logger.info("onClick: fabwalkthrough");
 
-                    final Intent intentWalkthroughActivity = new Intent(MainActivity.this, WalkthroughActivity.class);
-                    intentWalkthroughActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intentWalkthroughActivity);
+                    final Intent intentProfileActivity = new Intent(MainActivity.this, ProfileActivity.class);
+                    intentProfileActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentProfileActivity);
 
                     break;
 

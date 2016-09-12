@@ -14,6 +14,7 @@ import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekContact;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,6 +235,46 @@ public class Transport
         {
             lock.unlock();
             logger.debug("GetTrendingPlaces(....) - after unlock");
+        }
+    }
+
+    public static ArrayList<TakeAPeekRelation> GetAllRelations(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetAllRelations(....) Invoked - before lock");
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("GetAllRelations(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_all_relations"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+
+            ResponseObject responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+
+            if(responseObject != null)
+            {
+                Helper.SetProfileId(sharedPreferences.edit(), responseObject.profileId);
+                return responseObject.relations;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetAllRelations(....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("GetAllRelations(....) - after unlock");
         }
     }
 

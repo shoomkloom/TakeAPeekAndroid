@@ -62,8 +62,8 @@ import com.takeapeek.R;
 import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.common.Constants.UpdateTypeEnum;
 import com.takeapeek.ormlite.DatabaseManager;
-import com.takeapeek.ormlite.TakeAPeekContact;
 import com.takeapeek.ormlite.TakeAPeekContactUpdateTimes;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.syncadapter.ActiveSyncService;
 
 import org.slf4j.Logger;
@@ -79,8 +79,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -794,6 +792,23 @@ public class Helper
 			}
 		}
 	}
+
+    static public void UpdateRelations(Context context, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("UpdateRelations() Invoked");
+
+        String username = Helper.GetTakeAPeekAccountUsername(context);
+        String password = Helper.GetTakeAPeekAccountPassword(context);
+
+        ArrayList<TakeAPeekRelation> takeAPeekRelationList = Transport.GetAllRelations(context, username, password, sharedPreferences);
+
+        DatabaseManager.getInstance().ClearAllTakeAPeekRelations();
+
+        for(TakeAPeekRelation takeAPeekRelation : takeAPeekRelationList)
+        {
+            DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
+        }
+    }
 	
 	static public String GetResponseTakeAPeekPhotoPath(Context context, String userNumber) throws Exception
 	{
@@ -1464,180 +1479,6 @@ public class Helper
         return rotatedBitmap;
     }
     
-    private static void SaveContactToFile(String fileFullPath, ProfileObject takeAPeekContact) throws Exception
-    {
-    	logger.debug("SaveContactToFile(..) Invoked - before lock");
-    	
-    	lockProfileData.lock();
-    	
-    	try
-    	{
-    		logger.debug("SaveContactToFile(..) - inside lock");
-    		
-	    	FileOutputStream fileOutputStream = null;
-	    	ObjectOutputStream objectOutputStream = null;
-
-	    	fileOutputStream = new FileOutputStream(fileFullPath);
-    	 	objectOutputStream = new ObjectOutputStream(fileOutputStream);
-    	 	objectOutputStream.writeObject(takeAPeekContact);
-    	 	objectOutputStream.close();
-		}
-		catch(IOException e)
-		{
-			Error(logger, "EXCEPTION: when trying to save data file", e);
-			throw e;
-		}
-    	finally
-    	{
-    		lockProfileData.unlock();
-    		logger.debug("SaveContactToFile(..) - after unlock");
-    	}
-    }
-    
-    public static ProfileObject LoadTakeAPeekContact(Context context, String contactName)
-    {
-    	logger.debug("LoadTakeAPeekContact(..) Invoked");
-    	
-    	ProfileObject takeAPeekContact = null;
-    	
-    	DatabaseManager.init(context);
-
-/*@@
-    	try
-    	{
-	    	TakeAPeekContactContainer takeAPeekContactContainer = DatabaseManager.getInstance().GetTakeAPeekContactContainerWithContactName(contactName);
-	    	takeAPeekContact = takeAPeekContactContainer.GetContact();
-    	}
-    	catch(Exception e)
-    	{
-    		Error(logger, String.format("EXCEPTION: when loading TakeAPeekContactContainer for contactName '%s'", contactName), e);
-    	}
-    	
-    	if(takeAPeekContact == null)
-    	{
-    		String contactInfoPath = ""; 
-    				
-	    	try
-			{
-				contactInfoPath = GetTakeAPeekProfilePath(context);
-				takeAPeekContact = LoadContactFile(contactInfoPath);
-				
-				//Add this contact as the default contact to our ormlite DB
-				TakeAPeekContactContainer takeAPeekContactContainer = new TakeAPeekContactContainer();
-				takeAPeekContactContainer.SetContact(takeAPeekContact);
-				takeAPeekContactContainer.SetContactName(contactName);
-				
-				DatabaseManager.getInstance().AddTakeAPeekContactContainer(takeAPeekContactContainer);
-			}
-			catch (Exception e)
-			{
-				Error(logger, String.format("EXCEPTION: when loading data file '%s'", contactInfoPath), e);
-			}
-    	}
-@@*/
-
-    	return takeAPeekContact;
-    }
-    
-    public static void SaveTakeAPeekContact(Context context, String contactName, ProfileObject takeAPeekContact)
-    {
-    	logger.debug("SaveTakeAPeekContact(...) Invoked");
-
-/*@@
-    	try
-    	{
-    		DatabaseManager.init(context);
-	    	TakeAPeekContactContainer takeAPeekContactContainer = DatabaseManager.getInstance().GetTakeAPeekContactContainerWithContactName(contactName);
-	    	
-	    	if(takeAPeekContactContainer == null)
-	    	{
-	    		//Add this contact as the default contact to our ormlite DB
-				takeAPeekContactContainer = new TakeAPeekContactContainer();
-				takeAPeekContactContainer.SetContact(takeAPeekContact);
-				takeAPeekContactContainer.SetContactName(contactName);
-				
-				DatabaseManager.getInstance().AddTakeAPeekContactContainer(takeAPeekContactContainer);
-	    	}
-	    	else
-	    	{
-	    		takeAPeekContactContainer.SetContact(takeAPeekContact);
-	    	
-	    		DatabaseManager.getInstance().UpdateTakeAPeekContactContainer(takeAPeekContactContainer);
-	    	}
-    	}
-    	catch(Exception e)
-    	{
-    		Error(logger, String.format("EXCEPTION: when loading TakeAPeekContactContainer for contactName '%s'", contactName), e);
-    	}
-@@*/
-    }
-    
-    private static ProfileObject LoadContactFile(String fileFullPath) throws Exception
-    {
-    	logger.debug("LoadContactFile(.) Invoked - before lock");
-    	
-    	ProfileObject loadedContactData = null;
-    	
-    	lockProfileData.lock();
-    	
-    	try
-    	{
-    		logger.debug("LoadContactFile(.) - inside lock");
-    		
-    		File takeAPeekContactFile = new File(fileFullPath);
-    	
-    		if(takeAPeekContactFile.exists() == true)
-    		{
-		    	FileInputStream fileInputStream = null;
-				ObjectInputStream objectInputStream = null;
-				
-	    		fileInputStream = new FileInputStream(fileFullPath);
-	    		objectInputStream = new ObjectInputStream(fileInputStream);
-	    		loadedContactData = (ProfileObject)objectInputStream.readObject();
-	    		objectInputStream.close();
-    		}
-		}
-		catch(IOException e)
-		{
-			Error(logger, String.format("EXCEPTION: when loading data file '%s'", fileFullPath), e);
-		}
-    	finally
-    	{
-    		lockProfileData.unlock();
-    		logger.debug("LoadContactFile(.) - after unlock");
-    	}
-		
-		return loadedContactData;
-    }
-    
-    public static void ClearTakeAPeekContact(Context context, String contactUserNumber)
-    {
-    	logger.debug("ClearTakeAPeekContact(TakeAPeekvoked - before lock");
-    	
-    	lockTakeAPeekContactData.lock();
-    	try
-    	{
-	    	logger.debug("ClearTakeAPeekContact(..) - inside lock");
-	    	
-	    	DatabaseManager.init(context);
-	    	TakeAPeekContact takeAPeekContact = DatabaseManager.getInstance().GetTakeAPeekContact(contactUserNumber);
-
-	    	if(takeAPeekContact != null)
-	    	{
-	    		DatabaseManager.getInstance().DeleteTakeAPeekContact(takeAPeekContact);
-	    	}
-    	}
-    	catch(Exception e)
-    	{
-    		logger.warn(String.format("Element with id='%s' was not found", contactUserNumber));
-    	}
-    	finally
-    	{
-    		lockTakeAPeekContactData.unlock();
-    		logger.debug("ClearTakeAPeekContact(..) - after unlock");
-    	}
-    }
-    
     public static void ClearTakeAPeekContactUpdateTimes(Context context, HashMap<String, TakeAPeekContactUpdateTimes> takeAPeekContactUpdateTimesHashMap, String contactUserNumber)
     {
     	logger.debug("ClearTakeAPeekContactUpdateTimes(...) Invoked - before lock");
@@ -2259,19 +2100,19 @@ public class Helper
     	return sharedPreferences.getBoolean(Constants.PROFILE_DETAILS_CHANGED, false);
     }
     
-    public static void SetProfileImageChangedTime(Editor sharedPreferencesEditor, String profileImageChangedTime)
+    public static void SetProfileDisplayName(Editor sharedPreferencesEditor, String displayName)
     {
-    	logger.debug("SetProfileImageChangedTime(..) Invoked");
+    	logger.debug("SetProfileDisplayName(..) Invoked");
     	
-        sharedPreferencesEditor.putString(Constants.PROFILE_IMAGE_CHANGED_TIME, profileImageChangedTime);
+        sharedPreferencesEditor.putString(Constants.DISPLAY_NAME, displayName);
         sharedPreferencesEditor.commit();
     }
     
-    public static String GetProfileImageChangedTime(SharedPreferences sharedPreferences)
+    public static String GetProfileDisplayName(SharedPreferences sharedPreferences)
     {
-    	logger.debug("GetProfileImageChangedTime(.) Invoked");
+    	logger.debug("GetProfileDisplayName(.) Invoked");
     	
-    	return sharedPreferences.getString(Constants.PROFILE_IMAGE_CHANGED_TIME, null);
+    	return sharedPreferences.getString(Constants.DISPLAY_NAME, null);
     }
     
     public static void SetProfileDetailsHaveChanged(Editor sharedPreferencesEditor, boolean profileDetailsChanged)
@@ -2622,6 +2463,21 @@ public class Helper
     	logger.debug(String.format("SetAppVersion(Editor, appVersion=%d) Invoked", appVersion));
     	
         sharedPreferencesEditor.putLong(Constants.APP_VERSION, appVersion);
+        sharedPreferencesEditor.commit();
+    }
+
+    public static String GetProfileId(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetProfileId(.) Invoked");
+
+        return sharedPreferences.getString(Constants.PROFILE_ID, null);
+    }
+
+    public static void SetProfileId(Editor sharedPreferencesEditor, String profileId)
+    {
+        logger.debug("SetProfileId(..) Invoked");
+
+        sharedPreferencesEditor.putString(Constants.PROFILE_ID, profileId);
         sharedPreferencesEditor.commit();
     }
     

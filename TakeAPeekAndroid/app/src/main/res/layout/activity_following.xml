@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.takeapeek.profile.FollowingActivity"
+    android:background="@color/tap_white" >
+
+    <ListView
+        android:id="@+id/listview_following_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/tap_gray_faded"
+        android:dividerHeight="1dp"
+        android:orientation="vertical"
+        android:listSelector="@android:color/transparent"
+        android:drawSelectorOnTop="true"
+        android:animateLayoutChanges="true" />
+
+    <TextView
+        android:id="@+id/textview_following_empty"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="@string/textview_following_empty"
+        android:textColor="@color/tap_gray"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
+</RelativeLayout>

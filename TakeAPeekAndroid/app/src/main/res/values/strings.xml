@@ -199,4 +199,23 @@
     <string name="skip">Skip</string>
     <string name="lets_go">Let\'s go!</string>
 
+    <!-- Profile -->
+    <string name="following">Following</string>
+    <string name="textview_following_empty">You are not following anybody yet...</string>
+    <string name="following_unfollow">Unfollow</string>
+    <string name="followers">Followers</string>
+    <string name="textview_followers_empty">Nobody is following you yet...</string>
+    <string name="followers_follow">Follow</string>
+    <string name="followers_block">Block</string>
+    <string name="blocked">Blocked</string>
+    <string name="textview_blocked_empty">You are not blocking anybody yet...</string>
+    <string name="blocked_unblock">Unblock</string>
+    <string name="invite_friends">Invite Friends</string>
+    <string name="support">Support</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="licenses">Licenses</string>
+    <string name="share_text">Check out TakeAPeek!</string>
+    <string name="error_no_share_apps">Could not find an app to share with.</string>
+
 </resources>

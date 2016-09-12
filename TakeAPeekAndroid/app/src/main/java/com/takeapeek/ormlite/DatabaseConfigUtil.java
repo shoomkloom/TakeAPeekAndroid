@@ -9,7 +9,9 @@ public class DatabaseConfigUtil extends OrmLiteConfigUtil
         TakeAPeekContact.class,
         TakeAPeekContactUpdateTimes.class,
 		TakeAPeekObject.class,
-        TakeAPeekNotification.class
+        TakeAPeekNotification.class,
+        TakeAPeekRelation.class,
+        TakeAPeekSendObject.class
 	};
 
 	public static void main(String[] args) throws Exception 
