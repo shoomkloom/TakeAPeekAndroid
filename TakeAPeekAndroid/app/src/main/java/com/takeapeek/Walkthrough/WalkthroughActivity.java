@@ -65,8 +65,6 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        setTheme(R.style.AppThemeNoActionBar);
-
         super.onCreate(savedInstanceState);
 
         logger.debug("onCreate(.) Invoked");
