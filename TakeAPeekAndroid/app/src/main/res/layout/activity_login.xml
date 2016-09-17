@@ -282,7 +282,6 @@
 
         <!-- Authentication progress -->
         <LinearLayout
-            android:id="@+id/login_linearlayout_display_name_"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -331,55 +330,9 @@
                         android:textColor="@color/tap_blue"
                         android:textSize="24sp" />
 
-                    <!--
-                    <EditText
-                        android:id="@+id/editText_SMS_code"
-                        android:layout_width="190dp"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/login_textview_code_title"
-                        android:textColor="@color/tap_white"
-                        android:textSize="24sp"
-                        android:hint="@string/code_hint"
-                        android:textColorHint="@color/tap_white"
-                        android:gravity="center_horizontal"
-                        android:background="#00000000"
-                        android:paddingBottom="7dp"
-                        android:inputType="textNoSuggestions"
-                        android:singleLine="true" >
-                    </EditText>
-
-                    <View
-                        android:layout_width="wrap_content"
-                        android:layout_height="4dp"
-                        android:layout_alignLeft="@+id/login_textview_code_title"
-                        android:layout_alignBottom="@+id/editText_SMS_code"
-                        android:layout_alignRight="@+id/editText_SMS_code"
-                        android:background="@color/tap_white" />
-                    -->
-
                 </RelativeLayout>
 
             </LinearLayout>
-
-    <!--
-            <TextView
-                android:id="@+id/button_verify_account_submit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/tap_white"
-                android:textSize="24sp"
-                android:text="@string/button_verify"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:translationZ="4dp"
-                android:padding="17dp"
-                android:singleLine="true"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_green" />
-    -->
 
             <!-- Text below code -->
             <!-- Progress text and animation -->

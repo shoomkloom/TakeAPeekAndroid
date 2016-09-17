@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 20
-        versionName "0.9.20"
+        versionCode 22
+        versionName "0.9.22 beta"
     }
     buildTypes {
         release {
@@ -24,19 +24,17 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile files('libs/logback-android-1.0.7-1.jar')
     compile files('libs/libphonenumber-7.2.6.jar')
-    // [START gms_compile]
-    // [END gms_compile]
     compile files('libs/gson-2.1.jar')
     compile files('libs/ormlite-android-4.47.jar')
     compile files('libs/ormlite-core-4.47.jar')
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:support-v13:23.4.0'
-    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:support-v13:24.2.1'
+    compile 'com.android.support:design:24.2.1'
     compile 'com.google.firebase:firebase-core:9.0.0'
     compile 'com.google.firebase:firebase-crash:9.0.0'
     compile 'com.google.firebase:firebase-messaging:9.0.0'
     compile 'com.google.android.gms:play-services-location:9.0.0'
-    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.android.support:support-v4:24.2.1'
     compile 'com.google.maps.android:android-maps-utils:0.4'
 }
 
