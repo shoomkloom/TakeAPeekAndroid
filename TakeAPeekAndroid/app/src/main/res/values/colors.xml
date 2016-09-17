@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="tap_lightgray">#8c8c8c</color>
+    <color name="tap_verylightgray">#f0f0f0</color>
     <color name="tap_lightlightgray">#afafaf</color>
     <color name="tap_darkgray">#323232</color>
     <color name="tap_darkgray_faded">#AA282828</color>

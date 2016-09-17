@@ -95,17 +95,20 @@ public class FollowingActivity extends AppCompatActivity
 
         List<TakeAPeekRelation> takeAPeekFollowingList = GetTakeAPeekFollowingList();
 
-        if(mFollowingItemAdapter == null)
+        if(takeAPeekFollowingList != null)
         {
-            mFollowingItemAdapter = new FollowingItemAdapter(this, R.layout.item_following, takeAPeekFollowingList);
-            mListViewFollowingList.setAdapter(mFollowingItemAdapter);
-        }
-        else
-        {
-            //Refresh adapter list
-            mFollowingItemAdapter.clear();
-            mFollowingItemAdapter.addAll(takeAPeekFollowingList);
-            mFollowingItemAdapter.notifyDataSetChanged();
+            if (mFollowingItemAdapter == null)
+            {
+                mFollowingItemAdapter = new FollowingItemAdapter(this, R.layout.item_following, takeAPeekFollowingList);
+                mListViewFollowingList.setAdapter(mFollowingItemAdapter);
+            }
+            else
+            {
+                //Refresh adapter list
+                mFollowingItemAdapter.clear();
+                mFollowingItemAdapter.addAll(takeAPeekFollowingList);
+                mFollowingItemAdapter.notifyDataSetChanged();
+            }
         }
 
         if(takeAPeekFollowingList == null || takeAPeekFollowingList.size() == 0)
@@ -124,9 +127,13 @@ public class FollowingActivity extends AppCompatActivity
     {
         logger.debug("GetTakeAPeekFollowingArray() Invoked");
 
-        List<TakeAPeekRelation> takeAPeekFollowingArrayList =
-                DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(
-                        Helper.GetProfileId(mSharedPreferences));
+        String profileId = Helper.GetProfileId(mSharedPreferences);
+        List<TakeAPeekRelation> takeAPeekFollowingArrayList = null;
+
+        if(profileId != null)
+        {
+            takeAPeekFollowingArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(profileId);
+        }
 
         return takeAPeekFollowingArrayList;
     }

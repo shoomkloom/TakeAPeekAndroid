@@ -27,7 +27,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -175,8 +174,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     @Override
     public void onCreate(Bundle icicle) 
     {
-        setTheme(R.style.AppThemeNoActionBar);
-
         super.onCreate(icicle);
         
         logger.debug("onCreate(.) Invoked");
@@ -349,10 +346,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			        	buttonVerifyAccount.setOnClickListener(onClickListener);
 			        	Helper.setTypeface(this, buttonVerifyAccount, FontTypeEnum.boldFont);
 
-			        	Button buttonTeaserOK = (Button)findViewById(R.id.login_button_teaser_ok);
-			        	buttonTeaserOK.setOnClickListener(onClickListener);
-			        	Helper.setTypeface(this, buttonTeaserOK, FontTypeEnum.normalFont);
-			        	
 			        	mVerificationMessageHeader = (TextView)findViewById(R.id.login_textview_verification_message_header);
 			        	Helper.setTypeface(this, mVerificationMessageHeader, FontTypeEnum.lightFont);
 
@@ -1107,28 +1100,12 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             	//Show Display Name UI
                 findViewById(R.id.login_linearlayout_display_name).setVisibility(View.VISIBLE);
 
-
-
 	    		break;
 	    		
 	    	case accountCreationSuccess:
 	    		//Hide enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
             	
-            	//Show Teaser UI
-            	findViewById(R.id.login_relativelayout_teaser).setVisibility(View.VISIBLE);
-            	
-            	TextView loginTextviewTeaserLine_1 = (TextView)findViewById(R.id.login_textview_teaser_line_1);
-            	Helper.setTypeface(this, loginTextviewTeaserLine_1, FontTypeEnum.lightFont);
-            	
-            	TextView loginTextviewTeaserLine_2 = (TextView)findViewById(R.id.login_textview_teaser_line_2);
-            	Helper.setTypeface(this, loginTextviewTeaserLine_2, FontTypeEnum.lightFont);
-            	
-            	TextView loginTextviewTeaserLine_3 = (TextView)findViewById(R.id.login_textview_teaser_line_3);
-            	Helper.setTypeface(this, loginTextviewTeaserLine_3, FontTypeEnum.lightFont);
-            	
-            	Button loginButtonTeaserOk = (Button)findViewById(R.id.login_button_teaser_ok);
-            	Helper.setTypeface(this, loginButtonTeaserOk, FontTypeEnum.lightFont);
 	    		break;
     		
     		default: break;
@@ -1261,14 +1238,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             		
             		break;
             		
-            	case R.id.login_button_teaser_ok:
-            		logger.info("OnClickListener: 'login_button_teaser_ok' clicked");
-
-            		setResult(RESULT_OK);
-        			finish();
-            		
-            		break;
-
                 case R.id.button_create_display_name:
                     logger.info("OnClickListener: 'button_create_display_name' clicked");
 

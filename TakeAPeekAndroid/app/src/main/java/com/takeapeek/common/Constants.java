@@ -212,11 +212,6 @@ public class Constants
     public static final String CUSTOM_SCHEMA_PREFIX = "SM";
     //@@public static final String CUSTOM_SCHEMA_PREFIX_REPLACEMENT = "SM";
     public static final String UNSENT_LIKE_HASH = "UnsentLikeHash";
-    public static final String SHARE_FOLLOWME_LINK = "ShareFollowMeLink";
-    public static final String SHARE_FOLLOWME_LINK_DISPLAYNAME = "ShareFollowMeLinkDisplayName";
-    public static final String SHARE_FOLLOWME_LINK_NUMBER = "ShareFollowMeLinkNumber";
-    public static final String SHARE_FOLLOWME_LINK_GLOBAL = "ShareFollowMeLinkGlobal";
-    public static final String SHARE_FOLLOWME_INCLUDE_LINK = "ShareFollowMeIncludeLink";
     public static final String FIRST_CAPTURE = "FirstCapture";
     public static final String FIRST_WHOELSE = "FirstWhoElse";
     public static final String FIRST_CROP = "FirstCrop";
@@ -230,6 +225,7 @@ public class Constants
     public static final String DISPLAY_NAME_SUCCESS = "DisplayNameSuccess";
     public static final String PROFILE_ID = "ProfileId";
     public static final String DISPLAY_NAME = "DisplayName";
+    public static final String SHOW_NOTIFICATIONS = "ShowNotifications";
     
     public static final int OLDCURSOR_CONTACT_QUATA = 100;
     public static final int UPDATECURSOR_CONTACT_QUATA = 100;

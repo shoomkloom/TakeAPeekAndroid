@@ -86,7 +86,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppThemeNoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -203,7 +203,8 @@
         </activity>
         <activity
             android:name=".notifications.NotificationsActivity"
-            android:label="@string/title_activity_notifications">
+            android:label="@string/title_activity_notifications"
+            android:theme="@style/AppThemeNoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
@@ -216,40 +217,54 @@
             android:name=".trendingplaces.TrendingPlacesActivity"
             android:theme="@style/AppThemeNoActionBar">
         </activity>
-        <activity android:name=".walkthrough.WalkthroughActivity"
-                  android:theme="@style/AppThemeNoActionBar">
+        <activity
+            android:name=".walkthrough.WalkthroughActivity"
+            android:theme="@style/AppThemeNoActionBar">
         </activity>
-        <activity android:name=".profile.ProfileActivity"
-                  android:theme="@style/AppThemeNoActionBar">
+        <activity
+            android:name=".profile.ProfileActivity"
+            android:theme="@style/AppThemeNoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.MainActivity"/>
         </activity>
-        <activity android:name=".profile.FollowingActivity"
-                  android:label="@string/following">
+        <activity
+            android:name=".profile.FollowingActivity"
+            android:label="@string/following">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>
         </activity>
-        <activity android:name=".profile.FollowersActivity"
-                  android:label="@string/followers">
+        <activity
+            android:name=".profile.FollowersActivity"
+            android:label="@string/followers">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>
         </activity>
-        <activity android:name=".profile.BlockedActivity"
-                  android:label="@string/blocked">
+        <activity
+            android:name=".profile.BlockedActivity"
+            android:label="@string/blocked">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>
         </activity>
-        <activity android:name=".profile.ShareActivity"
-                  android:label="@string/invite_friends">
+        <activity
+            android:name=".profile.ShareActivity"
+            android:label="@string/invite_friends">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>
         </activity>
-
+        <activity
+            android:name=".profile.SettingsActivity"
+            android:label="@string/settings"
+            android:theme="@style/AppThemeNoActionBar"
+            android:windowSoftInputMode="stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.takeapeek.profile.ProfileActivity"/>
+        </activity>
     </application>
 
 </manifest>

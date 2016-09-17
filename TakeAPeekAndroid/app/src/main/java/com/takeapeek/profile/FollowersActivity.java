@@ -95,17 +95,20 @@ public class FollowersActivity extends AppCompatActivity
 
         List<TakeAPeekRelation> takeAPeekFollowersList = GetTakeAPeekFollowersList();
 
-        if(mFollowersItemAdapter == null)
+        if(takeAPeekFollowersList != null)
         {
-            mFollowersItemAdapter = new FollowersItemAdapter(this, R.layout.item_followers, takeAPeekFollowersList);
-            mListViewFollowersList.setAdapter(mFollowersItemAdapter);
-        }
-        else
-        {
-            //Refresh adapter list
-            mFollowersItemAdapter.clear();
-            mFollowersItemAdapter.addAll(takeAPeekFollowersList);
-            mFollowersItemAdapter.notifyDataSetChanged();
+            if (mFollowersItemAdapter == null)
+            {
+                mFollowersItemAdapter = new FollowersItemAdapter(this, R.layout.item_followers, takeAPeekFollowersList);
+                mListViewFollowersList.setAdapter(mFollowersItemAdapter);
+            }
+            else
+            {
+                //Refresh adapter list
+                mFollowersItemAdapter.clear();
+                mFollowersItemAdapter.addAll(takeAPeekFollowersList);
+                mFollowersItemAdapter.notifyDataSetChanged();
+            }
         }
 
         if(takeAPeekFollowersList == null || takeAPeekFollowersList.size() == 0)
@@ -124,9 +127,14 @@ public class FollowersActivity extends AppCompatActivity
     {
         logger.debug("GetTakeAPeekFollowersArray() Invoked");
 
-        List<TakeAPeekRelation> takeAPeekFollowersArrayList =
-                DatabaseManager.getInstance().GetTakeAPeekRelationFollowers(
-                        Helper.GetProfileId(mSharedPreferences));
+        String profileId = Helper.GetProfileId(mSharedPreferences);
+
+        List<TakeAPeekRelation> takeAPeekFollowersArrayList = null;
+
+        if(profileId != null)
+        {
+            takeAPeekFollowersArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationFollowers(profileId);
+        }
 
         return takeAPeekFollowersArrayList;
     }

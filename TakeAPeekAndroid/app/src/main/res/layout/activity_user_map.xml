@@ -10,14 +10,14 @@
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="@color/tap_blue">
 
         <ImageView
             android:id="@+id/notifications_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="centerInside"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/button_notifications"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"

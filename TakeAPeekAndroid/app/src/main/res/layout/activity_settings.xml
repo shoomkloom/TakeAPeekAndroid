@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".profile.ProfileActivity"
+    android:background="@color/tap_white" >
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/tap_blue">
+
+        <TextView
+            android:id="@+id/textview_profile_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:text="@string/settings"
+            android:layout_centerInParent="true"
+            android:textColor="@color/tap_white"/>
+
+        <ImageView
+            android:id="@+id/imageview_profile"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/button_profile"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="15dp"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollback_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/top_bar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textview_profile_account_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="15sp"
+                android:text="@string/my_account_title"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/tap_lightgray"
+                android:background="@color/tap_verylightgray"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/tap_lightgray" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="5dp">
+
+                <TextView
+                    android:id="@+id/textview_profile_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textSize="20sp"
+                    android:text="@string/name"
+                    android:layout_alignParentLeft="true"
+                    android:textColor="@color/tap_gray"/>
+
+                <EditText
+                    android:id="@+id/edittext_display_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toRightOf="@+id/textview_profile_name"
+                    android:textColor="@color/tap_gray"
+                    android:textSize="20sp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingRight="5dp"
+                    android:gravity="right"
+                    android:hint="@string/display_name_hint"
+                    android:textColorHint="@color/tap_lightlightgray"
+                    android:inputType="textCapWords|textNoSuggestions"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true" />
+
+                <ImageView
+                    android:id="@+id/imageview_display_name_validation_progess"
+                    android:layout_width="30dp"
+                    android:layout_height="50dp"
+                    android:layout_alignTop="@+id/edittext_display_name"
+                    android:layout_alignParentRight="true"
+                    android:translationZ="4dp"
+                    android:src="@drawable/progress"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/tap_lightgray" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:id="@+id/textview_profile_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/mobile_number"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/tap_gray"/>
+
+                <TextView
+                    android:id="@+id/textview_profile_number_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textSize="20sp"
+                    android:gravity="right"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@color/tap_gray"/>
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/tap_lightgray" />
+
+            <TextView
+                android:id="@+id/textview_profile_advanced_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="15sp"
+                android:text="@string/advanced_title"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/tap_lightgray"
+                android:background="@color/tap_verylightgray"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/tap_lightgray" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:id="@+id/textview_show_notifications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/show_notifications"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/tap_gray"/>
+
+                <Switch
+                    android:id="@+id/switch_show_notifications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:showText="true"
+                    android:checked="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/textview_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
+        android:textSize="15sp"
+        android:textColor="@color/tap_lightgray"
+        android:background="@color/tap_verylightgray"/>
+
+</RelativeLayout>

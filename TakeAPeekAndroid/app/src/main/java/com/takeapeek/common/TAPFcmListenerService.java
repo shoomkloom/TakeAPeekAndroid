@@ -67,6 +67,11 @@ public class TAPFcmListenerService extends FirebaseMessagingService
         {
             SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
+            if(Helper.GetShowNotifications(sharedPreferences) == false)
+            {
+                return;
+            }
+
             final Map<String, String> remoteMessageData = remoteMessage.getData();
 
             //Add a new notification object to our ormlite db

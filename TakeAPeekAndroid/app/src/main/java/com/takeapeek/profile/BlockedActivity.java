@@ -95,17 +95,20 @@ public class BlockedActivity extends AppCompatActivity
 
         List<TakeAPeekRelation> takeAPeekBlockedList = GetTakeAPeekBlockedList();
 
-        if(mBlockedItemAdapter == null)
+        if(takeAPeekBlockedList != null)
         {
-            mBlockedItemAdapter = new BlockedItemAdapter(this, R.layout.item_blocked, takeAPeekBlockedList);
-            mListViewBlockedList.setAdapter(mBlockedItemAdapter);
-        }
-        else
-        {
-            //Refresh adapter list
-            mBlockedItemAdapter.clear();
-            mBlockedItemAdapter.addAll(takeAPeekBlockedList);
-            mBlockedItemAdapter.notifyDataSetChanged();
+            if (mBlockedItemAdapter == null)
+            {
+                mBlockedItemAdapter = new BlockedItemAdapter(this, R.layout.item_blocked, takeAPeekBlockedList);
+                mListViewBlockedList.setAdapter(mBlockedItemAdapter);
+            }
+            else
+            {
+                //Refresh adapter list
+                mBlockedItemAdapter.clear();
+                mBlockedItemAdapter.addAll(takeAPeekBlockedList);
+                mBlockedItemAdapter.notifyDataSetChanged();
+            }
         }
 
         if(takeAPeekBlockedList == null || takeAPeekBlockedList.size() == 0)
@@ -124,9 +127,14 @@ public class BlockedActivity extends AppCompatActivity
     {
         logger.debug("GetTakeAPeekBlockedArray() Invoked");
 
-        List<TakeAPeekRelation> takeAPeekBlockedArrayList =
-                DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(
-                        Helper.GetProfileId(mSharedPreferences));
+        String profileId = Helper.GetProfileId(mSharedPreferences);
+
+        List<TakeAPeekRelation> takeAPeekBlockedArrayList = null;
+
+        if(profileId != null)
+        {
+            takeAPeekBlockedArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(profileId);
+        }
 
         return takeAPeekBlockedArrayList;
     }

@@ -24,8 +24,8 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
-import com.takeapeek.profile.ProfileActivity;
 import com.takeapeek.usermap.UserMapActivity;
+import com.takeapeek.walkthrough.WalkthroughActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -377,9 +377,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.fabwalkthrough:
                     logger.info("onClick: fabwalkthrough");
 
-                    final Intent intentProfileActivity = new Intent(MainActivity.this, ProfileActivity.class);
-                    intentProfileActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intentProfileActivity);
+                    final Intent intentWalkthroughActivity = new Intent(MainActivity.this, WalkthroughActivity.class);
+                    intentWalkthroughActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentWalkthroughActivity);
 
                     break;
 

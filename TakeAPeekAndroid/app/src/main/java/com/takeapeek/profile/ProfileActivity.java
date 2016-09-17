@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -39,6 +38,8 @@ public class ProfileActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        //@@setTheme(R.style.AppThemeNoActionBar);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
@@ -89,7 +90,9 @@ public class ProfileActivity extends AppCompatActivity
                 case R.id.imageview_settings:
                     logger.info("OnClickListener:onClick(.) imageview_settings Invoked");
 
-                    Toast.makeText(ProfileActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    final Intent settingsActivityIntent = new Intent(ProfileActivity.this, SettingsActivity.class);
+                    settingsActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    ProfileActivity.this.startActivity(settingsActivityIntent);
                     break;
 
                 case R.id.imageview_map:

@@ -11,512 +11,449 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Fill number and send -->
-
-<LinearLayout
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/gradient_yellow_fade">
-
     <LinearLayout
-        android:id="@+id/login_linearlayout_fill_number"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:orientation="vertical"
-    android:visibility="gone">
+        android:background="@drawable/gradient_yellow_fade">
 
-	    <!-- Text above number -->
-	    <TextView
-       		android:id="@+id/login_textview_to_use"
-          	android:layout_width="match_parent"
-          	android:layout_height="wrap_content"
-          	android:gravity="center"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-          	android:text="@string/verify_mobile_number"
-          	android:textColor="@color/tap_white"
-            android:textStyle="bold"
-          	android:textSize="35sp" />
-
-	    <TextView
-	        android:id="@+id/login_textview_type_your_phone_number"
-	        android:gravity="center"
-	        android:layout_height="wrap_content"
-	        android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:textStyle="bold"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-	        android:text="@string/verify_mobile_number_explain"
-	        android:textColor="@color/tap_white"
-	        android:textSize="20sp" />
-
-        <Spinner
-            android:id="@+id/SpinnerCountry"
+        <!-- Fill number and send -->
+        <LinearLayout
+            android:id="@+id/login_linearlayout_fill_number"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:translationZ="4dp"
-            android:textSize="24sp"
-            android:padding="17dp"
-            android:spinnerMode="dialog"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_white"/>
-
-        <EditText
-            android:id="@+id/edittext_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:textColor="@color/tap_gray"
-            android:textSize="24sp"
-            android:hint="@string/profile_mobile_number"
-            android:textColorHint="@color/tap_lightlightgray"
-            android:inputType="phone"
-            android:imeOptions="actionDone"
-            android:translationZ="4dp"
-            android:padding="17dp"
-            android:singleLine="true"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_white" >
-        </EditText>
-	    
-	    <TextView
-            android:id="@+id/terms_and_conditions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/create_account_message_bottom"
-            android:textColor="@color/tap_white"
-            android:textColorLink="@color/linkcolor"
-            android:background="#00000000"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/editText_SMS_code"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:textColor="@color/tap_gray"
-            android:textSize="24sp"
-            android:inputType="textNoSuggestions"
-            android:imeOptions="actionDone"
-            android:hint="@string/code_hint"
-            android:textColorHint="@color/tap_lightlightgray"
-            android:translationZ="4dp"
-            android:padding="17dp"
-            android:singleLine="true"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_white"
+            android:orientation="vertical"
             android:visibility="gone">
-        </EditText>
 
-        <TextView
-            android:id="@+id/button_create_account"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/tap_white"
-            android:textSize="24sp"
-            android:text="@string/button_verify"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:translationZ="4dp"
-            android:enabled="false"
-            android:padding="17dp"
-            android:singleLine="true"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_green" />
+            <!-- Text above number -->
+            <TextView
+                android:id="@+id/login_textview_to_use"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:shadowColor="@color/tap_darkgray"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:text="@string/verify_mobile_number"
+                android:textColor="@color/tap_white"
+                android:textStyle="bold"
+                android:textSize="35sp" />
 
-        <TextView
-            android:id="@+id/button_verify_account_submit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/tap_white"
-            android:textSize="24sp"
-            android:text="@string/button_continue"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:translationZ="4dp"
-            android:enabled="false"
-            android:padding="17dp"
-            android:singleLine="true"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_green"
-            android:visibility="gone"/>
+            <TextView
+                android:id="@+id/login_textview_type_your_phone_number"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:textStyle="bold"
+                android:shadowColor="@color/tap_darkgray"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="@string/verify_mobile_number_explain"
+                android:textColor="@color/tap_white"
+                android:textSize="20sp" />
 
-    </LinearLayout>
-	<!-- End fill number and send -->
+            <Spinner
+                android:id="@+id/SpinnerCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:translationZ="4dp"
+                android:textSize="24sp"
+                android:padding="17dp"
+                android:spinnerMode="dialog"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_white"/>
 
-    <!-- Display Name-->
-    <RelativeLayout
-        android:id="@+id/login_linearlayout_display_name"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        >
+            <EditText
+                android:id="@+id/edittext_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:textColor="@color/tap_gray"
+                android:textSize="24sp"
+                android:hint="@string/profile_mobile_number"
+                android:textColorHint="@color/tap_lightlightgray"
+                android:inputType="phone"
+                android:imeOptions="actionDone"
+                android:translationZ="4dp"
+                android:padding="17dp"
+                android:singleLine="true"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_white" >
+            </EditText>
 
-        <!-- Text above number -->
-        <TextView
-            android:id="@+id/textview_display_name_big_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            android:text="@string/display_name_pick_a_name"
-            android:textColor="@color/tap_white"
-            android:textStyle="bold"
-            android:textSize="35sp" />
+            <TextView
+                android:id="@+id/terms_and_conditions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:shadowColor="@color/tap_darkgray"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/create_account_message_bottom"
+                android:textColor="@color/tap_white"
+                android:textColorLink="@color/linkcolor"
+                android:background="#00000000"
+                android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/textview_display_name_small_title"
-            android:gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_below="@+id/textview_display_name_big_title"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:textStyle="bold"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:text="@string/display_name_explain"
-            android:textColor="@color/tap_white"
-            android:textSize="20sp" />
+            <EditText
+                android:id="@+id/editText_SMS_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:textColor="@color/tap_gray"
+                android:textSize="24sp"
+                android:inputType="textNoSuggestions"
+                android:imeOptions="actionDone"
+                android:hint="@string/code_hint"
+                android:textColorHint="@color/tap_lightlightgray"
+                android:translationZ="4dp"
+                android:padding="17dp"
+                android:singleLine="true"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_white"
+                android:visibility="gone">
+            </EditText>
 
-        <EditText
-            android:id="@+id/edittext_display_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_below="@+id/textview_display_name_small_title"
-            android:textColor="@color/tap_gray"
-            android:textSize="24sp"
-            android:hint="@string/display_name_hint"
-            android:textColorHint="@color/tap_lightlightgray"
-            android:inputType="textCapWords|textNoSuggestions"
-            android:imeOptions="actionDone"
-            android:paddingTop="17dp"
-            android:paddingBottom="17dp"
-            android:paddingLeft="17dp"
-            android:paddingRight="64dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:singleLine="true"
-            android:translationZ="4dp"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_white" >
-        </EditText>
+            <TextView
+                android:id="@+id/button_create_account"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/tap_white"
+                android:textSize="24sp"
+                android:text="@string/button_verify"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:translationZ="4dp"
+                android:enabled="false"
+                android:padding="17dp"
+                android:singleLine="true"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_green" />
 
-        <ImageView
-            android:id="@+id/imageview_display_name_validation_progess"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignTop="@+id/edittext_display_name"
-            android:layout_alignRight="@+id/edittext_display_name"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="7dp"
-            android:translationZ="5dp"
-            android:src="@drawable/progress"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/button_create_display_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/edittext_display_name"
-            android:textColor="@color/tap_white"
-            android:textSize="24sp"
-            android:text="@string/button_continue"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:translationZ="4dp"
-            android:enabled="false"
-            android:padding="17dp"
-            android:singleLine="true"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_green" />
-
-    </RelativeLayout>
-
-    <!-- End Display Name-->
-
-    <!-- Authentication progress -->
-    <LinearLayout
-        android:id="@+id/login_linearlayout_display_name_"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="15dp"
-        android:visibility="gone" >
-	        
-	    <!-- Text above number -->
-		<TextView
-		    android:id="@+id/login_textview_verification_message_header"
-        	android:layout_width="match_parent"
-          	android:layout_height="wrap_content"
-          	android:gravity="start"
-          	android:text="@string/for_your_protection"
-          	android:textColor="@color/tap_orange"
-          	android:textSize="48sp" />
-	    
-	    <TextView
-	        android:id="@+id/login_textview_verification_message"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:gravity="start"
-			android:textColor="@color/tap_white"
-			android:textSize="24sp" />
-	    
-	    <!-- Prefix text and code -->
-	    <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginTop="45dp" >
-		    
-		    <RelativeLayout
-	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_gravity="center_horizontal"
-	            android:gravity="center_horizontal" >
-	
-	            <TextView
-	                android:id="@+id/login_textview_code_title"
-					android:layout_width="130dp"
-					android:layout_height="wrap_content"
-					android:gravity="right"
-					android:text="@string/code"
-					android:textColor="@color/tap_blue"
-					android:textSize="24sp" />
-
-                <!--
-	            <EditText
-	                android:id="@+id/editText_SMS_code"
-	                android:layout_width="190dp"
-	                android:layout_height="wrap_content"
-	                android:layout_toRightOf="@+id/login_textview_code_title"
-	                android:textColor="@color/tap_white"
-	                android:textSize="24sp"
-	                android:hint="@string/code_hint"
-	                android:textColorHint="@color/tap_white"
-	                android:gravity="center_horizontal"
-	                android:background="#00000000"
-	                android:paddingBottom="7dp"
-	                android:inputType="textNoSuggestions"
-	                android:singleLine="true" >
-	            </EditText>
-
-	            <View 
-	                android:layout_width="wrap_content"
-			        android:layout_height="4dp"
-			        android:layout_alignLeft="@+id/login_textview_code_title"
-			        android:layout_alignBottom="@+id/editText_SMS_code"
-			        android:layout_alignRight="@+id/editText_SMS_code"
-			        android:background="@color/tap_white" />
-	            -->
-
-	        </RelativeLayout>
+            <TextView
+                android:id="@+id/button_verify_account_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/tap_white"
+                android:textSize="24sp"
+                android:text="@string/button_continue"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:translationZ="4dp"
+                android:enabled="false"
+                android:padding="17dp"
+                android:singleLine="true"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_green"
+                android:visibility="gone"/>
 
         </LinearLayout>
+        <!-- End fill number and send -->
 
-<!--
-        <TextView
-            android:id="@+id/button_verify_account_submit"
+        <!-- Display Name-->
+        <RelativeLayout
+            android:id="@+id/login_linearlayout_display_name"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/tap_white"
-            android:textSize="24sp"
-            android:text="@string/button_verify"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:translationZ="4dp"
-            android:padding="17dp"
-            android:singleLine="true"
-            android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_green" />
--->
+            android:orientation="vertical"
+            android:visibility="gone" >
 
-	    <!-- Text below code -->
-	    <!-- Progress text and animation -->
-	    <TextView
-	        android:id="@+id/login_textview_progress_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:text="@string/create_account_verify_message"
-            android:textColor="@color/tap_orange"
-            android:layout_marginTop="5dp"
-            android:textSize="16sp" />
+            <!-- Text above number -->
+            <TextView
+                android:id="@+id/textview_display_name_big_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:shadowColor="@color/tap_darkgray"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:text="@string/display_name_pick_a_name"
+                android:textColor="@color/tap_white"
+                android:textStyle="bold"
+                android:textSize="35sp" />
 
-	    <ImageView
-	    	android:id="@+id/progress_verify"
-	    	android:padding="10dp"
-			android:layout_width="70dp"
-			android:layout_height="70dp"
-			android:layout_marginTop="5dp"
-			android:layout_gravity="center_horizontal"
-			android:background="@drawable/progress" />
+            <TextView
+                android:id="@+id/textview_display_name_small_title"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/textview_display_name_big_title"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:textStyle="bold"
+                android:shadowColor="@color/tap_darkgray"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="@string/display_name_explain"
+                android:textColor="@color/tap_white"
+                android:textSize="20sp" />
 
-	    <!-- Resend options -->
-	    <LinearLayout
-	        android:id="@+id/login_linearlayout_resend_options"
+            <EditText
+                android:id="@+id/edittext_display_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_below="@+id/textview_display_name_small_title"
+                android:textColor="@color/tap_gray"
+                android:textSize="24sp"
+                android:hint="@string/display_name_hint"
+                android:textColorHint="@color/tap_lightlightgray"
+                android:inputType="textCapWords|textNoSuggestions"
+                android:imeOptions="actionDone"
+                android:paddingTop="17dp"
+                android:paddingBottom="17dp"
+                android:paddingLeft="17dp"
+                android:paddingRight="64dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:singleLine="true"
+                android:translationZ="4dp"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_white" >
+            </EditText>
+
+            <ImageView
+                android:id="@+id/imageview_display_name_validation_progess"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignTop="@+id/edittext_display_name"
+                android:layout_alignRight="@+id/edittext_display_name"
+                android:layout_marginTop="7dp"
+                android:layout_marginRight="7dp"
+                android:translationZ="5dp"
+                android:src="@drawable/progress"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/button_create_display_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edittext_display_name"
+                android:textColor="@color/tap_white"
+                android:textSize="24sp"
+                android:text="@string/button_continue"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:translationZ="4dp"
+                android:enabled="false"
+                android:padding="17dp"
+                android:singleLine="true"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_green" />
+
+        </RelativeLayout>
+
+        <!-- End Display Name-->
+
+        <!-- Authentication progress -->
+        <LinearLayout
+            android:id="@+id/login_linearlayout_display_name_"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="30dp" >
-		    
-	        <TextView
-			    android:id="@+id/login_resend_code"
-	        	android:layout_width="match_parent"
-	          	android:layout_height="wrap_content"
-	          	android:layout_gravity="start"
-	          	android:text="@string/resend_sms_code"
-	          	android:textColor="@color/linkcolor"
-	          	android:background="#00000000"
-	          	android:textSize="16sp" />
-	        
-	        <TextView
-			    android:id="@+id/login_resend_request_call"
-	        	android:layout_width="match_parent"
-	          	android:layout_height="wrap_content"
-	          	android:layout_gravity="start"
-	          	android:text="@string/message_request_call"
-	          	android:textColor="@color/linkcolor"
-	          	android:layout_marginTop="10dp"
-	          	android:background="#00000000"
-	          	android:textSize="16sp" />
-	        
-	        <TextView
-			    android:id="@+id/login_resend_edit_number_message"
-	        	android:layout_width="match_parent"
-	          	android:layout_height="wrap_content"
-	          	android:layout_gravity="start"
-	          	android:textColor="@color/tap_white"
-	          	android:layout_marginTop="15dp"
-	          	android:textSize="24sp" />
-	        
-	        <TextView
-			    android:id="@+id/login_resend_edit_number"
-	        	android:layout_width="match_parent"
-	          	android:layout_height="wrap_content"
-	          	android:layout_gravity="start"
-	          	android:text="@string/message_edit_phone"
-	          	android:textColor="@color/linkcolor"
-	          	android:layout_marginTop="10dp"
-	          	android:background="#00000000"
-	          	android:textSize="16sp" />
-	    </LinearLayout>
-	</LinearLayout>  
+            android:padding="15dp"
+            android:visibility="gone" >
+
+            <!-- Text above number -->
+            <TextView
+                android:id="@+id/login_textview_verification_message_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@string/for_your_protection"
+                android:textColor="@color/tap_orange"
+                android:textSize="48sp" />
+
+            <TextView
+                android:id="@+id/login_textview_verification_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textColor="@color/tap_white"
+                android:textSize="24sp" />
+
+            <!-- Prefix text and code -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:layout_marginTop="45dp" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal" >
+
+                    <TextView
+                        android:id="@+id/login_textview_code_title"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:text="@string/code"
+                        android:textColor="@color/tap_blue"
+                        android:textSize="24sp" />
+
+                    <!--
+                    <EditText
+                        android:id="@+id/editText_SMS_code"
+                        android:layout_width="190dp"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/login_textview_code_title"
+                        android:textColor="@color/tap_white"
+                        android:textSize="24sp"
+                        android:hint="@string/code_hint"
+                        android:textColorHint="@color/tap_white"
+                        android:gravity="center_horizontal"
+                        android:background="#00000000"
+                        android:paddingBottom="7dp"
+                        android:inputType="textNoSuggestions"
+                        android:singleLine="true" >
+                    </EditText>
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="4dp"
+                        android:layout_alignLeft="@+id/login_textview_code_title"
+                        android:layout_alignBottom="@+id/editText_SMS_code"
+                        android:layout_alignRight="@+id/editText_SMS_code"
+                        android:background="@color/tap_white" />
+                    -->
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+    <!--
+            <TextView
+                android:id="@+id/button_verify_account_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/tap_white"
+                android:textSize="24sp"
+                android:text="@string/button_verify"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:translationZ="4dp"
+                android:padding="17dp"
+                android:singleLine="true"
+                android:stateListAnimator="@anim/button_elevation"
+                android:background="@drawable/button_green" />
+    -->
+
+            <!-- Text below code -->
+            <!-- Progress text and animation -->
+            <TextView
+                android:id="@+id/login_textview_progress_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="@string/create_account_verify_message"
+                android:textColor="@color/tap_orange"
+                android:layout_marginTop="5dp"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/progress_verify"
+                android:padding="10dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/progress" />
+
+            <!-- Resend options -->
+            <LinearLayout
+                android:id="@+id/login_linearlayout_resend_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="30dp" >
+
+                <TextView
+                    android:id="@+id/login_resend_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:text="@string/resend_sms_code"
+                    android:textColor="@color/linkcolor"
+                    android:background="#00000000"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/login_resend_request_call"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:text="@string/message_request_call"
+                    android:textColor="@color/linkcolor"
+                    android:layout_marginTop="10dp"
+                    android:background="#00000000"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/login_resend_edit_number_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:textColor="@color/tap_white"
+                    android:layout_marginTop="15dp"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/login_resend_edit_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:text="@string/message_edit_phone"
+                    android:textColor="@color/linkcolor"
+                    android:layout_marginTop="10dp"
+                    android:background="#00000000"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- End Authentication progress -->
 	
-    <!-- End Authentication progress -->
-	
-    <!-- Teaser -->
-    <RelativeLayout
-        android:id="@+id/login_relativelayout_teaser"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="15dp"
-        android:visibility="gone" >
-	    
-        <TextView
-		    android:id="@+id/login_textview_teaser_line_1"
-        	android:layout_width="match_parent"
-          	android:layout_height="wrap_content"
-          	android:gravity="start"
-          	android:layout_alignParentTop="true"
-          	android:layout_alignParentLeft="true"
-          	android:layout_alignParentStart="true"
-          	android:text="@string/teaser_line_1"
-          	android:textColor="@color/tap_darkorange"
-          	android:textSize="48sp" />
-        
-        <TextView
-		    android:id="@+id/login_textview_teaser_line_2"
-        	android:layout_width="match_parent"
-          	android:layout_height="wrap_content"
-          	android:paddingTop="20dp"
-          	android:gravity="start"
-          	android:layout_below="@+id/login_textview_teaser_line_1"
-          	android:layout_alignParentLeft="true"
-          	android:layout_alignParentStart="true"
-          	android:text="@string/teaser_line_2"
-          	android:textColor="@color/tap_blue"
-          	android:textSize="48sp" />
-        
-        <TextView
-		    android:id="@+id/login_textview_teaser_line_3"
-        	android:layout_width="match_parent"
-          	android:layout_height="wrap_content"
-          	android:paddingTop="20dp"
-          	android:gravity="start"
-          	android:layout_below="@+id/login_textview_teaser_line_2"
-          	android:layout_alignParentLeft="true"
-          	android:layout_alignParentStart="true"
-          	android:text="@string/teaser_line_3"
-          	android:textColor="@color/tap_orange"
-          	android:textSize="48sp" />
-        
-        <Button
-	        android:id="@+id/login_button_teaser_ok"
-	        android:layout_width="wrap_content"
-	        android:layout_height="50dp"
-	        android:layout_below="@+id/login_textview_teaser_line_3"
-	        android:textColor="@color/textcolororange"
-	        android:textSize="24sp"
-	        android:text="@string/teaser_ok"
-	        android:background="@drawable/button_border_enabled"
-	        android:layout_centerHorizontal="true"
-	        android:drawablePadding="7dp"
-	        android:layout_marginTop="50dp"
-	        android:padding="10dp"
-	        android:drawableRight="@drawable/takeapeek_button"
-	        android:drawableEnd="@drawable/takeapeek_button" />
-    </RelativeLayout>
 </LinearLayout>
 </RelativeLayout>

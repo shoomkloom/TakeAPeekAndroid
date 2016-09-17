@@ -2511,6 +2511,21 @@ public class Helper
         sharedPreferencesEditor.putBoolean(Constants.FIRST_CAPTURE, firstCapture);
         sharedPreferencesEditor.commit();
     }
+
+    public static Boolean GetShowNotifications(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetShowNotifications(.) Invoked");
+
+        return sharedPreferences.getBoolean(Constants.SHOW_NOTIFICATIONS, true);
+    }
+
+    public static void SetShowNotifications(Editor sharedPreferencesEditor, Boolean showNotifications)
+    {
+        logger.debug(String.format("SetShowNotifications(Editor, showNotifications=%b) Invoked", showNotifications));
+
+        sharedPreferencesEditor.putBoolean(Constants.SHOW_NOTIFICATIONS, showNotifications);
+        sharedPreferencesEditor.commit();
+    }
     
     public static Boolean GetFirstWhoElse(SharedPreferences sharedPreferences)
     {

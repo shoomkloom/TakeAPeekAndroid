@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.takeapeek.common.Constants;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
+import com.takeapeek.profile.ProfileActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +38,7 @@ public class NotificationsActivity extends AppCompatActivity
 
     ListView mListViewNotificationList = null;
     TextView mTextViewEmptyList = null;
-    TextView mTextViewNotificationTime = null;
-    TextView mTextViewSrcProfileName = null;
-    TextView mTextViewButton = null;
+    ImageView mImageViewProfileButton = null;
 
     NotificationItemAdapter mNotificationItemAdapter = null;
 
@@ -69,6 +69,8 @@ public class NotificationsActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        //@@setTheme(R.style.AppThemeNoActionBar);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
@@ -83,6 +85,8 @@ public class NotificationsActivity extends AppCompatActivity
         //List View
         mListViewNotificationList = (ListView)findViewById(R.id.listview_notifications_list);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_notifications_empty);
+        mImageViewProfileButton = (ImageView)findViewById(R.id.imageview_profile);
+        mImageViewProfileButton.setOnClickListener(ClickListener);
 
         if(takeAPeekNotificationArrayList.size() == 0)
         {
@@ -218,6 +222,27 @@ public class NotificationsActivity extends AppCompatActivity
             {
                 lockBroadcastReceiver.unlock();
                 logger.debug("onPushNotificationBroadcast.onReceive() Invoked - after unlock");
+            }
+        }
+    };
+
+    private View.OnClickListener ClickListener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            logger.debug("OnClickListener:onClick(.) Invoked");
+
+            switch(v.getId())
+            {
+                case R.id.imageview_profile:
+                    final Intent profileIntent = new Intent(NotificationsActivity.this, ProfileActivity.class);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(profileIntent);
+                    break;
+
+                default:
+                    break;
             }
         }
     };

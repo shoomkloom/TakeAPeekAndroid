@@ -63,14 +63,15 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
 
         DatabaseManager.init(mProfileActivity);
 
-        mFollowingNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(
-                Helper.GetProfileId(mSharedPreferences)).size();
+        String profileId = Helper.GetProfileId(mSharedPreferences);
+        if(profileId != null)
+        {
+            mFollowingNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(profileId).size();
 
-        mFollowersNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowers(
-                Helper.GetProfileId(mSharedPreferences)).size();
+            mFollowersNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowers(profileId).size();
 
-        mBlockedNumber = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(
-                Helper.GetProfileId(mSharedPreferences)).size();
+            mBlockedNumber = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(profileId).size();
+        }
     }
 
     @Override
