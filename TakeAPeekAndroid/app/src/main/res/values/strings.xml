@@ -120,6 +120,10 @@
     <string name="display_name_pick_a_name">Pick a User Name</string>
     <string name="display_name_explain">Your User Name is your identity on TakeAPeek</string>
     <string name="display_name_hint">User Name</string>
+    <string name="what_is_your_birthday">What is your Birthday?</string>
+    <string name="date_of_birth_explain">Just making sure you are\nold enough to peek :)</string>
+    <string name="date_of_birth_hint">Birthday</string>
+    <string name="date_of_birth_dialog_title">Your Birthday</string>
 
     <!-- User peek feed -->
     <string name="error_no_profile">There was an error getting the user feed. Please try again later.</string>

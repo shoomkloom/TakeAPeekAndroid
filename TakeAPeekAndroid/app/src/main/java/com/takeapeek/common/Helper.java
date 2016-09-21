@@ -2496,7 +2496,6 @@ public class Helper
         sharedPreferencesEditor.commit();
     }
     
-    //First.Me params
     public static Boolean GetFirstCapture(SharedPreferences sharedPreferences)
     {
     	logger.debug("GetFirstCapture(.) Invoked");
@@ -2509,6 +2508,36 @@ public class Helper
     	logger.debug(String.format("SetFirstCapture(Editor, firstCapture=%b) Invoked", firstCapture));
     	
         sharedPreferencesEditor.putBoolean(Constants.FIRST_CAPTURE, firstCapture);
+        sharedPreferencesEditor.commit();
+    }
+
+    public static Boolean GetFirstRun(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetFirstRun(.) Invoked");
+
+        return sharedPreferences.getBoolean(Constants.FIRST_RUN, false);
+    }
+
+    public static void SetFirstRun(Editor sharedPreferencesEditor, Boolean firstRun)
+    {
+        logger.debug(String.format("SetFirstRun(Editor, firstRun=%b) Invoked", firstRun));
+
+        sharedPreferencesEditor.putBoolean(Constants.FIRST_RUN, firstRun);
+        sharedPreferencesEditor.commit();
+    }
+
+    public static long GetLastCapture(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetLastCapture(.) Invoked");
+
+        return sharedPreferences.getLong(Constants.LAST_CAPTURE, 0);
+    }
+
+    public static void SetLastCapture(Editor sharedPreferencesEditor, long lastCapture)
+    {
+        logger.debug(String.format("SetLastCapture(Editor, lastCapture=%d) Invoked", lastCapture));
+
+        sharedPreferencesEditor.putLong(Constants.LAST_CAPTURE, lastCapture);
         sharedPreferencesEditor.commit();
     }
 
@@ -2526,82 +2555,6 @@ public class Helper
         sharedPreferencesEditor.putBoolean(Constants.SHOW_NOTIFICATIONS, showNotifications);
         sharedPreferencesEditor.commit();
     }
-    
-    public static Boolean GetFirstWhoElse(SharedPreferences sharedPreferences)
-    {
-    	logger.debug("GetFirstWhoElse(.) Invoked");
-    	
-    	return sharedPreferences.getBoolean(Constants.FIRST_WHOELSE, true);
-    }
-    
-    public static void SetFirstWhoElse(Editor sharedPreferencesEditor, Boolean firstWhoElse)
-    {
-    	logger.debug(String.format("SetFirstWhoElse(Editor, firstWhoElse=%b) Invoked", firstWhoElse));
-    	
-        sharedPreferencesEditor.putBoolean(Constants.FIRST_WHOELSE, firstWhoElse);
-        sharedPreferencesEditor.commit();
-    }
-    
-    public static Boolean GetFirstCrop(SharedPreferences sharedPreferences)
-    {
-    	logger.debug("GetFirstCrop(.) Invoked");
-    	
-    	return sharedPreferences.getBoolean(Constants.FIRST_CROP, true);
-    }
-    
-    public static void SetFirstCrop(Editor sharedPreferencesEditor, Boolean firstCrop)
-    {
-    	logger.debug(String.format("SetFirstCrop(Editor, firstCrop=%b) Invoked", firstCrop));
-    	
-        sharedPreferencesEditor.putBoolean(Constants.FIRST_CROP, firstCrop);
-        sharedPreferencesEditor.commit();
-    }
-    
-    public static Boolean GetFirstShare(SharedPreferences sharedPreferences)
-    {
-    	logger.debug("GetFirstShare(.) Invoked");
-    	
-    	return sharedPreferences.getBoolean(Constants.FIRST_SHARE, true);
-    }
-    
-    public static void SetFirstShare(Editor sharedPreferencesEditor, Boolean firstShare)
-    {
-    	logger.debug(String.format("SetFirstShare(Editor, firstShare=%b) Invoked", firstShare));
-    	
-        sharedPreferencesEditor.putBoolean(Constants.FIRST_SHARE, firstShare);
-        sharedPreferencesEditor.commit();
-    }
-    
-    public static Boolean GetUseSampledImage(SharedPreferences sharedPreferences)
-    {
-    	logger.debug("GetUseSampledImage(.) Invoked");
-    	
-    	return sharedPreferences.getBoolean(Constants.USE_SAMPLED_IMAGE, false);
-    }
-    
-    public static void SetUseSampledImage(Editor sharedPreferencesEditor, Boolean useSampledImage)
-    {
-    	logger.debug(String.format("SetUseSampledImage(Editor, firstShare=%b) Invoked", useSampledImage));
-    	
-        sharedPreferencesEditor.putBoolean(Constants.USE_SAMPLED_IMAGE, useSampledImage);
-        sharedPreferencesEditor.commit();
-    }
-    
-    public static Boolean GetFirstScan(SharedPreferences sharedPreferences)
-    {
-    	logger.debug("GetFirstScan(.) Invoked");
-    	
-    	return sharedPreferences.getBoolean(Constants.FIRST_SCAN, true);
-    }
-    
-    public static void SetFirstScan(Editor sharedPreferencesEditor, Boolean firstScan)
-    {
-    	logger.debug(String.format("SetFirstScan(Editor, firstScan=%b) Invoked", firstScan));
-    	
-        sharedPreferencesEditor.putBoolean(Constants.FIRST_SCAN, firstScan);
-        sharedPreferencesEditor.commit();
-    }
-    //End First.Me params
 
     //Current Build Number params
     public static long GetCurrentBuildNumber(SharedPreferences sharedPreferences)

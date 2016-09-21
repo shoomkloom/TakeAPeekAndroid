@@ -171,6 +171,41 @@ public class Transport
         return displayName;
     }
 
+    public static ResponseObject SetDateOfBirth(Context context, String userName, String password, long dateOfBirthMillis, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("SetDateOfBirth(....) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        lock.lock();
+
+        try
+        {
+            logger.debug("SetDateOfBirth(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "set_profile_dob"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("dob", String.format("%d", dateOfBirthMillis)));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside SetDateOfBirth(....)", e);
+            throw e;
+        }
+        finally
+        {
+            lock.unlock();
+            logger.debug("SetDateOfBirth(....) - after unlock");
+        }
+
+        return responseObject;
+    }
+
     public static ResponseObject UpdateLocation(Context context, String userName, String password, double longitude, double latitude, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("UpdateLocation(......) Invoked - before lock");

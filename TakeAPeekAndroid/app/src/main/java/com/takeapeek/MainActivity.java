@@ -5,17 +5,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -24,7 +16,7 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.ormlite.DatabaseManager;
-import com.takeapeek.usermap.UserMapActivity;
+import com.takeapeek.trendingplaces.TrendingPlacesActivity;
 import com.takeapeek.walkthrough.WalkthroughActivity;
 
 import org.slf4j.Logger;
@@ -32,13 +24,14 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+public class MainActivity extends AppCompatActivity
 {
     static private final Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int RESULT_AUTHENTICATE = 9001;
-    private static final int RESULT_CAPTURECLIP = 9002;
+    private static final int RESULT_WALKTHROUGH = 9002;
+    private static final int RESULT_CAPTURECLIP = 9003;
 
     SharedPreferences mSharedPreferences = null;
 
@@ -94,19 +87,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DatabaseManager.init(this);
 
         if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
-                Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
+           Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
         {
-            CreateMain();
+            if(Helper.GetFirstRun(mSharedPreferences) == true)
+            {
+                ShowWalkthrough();
+
+                Helper.SetFirstRun(mSharedPreferences.edit(), false);
+            }
+            else
+            {
+                if(ShowCaptureOnLoad() == false)
+                {
+                    ShowTrendingPlaces();
+                }
+            }
         }
         else
         {
-            final Intent intent = new Intent(this, AuthenticatorActivity.class);
-            intent.putExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN, Constants.PARAM_AUTH_REQUEST_ORIGIN_MAIN);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, RESULT_AUTHENTICATE);
+            ShowAuthenticator();
         }
     }
 
+/*@@
     private void CreateMain()
     {
         logger.debug("CreateMain() Invoked");
@@ -143,8 +146,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Registering BroadcastReceiver
         RegisterReceiver();
-@@*/
+@@/
     }
+@@*/
 
     @Override
     protected void onResume()
@@ -169,16 +173,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     {
         logger.debug("onBackPressed() Invoked");
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        if (drawer.isDrawerOpen(GravityCompat.START))
-        {
-            drawer.closeDrawer(GravityCompat.START);
-        }
-        else
-        {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -210,47 +205,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item)
-    {
-        logger.debug("onNavigationItemSelected(.) Invoked");
-
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_map)
-        {
-            final Intent intent = new Intent(MainActivity.this, UserMapActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        }
-        else if (id == R.id.nav_gallery)
-        {
-
-        }
-        else if (id == R.id.nav_slideshow)
-        {
-
-        }
-        else if (id == R.id.nav_manage)
-        {
-
-        }
-        else if (id == R.id.nav_share)
-        {
-
-        }
-        else if (id == R.id.nav_send)
-        {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -276,12 +230,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case RESULT_AUTHENTICATE:
                 logger.info("onActivityResult: requestCode = 'RESULT_AUTHENTICATE'");
 
-                CreateMain();
+                ShowWalkthrough();
+
+                break;
+
+            case RESULT_WALKTHROUGH:
+                logger.info("onActivityResult: requestCode = 'RESULT_WALKTHROUGH'");
+
+                ShowTrendingPlaces();
 
                 break;
 
             case RESULT_CAPTURECLIP:
                 logger.info("onActivityResult: requestCode = 'RESULT_CAPTURECLIP'");
+
+                ShowTrendingPlaces();
 
                 break;
 
@@ -289,6 +252,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 logger.error(String.format("onActivityResult: unknown requestCode = '%d' returned", requestCode));
                 break;
         }
+    }
+
+    private void ShowAuthenticator()
+    {
+        logger.debug("ShowAuthenticator() Invoked");
+
+        Intent authenticatorActivityIntent = new Intent(this, AuthenticatorActivity.class);
+        authenticatorActivityIntent.putExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN, Constants.PARAM_AUTH_REQUEST_ORIGIN_MAIN);
+        authenticatorActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivityForResult(authenticatorActivityIntent, RESULT_AUTHENTICATE);
+    }
+
+    private void ShowWalkthrough()
+    {
+        logger.debug("ShowWalkthrough() Invoked");
+
+        Intent walkthroughActivityIntent = new Intent(this, WalkthroughActivity.class);
+        walkthroughActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivityForResult(walkthroughActivityIntent, RESULT_WALKTHROUGH);
+    }
+
+    private void ShowTrendingPlaces()
+    {
+        logger.debug("ShowTrendingPlaces() Invoked");
+
+        Intent trendingPlacesActivityIntent = new Intent(this, TrendingPlacesActivity.class);
+        trendingPlacesActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(trendingPlacesActivityIntent);
+    }
+
+    private boolean ShowCaptureOnLoad()
+    {
+        logger.debug("ShowCaptureOnLoad() Invoked");
+
+        boolean showCaptureOnLoad = false;
+
+        try
+        {
+            long currentTimeMillis = Helper.GetCurrentTimeMillis();
+
+            if (currentTimeMillis - Helper.GetLastCapture(mSharedPreferences) > Constants.INTERVAL_HOUR)
+            {
+                Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
+                showCaptureOnLoad = true;
+
+                Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);
+                captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivityForResult(captureClipActivityIntent, RESULT_CAPTURECLIP);
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to load CaptureClipActivity", e);
+        }
+
+        return showCaptureOnLoad;
     }
 
 /*@@
@@ -334,6 +354,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+/*@@
     private OnClickListener onClickListener = new OnClickListener()
     {
         @Override
@@ -355,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 /*@@
                         Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
-@@*/
+@@/
 
                     }
                     catch (Exception e)
@@ -388,4 +409,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     };
+*/
 }

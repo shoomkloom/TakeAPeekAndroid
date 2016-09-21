@@ -14,15 +14,14 @@
         android:background="@color/tap_blue">
 
         <ImageView
-            android:id="@+id/imageview_map_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="centerInside"
-            android:src="@drawable/button_notifications"
-            android:layout_alignParentTop="true"
+            android:id="@+id/imageview_map"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/button_map"
+            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_margin="15dp"
-            android:visibility="invisible"/>
+            android:layout_margin="15dp"/>
 
         <TextView
             android:id="@+id/textview_places_title"
@@ -36,16 +35,6 @@
             android:textColor="@color/tap_white"/>
 
     </RelativeLayout>
-
-<!--
-    <ImageView
-        android:id = "@+id/places_thumbnail"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:scaleType="centerCrop"
-        android:visibility="gone" />
--->
 
     <ListView
         android:id="@+id/listview_places_list"

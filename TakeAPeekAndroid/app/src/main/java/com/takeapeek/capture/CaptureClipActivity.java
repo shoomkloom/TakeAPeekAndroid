@@ -1358,6 +1358,7 @@ public class CaptureClipActivity extends Activity implements
 
         // set screen to max brightness - see http://stackoverflow.com/questions/11978042/android-screen-brightness-max-value
 		// done here rather than onCreate, so that changing it in preferences takes effect without restarting app
+/*@@
 		{
 	        WindowManager.LayoutParams layout = getWindow().getAttributes();
 			if(mSharedPreferences.getBoolean(com.takeapeek.capture.PreferenceKeys.getMaxBrightnessPreferenceKey(), true) )
@@ -1371,7 +1372,8 @@ public class CaptureClipActivity extends Activity implements
 
             getWindow().setAttributes(layout);
 		}
-		
+@@*/
+
 		initImmersiveMode();
 		camera_in_background = false;
     }
@@ -3154,7 +3156,13 @@ public class CaptureClipActivity extends Activity implements
                 mRelativelayoutIntro.setVisibility(View.VISIBLE);
                 mTextviewIntroLine1.setVisibility(View.VISIBLE);
                 mImageviewIntroArrow.setVisibility(View.VISIBLE);
-                mTextviewIntroLine2.setVisibility(View.VISIBLE);
+
+                if(Helper.GetFirstCapture(mSharedPreferences) == true)
+                {
+                    mTextviewIntroLine2.setVisibility(View.VISIBLE);
+                    Helper.SetFirstCapture(mSharedPreferences.edit(), false);
+                }
+
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
                 mTextviewButtonBack.setVisibility(View.GONE);

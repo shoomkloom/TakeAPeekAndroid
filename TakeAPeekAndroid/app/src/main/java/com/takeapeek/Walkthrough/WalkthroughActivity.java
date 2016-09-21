@@ -130,11 +130,15 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         {
             case R.id.textview_button_skip:
                 logger.info("onClick(.) Invoked with R.id.textview_button_skip");
+
+                setResult(RESULT_OK);
                 finish();
                 break;
 
             case R.id.textview_button_letsgo:
                 logger.info("onClick(.) Invoked with R.id.textview_button_letsgo");
+
+                setResult(RESULT_OK);
                 finish();
                 break;
         }

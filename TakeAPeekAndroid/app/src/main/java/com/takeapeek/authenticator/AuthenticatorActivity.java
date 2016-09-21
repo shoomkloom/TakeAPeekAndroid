@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -27,6 +28,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -53,6 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,7 +73,8 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 		receiveSMSTimeout,
 		verificationSuccess,
 		accountCreationSuccess,
-        displayNameVerify
+        displayNameVerify,
+        dateOfBirth
 	}
 
     ValidateDisplayNameAsyncTask mValidateDisplayNameAsyncTask = null;
@@ -159,6 +163,8 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     
     private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
     private Bundle mResultBundle = null;
+
+    Calendar mCalendar = Calendar.getInstance();
 
     /**
      * Set the result that is to be sent as the result of the request that caused this
@@ -324,26 +330,26 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 		            	termAndConditionsLink.setText(Html.fromHtml(text)); 
 			        	
 			        	TextView buttonCreateAccount = (TextView)findViewById(R.id.button_create_account);
-			        	buttonCreateAccount.setOnClickListener(onClickListener);
+			        	buttonCreateAccount.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, buttonCreateAccount, FontTypeEnum.boldFont);
 			        	
 			        	TextView loginResendCode = (TextView)findViewById(R.id.login_resend_code);
-			        	loginResendCode.setOnClickListener(onClickListener);
+			        	loginResendCode.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, loginResendCode, FontTypeEnum.lightFont);
 			        	
 			        	TextView loginResendRequestCall = (TextView)findViewById(R.id.login_resend_request_call);
-			        	loginResendRequestCall.setOnClickListener(onClickListener);
+			        	loginResendRequestCall.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, loginResendRequestCall, FontTypeEnum.lightFont);
 			        	
 			        	TextView loginResendEditNumberMessage = (TextView)findViewById(R.id.login_resend_edit_number_message);
 			        	Helper.setTypeface(this, loginResendEditNumberMessage, FontTypeEnum.lightFont);
 			        	
 			        	TextView loginResendEditNumber = (TextView)findViewById(R.id.login_resend_edit_number);
-			        	loginResendEditNumber.setOnClickListener(onClickListener);
+			        	loginResendEditNumber.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, loginResendEditNumber, FontTypeEnum.lightFont);
 
                         TextView buttonVerifyAccount = (TextView)findViewById(R.id.button_verify_account_submit);
-			        	buttonVerifyAccount.setOnClickListener(onClickListener);
+			        	buttonVerifyAccount.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, buttonVerifyAccount, FontTypeEnum.boldFont);
 
 			        	mVerificationMessageHeader = (TextView)findViewById(R.id.login_textview_verification_message_header);
@@ -378,7 +384,10 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 
                         mDisplayNameValidationProgess = (ImageView)findViewById(R.id.imageview_display_name_validation_progess);
                         mButtonCreateDisplayName = (TextView)findViewById(R.id.button_create_display_name);
-                        mButtonCreateDisplayName.setOnClickListener(onClickListener);
+                        mButtonCreateDisplayName.setOnClickListener(ClickListener);
+
+                        findViewById(R.id.textview_date_of_birth).setOnClickListener(ClickListener);
+                        findViewById(R.id.button_create_date_of_birth).setOnClickListener(ClickListener);
 
 			        	mLoginTextviewProgressBottom = (TextView)findViewById(R.id.login_textview_progress_bottom);
 			        	Helper.setTypeface(this, mLoginTextviewProgressBottom, FontTypeEnum.lightFont);
@@ -617,7 +626,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                 }
                 catch (Exception e)
                 {
-                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when registering the FCM token", e);
                 }
 
                 return null;
@@ -878,18 +887,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     			mHandlerState = HandlerState.verificationSuccess;
     			UpdateUI();
 
-/*@@
-      	        //Set a 3 second timeout for going to teaser
-            	mHandler.postDelayed(new Runnable() 
-            	{
-                    public void run() 
-                    {
-                        Message msg = Message.obtain();
-                        msg.arg1 = HandlerState.accountCreationSuccess.ordinal();
-                        mHandler.sendMessage(msg);
-                    }
-                }, 3000);
-*/
                 break;
     	        
     		case accountCreationSuccess:
@@ -902,18 +899,19 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             case displayNameVerify:
                 logger.info("HandleMessage::displayNameVerify");
 
-                mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
-                mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
-                Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
-                mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
-                zoomInAnimation.start();
-                AnimationDrawable progressDrawable = (AnimationDrawable)mDisplayNameValidationProgess.getDrawable();
-                progressDrawable.start();
+                mHandlerState = HandlerState.displayNameVerify;
+                UpdateUI();
 
                 String proposedDisplayName = mEditTextDisplayName.getText().toString();
 
                 mValidateDisplayNameAsyncTask = new ValidateDisplayNameAsyncTask(this, proposedDisplayName, mSharedPreferences);
                 mValidateDisplayNameAsyncTask.execute();
+
+                break;
+
+            case dateOfBirth:
+                logger.info("HandleMessage::dateOfBirth");
+
 
                 break;
     			
@@ -1107,6 +1105,25 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
             	
 	    		break;
+
+            case displayNameVerify:
+
+                mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
+                mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
+                Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
+                mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
+                zoomInAnimation.start();
+                AnimationDrawable progressDrawable = (AnimationDrawable)mDisplayNameValidationProgess.getDrawable();
+                progressDrawable.start();
+
+                break;
+
+            case dateOfBirth:
+
+                findViewById(R.id.login_linearlayout_display_name).setVisibility(View.GONE);
+                findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.VISIBLE);
+
+                break;
     		
     		default: break;
     	}
@@ -1154,7 +1171,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
         public void onTextChanged(CharSequence s, int start, int before, int count){}
     };
     
-    private OnClickListener onClickListener = new OnClickListener() 
+    private OnClickListener ClickListener = new OnClickListener()
     { 
         @Override 
         public void onClick(final View v) 
@@ -1241,11 +1258,38 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                 case R.id.button_create_display_name:
                     logger.info("OnClickListener: 'button_create_display_name' clicked");
 
-                    setResult(RESULT_OK);
-
                     Helper.SetDisplayNameSuccess(mSharedPreferences.edit(), true);
                     Helper.SetProfileDisplayName(mSharedPreferences.edit(), mEditTextDisplayName.getText().toString());
 
+                    mHandlerState =  HandlerState.dateOfBirth;
+                    UpdateUI();
+
+                    break;
+
+                case R.id.textview_date_of_birth:
+                    logger.info("OnClickListener: 'textview_date_of_birth' clicked");
+
+/*@@
+                    //Show date picker dialog
+                    final Dialog datePickerDialog = new Dialog(AuthenticatorActivity.this);
+                    datePickerDialog.setContentView(R.layout.dialog_datepicker);
+                    datePickerDialog.show();
+@@*/
+
+                    new DatePickerDialog(
+                            AuthenticatorActivity.this,
+                            AlertDialog.THEME_HOLO_LIGHT,
+                            dateSetListener,
+                            mCalendar.get(Calendar.YEAR),
+                            mCalendar.get(Calendar.MONTH),
+                            mCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+                    break;
+
+                case R.id.button_create_date_of_birth:
+                    logger.info("OnClickListener: 'button_create_date_of_birth' clicked");
+
+                    setResult(RESULT_OK);
                     finish();
 
                     break;
@@ -1254,6 +1298,71 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             } 
         } 
     };
+
+    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+        {
+            mCalendar.set(Calendar.YEAR, year);
+            mCalendar.set(Calendar.MONTH, monthOfYear);
+            mCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+            new AsyncTask<Void, Void, ResponseObject>()
+            {
+                @Override
+                protected ResponseObject doInBackground(Void... params)
+                {
+                    try
+                    {
+                        logger.info("Setting Date Of Birth");
+
+                        long dateOfBirthMillis = mCalendar.getTimeInMillis();
+
+                        String userName = Helper.GetTakeAPeekAccountUsername(AuthenticatorActivity.this);
+                        String password = Helper.GetTakeAPeekAccountPassword(AuthenticatorActivity.this);
+
+                        return Transport.SetDateOfBirth(AuthenticatorActivity.this, userName, password, dateOfBirthMillis, mSharedPreferences);
+                    }
+                    catch (Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: doInBackground: setting date of birth", e);
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(ResponseObject responseObject)
+                {
+                    logger.debug("onPostExecute(.) Invoked");
+
+                    if(responseObject == null)
+                    {
+                        Helper.Error(logger, "responseObject = null when trying set date of birth");
+                    }
+
+                    //@@This is where we can check for appropriate age
+
+                    UpdateDOBTextView();
+                }
+            }.execute();
+        }
+    };
+
+    private void UpdateDOBTextView()
+    {
+        logger.debug("UpdateDOBTextView() Invoked");
+
+        java.text.DateFormat formatter = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM);
+        formatter.setTimeZone(mCalendar.getTimeZone());
+        String formattedDate = formatter.format(mCalendar.getTime());
+
+        ((TextView)findViewById(R.id.textview_date_of_birth)).setText(formattedDate);
+
+        //Enable the 'Continue' button
+        findViewById(R.id.button_create_date_of_birth).setEnabled(true);
+    }
 
     private void OnButtonCreateAccount()
     {

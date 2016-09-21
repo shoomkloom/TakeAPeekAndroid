@@ -25,6 +25,7 @@ import com.takeapeek.common.Transport;
 import com.takeapeek.common.TrendingPlaceObject;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +135,8 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_places_empty);
 
+        findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
+
         mEnumActivityState = EnumActivityState.loading;
         UpdateUI();
 
@@ -178,6 +181,15 @@ public class TrendingPlacesActivity extends AppCompatActivity
                 }
             }
         }.execute();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        logger.debug("onBackPressed() Invoked");
+
+        //@@ Do nothing
+        //@@ super.onBackPressed();
     }
 
     public void FillList(ArrayList<TrendingPlaceObject> trendingPlaceObjectList)
@@ -234,13 +246,12 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
             switch (v.getId())
             {
-                case R.id.user_peek_stack_close:
-                    logger.info("onClick: user_peek_stack_close");
+                case R.id.imageview_map:
+                    logger.info("onClick: imageview_map");
 
-                    mCurrentTakeAPeekObject = null;
-
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
+                    Intent userMapActivityIntent = new Intent(TrendingPlacesActivity.this, UserMapActivity.class);
+                    userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(userMapActivityIntent);
 
                     break;
 
