@@ -82,12 +82,19 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         logger.debug("onCreate(.) Invoked");
 
+        DoCreate();
+    }
+
+    private void DoCreate()
+    {
+        logger.debug("DoCreate() Invoked");
+
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         DatabaseManager.init(this);
 
         if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
-           Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
+                Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
         {
             if(Helper.GetFirstRun(mSharedPreferences) == true)
             {
@@ -155,7 +162,7 @@ public class MainActivity extends AppCompatActivity
     {
         logger.debug("onResume() Invoked");
 
-        DatabaseManager.init(this);
+        //@@DoCreate();
 
         super.onResume();
     }
@@ -237,7 +244,10 @@ public class MainActivity extends AppCompatActivity
             case RESULT_WALKTHROUGH:
                 logger.info("onActivityResult: requestCode = 'RESULT_WALKTHROUGH'");
 
-                ShowTrendingPlaces();
+                if(ShowCaptureOnLoad() == false)
+                {
+                    ShowTrendingPlaces();
+                }
 
                 break;
 

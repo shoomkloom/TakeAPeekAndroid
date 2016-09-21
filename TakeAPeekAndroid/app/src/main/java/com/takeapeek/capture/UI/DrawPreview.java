@@ -13,7 +13,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Pair;
 import android.view.Surface;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.takeapeek.R;
@@ -538,9 +537,9 @@ public class DrawPreview
 		else if( ui_rotation == 90 || ui_rotation == 270 )
         {
 			//text_base_y = canvas.getHeight() + (int)(0.5*text_y);
-			ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
+			//@@ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
 			// align with "top" of the take_photo button, but remember to take the rotation into account!
-			view.getLocationOnScreen(gui_location);
+			//@@view.getLocationOnScreen(gui_location);
 			int view_left = gui_location[0];
 			preview.getView().getLocationOnScreen(gui_location);
 			int this_left = gui_location[0];

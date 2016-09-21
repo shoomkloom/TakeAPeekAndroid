@@ -18,7 +18,6 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
@@ -26,10 +25,7 @@ import android.provider.MediaStore;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.SeekBar;
 
-import com.takeapeek.R;
 import com.takeapeek.capture.CameraController.CameraController;
 import com.takeapeek.capture.Preview.ApplicationInterface;
 import com.takeapeek.capture.Preview.Preview;
@@ -57,7 +53,7 @@ public class MyApplicationInterface implements ApplicationInterface
 	private CaptureClipActivity main_activity = null;
 	private com.takeapeek.capture.StorageUtils storageUtils = null;
 	private DrawPreview drawPreview = null;
-	private ImageSaver imageSaver = null;
+	//@@private ImageSaver imageSaver = null;
 
 	private Rect text_bounds = new Rect();
 
@@ -84,8 +80,8 @@ public class MyApplicationInterface implements ApplicationInterface
 
 		this.drawPreview = new DrawPreview(main_activity, this);
 		
-		this.imageSaver = new ImageSaver(main_activity);
-		this.imageSaver.start();
+		//@@this.imageSaver = new ImageSaver(main_activity);
+		//@@this.imageSaver.start();
 
         if( savedInstanceState != null )
         {
@@ -118,12 +114,14 @@ public class MyApplicationInterface implements ApplicationInterface
         return storageUtils;
 	}
 	
-	ImageSaver getImageSaver()
+/*@@
+    ImageSaver getImageSaver()
     {
         logger.debug("getImageSaver() Invoked.");
 
         return imageSaver;
 	}
+@@*/
 
     @Override
 	public Context getContext()
@@ -958,25 +956,29 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("touchEvent(.) Invoked.");
 
+/*@@
 		main_activity.getMainUI().clearSeekBar();
 		main_activity.getMainUI().closePopup();
 		if( main_activity.usingKitKatImmersiveMode() )
         {
 			main_activity.setImmersiveMode(false);
 		}
+@@*/
 	}
-	
+
 	@Override
 	public void startingVideo()
     {
         logger.debug("startingVideo() Invoked.");
 
+/*@@
 		if( mSharedPreferences.getBoolean(com.takeapeek.capture.PreferenceKeys.getLockVideoPreferenceKey(), false) )
         {
 			main_activity.lockScreen();
 		}
 		main_activity.stopAudioListeners(); // important otherwise MediaRecorder will fail to start() if we have an audiolistener! Also don't want to have the speech recognizer going off
-		ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
+		//@@ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
+@@*/
 	}
 
 	@Override
@@ -984,8 +986,8 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("stoppingVideo() Invoked.");
 
-		main_activity.unlockScreen();
-		ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
+		//@@main_activity.unlockScreen();
+		//@@ImageButton view = (ImageButton)main_activity.findViewById(R.id.take_photo);
 	}
 
 	@Override
@@ -1088,6 +1090,7 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("hasPausedPreview() Invoked.");
 
+/*@@
 	    View shareButton = (View) main_activity.findViewById(R.id.share);
 	    View trashButton = (View) main_activity.findViewById(R.id.trash);
 	    if( paused )
@@ -1100,7 +1103,7 @@ public class MyApplicationInterface implements ApplicationInterface
 			shareButton.setVisibility(View.GONE);
 		    trashButton.setVisibility(View.GONE);
 	    }
-		
+@@*/
 	}
 	
     @Override
@@ -1117,11 +1120,12 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("cameraClosed() Invoked.");
 
-		main_activity.getMainUI().clearSeekBar();
-		main_activity.getMainUI().destroyPopup(); // need to close popup - and when camera reopened, it may have different settings
+		//@@main_activity.getMainUI().clearSeekBar();
+		//@@main_activity.getMainUI().destroyPopup(); // need to close popup - and when camera reopened, it may have different settings
 		drawPreview.clearContinuousFocusMove();
 	}
-	
+
+/*@@
 	void updateThumbnail(Bitmap thumbnail)
     {
         logger.debug("updateThumbnail(.) Invoked.");
@@ -1129,7 +1133,8 @@ public class MyApplicationInterface implements ApplicationInterface
 		main_activity.updateGalleryIcon(thumbnail);
 		drawPreview.updateThumbnail(thumbnail);
 	}
-	
+@@*/
+
 	@Override
 	public void timerBeep(long remaining_time)
     {
@@ -1198,8 +1203,8 @@ public class MyApplicationInterface implements ApplicationInterface
 		editor.apply();
 		// focus may be updated by preview (e.g., when switching to/from video mode)
     	final int visibility = main_activity.getPreview().getCurrentFocusValue() != null && main_activity.getPreview().getCurrentFocusValue().equals("focus_mode_manual2") ? View.VISIBLE : View.INVISIBLE;
-	    View focusSeekBar = (SeekBar) main_activity.findViewById(R.id.focus_seekbar);
-	    focusSeekBar.setVisibility(visibility);
+	    //@@View focusSeekBar = (SeekBar) main_activity.findViewById(R.id.focus_seekbar);
+	    //@@focusSeekBar.setVisibility(visibility);
     }
 
     @Override
@@ -1500,6 +1505,7 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("onPictureTaken(..) Invoked.");
 
+/*@@
         System.gc();
 		logger.info("onPictureTaken");
 
@@ -1555,8 +1561,10 @@ public class MyApplicationInterface implements ApplicationInterface
 				has_thumbnail_animation);
 		
 		logger.info("onPictureTaken complete, success: " + success);
-		
+
 		return success;
+@@*/
+        return true;
 	}
 
     @Override
@@ -1569,7 +1577,7 @@ public class MyApplicationInterface implements ApplicationInterface
 
 		boolean do_in_background = saveInBackground(false);
 
-		boolean success = imageSaver.saveImageRaw(do_in_background, dngCreator, image, current_date);
+		boolean success = true;//@@imageSaver.saveImageRaw(do_in_background, dngCreator, image, current_date);
 		
 		logger.info("onRawPictureTaken complete");
 		return success;
@@ -1667,6 +1675,8 @@ public class MyApplicationInterface implements ApplicationInterface
 			clearLastImage();
 			preview.startCameraPreview();
 		}
+
+/*@@
     	// Calling updateGalleryIcon() immediately has problem that it still returns the latest image that we've just deleted!
     	// But works okay if we call after a delay. 100ms works fine on Nexus 7 and Galaxy Nexus, but set to 500 just to be safe.
     	final Handler handler = new Handler();
@@ -1678,6 +1688,7 @@ public class MyApplicationInterface implements ApplicationInterface
 				main_activity.updateGalleryIcon();
 			}
 		}, 500);
+@@*/
 	}
 
 	// for testing

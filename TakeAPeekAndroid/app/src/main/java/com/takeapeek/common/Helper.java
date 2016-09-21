@@ -152,12 +152,12 @@ public class Helper
     {
         logger.debug("RefreshFCMToken(..) Invoked.");
 
-        // Get updated InstanceID token.
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        logger.info("Refreshed token: " + refreshedToken);
-
         try
         {
+            // Get updated InstanceID token.
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            logger.info("Refreshed token: " + refreshedToken);
+
             String userName = GetTakeAPeekAccountUsername(context);
             String password = GetTakeAPeekAccountPassword(context);
 
@@ -170,7 +170,7 @@ public class Helper
 
         return null;
     }
-	
+
 	static public boolean DoesTakeAPeekAccountExist(Context context, Handler handler)
     {
     	logger.debug("DoesTakeAPeekAccountExist() Invoked");

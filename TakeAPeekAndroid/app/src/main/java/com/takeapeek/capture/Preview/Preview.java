@@ -52,7 +52,6 @@ import com.takeapeek.capture.CameraController.CameraControllerManager2;
 import com.takeapeek.capture.Preview.CameraSurface.CameraSurface;
 import com.takeapeek.capture.Preview.CameraSurface.MySurfaceView;
 import com.takeapeek.capture.Preview.CameraSurface.MyTextureView;
-import com.takeapeek.capture.TakePhoto;
 import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
@@ -1198,6 +1197,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         {
 			Activity activity = (Activity)this.getContext();
 
+/*@@
 			logger.info("intent: " + activity.getIntent());
 
 			if( activity.getIntent() != null && activity.getIntent().getExtras() != null )
@@ -1209,6 +1209,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             {
 				logger.info("no intent data");
 			}
+@@*/
 
 			logger.info("take_photo?: " + take_photo);
 

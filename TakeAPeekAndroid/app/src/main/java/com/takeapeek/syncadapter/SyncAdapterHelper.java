@@ -2,6 +2,7 @@ package com.takeapeek.syncadapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -82,16 +83,13 @@ public class SyncAdapterHelper implements Runnable,
         String packageName = "NA";
         try 
         {
-/*@@
         	packageName = mContext.getPackageName();
 			PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(packageName, 0);
 			mBuildNumber = packageInfo.versionCode;
 			mAppVersion = packageInfo.versionName;
 			
 			logger.info(String.format("====== App Version: %s : %d : %s ======", mAppVersion, mBuildNumber, packageName));
-@@*/
-
-		} 
+		}
         catch (Exception e) 
         {
 			Helper.Error(logger, String.format("EXCEPTION: When trying to get app version for %s", packageName), e); 

@@ -5,10 +5,8 @@ import android.preference.PreferenceManager;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.ZoomControls;
 
 import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
@@ -97,6 +95,7 @@ public class MainUI
 			align_parent_bottom = RelativeLayout.ALIGN_PARENT_TOP;
 		}
 
+/*@@
         {
 			// we use a dummy button, so that the GUI buttons keep their positioning even if the Settings button is hidden (visibility set to View.GONE)
 			View view = main_activity.findViewById(R.id.gui_anchor);
@@ -185,14 +184,14 @@ public class MainUI
 			layoutParams.addRule(right_of, 0);
 			view.setLayoutParams(layoutParams);
 			view.setRotation(ui_rotation);
-	
+
 			view = main_activity.findViewById(R.id.take_photo);
 			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
 			layoutParams.addRule(align_parent_left, 0);
 			layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
 			view.setLayoutParams(layoutParams);
 			view.setRotation(ui_rotation);
-	
+
 			view = main_activity.findViewById(R.id.zoom);
 			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
 			layoutParams.addRule(align_parent_left, 0);
@@ -212,6 +211,7 @@ public class MainUI
 			layoutParams.addRule(align_parent_bottom, RelativeLayout.TRUE);
 			view.setLayoutParams(layoutParams);
 		}
+@@*/
 
         {
 			// set seekbar info
@@ -229,6 +229,7 @@ public class MainUI
 			int width_pixels = (int) (width_dp * scale + 0.5f); // convert dps to pixels
 			int height_pixels = (int) (height_dp * scale + 0.5f); // convert dps to pixels
 
+/*@@
 			View view = main_activity.findViewById(R.id.exposure_seekbar);
 			view.setRotation(ui_rotation);
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)view.getLayoutParams();
@@ -295,16 +296,17 @@ public class MainUI
 				view.setTranslationX(height_pixels);
 				view.setTranslationY(0);
 			}
-
+@@*/
 		}
 
-		setTakePhotoIcon();
+		//@@setTakePhotoIcon();
 		// no need to call setSwitchCameraContentDescription()
     }
 
     /** Set icon for taking photos vs videos.
 	 *  Also handles content descriptions for the take photo button and switch video button.
      */
+/*@@
     public void setTakePhotoIcon()
     {
         logger.debug("setTakePhotoIcon() Invoked.");
@@ -325,6 +327,7 @@ public class MainUI
 			}
 		}
     }
+@@*/
 
     public boolean getUIPlacementRight()
     {
@@ -378,16 +381,22 @@ public class MainUI
 		    	final int visibility = immersive_mode ? View.GONE : View.VISIBLE;
 				logger.info("setImmersiveMode: set visibility: " + visibility);
 		    	// n.b., don't hide share and trash buttons, as they require immediate user input for us to continue
-			    View switchCameraButton = (View) main_activity.findViewById(R.id.switch_camera);
+
+                /*@@
+                View switchCameraButton = (View) main_activity.findViewById(R.id.switch_camera);
 			    View switchVideoButton = (View) main_activity.findViewById(R.id.switch_video);
 			    View exposureButton = (View) main_activity.findViewById(R.id.exposure);
 			    View exposureLockButton = (View) main_activity.findViewById(R.id.exposure_lock);
 			    View audioControlButton = (View) main_activity.findViewById(R.id.audio_control);
 			    View popupButton = (View) main_activity.findViewById(R.id.popup);
+			    @@*/
+
 			    //@@View galleryButton = (View) main_activity.findViewById(R.id.gallery);
 			    //@@View settingsButton = (View) main_activity.findViewById(R.id.settings);
-			    View zoomControls = (View) main_activity.findViewById(R.id.zoom);
+			    //@@View zoomControls = (View) main_activity.findViewById(R.id.zoom);
 			    View zoomSeekBar = (View) main_activity.findViewById(R.id.zoom_seekbar);
+
+                /*@@
 			    if( main_activity.getPreview().getCameraControllerManager().getNumberOfCameras() > 1 )
 			    	switchCameraButton.setVisibility(visibility);
 		    	switchVideoButton.setVisibility(View.INVISIBLE);
@@ -398,23 +407,29 @@ public class MainUI
 			    if( main_activity.hasAudioControl() )
 			    	audioControlButton.setVisibility(View.INVISIBLE);
 		    	popupButton.setVisibility(visibility);
+                @@*/
 
 				logger.info("has_zoom: " + main_activity.getPreview().supportsZoom());
 
+/*@@
 				if( main_activity.getPreview().supportsZoom() && sharedPreferences.getBoolean(PreferenceKeys.getShowZoomControlsPreferenceKey(), false) )
                 {
 					zoomControls.setVisibility(visibility);
 				}
+@@*/
 				if( main_activity.getPreview().supportsZoom() && sharedPreferences.getBoolean(PreferenceKeys.getShowZoomSliderControlsPreferenceKey(), true) )
                 {
 					zoomSeekBar.setVisibility(visibility);
 				}
         		String pref_immersive_mode = sharedPreferences.getString(PreferenceKeys.getImmersiveModePreferenceKey(), "immersive_mode_low_profile");
+
+/*@@
         		if( pref_immersive_mode.equals("immersive_mode_everything") )
                 {
     			    View takePhotoButton = (View) main_activity.findViewById(R.id.take_photo);
     			    takePhotoButton.setVisibility(View.INVISIBLE);
         		}
+@@*/
 				if( !immersive_mode )
                 {
 					// make sure the GUI is set up as expected
@@ -442,11 +457,13 @@ public class MainUI
             return;
         }
 
+/*@@
 		if( show && main_activity.usingKitKatImmersiveMode() )
         {
 			// call to reset the timer
 			main_activity.initImmersiveMode();
 		}
+@@*/
 
         main_activity.runOnUiThread(new Runnable()
         {
@@ -455,6 +472,8 @@ public class MainUI
                 logger.debug("runOnUiThread:run() Invoked.");
 
 		    	final int visibility = show ? View.VISIBLE : View.GONE;
+
+/*@@
 			    View switchCameraButton = (View) main_activity.findViewById(R.id.switch_camera);
 			    View switchVideoButton = (View) main_activity.findViewById(R.id.switch_video);
 			    View exposureButton = (View) main_activity.findViewById(R.id.exposure);
@@ -489,10 +508,12 @@ public class MainUI
                 {
                     popupButton.setVisibility(View.INVISIBLE); // still allow popup in order to change flash mode when recording video
                 }
+@@*/
 			}
 		});
     }
 
+/*@@
     public void audioControlStarted()
     {
         logger.debug("audioControlStarted() Invoked.");
@@ -554,6 +575,7 @@ public class MainUI
 			}
 		}
     }
+@@*/
 
 	public void setSeekbarZoom()
     {
@@ -592,6 +614,7 @@ public class MainUI
 	    }
 	}
 
+/*@@
     public void clearSeekBar()
     {
         logger.debug("clearSeekBar() Invoked.");
@@ -605,7 +628,7 @@ public class MainUI
 		view = main_activity.findViewById(R.id.exposure_seekbar_zoom);
 		view.setVisibility(View.GONE);
     }
-    
+
     public void setPopupIcon()
     {
         logger.debug("setPopupIcon() Invoked.");
@@ -644,7 +667,6 @@ public class MainUI
     {
         logger.debug("closePopup() Invoked.");
 
-/*@@
 		if( popupIsOpen() )
 		{
 			ViewGroup popup_container = (ViewGroup)main_activity.findViewById(R.id.popup_container);
@@ -662,8 +684,8 @@ public class MainUI
 			destroyPopup();
 			main_activity.initImmersiveMode(); // to reset the timer when closing the popup
 		}
-*/
     }
+
 
     public boolean popupIsOpen()
     {
@@ -682,6 +704,7 @@ public class MainUI
 		}
 //@@		popup_view = null;
     }
+@@*/
 
     public void togglePopupSettings()
     {

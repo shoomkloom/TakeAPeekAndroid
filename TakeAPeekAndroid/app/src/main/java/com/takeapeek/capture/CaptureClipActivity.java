@@ -1,12 +1,9 @@
 package com.takeapeek.capture;
 
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.KeyguardManager;
-import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +13,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -28,16 +24,11 @@ import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
@@ -56,7 +47,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -65,7 +55,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
-import android.widget.ZoomControls;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -86,17 +75,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /** The main Activity for Open Camera.
  */
 public class CaptureClipActivity extends Activity implements
-        AudioListener.AudioListenerCallback,
+//@@        AudioListener.AudioListenerCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
@@ -129,7 +116,7 @@ public class CaptureClipActivity extends Activity implements
 	private TextToSpeech textToSpeech = null;
 	private boolean textToSpeechSuccess = false;
 	
-	private AudioListener audio_listener = null;
+//@@	private AudioListener audio_listener = null;
 	private int audio_noise_sensitivity = -1;
 	private SpeechRecognizer speechRecognizer = null;
 	private boolean speechRecognizerIsStarted = false;
@@ -278,17 +265,17 @@ public class CaptureClipActivity extends Activity implements
 		}
 
 		// clear any seek bars (just in case??)
-		mainUI.clearSeekBar();
+		//@@mainUI.clearSeekBar();
 
 		// set up the camera and its preview
         preview = new Preview(applicationInterface, savedInstanceState, ((ViewGroup) this.findViewById(R.id.preview)));
 
 		// initialise on-screen button visibility
-	    View switchCameraButton = (View) findViewById(R.id.switch_camera);
-	    switchCameraButton.setVisibility(preview.getCameraControllerManager().getNumberOfCameras() > 1 ? View.VISIBLE : View.GONE);
+	    //@@View switchCameraButton = (View) findViewById(R.id.switch_camera);
+	    //@@switchCameraButton.setVisibility(preview.getCameraControllerManager().getNumberOfCameras() > 1 ? View.VISIBLE : View.GONE);
 
-	    View speechRecognizerButton = (View) findViewById(R.id.audio_control);
-	    speechRecognizerButton.setVisibility(View.GONE); // disabled by default, until the speech recognizer is created
+	    //@@View speechRecognizerButton = (View) findViewById(R.id.audio_control);
+	    //@@speechRecognizerButton.setVisibility(View.GONE); // disabled by default, until the speech recognizer is created
 
 		// listen for orientation event change
 	    orientationEventListener = new OrientationEventListener(this)
@@ -299,6 +286,7 @@ public class CaptureClipActivity extends Activity implements
 			}
         };
 
+/*@@
 		// listen for gestures
         gestureDetector = new GestureDetector(this, new MyGestureDetector());
 
@@ -336,6 +324,7 @@ public class CaptureClipActivity extends Activity implements
                 }
             }
         });
+@@*/
 
 		// initialise text to speech engine
         textToSpeechSuccess = false;
@@ -531,14 +520,14 @@ public class CaptureClipActivity extends Activity implements
                 logger.info("audio trigger from loud noise");
 
 				time_last_audio_trigger_photo = time_now;
-				audioTrigger();
+				//@@audioTrigger();
 			}
 		}
 	}
-	
+
+/*@@
 	/* Audio trigger - either loud sound, or speech recognition.
 	 * This performs some additional checks before taking a photo.
-	 */
 	private void audioTrigger()
     {
         logger.debug("audioTrigger() Invoked");
@@ -573,6 +562,7 @@ public class CaptureClipActivity extends Activity implements
 			});
 		}
 	}
+@@*/
 	
 	@SuppressWarnings("deprecation")
 	public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -606,7 +596,8 @@ public class CaptureClipActivity extends Activity implements
                         break; // isWiredHeadsetOn() is deprecated, but comment says "Use only to check is a headset is connected or not."
                     }
 	        	}
-	    		
+
+/*@@
 	    		if( volume_keys.equals("volume_take_photo") )
                 {
 	            	takePicture();
@@ -637,6 +628,7 @@ public class CaptureClipActivity extends Activity implements
 	    			}
 					return true;
 	    		}
+@@*/
 	    		else if( volume_keys.equals("volume_zoom") )
                 {
 	    			if( keyCode == KeyEvent.KEYCODE_VOLUME_UP )
@@ -649,6 +641,7 @@ public class CaptureClipActivity extends Activity implements
                     }
 	                return true;
 	    		}
+/*@@
 	    		else if( volume_keys.equals("volume_exposure") )
                 {
 	    			if( preview.getCameraController() != null )
@@ -688,6 +681,7 @@ public class CaptureClipActivity extends Activity implements
 
                     return true;
 	    		}
+@@*/
 	    		else if( volume_keys.equals("volume_really_nothing") )
                 {
 	    			// do nothing, but still return true so we don't change volume either
@@ -706,6 +700,7 @@ public class CaptureClipActivity extends Activity implements
 	            return true;
 			}
 
+/*@@
             case KeyEvent.KEYCODE_CAMERA:
 			{
 				if( event.getRepeatCount() == 0 )
@@ -714,6 +709,7 @@ public class CaptureClipActivity extends Activity implements
 		            return true;
 				}
 			}
+@@*/
 
             case KeyEvent.KEYCODE_FOCUS:
 			{
@@ -756,7 +752,8 @@ public class CaptureClipActivity extends Activity implements
 
 		mainUI.changeSeekbar(R.id.zoom_seekbar, 1);
 	}
-	
+
+/*@@
 	public void changeExposure(int change)
     {
         logger.debug("changeExposure(.) Invoked.");
@@ -770,13 +767,14 @@ public class CaptureClipActivity extends Activity implements
 
 		mainUI.changeSeekbar(R.id.iso_seekbar, change);
 	}
-	
+
 	void changeFocusDistance(int change)
     {
         logger.debug("changeFocusDistance(.) Invoked.");
 
 		mainUI.changeSeekbar(R.id.focus_seekbar, change);
 	}
+@@*/
 	
 	private SensorEventListener accelerometerListener = new SensorEventListener()
     {
@@ -830,12 +828,12 @@ public class CaptureClipActivity extends Activity implements
         mSensorManager.registerListener(magneticListener, mSensorMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
         orientationEventListener.enable();
 
-        initSpeechRecognizer();
+        //@@initSpeechRecognizer();
         initSound();
 
 		mainUI.layoutUI();
 
-		updateGalleryIcon(); // update in case images deleted whilst idle
+	//@@	updateGalleryIcon(); // update in case images deleted whilst idle
 
 		preview.onResume();
     }
@@ -847,6 +845,7 @@ public class CaptureClipActivity extends Activity implements
 
 		super.onWindowFocusChanged(hasFocus);
 
+/*@@
         if( !this.camera_in_background && hasFocus )
         {
 			// low profile mode is cleared when app goes into background
@@ -854,6 +853,7 @@ public class CaptureClipActivity extends Activity implements
         	// we do in onWindowFocusChanged rather than onResume(), to also catch when window lost focus due to notification bar being dragged down (which prevents resetting of immersive mode)
             initImmersiveMode();
         }
+@@*/
 	}
 
     @Override
@@ -861,19 +861,19 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("onPause() Invoked.");
 
-		waitUntilImageQueueEmpty(); // so we don't risk losing any images
+		//@@waitUntilImageQueueEmpty(); // so we don't risk losing any images
 
         super.onPause();
 
-        mainUI.destroyPopup();
+        //@@mainUI.destroyPopup();
 
         mSensorManager.unregisterListener(accelerometerListener);
         mSensorManager.unregisterListener(magneticListener);
 
         orientationEventListener.disable();
 
-        freeAudioListener(false);
-        freeSpeechRecognizer();
+        //@@freeAudioListener(false);
+        //@@freeSpeechRecognizer();
 
 		releaseSound();
 
@@ -897,14 +897,16 @@ public class CaptureClipActivity extends Activity implements
 
         super.onConfigurationChanged(newConfig);
     }
-    
+
+/*@@
     public void waitUntilImageQueueEmpty()
     {
         logger.debug("waitUntilImageQueueEmpty() Invoked.");
 
         applicationInterface.getImageSaver().waitUntilDone();
     }
-    
+@@*/
+
     public void clickedTakePhoto(View view)
     {
         logger.debug("clickedTakePhoto(.) Invoked.");
@@ -923,6 +925,7 @@ public class CaptureClipActivity extends Activity implements
     	this.takePicture();
     }
 
+/*@@
     public void clickedAudioControl(View view)
     {
         logger.debug("clickedAudioControl(.) Invoked.");
@@ -966,7 +969,7 @@ public class CaptureClipActivity extends Activity implements
         	}
         }
     }
-    
+
     private void speechRecognizerStarted()
     {
         logger.debug("speechRecognizerStarted() Invoked.");
@@ -982,6 +985,7 @@ public class CaptureClipActivity extends Activity implements
 		mainUI.audioControlStopped();
 		speechRecognizerIsStarted = false;
     }
+@@*/
     
     /* Returns the cameraId that the "Switch camera" button will switch to.
      */
@@ -1004,6 +1008,7 @@ public class CaptureClipActivity extends Activity implements
 		return cameraId;
     }
 
+/*@@
     public void clickedSwitchCamera(View view)
     {
         logger.debug("clickedSwitchCamera(.) Invoked.");
@@ -1030,20 +1035,21 @@ public class CaptureClipActivity extends Activity implements
 		this.preview.switchVideo(false);
 		switchVideoButton.setEnabled(true);
 
-		mainUI.setTakePhotoIcon();
+		//@@mainUI.setTakePhotoIcon();
 
 		if( !block_startup_toast )
         {
 			this.showPhotoVideoToast(true);
 		}
     }
+@@*/
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void clickedExposure(View view)
     {
         logger.debug("clickedExposure(.) Invoked.");
 
-		mainUI.toggleExposureUI();
+		//@@mainUI.toggleExposureUI();
     }
     
     private static double seekbarScaling(double frac)
@@ -1090,7 +1096,8 @@ public class CaptureClipActivity extends Activity implements
 
     	this.preview.toggleExposureLock();
     }
-    
+
+/*@@
     public boolean popupIsOpen()
     {
         logger.debug("popupIsOpen() Invoked.");
@@ -1104,6 +1111,7 @@ public class CaptureClipActivity extends Activity implements
 
         mainUI.closePopup();
     }
+@@*/
 
     public Bitmap getPreloadedBitmap(int resource)
     {
@@ -1146,7 +1154,7 @@ public class CaptureClipActivity extends Activity implements
 
         logger.info("saved_focus_value: " + saved_focus_value);
 
-		updateFolderHistory(true);
+		//@@updateFolderHistory(true);
 
 		// update camera for changes made in prefs - do this without closing and reopening the camera app if possible for speed!
 		// but need workaround for Nexus 7 bug, where scene mode doesn't take effect unless the camera is restarted - I can reproduce this with other 3rd party camera apps, so may be a Nexus 7 issue...
@@ -1172,6 +1180,7 @@ public class CaptureClipActivity extends Activity implements
 
 		mainUI.layoutUI(); // needed in case we've changed left/right handed UI
 
+/*@@
 		if(mSharedPreferences.getString(com.takeapeek.capture.PreferenceKeys.getAudioControlPreferenceKey(), "none").equals("none") )
         {
 			// ensure icon is invisible if switching from audio control enabled to disabled
@@ -1181,6 +1190,7 @@ public class CaptureClipActivity extends Activity implements
 		}
 
         initSpeechRecognizer(); // in case we've enabled or disabled speech recognizer
+@@*/
 
         if( toast_message != null )
         {
@@ -1219,11 +1229,13 @@ public class CaptureClipActivity extends Activity implements
         	return;
         }
 
+/*@@
         if( popupIsOpen() )
         {
             closePopup();
             return;
         }
+@@*/
 
         super.onBackPressed();
     }
@@ -1245,7 +1257,8 @@ public class CaptureClipActivity extends Activity implements
 
 		return false;
     }
-    
+
+/*@@
     private Handler immersive_timer_handler = null;
     private Runnable immersive_timer_runnable = null;
     
@@ -1320,6 +1333,7 @@ public class CaptureClipActivity extends Activity implements
             getWindow().getDecorView().setSystemUiVisibility(0);
         }
     }
+@@*/
 
     /** Sets the window flags for normal operation (when camera preview is visible).
      */
@@ -1374,7 +1388,7 @@ public class CaptureClipActivity extends Activity implements
 		}
 @@*/
 
-		initImmersiveMode();
+		//@@initImmersiveMode();
 		camera_in_background = false;
     }
     
@@ -1399,10 +1413,11 @@ public class CaptureClipActivity extends Activity implements
 	        getWindow().setAttributes(layout); 
 		}
 
-		setImmersiveMode(false);
+		//@@setImmersiveMode(false);
 		camera_in_background = true;
     }
-    
+
+/*@@
     private void showPreview(boolean show)
     {
         logger.debug("showPreview(.) Invoked.");
@@ -1411,14 +1426,13 @@ public class CaptureClipActivity extends Activity implements
 		container.setBackgroundColor(Color.BLACK);
 		container.setAlpha(show ? 0.0f : 1.0f);
     }
-    
+
     /** Shows the default "blank" gallery icon, when we don't have a thumbnail available.
-     */
+     /
     public void updateGalleryIconToBlank()
     {
         logger.debug("updateGalleryIconToBlank() Invoked.");
 
-/*@@
     	ImageButton galleryButton = (ImageButton) this.findViewById(R.id.gallery);
 	    int bottom = galleryButton.getPaddingBottom();
 	    int top = galleryButton.getPaddingTop();
@@ -1431,25 +1445,22 @@ public class CaptureClipActivity extends Activity implements
 		// workaround for setImageResource also resetting padding, Android bug
 		galleryButton.setPadding(left, top, right, bottom);
 		gallery_bitmap = null;
-*/
     }
 
     /** Shows a thumbnail for the gallery icon.
-     */
+     /
     void updateGalleryIcon(Bitmap thumbnail)
     {
         logger.debug("updateGalleryIcon(.) Invoked.");
 
-/*@@
     	ImageButton galleryButton = (ImageButton) this.findViewById(R.id.gallery);
 		galleryButton.setImageBitmap(thumbnail);
 		gallery_bitmap = thumbnail;
-*/
     }
 
     /** Updates the gallery icon by searching for the most recent photo.
      *  Launches the task in a separate thread.
-     */
+     /
     public void updateGalleryIcon()
     {
         logger.debug("updateGalleryIcon() Invoked.");
@@ -1457,7 +1468,7 @@ public class CaptureClipActivity extends Activity implements
 		new AsyncTask<Void, Void, Bitmap>()
         {
 			/** The system calls this to perform work in a worker thread and
-		      * delivers it the parameters given to AsyncTask.execute() */
+		      * delivers it the parameters given to AsyncTask.execute()
 		    protected Bitmap doInBackground(Void... params)
             {
                 logger.debug("AsyncTask:doInBackground(.) Invoked.");
@@ -1514,7 +1525,7 @@ public class CaptureClipActivity extends Activity implements
 		    }
 
 		    /** The system calls this to perform work in the UI thread and delivers
-		      * the result from doInBackground() */
+		      * the result from doInBackground()
 		    protected void onPostExecute(Bitmap thumbnail)
             {
                 logger.debug("AsyncTask:onPostExecute(.) Invoked.");
@@ -1542,7 +1553,6 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("savingImage(.) Invoked.");
 
-/*@@
 		this.runOnUiThread(new Runnable() {
 			public void run() {
 				final ImageButton galleryButton = (ImageButton) findViewById(R.id.gallery);
@@ -1570,7 +1580,6 @@ public class CaptureClipActivity extends Activity implements
 					galleryButton.setColorFilter(null);
 			}
 		});
-*/
     }
 
     public void clickedGallery(View view)
@@ -1654,7 +1663,6 @@ public class CaptureClipActivity extends Activity implements
     }
 
     /* update_icon should be true, unless it's known we'll call updateGalleryIcon afterwards anyway.
-     */
     private void updateFolderHistory(boolean update_icon)
     {
         logger.debug("updateFolderHistory(.) Invoked.");
@@ -1707,6 +1715,7 @@ public class CaptureClipActivity extends Activity implements
 		save_location_history.clear();
 		updateFolderHistory(true); // to re-add the current choice, and save
     }
+@@*/
     
     private void writeSaveLocations()
     {
@@ -1812,6 +1821,7 @@ public class CaptureClipActivity extends Activity implements
 		}
     }
 
+/*@@
     public void clickedShare(View view)
     {
         logger.debug("clickedShare(.) Invoked.");
@@ -1825,19 +1835,20 @@ public class CaptureClipActivity extends Activity implements
 
 		applicationInterface.trashLastImage();
     }
-
+@@*/
     private void takePicture()
     {
         logger.debug("takePicture() Invoked.");
 
-		closePopup();
+		//@@closePopup();
 
     	this.preview.takePicturePressed();
     }
-    
+
+/*@@
     /** Lock the screen - this is Open Camera's own lock to guard against accidental presses,
      *  not the standard Android lock.
-     */
+     /
     void lockScreen()
     {
         logger.debug("lockScreen() Invoked.");
@@ -1856,7 +1867,7 @@ public class CaptureClipActivity extends Activity implements
     }
 
     /** Unlock the screen (see lockScreen()).
-     */
+     /
     void unlockScreen()
     {
         logger.debug("unlockScreen() Invoked.");
@@ -1866,13 +1877,14 @@ public class CaptureClipActivity extends Activity implements
     }
     
     /** Whether the screen is locked (see lockScreen()).
-     */
+     /
     public boolean isScreenLocked()
     {
         logger.debug("isScreenLocked() Invoked.");
 
     	return screen_is_locked;
     }
+@@*/
 
     /** Listen for gestures.
      *  Doing a swipe will unlock the screen (see lockScreen()).
@@ -1904,7 +1916,7 @@ public class CaptureClipActivity extends Activity implements
                 float vel2 = velocityX*velocityX + velocityY*velocityY;
                 if( dist2 > swipeMinDistance*swipeMinDistance && vel2 > swipeThresholdVelocity*swipeThresholdVelocity ) {
                 	//@@preview.showToast(screen_locked_toast, R.string.unlocked);
-                	unlockScreen();
+                	//@@unlockScreen();
                 }
             }
             catch(Exception e)
@@ -1983,11 +1995,12 @@ public class CaptureClipActivity extends Activity implements
         logger.info("set up zoom");
         logger.info("has_zoom? " + preview.supportsZoom());
         {
-		    ZoomControls zoomControls = (ZoomControls) findViewById(R.id.zoom);
+		    //@@ZoomControls zoomControls = (ZoomControls) findViewById(R.id.zoom);
 		    SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
 
 			if( preview.supportsZoom() )
             {
+/*@@
 				if(mSharedPreferences.getBoolean(PreferenceKeys.getShowZoomControlsPreferenceKey(), false) )
                 {
 				    zoomControls.setIsZoomInEnabled(true);
@@ -2013,6 +2026,7 @@ public class CaptureClipActivity extends Activity implements
                 {
 					zoomControls.setVisibility(View.INVISIBLE); // must be INVISIBLE not GONE, so we can still position the zoomSeekBar relative to it
 				}
+@@*/
 				
 				zoomSeekBar.setOnSeekBarChangeListener(null); // clear an existing listener - don't want to call the listener when setting up the progress bar to match the existing state
 				zoomSeekBar.setMax(preview.getMaxZoom());
@@ -2052,10 +2066,12 @@ public class CaptureClipActivity extends Activity implements
 			}
 			else
             {
-				zoomControls.setVisibility(View.GONE);
+				//@@zoomControls.setVisibility(View.GONE);
 				zoomSeekBar.setVisibility(View.GONE);
 			}
 		}
+
+/*@@
 		{
             logger.info("set up manual focus");
 
@@ -2240,13 +2256,14 @@ public class CaptureClipActivity extends Activity implements
 
 	    mainUI.setPopupIcon(); // needed so that the icon is set right even if no flash mode is set when starting up camera (e.g., switching to front camera with no flash)
 
-		mainUI.setTakePhotoIcon();
+		//@@mainUI.setTakePhotoIcon();
 //@@		mainUI.setSwitchCameraContentDescription();
 
 		if( !block_startup_toast )
         {
 			this.showPhotoVideoToast(false);
 		}
+@@*/
     }
     
     public boolean supportsAutoStabilise()
@@ -2532,6 +2549,7 @@ public class CaptureClipActivity extends Activity implements
     	}
 	}
 
+/*@@
 	private void freeAudioListener(boolean wait_until_done)
     {
         logger.debug("freeAudioListener(.) Invoked.");
@@ -2553,7 +2571,7 @@ public class CaptureClipActivity extends Activity implements
 
         mainUI.audioControlStopped();
 	}
-	
+
 	private void startAudioListener()
     {
         logger.debug("startAudioListener() Invoked.");
@@ -2679,7 +2697,7 @@ public class CaptureClipActivity extends Activity implements
 
 							/*if( i > 0 )
 								debug_toast += "\n";
-							debug_toast += text + " : " + scores[i];*/
+							debug_toast += text + " : " + scores[i];/
 
 							if( text.toLowerCase(Locale.US).contains(trigger) )
                             {
@@ -2723,7 +2741,8 @@ public class CaptureClipActivity extends Activity implements
 			freeSpeechRecognizer();
 		}
 	}
-	
+@@*/
+/*@@
 	private void freeSpeechRecognizer()
     {
         logger.debug("freeSpeechRecognizer() Invoked.");
@@ -2737,6 +2756,7 @@ public class CaptureClipActivity extends Activity implements
 			speechRecognizer = null;
 		}
 	}
+@@*/
 	
 	public boolean hasAudioControl()
     {
@@ -2755,7 +2775,8 @@ public class CaptureClipActivity extends Activity implements
 
         return false;
 	}
-	
+
+/*@@
 	public void stopAudioListeners()
     {
         logger.debug("stopAudioListeners() Invoked.");
@@ -2769,7 +2790,8 @@ public class CaptureClipActivity extends Activity implements
         	speechRecognizerStopped();
         }
 	}
-	
+@@*/
+
 	@SuppressWarnings("deprecation")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void initSound()
@@ -2864,13 +2886,15 @@ public class CaptureClipActivity extends Activity implements
         }
 	}
 
+/*@@
     public void usedFolderPicker()
     {
         logger.debug("usedFolderPicker() Invoked.");
 
     	updateFolderHistory(true);
     }
-    
+@@*/
+
 	public boolean hasThumbnailAnimation()
     {
         logger.debug("hasThumbnailAnimation() Invoked.");
