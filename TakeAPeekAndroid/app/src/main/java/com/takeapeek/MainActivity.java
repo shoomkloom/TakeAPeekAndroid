@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity
         {
             long currentTimeMillis = Helper.GetCurrentTimeMillis();
 
-            if (currentTimeMillis - Helper.GetLastCapture(mSharedPreferences) > Constants.INTERVAL_HOUR)
+            if (currentTimeMillis - Helper.GetLastCapture(mSharedPreferences) > 10 * Constants.INTERVAL_MINUTE)
             {
                 Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
