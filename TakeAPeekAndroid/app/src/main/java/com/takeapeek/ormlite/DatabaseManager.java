@@ -586,6 +586,49 @@ public class DatabaseManager
         }
     }
 
+    public List<TakeAPeekNotification> GetTakeAPeekNotificationUnnotifiedList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekNotificationUnnotifiedList() Invoked");
+
+        List<TakeAPeekNotification> takeAPeekNotificationList = null;
+
+        try
+        {
+            takeAPeekNotificationList = getHelper().GetTakeAPeekNotificationDao().queryBuilder().
+                    where().eq("notified", false).query();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekNotificationList;
+    }
+
+    public void NotifyAllTakeAPeekNotifications()
+    {
+        //Do not lock this function
+
+        logger.debug("NotifyAllTakeAPeekNotifications() Invoked");
+
+        try
+        {
+            List<TakeAPeekNotification> takeAPeekNotificationList = GetTakeAPeekNotificationList();
+
+            for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+            {
+                takeAPeekNotification.notified = true;
+                UpdateTakeAPeekNotification(takeAPeekNotification);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: in NotifyAllTakeAPeekNotifications", e);
+        }
+    }
+
     //TakeAPeekNotification helper functions
     public List<TakeAPeekNotification> GetTakeAPeekNotificationList()
     {

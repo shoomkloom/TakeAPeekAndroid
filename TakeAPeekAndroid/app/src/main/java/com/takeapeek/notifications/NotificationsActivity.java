@@ -105,6 +105,9 @@ public class NotificationsActivity extends AppCompatActivity
             mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_MINUTE);
         }
 
+        //Set all notifications as 'notified = true'
+        DatabaseManager.getInstance().NotifyAllTakeAPeekNotifications();
+
         //Cancel all notifications on taskbar
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

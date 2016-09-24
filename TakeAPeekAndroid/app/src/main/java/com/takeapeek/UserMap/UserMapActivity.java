@@ -58,7 +58,6 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
-import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
@@ -67,6 +66,8 @@ import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
+import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.trendingplaces.TrendingPlacesActivity;
 
 import org.slf4j.Logger;
@@ -114,6 +115,7 @@ public class UserMapActivity extends FragmentActivity implements
     private AsyncTask<Void, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     ImageView mImageViewNotifications = null;
+    TextView mTextViewNumNewNotifications = null;
     LinearLayout mLinearLayout = null;
     ImageView mImageViewOverlay = null;
     LinearLayout mLinearLayoutRequestPeek = null;
@@ -139,6 +141,8 @@ public class UserMapActivity extends FragmentActivity implements
         mFirstLoad = true;
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
+        DatabaseManager.init(this);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -155,6 +159,12 @@ public class UserMapActivity extends FragmentActivity implements
 
         mImageViewNotifications = (ImageView)findViewById(R.id.notifications_image);
         mImageViewNotifications.setOnClickListener(ClickListener);
+
+        mTextViewNumNewNotifications = (TextView)findViewById(R.id.textview_new_notifications);
+        mTextViewNumNewNotifications.setOnClickListener(ClickListener);
+
+        UpdateNumberOfNewNotifications();
+
         mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
         mImageViewOverlay = (ImageView)findViewById(R.id.map_overlay_image);
         mLinearLayoutRequestPeek = (LinearLayout)findViewById(R.id.button_request_peek);
@@ -216,6 +226,35 @@ public class UserMapActivity extends FragmentActivity implements
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
     }
 
+    private void UpdateNumberOfNewNotifications()
+    {
+        logger.debug("UpdateNumberOfNewNotifications() Invoked");
+
+        try
+        {
+            int numberOfNewNotifications = DatabaseManager.getInstance().GetTakeAPeekNotificationUnnotifiedList().size();
+            if(numberOfNewNotifications > 0)
+            {
+                mTextViewNumNewNotifications.setText(String.format("%d", numberOfNewNotifications));
+
+                Animation zoomInAnimation = AnimationUtils.loadAnimation(this, R.anim.zoomin);
+                mTextViewNumNewNotifications.setAnimation(zoomInAnimation);
+                zoomInAnimation.start();
+
+                mTextViewNumNewNotifications.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                mTextViewNumNewNotifications.setVisibility(View.GONE);
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to get number of new Notifications", e);
+        }
+
+    }
+
     @Override
     public void onResume()
     {
@@ -227,6 +266,8 @@ public class UserMapActivity extends FragmentActivity implements
         {
             mGoogleApiClient.connect();
         }
+
+        UpdateNumberOfNewNotifications();
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);

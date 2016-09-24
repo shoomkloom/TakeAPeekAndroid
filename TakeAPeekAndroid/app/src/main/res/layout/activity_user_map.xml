@@ -33,6 +33,19 @@
             android:layout_centerInParent="true"
             android:textColor="@color/tap_white"/>
 
+        <TextView
+            android:id="@+id/textview_new_notifications"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:gravity="center"
+            android:padding="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="30dp"
+            android:textSize="15sp"
+            android:textColor="@color/tap_white"
+            android:background="@drawable/button_red_rounded"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <FrameLayout
