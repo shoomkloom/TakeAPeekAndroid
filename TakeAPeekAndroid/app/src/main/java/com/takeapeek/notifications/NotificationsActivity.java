@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
+import com.takeapeek.common.Helper;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
@@ -175,6 +176,9 @@ public class NotificationsActivity extends AppCompatActivity
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()

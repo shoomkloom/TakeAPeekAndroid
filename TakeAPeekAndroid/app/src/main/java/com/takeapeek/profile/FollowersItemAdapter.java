@@ -114,7 +114,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
         {
             viewHolder.mTakeAPeekFollowers = mTakeAPeekFollowersList.get(position);
 
-            viewHolder.mTextViewSrcProfileName.setText(viewHolder.mTakeAPeekFollowers.targetDisplayName);
+            viewHolder.mTextViewSrcProfileName.setText(viewHolder.mTakeAPeekFollowers.sourceDisplayName);
         }
 
         return view;
@@ -150,11 +150,9 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                                 Transport.SetRelation(
                                         mFollowersActivity, username, password,
-                                        mViewHolder.mTakeAPeekFollowers.targetId,
+                                        mViewHolder.mTakeAPeekFollowers.sourceId,
                                         Constants.RelationTypeEnum.Follow.name(),
                                         mSharedPreferences);
-
-                                DatabaseManager.getInstance().DeleteTakeAPeekRelation(mViewHolder.mTakeAPeekFollowers);
 
                                 return true;
                             }
@@ -176,7 +174,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 //Refresh the adapter data
                                 mFollowersActivity.RefreshAdapterData();
 
-                                String message = String.format(mFollowersActivity.getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowers.targetDisplayName);
+                                String message = String.format(mFollowersActivity.getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
                                 Toast.makeText(mFollowersActivity, message, Toast.LENGTH_LONG).show();
                             }
                             else
@@ -208,7 +206,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                                 Transport.SetRelation(
                                         mFollowersActivity, username, password,
-                                        mViewHolder.mTakeAPeekFollowers.targetId,
+                                        mViewHolder.mTakeAPeekFollowers.sourceId,
                                         Constants.RelationTypeEnum.Block.name(),
                                         mSharedPreferences);
 
@@ -234,12 +232,12 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 //Refresh the adapter data
                                 mFollowersActivity.RefreshAdapterData();
 
-                                String message = String.format(mFollowersActivity.getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.targetDisplayName);
+                                String message = String.format(mFollowersActivity.getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
                                 Toast.makeText(mFollowersActivity, message, Toast.LENGTH_LONG).show();
                             }
                             else
                             {
-                                String error = String.format(mFollowersActivity.getString(R.string.error_set_relation_block), mViewHolder.mTakeAPeekFollowers.targetDisplayName);
+                                String error = String.format(mFollowersActivity.getString(R.string.error_set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
                                 Toast.makeText(mFollowersActivity, error, Toast.LENGTH_LONG).show();
                             }
                         }

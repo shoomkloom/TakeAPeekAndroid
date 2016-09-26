@@ -153,5 +153,8 @@ public class FollowersActivity extends AppCompatActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 }

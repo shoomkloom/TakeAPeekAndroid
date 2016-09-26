@@ -1,5 +1,6 @@
 package com.takeapeek.walkthrough;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.takeapeek.R;
 import com.takeapeek.common.AutoFitTextureView;
 import com.takeapeek.common.CameraPreviewBGActivity;
+import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
@@ -31,6 +33,7 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
     private int dotsCount;
     private ImageView[] dots;
     private ViewPagerAdapter  mAdapter;
+    SharedPreferences mSharedPreferences = null;
 
     private int[] mImageResources =
     {
@@ -71,6 +74,8 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
 
         setContentView(R.layout.activity_walkthrough);
 
+        mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
         mViewPager = (ViewPager) findViewById(R.id.pager_introduction);
         mViewPager.setClipToPadding(false);
 
@@ -93,6 +98,17 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         setUiPageViewController();
 
         mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
+    }
+
+    @Override
+    public void onResume()
+    {
+        logger.debug("onResume() Invoked");
+
+        super.onResume();
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     private void setUiPageViewController()

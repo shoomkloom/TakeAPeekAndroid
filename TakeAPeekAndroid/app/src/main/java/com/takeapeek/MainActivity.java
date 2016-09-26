@@ -302,10 +302,8 @@ public class MainActivity extends AppCompatActivity
         {
             long currentTimeMillis = Helper.GetCurrentTimeMillis();
 
-            if (currentTimeMillis - Helper.GetLastCapture(mSharedPreferences) > 10 * Constants.INTERVAL_MINUTE)
+            if (currentTimeMillis - Helper.GetLastCapture(mSharedPreferences) > Constants.INTERVAL_MINUTE)
             {
-                Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
-
                 showCaptureOnLoad = true;
 
                 Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);

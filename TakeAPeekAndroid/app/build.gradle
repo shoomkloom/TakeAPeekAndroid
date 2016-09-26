@@ -8,8 +8,8 @@ android {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 23
-        versionName "0.9.23 beta"
+        versionCode 25
+        versionName "0.9.25 beta"
     }
     buildTypes {
         release {

@@ -833,8 +833,6 @@ public class CaptureClipActivity extends Activity implements
 
 		mainUI.layoutUI();
 
-	//@@	updateGalleryIcon(); // update in case images deleted whilst idle
-
 		preview.onResume();
     }
 	
@@ -3042,6 +3040,11 @@ public class CaptureClipActivity extends Activity implements
 
         Toast.makeText(this, R.string.clip_will_be_sent, Toast.LENGTH_LONG).show();
 
+        //Save time for last capture
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
+        setResult(RESULT_OK);
         finish();
     }
 

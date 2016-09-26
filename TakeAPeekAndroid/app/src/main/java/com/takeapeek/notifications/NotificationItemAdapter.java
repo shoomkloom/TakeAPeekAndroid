@@ -64,7 +64,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
         TextView mTextViewButton = null;
 
         TakeAPeekNotification mTakeAPeekNotification = null;
-        ProfileObject mProfileObject = null;
+        ProfileObject mSrcProfileObject = null;
         TakeAPeekObject mTakeAPeekObject = null;
         int Position = -1;
     }
@@ -114,7 +114,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             viewHolder.mTakeAPeekNotification = mTakeAPeekNotificationList.get(position);
             try
             {
-                viewHolder.mProfileObject = mGson.fromJson(viewHolder.mTakeAPeekNotification.srcProfileJson, ProfileObject.class);
+                viewHolder.mSrcProfileObject = mGson.fromJson(viewHolder.mTakeAPeekNotification.srcProfileJson, ProfileObject.class);
                 viewHolder.mTakeAPeekObject = mGson.fromJson(viewHolder.mTakeAPeekNotification.relatedPeekJson, TakeAPeekObject.class);
             }
             catch(Exception ex)
@@ -130,9 +130,9 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 
-            if(viewHolder.mProfileObject.latitude > 0 && viewHolder.mProfileObject.longitude > 0)
+            if(viewHolder.mSrcProfileObject.latitude > 0 && viewHolder.mSrcProfileObject.longitude > 0)
             {
-                LatLng location = new LatLng(viewHolder.mProfileObject.latitude, viewHolder.mProfileObject.longitude);
+                LatLng location = new LatLng(viewHolder.mSrcProfileObject.latitude, viewHolder.mSrcProfileObject.longitude);
                 mAddressLoader.SetAddress(mNotificationsActivity, location, viewHolder.mTextViewNotificationAddress, mSharedPreferences);
             }
 
@@ -148,7 +148,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
         {
             viewHolder.mTakeAPeekNotification = mTakeAPeekNotificationList.get(position);
 
-            viewHolder.mTextViewSrcProfileName.setText(viewHolder.mProfileObject.displayName);
+            viewHolder.mTextViewSrcProfileName.setText(viewHolder.mSrcProfileObject.displayName);
 
             viewHolder.mTextViewNotificationTime.setText(Helper.GetFormttedDiffTime(mNotificationsActivity, viewHolder.mTakeAPeekNotification.creationTime));
 
@@ -206,11 +206,11 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                     switch(pushNotificationTypeEnum)
                     {
                         case request:
-                            logger.info(String.format("Starting CaptureClipActivity with RELATEDPROFILEIDEXTRA_KEY = %s", viewHolder.mProfileObject.profileId));
+                            logger.info(String.format("Starting CaptureClipActivity with RELATEDPROFILEIDEXTRA_KEY = %s", viewHolder.mSrcProfileObject.profileId));
 
                             final Intent captureClipActivityIntent = new Intent(mNotificationsActivity, CaptureClipActivity.class);
                             captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mProfileObject.profileId);
+                            captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mSrcProfileObject.profileId);
                             mNotificationsActivity.startActivity(captureClipActivityIntent);
                             break;
 
@@ -289,7 +289,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                                                     mAsyncTaskRequestPeek = null;
                                                 }
                                             }
-                                        }.execute(viewHolder.mProfileObject);
+                                        }.execute(viewHolder.mSrcProfileObject);
                                     }
                                 }
                                 catch (Exception e)

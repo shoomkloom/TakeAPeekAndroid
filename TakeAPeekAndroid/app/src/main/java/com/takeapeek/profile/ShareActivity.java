@@ -92,6 +92,17 @@ public class ShareActivity extends ActionBarActivity
     	
     	UpdateUI();
 	}
+
+    @Override
+    protected void onResume()
+    {
+        logger.debug("onResume() Invoked");
+
+        super.onResume();
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+    }
 	
 	@Override
 	protected void onStart()

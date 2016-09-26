@@ -190,6 +190,9 @@ public class SettingsActivity extends AppCompatActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     public void DoValidatedDisplayName(String validatedDisplayName)
