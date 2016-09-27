@@ -193,6 +193,22 @@ public class UserMapActivity extends FragmentActivity implements
         }
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        logger.debug("onBackPressed() Invoked");
+
+        if(mUserStackItemPosition >= 0)
+        {
+            //Stack is open, close it
+            CloseUserPeekStack();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
