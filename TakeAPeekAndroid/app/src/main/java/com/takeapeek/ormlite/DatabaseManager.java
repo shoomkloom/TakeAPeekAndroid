@@ -27,6 +27,7 @@ public class DatabaseManager
     static ReentrantLock lockTakeAPeekNotification = new ReentrantLock();
     static ReentrantLock lockTakeAPeekRelation = new ReentrantLock();
     static ReentrantLock lockTakeAPeekSendObject = new ReentrantLock();
+    static ReentrantLock lockTakeAPeekRequest = new ReentrantLock();
 
 	static public void init(Context context) 
 	{
@@ -1172,5 +1173,177 @@ public class DatabaseManager
         }
 
         return takeAPeekSendObject;
+    }
+
+    //TakeAPeekRequest
+    public void AddTakeAPeekRequest(TakeAPeekRequest takeAPeekRequest)
+    {
+        //Do not lock this function
+
+        logger.debug("AddTakeAPeekRequest(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekRequestDao().create(takeAPeekRequest);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public TakeAPeekRequest GetTakeAPeekRequestWithId(int takeAPeekRequestId)
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekRequestWithId(.) Invoked");
+
+        TakeAPeekRequest takeAPeekRequest = null;
+
+        try
+        {
+            takeAPeekRequest = getHelper().GetTakeAPeekRequestDao().queryForId(takeAPeekRequestId);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekRequest;
+    }
+
+    public void DeleteTakeAPeekRequest(TakeAPeekRequest takeAPeekRequest)
+    {
+        //Do not lock this function
+
+        logger.debug("DeleteTakeAPeekRequest(.) Invoked");
+
+        try
+        {
+            getHelper().GetTakeAPeekRequestDao().delete(takeAPeekRequest);
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    public void UpdateTakeAPeekRequest(TakeAPeekRequest takeAPeekRequest)
+    {
+        //Do not lock this function
+
+        logger.debug("UpdateTakeAPeekRequest(.) Invoked");
+
+        try
+        {
+            int result = getHelper().GetTakeAPeekRequestDao().update(takeAPeekRequest);
+            logger.debug(String.format("%d rows were updated", result));
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+    }
+
+    //TakeAPeekRequest helper functions
+    public int GetTakeAPeekRequestWithProfileIdCount(String profileId)
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekRequestWithProfileId(.) Invoked");
+
+        int requestCount = 0;
+
+        try
+        {
+            //There should be only one or none
+            requestCount = getHelper().GetTakeAPeekRequestDao().queryBuilder().
+                    where().eq("profileId", profileId).query().size();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return requestCount;
+    }
+
+    public List<TakeAPeekRequest> GetTakeAPeekRequestList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekRequestList() Invoked");
+
+        List<TakeAPeekRequest> takeAPeekRequestList = null;
+
+        try
+        {
+            takeAPeekRequestList = getHelper().GetTakeAPeekRequestDao().queryForAll();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekRequestList;
+    }
+
+    public void ClearAllTakeAPeekRequests()
+    {
+        logger.debug("ClearAllTakeAPeekRequests() - before lock");
+
+        lockTakeAPeekRequest.lock();
+
+        try
+        {
+            logger.debug("ClearAllTakeAPeekRequests() - inside lock");
+
+            List<TakeAPeekRequest> takeAPeekRequestList = GetTakeAPeekRequestList();
+
+            if(takeAPeekRequestList != null)
+            {
+                for(TakeAPeekRequest takeAPeekRequest : takeAPeekRequestList)
+                {
+                    DeleteTakeAPeekRequest(takeAPeekRequest);
+                }
+            }
+        }
+        finally
+        {
+            lockTakeAPeekRequest.unlock();
+            logger.debug("ClearAllTakeAPeekRequests() - after unlock");
+        }
+    }
+
+    public void ClearOldTakeAPeekRequests()
+    {
+        logger.debug("ClearOldTakeAPeekRequests() - before lock");
+
+        lockTakeAPeekRequest.lock();
+
+        try
+        {
+            logger.debug("ClearOldTakeAPeekRequests() - inside lock");
+
+            long currentTimeMillis = Helper.GetCurrentTimeMillis();
+            List<TakeAPeekRequest> takeAPeekRequestList = GetTakeAPeekRequestList();
+
+            if(takeAPeekRequestList != null)
+            {
+                for(TakeAPeekRequest takeAPeekRequest : takeAPeekRequestList)
+                {
+                    //Delete requests that are older than 1 hour
+                    if(currentTimeMillis - takeAPeekRequest.creationTime > Constants.INTERVAL_HOUR)
+                    {
+                        DeleteTakeAPeekRequest(takeAPeekRequest);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            lockTakeAPeekRequest.unlock();
+            logger.debug("ClearOldTakeAPeekRequests() - after unlock");
+        }
     }
 }

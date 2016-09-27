@@ -68,6 +68,7 @@ import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
+import com.takeapeek.ormlite.TakeAPeekRequest;
 import com.takeapeek.trendingplaces.TrendingPlacesActivity;
 
 import org.slf4j.Logger;
@@ -427,6 +428,9 @@ public class UserMapActivity extends FragmentActivity implements
 
                             try
                             {
+                                logger.info("Delete old requests from ormLite");
+                                DatabaseManager.getInstance().ClearOldTakeAPeekRequests();
+
                                 logger.info("Getting profile list from server");
 
                                 //Get the list of users inside the bounds
@@ -713,7 +717,7 @@ public class UserMapActivity extends FragmentActivity implements
     };
 @@*/
 
-    private View.OnClickListener ClickListener = new View.OnClickListener()
+    public View.OnClickListener ClickListener = new View.OnClickListener()
     {
         @Override
         public void onClick(final View v)
@@ -732,6 +736,9 @@ public class UserMapActivity extends FragmentActivity implements
 
                 case R.id.button_request_peek:
                     logger.info("OnClickListener:onClick: button_request_peek clicked");
+
+                    logger.info("Delete old requests from ormLite");
+                    DatabaseManager.getInstance().ClearOldTakeAPeekRequests();
 
                     try
                     {
@@ -758,9 +765,17 @@ public class UserMapActivity extends FragmentActivity implements
                                                 RequestObject requestObject = new RequestObject();
                                                 requestObject.targetProfileList = new ArrayList<String>();
 
+                                                long currentTimeMillis = Helper.GetCurrentTimeMillis();
+
                                                 for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
                                                 {
-                                                    requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
+                                                    if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) == 0)
+                                                    {
+                                                        requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
+
+                                                        TakeAPeekRequest takeAPeekRequest = new TakeAPeekRequest(tapClusterItem.mProfileObject.profileId, currentTimeMillis);
+                                                        DatabaseManager.getInstance().AddTakeAPeekRequest(takeAPeekRequest);
+                                                    }
                                                 }
 
                                                 String metaDataJson = new Gson().toJson(requestObject);
@@ -789,6 +804,8 @@ public class UserMapActivity extends FragmentActivity implements
                                                 }
                                                 else
                                                 {
+                                                    ShowProfilesInBounds(true);
+
                                                     String message = String.format(getString(R.string.user_map_requested_peeks_to), mClusterManagerAlgorithm.getItems().size());
                                                     Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
                                                 }
@@ -980,6 +997,8 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         mUserMapActivity = userMapActivity;
 
+        DatabaseManager.init(mUserMapActivity);
+
         //Get sized images
         try
         {
@@ -1005,7 +1024,16 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     @Override
     protected void onBeforeClusterItemRendered(TAPClusterItem tapClusterItem, MarkerOptions markerOptions)
     {
-        Bitmap iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+        Bitmap iconBitmap = null;
+
+        if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) > 0)
+        {
+            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+        }
+        else
+        {
+            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+        }
 
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
         markerOptions.anchor((float)0.0, (float)1.0);
@@ -1014,7 +1042,26 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     @Override
     protected void onBeforeClusterRendered(Cluster<TAPClusterItem> cluster, MarkerOptions markerOptions)
     {
-        Bitmap iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+        boolean hasRequest = false;
+        for(TAPClusterItem tapClusterItem : cluster.getItems())
+        {
+            if (DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) > 0)
+            {
+                hasRequest = true;
+                break;
+            }
+        }
+
+        Bitmap iconBitmap = null;
+
+        if(hasRequest == true)
+        {
+            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+        }
+        else
+        {
+            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+        }
 
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
         markerOptions.anchor((float)0.0, (float)1.0);
