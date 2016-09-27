@@ -681,17 +681,17 @@ public class Transport
 		
 		//Find local disaply names for followers list
 		DatabaseManager.init(context);
-		HashMap<String, TakeAPeekContact> selfMeContactHash = DatabaseManager.getInstance().GetTakeAPeekContactProfileIdHash();
+		HashMap<String, TakeAPeekContact> takeAPeekContactHash = DatabaseManager.getInstance().GetTakeAPeekContactProfileIdHash();
 		
 		if(responseObject.followersList != null)
 		{
 			for(ProfileObject contactObject : responseObject.followersList)
 			{
 				//Update follower display names with local names
-				TakeAPeekContact selfMeContact = selfMeContactHash.get(contactObject.profileId);
-				if(selfMeContact != null && selfMeContact.ContactData.displayName != null && selfMeContact.ContactData.displayName.isEmpty() == false)
+				TakeAPeekContact takeAPeekContact = takeAPeekContactHash.get(contactObject.profileId);
+				if(takeAPeekContact != null && takeAPeekContact.ContactData.displayName != null && takeAPeekContact.ContactData.displayName.isEmpty() == false)
 				{
-					contactObject.displayName = selfMeContact.ContactData.displayName;
+					contactObject.displayName = takeAPeekContact.ContactData.displayName;
 				}
 			}
 		}
