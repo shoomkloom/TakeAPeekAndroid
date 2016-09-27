@@ -1221,21 +1221,8 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("onBackPressed() Invoked.");
 
-        if( screen_is_locked )
-        {
-			//@@preview.showToast(screen_locked_toast, R.string.screen_is_locked);
-        	return;
-        }
-
-/*@@
-        if( popupIsOpen() )
-        {
-            closePopup();
-            return;
-        }
-@@*/
-
-        super.onBackPressed();
+        //Do nothing
+        //super.onBackPressed();
     }
     
     public boolean usingKitKatImmersiveMode()

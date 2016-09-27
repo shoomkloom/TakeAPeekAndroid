@@ -35,6 +35,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -65,6 +67,8 @@ import java.util.Locale;
 public class AuthenticatorActivity extends CameraPreviewBGActivity
 {
 	static private final Logger logger = LoggerFactory.getLogger(AuthenticatorActivity.class);
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
 	enum HandlerState
 	{
@@ -183,6 +187,12 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
         super.onCreate(icicle);
         
         logger.debug("onCreate(.) Invoked");
+
+        if(CheckPlayServices() == false)
+        {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
         
         //Do the AccountAuthenticator stuff
         /**
@@ -412,6 +422,35 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 		    	}
 		    }
         }
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean CheckPlayServices()
+    {
+        logger.debug("CheckPlayServices() Invoked");
+
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS)
+        {
+            if (apiAvailability.isUserResolvableError(resultCode))
+            {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+            else
+            {
+                Helper.Error(logger, "No Google Play Services. This device is not supported.");
+                Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
+            }
+            return false;
+        }
+        return true;
     }
     
     /**

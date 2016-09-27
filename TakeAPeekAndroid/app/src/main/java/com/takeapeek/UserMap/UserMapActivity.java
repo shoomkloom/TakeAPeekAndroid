@@ -54,6 +54,7 @@ import com.google.maps.android.clustering.algo.Algorithm;
 import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.takeapeek.R;
+import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -70,6 +71,7 @@ import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.ormlite.TakeAPeekRequest;
 import com.takeapeek.trendingplaces.TrendingPlacesActivity;
+import com.takeapeek.walkthrough.WalkthroughActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +96,10 @@ public class UserMapActivity extends FragmentActivity implements
     static private ReentrantLock peekListLock = new ReentrantLock();
     static private ReentrantLock requestPeekLock = new ReentrantLock();
 
+    private static final int RESULT_AUTHENTICATE = 9001;
+    private static final int RESULT_WALKTHROUGH = 9002;
+    private static final int RESULT_CAPTURECLIP = 9003;
+
     Handler mHandler = new Handler();
     SharedPreferences mSharedPreferences = null;
 
@@ -105,8 +111,6 @@ public class UserMapActivity extends FragmentActivity implements
     private boolean mFirstLoad = false;
     HashMap<String, Integer> mHashMapProfileObjectToIndex = new HashMap<String, Integer>();
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
-    //@@HashMap<String, Integer> mHashMapMarkerToIndex = new HashMap<String, Integer>();
-    //@@WeakHashMap<Integer, Marker> mHashMapIndexToMarker = new WeakHashMap<Integer, Marker>();
 
     private LatLngBounds mLatLngBounds = null;
     private LatLngBounds mLatLngBoundsIntent = null;
@@ -139,10 +143,77 @@ public class UserMapActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         logger.debug("onCreate(.) Invoked");
 
+        mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        DatabaseManager.init(this);
+
+        AppLoadLogic();
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     /
+    private boolean CheckPlayServices()
+    {
+        logger.debug("CheckPlayServices() Invoked");
+
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS)
+        {
+            if (apiAvailability.isUserResolvableError(resultCode))
+            {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+            else
+            {
+                Helper.Error(logger, "No Google Play Services. This device is not supported.");
+                Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_play_services));
+            }
+            return false;
+        }
+        return true;
+    }
+*/
+
+    private void AppLoadLogic()
+    {
+        logger.debug("AppLoadLogic() Invoked");
+
+        if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
+                Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
+        {
+            if(Helper.GetFirstRun(mSharedPreferences) == true)
+            {
+                ShowWalkthrough();
+
+                Helper.SetFirstRun(mSharedPreferences.edit(), false);
+            }
+            else
+            {
+                if(ShowCaptureOnLoad() == false)
+                {
+                    ShowUserMap();
+                }
+            }
+        }
+        else
+        {
+            ShowAuthenticator();
+        }
+    }
+
+    private void ShowUserMap()
+    {
+        logger.debug("ShowUserMap() Invoked");
+
         setContentView(R.layout.activity_user_map);
 
         mFirstLoad = true;
-        mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         DatabaseManager.init(this);
 
@@ -191,6 +262,114 @@ public class UserMapActivity extends FragmentActivity implements
                 mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        logger.debug("onActivityResult(...) Invoked");
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode != RESULT_OK)
+        {
+            logger.warn(String.format("onActivityResult returned with resultCode = %d or data was null", resultCode));
+
+            if(requestCode == RESULT_AUTHENTICATE)
+            {
+                logger.info("onActivityResult: requestCode == RESULT_AUTHENTICATE, calling finish()");
+                finish();
+            }
+
+            return;
+        }
+
+        switch (requestCode)
+        {
+            case RESULT_AUTHENTICATE:
+                logger.info("onActivityResult: requestCode = 'RESULT_AUTHENTICATE'");
+
+                ShowWalkthrough();
+
+                break;
+
+            case RESULT_WALKTHROUGH:
+                logger.info("onActivityResult: requestCode = 'RESULT_WALKTHROUGH'");
+
+                if(ShowCaptureOnLoad() == false)
+                {
+                    ShowUserMap();
+                }
+
+                break;
+
+            case RESULT_CAPTURECLIP:
+                logger.info("onActivityResult: requestCode = 'RESULT_CAPTURECLIP'");
+
+                ShowUserMap();
+
+                break;
+
+            default:
+                logger.error(String.format("onActivityResult: unknown requestCode = '%d' returned", requestCode));
+                break;
+        }
+    }
+
+    private void ShowAuthenticator()
+    {
+        logger.debug("ShowAuthenticator() Invoked");
+
+        Intent authenticatorActivityIntent = new Intent(this, AuthenticatorActivity.class);
+        authenticatorActivityIntent.putExtra(Constants.PARAM_AUTH_REQUEST_ORIGIN, Constants.PARAM_AUTH_REQUEST_ORIGIN_MAIN);
+        authenticatorActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivityForResult(authenticatorActivityIntent, RESULT_AUTHENTICATE);
+    }
+
+    private void ShowWalkthrough()
+    {
+        logger.debug("ShowWalkthrough() Invoked");
+
+        Intent walkthroughActivityIntent = new Intent(this, WalkthroughActivity.class);
+        walkthroughActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivityForResult(walkthroughActivityIntent, RESULT_WALKTHROUGH);
+    }
+
+    private void ShowTrendingPlaces()
+    {
+        logger.debug("ShowTrendingPlaces() Invoked");
+
+        Intent trendingPlacesActivityIntent = new Intent(this, TrendingPlacesActivity.class);
+        trendingPlacesActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(trendingPlacesActivityIntent);
+    }
+
+    private boolean ShowCaptureOnLoad()
+    {
+        logger.debug("ShowCaptureOnLoad() Invoked");
+
+        boolean showCaptureOnLoad = false;
+
+        try
+        {
+            long currentTimeMillis = Helper.GetCurrentTimeMillis();
+            long lastCaptureMillis = Helper.GetLastCapture(mSharedPreferences);
+
+            if (currentTimeMillis - lastCaptureMillis > Constants.INTERVAL_MINUTE)
+            {
+                showCaptureOnLoad = true;
+
+                Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);
+                captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivityForResult(captureClipActivityIntent, RESULT_CAPTURECLIP);
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to load CaptureClipActivity", e);
+        }
+
+        return showCaptureOnLoad;
     }
 
     @Override
@@ -315,9 +494,6 @@ public class UserMapActivity extends FragmentActivity implements
     public void onConnected(@Nullable Bundle bundle)
     {
         logger.debug("onConnected(.) Invoked");
-
-        //@@mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
-        //@@mGoogleMap.setOnMarkerClickListener(MarkerClickListener);
 
         if(mFirstLoad == true)
         {
@@ -661,10 +837,6 @@ public class UserMapActivity extends FragmentActivity implements
                     Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
                     mLinearLayout.setAnimation(slideDownAnimation);
                     slideDownAnimation.start();
-
-                    //Workaround: Set the name for the first loaded page
-                    //@@int position = mViewPager.getCurrentItem();
-                    //@@ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
 
                     ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
                     mTextViewStackUserName.setText(profileObject.displayName);

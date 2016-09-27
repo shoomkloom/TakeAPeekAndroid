@@ -188,8 +188,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
     {
         logger.debug("onBackPressed() Invoked");
 
-        //@@ Do nothing
-        //@@ super.onBackPressed();
+        super.onBackPressed();
     }
 
     public void FillList(ArrayList<TrendingPlaceObject> trendingPlaceObjectList)
