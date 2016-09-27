@@ -127,6 +127,8 @@ public class UserMapActivity extends FragmentActivity implements
     PeekStackPagerAdapter mPeekStackPagerAdapter = null;
     SlideButton mSlideButton = null;
 
+    int mUserStackItemPosition = -1;
+
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
     static public ReentrantLock lockBroadcastReceiver = new ReentrantLock();
@@ -339,8 +341,8 @@ public class UserMapActivity extends FragmentActivity implements
         logger.debug("onClusterClick(.) Invoked");
 
         //Show peek for first profile
-        int position = cluster.getItems().iterator().next().mIndex;
-        ShowUserPeekStack(position);
+        mUserStackItemPosition = cluster.getItems().iterator().next().mIndex;
+        ShowUserPeekStack();
 
         return true;
     }
@@ -354,7 +356,8 @@ public class UserMapActivity extends FragmentActivity implements
     @Override
     public boolean onClusterItemClick(TAPClusterItem item)
     {
-        ShowUserPeekStack(item.mIndex);
+        mUserStackItemPosition = item.mIndex;
+        ShowUserPeekStack();
 
         return true;
     }
@@ -613,7 +616,7 @@ public class UserMapActivity extends FragmentActivity implements
         mGoogleMap.animateCamera(cameraUpdate);
     }
 
-    private void ShowUserPeekStack(int position)
+    private void ShowUserPeekStack()
     {
         logger.debug("ShowUserPeekStack() Invoked");
 
@@ -623,14 +626,14 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 peekListLock.lock();
 
-                mViewPager.setCurrentItem(position);
+                mViewPager.setCurrentItem(mUserStackItemPosition);
 
-                ProfileObject currentProfileObject = mHashMapIndexToProfileObject.get(position);
+                ProfileObject currentProfileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
                 LatLng markerLatLng = new LatLng(
                         currentProfileObject.latitude,
                         currentProfileObject.longitude);
 
-                ClusterManagerSingleItem(position);
+                ClusterManagerSingleItem(mUserStackItemPosition);
 
                 UpdateBelowProjection(markerLatLng);
 
@@ -647,7 +650,7 @@ public class UserMapActivity extends FragmentActivity implements
                     //@@int position = mViewPager.getCurrentItem();
                     //@@ProfileObject profileObject = mHashMapIndexToProfileObject.get(pos);
 
-                    ProfileObject profileObject = GetProfileObjectByPosition(position);
+                    ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
                     mTextViewStackUserName.setText(profileObject.displayName);
                 }
             }
@@ -669,6 +672,8 @@ public class UserMapActivity extends FragmentActivity implements
     public void CloseUserPeekStack()
     {
         logger.debug("OnClickListener:onClick(.) Invoked");
+
+        mUserStackItemPosition = -1;
 
         mTextViewStackUserName.setText("");
 
@@ -753,6 +758,8 @@ public class UserMapActivity extends FragmentActivity implements
                                     //Start asynchronous request to server
                                     mAsyncTaskRequestPeek = new AsyncTask<Void, Void, ResponseObject>()
                                     {
+                                        int mNumberOfRequests = 0;
+
                                         @Override
                                         protected ResponseObject doInBackground(Void... params)
                                         {
@@ -771,6 +778,8 @@ public class UserMapActivity extends FragmentActivity implements
                                                 {
                                                     if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) == 0)
                                                     {
+                                                        mNumberOfRequests++;
+
                                                         requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
 
                                                         TakeAPeekRequest takeAPeekRequest = new TakeAPeekRequest(tapClusterItem.mProfileObject.profileId, currentTimeMillis);
@@ -804,9 +813,22 @@ public class UserMapActivity extends FragmentActivity implements
                                                 }
                                                 else
                                                 {
-                                                    ShowProfilesInBounds(true);
+                                                    if(mUserStackItemPosition >= 0)
+                                                    {
+                                                        ShowUserPeekStack();
+                                                    }
+                                                    else
+                                                    {
+                                                        ShowProfilesInBounds(true);
+                                                    }
 
-                                                    String message = String.format(getString(R.string.user_map_requested_peeks_to), mClusterManagerAlgorithm.getItems().size());
+                                                    String message = String.format(getString(R.string.user_map_requested_peeks_to), mNumberOfRequests);
+
+                                                    if(mNumberOfRequests == 1)
+                                                    {
+                                                        message = getString(R.string.user_map_requested_peeks_to_one);
+                                                    }
+
                                                     Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
                                                 }
                                             }
@@ -875,6 +897,8 @@ public class UserMapActivity extends FragmentActivity implements
         @Override
         public void onPageSelected(int index)
         {
+            mUserStackItemPosition = index;
+
             ProfileObject profileObject = GetProfileObjectByPosition(index);
 
             ClusterManagerSingleItem(index);

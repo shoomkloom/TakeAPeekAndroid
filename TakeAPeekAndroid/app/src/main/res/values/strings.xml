@@ -135,6 +135,7 @@
     <string name="search_location">Search</string>
     <string name="error_request_peek">There was an error requesting a peek, please try again later.</string>
     <string name="user_map_requested_peeks_to">Sent peek request to %1$d users</string>
+    <string name="user_map_requested_peeks_to_one">Sent peek request to 1 user</string>
     <string name="trending_locations">Trending locations</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
