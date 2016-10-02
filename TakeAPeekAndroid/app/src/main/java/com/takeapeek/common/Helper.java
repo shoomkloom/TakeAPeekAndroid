@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -1254,12 +1255,21 @@ public class Helper
         canvas.drawBitmap(foregroundBmp, foregroundMatrix, null); 
     
         return bmOverlay; 
-    } 
-    
-    public static Bitmap OverlayText(Context context, Bitmap backgroundBmp, String text, Point position, int textSize, String textColor, Align textAlign) 
+    }
+
+    public static Bitmap OverlayText(Context context, Bitmap backgroundBmp, String text, Point position, int textSize, String textColor, Align textAlign)
+    {
+        logger.debug("OverlayText(.......) Invoked");
+
+        return OverlayText(context, backgroundBmp, text, position, textSize, textColor, textAlign, false);
+    }
+
+    public static Bitmap OverlayText(Context context, Bitmap backgroundBmp, String text, Point position, int textSize, String textColor, Align textAlign, boolean doBlur)
     { 
-    	logger.debug("OverlayText(...) Invoked");
-    	
+    	logger.debug("OverlayText(........) Invoked");
+
+        BlurMaskFilter blurMaskFilter = null;
+
         Bitmap bmOverlay = Bitmap.createBitmap(backgroundBmp.getWidth(), backgroundBmp.getHeight(), backgroundBmp.getConfig());
         
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -1267,6 +1277,12 @@ public class Helper
         paint.setTextSize(textSize); 
 //@@        paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
        	paint.setTextAlign(textAlign);
+
+        if(doBlur == true)
+        {
+            blurMaskFilter = new BlurMaskFilter(textSize/10, BlurMaskFilter.Blur.NORMAL);
+            paint.setMaskFilter(blurMaskFilter);
+        }
        	
        	//@@Typeface boldTypeface = getBoldFont(context);
        	//@@paint.setTypeface(boldTypeface);
@@ -3208,7 +3224,7 @@ public class Helper
     {
         if(NormalFont == null) 
         {
-        	NormalFont = Typeface.createFromAsset(context.getAssets(),"fonts/Antipasto_regular.otf");
+        	NormalFont = Typeface.createFromAsset(context.getAssets(),"fonts/Houschka Rounded Medium.otf");
         }
         
         return NormalFont;
@@ -3218,7 +3234,7 @@ public class Helper
     {
         if(BoldFont == null) 
         {
-        	BoldFont = Typeface.createFromAsset(context.getAssets(),"fonts/Antipasto_extrabold.otf");
+        	BoldFont = Typeface.createFromAsset(context.getAssets(),"fonts/Houschka Rounded Bold.otf");
         }
         
         return BoldFont;
@@ -3228,7 +3244,7 @@ public class Helper
     {
         if(LightFont == null) 
         {
-        	LightFont = Typeface.createFromAsset(context.getAssets(),"fonts/Antipasto_extralight.otf");
+        	LightFont = Typeface.createFromAsset(context.getAssets(),"fonts/Houschka Rounded Light.otf");
         }
         
         return LightFont;

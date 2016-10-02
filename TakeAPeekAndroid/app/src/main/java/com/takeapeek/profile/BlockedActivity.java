@@ -50,6 +50,7 @@ public class BlockedActivity extends AppCompatActivity
         //List View
         mListViewBlockedList = (ListView)findViewById(R.id.listview_blocked_list);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_blocked_empty);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         RefreshAdapterData();
 
@@ -144,6 +145,9 @@ public class BlockedActivity extends AppCompatActivity
     {
         logger.debug("onPause() Invoked");
 
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
         super.onPause();
     }
 
@@ -153,8 +157,5 @@ public class BlockedActivity extends AppCompatActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 }

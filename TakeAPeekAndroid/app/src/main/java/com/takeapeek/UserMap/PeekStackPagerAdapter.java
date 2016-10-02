@@ -64,10 +64,14 @@ public class PeekStackPagerAdapter extends PagerAdapter
         ImageView imageViewPeekThumbnailPlay = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
         imageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
         imageViewPeekThumbnailPlay.setTag(profileObject);
+
         TextView textViewUserStackTime = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_time);
+        Helper.setTypeface(mUserMapActivity, textViewUserStackTime, Helper.FontTypeEnum.normalFont);
         textViewUserStackTime.setOnClickListener(ClickListener);
         textViewUserStackTime.setTag(profileObject);
+
         TextView textViewUserStackFollow = (TextView)viewGroup.findViewById(R.id.user_peek_stack_follow);
+        Helper.setTypeface(mUserMapActivity, textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
         textViewUserStackFollow.setOnClickListener(ClickListener);
         textViewUserStackFollow.setTag(position);
 

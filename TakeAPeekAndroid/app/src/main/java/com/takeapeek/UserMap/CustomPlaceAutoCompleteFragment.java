@@ -21,6 +21,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.takeapeek.R;
+import com.takeapeek.common.Helper;
 
 /**
  * A simple {@link Fragment} subclass.

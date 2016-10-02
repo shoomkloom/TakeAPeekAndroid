@@ -50,7 +50,9 @@ public class ProfileActivity extends AppCompatActivity
         DatabaseManager.init(this);
 
         String displayName = Helper.GetProfileDisplayName(mSharedPreferences);
-        ((TextView)findViewById(R.id.textview_profile_title)).setText(displayName);
+        TextView textviewProfileTitle = (TextView)findViewById(R.id.textview_profile_title);
+        Helper.setTypeface(this, textviewProfileTitle, Helper.FontTypeEnum.boldFont);
+        textviewProfileTitle.setText(displayName);
 
         //List View
         mListViewProfileList = (ListView)findViewById(R.id.listview_profile_list);
@@ -72,6 +74,9 @@ public class ProfileActivity extends AppCompatActivity
     {
         logger.debug("onPause() Invoked");
 
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
         super.onPause();
     }
 
@@ -83,9 +88,6 @@ public class ProfileActivity extends AppCompatActivity
         super.onResume();
 
         InitList();
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     private View.OnClickListener ClickListener = new View.OnClickListener()

@@ -84,9 +84,11 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         //@@mViewPager.setPageMargin(-100);
 
         mTextViewButtonSkip = (TextView) findViewById(R.id.textview_button_skip);
+        Helper.setTypeface(this, mTextViewButtonSkip, Helper.FontTypeEnum.boldFont);
         mTextViewButtonSkip.setOnClickListener(this);
 
         mTextViewButtonLetsGo = (TextView) findViewById(R.id.textview_button_letsgo);
+        Helper.setTypeface(this, mTextViewButtonLetsGo, Helper.FontTypeEnum.boldFont);
         mTextViewButtonLetsGo.setOnClickListener(this);
 
         mLinearLayoutIndicator = (LinearLayout) findViewById(R.id.viewPagerCountDots);
@@ -109,6 +111,17 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
 
         long currentTimeMillis = Helper.GetCurrentTimeMillis();
         Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+    }
+
+    @Override
+    public void onPause()
+    {
+        logger.debug("onPause() Invoked");
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
+        super.onPause();
     }
 
     private void setUiPageViewController()

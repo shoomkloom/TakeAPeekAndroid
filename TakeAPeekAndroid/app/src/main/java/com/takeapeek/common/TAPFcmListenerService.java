@@ -96,6 +96,23 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                     takeAPeekNotification.relatedPeekId = remoteMessageData.get("relatedPeekId");
                     takeAPeekNotification.notificationIntId = notificationIntId;
 
+                    try
+                    {
+                        //Clear the request sent if received answer
+                        Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(takeAPeekNotification.type);
+                        if (pushNotificationTypeEnum == Constants.PushNotificationTypeEnum.peek || pushNotificationTypeEnum == Constants.PushNotificationTypeEnum.response)
+                        {
+                            if (DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(takeAPeekNotification.srcProfileId) > 0)
+                            {
+                                DatabaseManager.getInstance().DeleteTakeAPeekRequestWithProfileId(takeAPeekNotification.srcProfileId);
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When trying to clear TakeAPeekRequest", e);
+                    }
+
                     //Get the Push Notification Data with these srcProfileId and relatedPeekId
                     String accountUsername = Helper.GetTakeAPeekAccountUsername(TAPFcmListenerService.this);
                     String accountPassword = Helper.GetTakeAPeekAccountPassword(TAPFcmListenerService.this);

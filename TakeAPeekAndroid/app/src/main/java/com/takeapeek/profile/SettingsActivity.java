@@ -130,26 +130,47 @@ public class SettingsActivity extends AppCompatActivity
 
         DatabaseManager.init(this);
 
+        TextView textviewSettingsTitle = (TextView)findViewById(R.id.textview_settings_title);
+        Helper.setTypeface(this, textviewSettingsTitle, Helper.FontTypeEnum.boldFont);
+
+        TextView textviewProfileAccountTitle = (TextView)findViewById(R.id.textview_profile_account_title);
+        Helper.setTypeface(this, textviewProfileAccountTitle, Helper.FontTypeEnum.normalFont);
+
+        TextView textviewProfileName = (TextView)findViewById(R.id.textview_profile_name);
+        Helper.setTypeface(this, textviewProfileName, Helper.FontTypeEnum.normalFont);
+
         findViewById(R.id.imageview_profile).setOnClickListener(ClickListener);
 
         String displayName = Helper.GetProfileDisplayName(mSharedPreferences);
         mEditTextDisplayName = (EditText)findViewById(R.id.edittext_display_name);
+        Helper.setTypeface(this, mEditTextDisplayName, Helper.FontTypeEnum.normalFont);
         mEditTextDisplayName.setText(displayName);
         mEditTextDisplayName.setSelection(mEditTextDisplayName.getText().length());
         Helper.setTypeface(this, mEditTextDisplayName, Helper.FontTypeEnum.lightFont);
         mEditTextDisplayName.addTextChangedListener(onTextChangedDisplayName);
 
+        TextView textviewProfileNumber = (TextView)findViewById(R.id.textview_profile_number);
+        Helper.setTypeface(this, textviewProfileNumber, Helper.FontTypeEnum.normalFont);
+
         try
         {
             String userName = Helper.GetTakeAPeekAccountUsername(this);
-            ((TextView) findViewById(R.id.textview_profile_number_value)).setText(userName);
+            TextView textviewProfileNumberValue = (TextView) findViewById(R.id.textview_profile_number_value);
+            Helper.setTypeface(this, textviewProfileNumberValue, Helper.FontTypeEnum.normalFont);
+            textviewProfileNumberValue.setText(userName);
         }
         catch(Exception e)
         {
             Helper.Error(logger, "EXCEPTION: when getting userName", e);
         }
 
+        TextView textviewProfileAdvancedTitle = (TextView) findViewById(R.id.textview_profile_advanced_title);
+        Helper.setTypeface(this, textviewProfileAdvancedTitle, Helper.FontTypeEnum.normalFont);
+
         mDisplayNameValidationProgess = (ImageView)findViewById(R.id.imageview_display_name_validation_progess);
+
+        TextView textviewShowNotifications = (TextView) findViewById(R.id.textview_show_notifications);
+        Helper.setTypeface(this, textviewShowNotifications, Helper.FontTypeEnum.normalFont);
 
         boolean showNotifications = Helper.GetShowNotifications(mSharedPreferences);
         mSwitchShowNotifications = (Switch)findViewById(R.id.switch_show_notifications);
@@ -168,7 +189,9 @@ public class SettingsActivity extends AppCompatActivity
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 
             String versionString = String.format("TakeAPeek %s", packageInfo.versionName);
-            ((TextView) findViewById(R.id.textview_version)).setText(versionString);
+            TextView textviewVersion = (TextView) findViewById(R.id.textview_version);
+            Helper.setTypeface(this, textviewVersion, Helper.FontTypeEnum.normalFont);
+            textviewVersion.setText(versionString);
         }
         catch (Exception e)
         {
@@ -181,6 +204,9 @@ public class SettingsActivity extends AppCompatActivity
     {
         logger.debug("onPause() Invoked");
 
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
         super.onPause();
     }
 
@@ -190,9 +216,6 @@ public class SettingsActivity extends AppCompatActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     public void DoValidatedDisplayName(String validatedDisplayName)

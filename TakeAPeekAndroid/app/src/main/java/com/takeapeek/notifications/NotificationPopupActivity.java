@@ -114,9 +114,17 @@ public class NotificationPopupActivity extends FragmentActivity implements
         ImageView imageViewButtonClose = (ImageView)findViewById(R.id.button_close);
         imageViewButtonClose.setOnClickListener(ClickListener);
         TextView textViewTitleBig = (TextView)findViewById(R.id.big_title);
+        Helper.setTypeface(this, textViewTitleBig, Helper.FontTypeEnum.boldFont);
         TextView textViewTitleSmall = (TextView)findViewById(R.id.small_title);
+        Helper.setTypeface(this, textViewTitleSmall, Helper.FontTypeEnum.normalFont);
+
         LinearLayout linearLayoutButtonSend = (LinearLayout)findViewById(R.id.button_send_peek);
+        TextView textviewButtonSendPeek = (TextView)findViewById(R.id.textview_button_send_peek);
+        Helper.setTypeface(this, textviewButtonSendPeek, Helper.FontTypeEnum.boldFont);
+
         LinearLayout linearLayoutButtonRequest = (LinearLayout)findViewById(R.id.button_request_peek);
+        TextView textviewButtonRequestPeek = (TextView)findViewById(R.id.textview_button_request_peek);
+        Helper.setTypeface(this, textviewButtonRequestPeek, Helper.FontTypeEnum.boldFont);
 
         RelativeLayout.LayoutParams relativeLayoutParamsSend = null;
         RelativeLayout.LayoutParams relativeLayoutParamsRequest = null;
@@ -140,7 +148,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
             ImageView imageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_notification_thumbnail_play);
             imageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
             TextView textViewUserFeedTime = (TextView)findViewById(R.id.user_peek_notification_thumbnail_time);
+            Helper.setTypeface(this, textViewUserFeedTime, Helper.FontTypeEnum.normalFont);
+
             TextView textViewUserFeedAddress = (TextView)findViewById(R.id.user_peek_notification_thumbnail_address);
+            Helper.setTypeface(this, textViewUserFeedAddress, Helper.FontTypeEnum.normalFont);
 
             switch(mPushNotificationTypeEnum)
             {
@@ -159,10 +170,12 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     findViewById(R.id.corner_overlay_on_map).setVisibility(View.VISIBLE);
 
                     TextView textViewDisplayNameRequest = (TextView)findViewById(R.id.request_displayname_on_map);
+                    Helper.setTypeface(this, textViewDisplayNameRequest, Helper.FontTypeEnum.normalFont);
                     textViewDisplayNameRequest.setVisibility(View.VISIBLE);
                     textViewDisplayNameRequest.setText(mProfileObject.displayName);
 
                     TextView textViewLocationRequest = (TextView)findViewById(R.id.request_location_on_map);
+                    Helper.setTypeface(this, textViewLocationRequest, Helper.FontTypeEnum.normalFont);
                     textViewLocationRequest.setVisibility(View.VISIBLE);
 
                     if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
@@ -326,6 +339,9 @@ public class NotificationPopupActivity extends FragmentActivity implements
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
         super.onPause();
     }

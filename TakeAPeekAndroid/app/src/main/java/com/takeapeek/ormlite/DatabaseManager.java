@@ -1250,7 +1250,7 @@ public class DatabaseManager
     {
         //Do not lock this function
 
-        logger.debug("GetTakeAPeekRequestWithProfileId(.) Invoked");
+        logger.debug("GetTakeAPeekRequestWithProfileIdCount(.) Invoked");
 
         int requestCount = 0;
 
@@ -1266,6 +1266,29 @@ public class DatabaseManager
         }
 
         return requestCount;
+    }
+
+    public void DeleteTakeAPeekRequestWithProfileId(String profileId)
+    {
+        //Do not lock this function
+
+        logger.debug("DeleteTakeAPeekRequestWithProfileId(.) Invoked");
+
+        try
+        {
+            //There should be only one or none
+            TakeAPeekRequest takeAPeekRequest = getHelper().GetTakeAPeekRequestDao().queryBuilder().
+                    where().eq("profileId", profileId).queryForFirst();
+
+            if(takeAPeekRequest != null)
+            {
+                DeleteTakeAPeekRequest(takeAPeekRequest);
+            }
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
     }
 
     public List<TakeAPeekRequest> GetTakeAPeekRequestList()

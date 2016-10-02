@@ -53,9 +53,11 @@ public class ShareListAdapter extends ArrayAdapter<TakeAPeekSendObject>
 			convertView = mInflater.inflate(R.layout.item_share, null);
 			holder = new ViewHolder();
 			holder.mImageViewIcon = (ImageView) convertView.findViewById(R.id.share_list_item_image);
-			holder.mTextViewLabel = (TextView) convertView.findViewById(R.id.share_list_item_label);
-			//@@Helper.setTypeface(mActivity, holder.mTextViewLabel, FontTypeEnum.normalFont);
-			convertView.setTag(holder);
+
+            holder.mTextViewLabel = (TextView) convertView.findViewById(R.id.share_list_item_label);
+			Helper.setTypeface(mActivity, holder.mTextViewLabel, Helper.FontTypeEnum.normalFont);
+
+            convertView.setTag(holder);
 		} 
 		else
 		{

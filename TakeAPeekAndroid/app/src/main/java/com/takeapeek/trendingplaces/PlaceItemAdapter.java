@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.takeapeek.R;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
+import com.takeapeek.common.Helper;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.TrendingPlaceObject;
 import com.takeapeek.usermap.UserMapActivity;
@@ -103,7 +104,10 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
             viewHolder.mImagePlaceThumbnail.setOnClickListener(ClickListener);
 
             viewHolder.mTextViewPlaceAddress = (TextView)view.findViewById(R.id.place_address);
+            Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewPlaceAddress, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextViewNumberOfPeeks = (TextView)view.findViewById(R.id.place_number_of_peeks);
+            Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewNumberOfPeeks, Helper.FontTypeEnum.normalFont);
 
             view.setTag(viewHolder);
         }

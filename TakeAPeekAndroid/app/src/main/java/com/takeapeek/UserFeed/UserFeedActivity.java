@@ -155,7 +155,9 @@ public class UserFeedActivity extends AppCompatActivity
         mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
         mImageViewPeekClose = (ImageView)findViewById(R.id.user_peek_stack_close);
         mImageViewPeekClose.setOnClickListener(ClickListener);
+
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_user_feed_empty);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         mThumbnailLoader = new ThumbnailLoader();
 
@@ -214,9 +216,6 @@ public class UserFeedActivity extends AppCompatActivity
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     @Override
@@ -227,6 +226,9 @@ public class UserFeedActivity extends AppCompatActivity
         mTimerHandler.removeCallbacks(mTimerRunnable);
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
         super.onPause();
     }

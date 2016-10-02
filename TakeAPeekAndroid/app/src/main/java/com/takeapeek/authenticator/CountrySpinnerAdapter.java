@@ -62,7 +62,9 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		LayoutInflater inflater = mActivity.getLayoutInflater();            
 		View row = inflater.inflate(R.layout.country_spinner_item_collapsed, parent, false);            
 		
-		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);            
+		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
+        Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
+
 		String labelText = "";
 		int countryPrefix = mCountryPrefixCodes[position];
 		if(countryPrefix == -1)
@@ -86,8 +88,11 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		LayoutInflater inflater = mActivity.getLayoutInflater();            
 		View row = inflater.inflate(R.layout.country_spinner_item, parent, false);            
 		
-		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName); 
-		TextView prefix = (TextView)row.findViewById(R.id.itemTextCountryPrefix); 
+		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
+        Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
+
+        TextView prefix = (TextView)row.findViewById(R.id.itemTextCountryPrefix);
+        Helper.setTypeface(mActivity, prefix, Helper.FontTypeEnum.normalFont);
 		
 		int countryPrefix = mCountryPrefixCodes[position];
 		if(countryPrefix == -1)

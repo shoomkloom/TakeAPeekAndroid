@@ -50,6 +50,7 @@ public class FollowersActivity extends AppCompatActivity
         //List View
         mListViewFollowersList = (ListView)findViewById(R.id.listview_followers_list);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_followers_empty);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         RefreshAdapterData();
 
@@ -144,6 +145,9 @@ public class FollowersActivity extends AppCompatActivity
     {
         logger.debug("onPause() Invoked");
 
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
         super.onPause();
     }
 
@@ -153,8 +157,5 @@ public class FollowersActivity extends AppCompatActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 }

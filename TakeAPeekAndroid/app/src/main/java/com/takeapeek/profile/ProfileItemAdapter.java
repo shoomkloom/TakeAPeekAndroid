@@ -104,8 +104,13 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
             viewHolder = new ViewHolder();
 
             viewHolder.mTextViewTitle = (TextView)view.findViewById(R.id.textview_profile_item_name);
+            Helper.setTypeface(mProfileActivity, viewHolder.mTextViewTitle, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextViewNumber = (TextView)view.findViewById(R.id.textview_profile_number);
+            Helper.setTypeface(mProfileActivity, viewHolder.mTextViewNumber, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextviewInviteFriends = (TextView)view.findViewById(R.id.textview_profile_invite_friends);
+            Helper.setTypeface(mProfileActivity, viewHolder.mTextviewInviteFriends, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextviewInviteFriends.setOnClickListener(ClickListener);
             viewHolder.mTextviewInviteFriends.setTag(viewHolder);
 

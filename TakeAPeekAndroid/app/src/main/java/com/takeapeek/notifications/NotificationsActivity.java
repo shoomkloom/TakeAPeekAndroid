@@ -83,9 +83,14 @@ public class NotificationsActivity extends AppCompatActivity
 
         ArrayList<TakeAPeekNotification> takeAPeekNotificationArrayList = GetTakeAPeekNotificationArray();
 
+        TextView textviewNotificationsTitle = (TextView)findViewById(R.id.textview_notifications_title);
+        Helper.setTypeface(this, textviewNotificationsTitle, Helper.FontTypeEnum.boldFont);
+
         //List View
         mListViewNotificationList = (ListView)findViewById(R.id.listview_notifications_list);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_notifications_empty);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
+
         mImageViewProfileButton = (ImageView)findViewById(R.id.imageview_profile);
         mImageViewProfileButton.setOnClickListener(ClickListener);
 
@@ -164,6 +169,9 @@ public class NotificationsActivity extends AppCompatActivity
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
 
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
         super.onPause();
     }
 
@@ -176,9 +184,6 @@ public class NotificationsActivity extends AppCompatActivity
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()

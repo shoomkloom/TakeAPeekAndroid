@@ -12,7 +12,6 @@
         android:layout_alignParentLeft="true"
         android:gravity="center"
         android:textSize="24sp"
-        android:textStyle="bold"
         android:textColor="@color/tap_gray"/>
 
     <TextView

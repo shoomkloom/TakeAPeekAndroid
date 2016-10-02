@@ -95,10 +95,15 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             viewHolder.mTakeAPeekFollowers = mTakeAPeekFollowersList.get(position);
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_followers_src_name);
+            Helper.setTypeface(mFollowersActivity, viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextViewFollowButton = (TextView)view.findViewById(R.id.textview_followers_follow_action);
+            Helper.setTypeface(mFollowersActivity, viewHolder.mTextViewFollowButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewFollowButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewFollowButton.setTag(viewHolder);
+
             viewHolder.mTextViewBlockButton = (TextView)view.findViewById(R.id.textview_followers_block_action);
+            Helper.setTypeface(mFollowersActivity, viewHolder.mTextViewBlockButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewBlockButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewBlockButton.setTag(viewHolder);
 

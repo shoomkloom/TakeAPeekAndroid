@@ -332,19 +332,43 @@ public class CaptureClipActivity extends Activity implements
         //Start TAP specific code
         mImageviewFlash = (ImageView)findViewById(R.id.imageview_flash);
         mImageviewSwitchCamera = (ImageView)findViewById(R.id.imageview_switch_camera);
+
+        TextView textviewIntroDetailsTitle = (TextView)findViewById(R.id.textview_intro_details_title);
+        Helper.setTypeface(this, textviewIntroDetailsTitle, Helper.FontTypeEnum.boldFont);
+
+        TextView textviewIntroDetailsText = (TextView)findViewById(R.id.textview_intro_details_text);
+        Helper.setTypeface(this, textviewIntroDetailsText, Helper.FontTypeEnum.boldFont);
+
         mTextviewIntroLine1 = (TextView)findViewById(R.id.textview_intro_line1);
+        Helper.setTypeface(this, mTextviewIntroLine1, Helper.FontTypeEnum.boldFont);
+
         mImageviewIntroArrow = (ImageView)findViewById(R.id.imageview_intro_arrow);
+
         mTextviewIntroLine2 = (TextView)findViewById(R.id.textview_intro_line2);
+        Helper.setTypeface(this, mTextviewIntroLine2, Helper.FontTypeEnum.boldFont);
+
+        TextView textviewIntroLine3 = (TextView)findViewById(R.id.textview_intro_line3);
+        Helper.setTypeface(this, textviewIntroLine3, Helper.FontTypeEnum.boldFont);
+
         mImageviewIntroClose = (ImageView)findViewById(R.id.imageview_intro_close);
         mRelativelayoutIntro = (RelativeLayout)findViewById(R.id.relativelayout_intro);
         mLinearlayoutIntroDetails = (LinearLayout)findViewById(R.id.linearlayout_intro_details);
         mRelativelayoutTapBar = (RelativeLayout)findViewById(R.id.relativelayout_tap_bar);
+
         mTextviewButtonBack = (TextView)findViewById(R.id.textview_button_back);
+        Helper.setTypeface(this, mTextviewButtonBack, Helper.FontTypeEnum.boldFont);
+
         mTextviewButtonVideo = (TextView)findViewById(R.id.textview_button_video);
+        Helper.setTypeface(this, mTextviewButtonVideo, Helper.FontTypeEnum.boldFont);
+
         mTextviewButtonDone = (TextView)findViewById(R.id.textview_button_done);
+        Helper.setTypeface(this, mTextviewButtonDone, Helper.FontTypeEnum.boldFont);
+
         mCapturePreviewTitleBar = (TextView)findViewById(R.id.capture_preview_title_bar);
+        Helper.setTypeface(this, mCapturePreviewTitleBar, Helper.FontTypeEnum.boldFont);
 
         mCapturePreviewTitle = (EditText)findViewById(R.id.capture_preview_title);
+        Helper.setTypeface(this, mCapturePreviewTitle, Helper.FontTypeEnum.boldFont);
         mCapturePreviewTitle.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -1221,8 +1245,9 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("onBackPressed() Invoked.");
 
-        //Do nothing
-        //super.onBackPressed();
+        setResult(RESULT_CANCELED);
+
+        super.onBackPressed();
     }
     
     public boolean usingKitKatImmersiveMode()

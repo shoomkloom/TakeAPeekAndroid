@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.takeapeek.R;
+import com.takeapeek.common.Helper;
 
 /**
  * Created by orenslev on 30/08/2016.
@@ -53,6 +54,7 @@ public class ViewPagerAdapter extends PagerAdapter
             imageView.setImageResource(mImageResources[position]);
 
             TextView textView = (TextView) itemView.findViewById(R.id.text_pager_item);
+            Helper.setTypeface(mContext, textView, Helper.FontTypeEnum.normalFont);
             textView.setGravity(mTextGravity[position]);
             textView.setText(mStringResources[position]);
         }

@@ -103,9 +103,16 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mImageViewPeekThumbnailPlay = (ImageView)view.findViewById(R.id.user_peek_feed_thumbnail_play);
             viewHolder.mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
             viewHolder.mTextViewUserFeedDisplayname = (TextView)view.findViewById(R.id.user_peek_feed_displayname);
+            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedDisplayname, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextViewUserFeedTitle = (TextView)view.findViewById(R.id.user_peek_feed_title);
+            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedTitle, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextViewUserFeedTime = (TextView)view.findViewById(R.id.user_peek_feed_time);
+            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedTime, Helper.FontTypeEnum.normalFont);
+
             viewHolder.mTextViewUserFeedAddress = (TextView)view.findViewById(R.id.user_peek_feed_address);
+            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedAddress, Helper.FontTypeEnum.normalFont);
 
             view.setTag(viewHolder);
         }

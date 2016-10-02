@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.maps.android.clustering.Cluster;
@@ -79,6 +80,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -117,12 +119,11 @@ public class UserMapActivity extends FragmentActivity implements
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
-    private AsyncTask<Void, Void, ResponseObject> mAsyncTaskRequestPeek = null;
+    private AsyncTask<Hashtable<Integer, Boolean>, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     ImageView mImageViewNotifications = null;
     TextView mTextViewNumNewNotifications = null;
     LinearLayout mLinearLayout = null;
-    ImageView mImageViewOverlay = null;
     LinearLayout mLinearLayoutRequestPeek = null;
     LinearLayout mLinearLayoutSendPeek = null;
     TextView mTextviewTrending = null;
@@ -130,6 +131,7 @@ public class UserMapActivity extends FragmentActivity implements
     ViewPager mViewPager = null;
     PeekStackPagerAdapter mPeekStackPagerAdapter = null;
     SlideButton mSlideButton = null;
+    private CutOutView mCutOutView = null;
 
     int mUserStackItemPosition = -1;
 
@@ -235,21 +237,33 @@ public class UserMapActivity extends FragmentActivity implements
         mImageViewNotifications.setOnClickListener(ClickListener);
 
         mTextViewNumNewNotifications = (TextView)findViewById(R.id.textview_new_notifications);
+        Helper.setTypeface(this, mTextViewNumNewNotifications, Helper.FontTypeEnum.normalFont);
         mTextViewNumNewNotifications.setOnClickListener(ClickListener);
 
         UpdateNumberOfNewNotifications();
 
         mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
-        mImageViewOverlay = (ImageView)findViewById(R.id.map_overlay_image);
+        mCutOutView = (CutOutView)findViewById(R.id.cutOut);
         mLinearLayoutRequestPeek = (LinearLayout)findViewById(R.id.button_request_peek);
         mLinearLayoutRequestPeek.setOnClickListener(ClickListener);
+        TextView textviewButtonRequestPeek = (TextView)findViewById(R.id.textview_button_request_peek);
+        Helper.setTypeface(this, textviewButtonRequestPeek, Helper.FontTypeEnum.boldFont);
+
         mLinearLayoutSendPeek = (LinearLayout)findViewById(R.id.button_send_peek);
         mLinearLayoutSendPeek.setOnClickListener(ClickListener);
+        TextView textviewButtonSendPeek = (TextView)findViewById(R.id.textview_button_send_peek);
+        Helper.setTypeface(this, textviewButtonSendPeek, Helper.FontTypeEnum.boldFont);
+
         mTextviewTrending = (TextView)findViewById(R.id.textview_trending);
+        Helper.setTypeface(this, mTextviewTrending, Helper.FontTypeEnum.boldFont);
         mTextviewTrending.setOnClickListener(ClickListener);
+
         //@@mSlideButton = (SlideButton)findViewById(R.id.slidebutton_trending);
         //@@mSlideButton.setSlideButtonListener(SlideListener);
+
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
+        Helper.setTypeface(this, mTextViewStackUserName, Helper.FontTypeEnum.boldFont);
+
         mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
         mViewPager.addOnPageChangeListener(PageChangeListener);
 
@@ -275,9 +289,9 @@ public class UserMapActivity extends FragmentActivity implements
         {
             logger.warn(String.format("onActivityResult returned with resultCode = %d or data was null", resultCode));
 
-            if(requestCode == RESULT_AUTHENTICATE)
+            if(requestCode == RESULT_AUTHENTICATE || requestCode == RESULT_CAPTURECLIP)
             {
-                logger.info("onActivityResult: requestCode == RESULT_AUTHENTICATE, calling finish()");
+                logger.info(String.format("onActivityResult: resultCode != RESULT_OK, requestCode == %d, calling finish()", requestCode));
                 finish();
             }
 
@@ -414,7 +428,7 @@ public class UserMapActivity extends FragmentActivity implements
         mClusterManager = new ClusterManager<TAPClusterItem>(this, mGoogleMap);
         mClusterManagerAlgorithm = new NonHierarchicalDistanceBasedAlgorithm();
         mClusterManager.setAlgorithm(mClusterManagerAlgorithm);
-        mClusterManager.setRenderer(new TAPClusterItemRenderer(this, mGoogleMap, mClusterManager, mSharedPreferences));
+        mClusterManager.setRenderer(new TAPClusterItemRenderer(this, mGoogleMap, mClusterManager, mCutOutView, mSharedPreferences));
         mGoogleMap.setOnCameraChangeListener(CameraChangeListener);
         mGoogleMap.setOnMarkerClickListener(mClusterManager);
         mGoogleMap.setOnInfoWindowClickListener(mClusterManager);
@@ -469,9 +483,6 @@ public class UserMapActivity extends FragmentActivity implements
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     @Override
@@ -486,6 +497,9 @@ public class UserMapActivity extends FragmentActivity implements
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
         super.onPause();
     }
@@ -831,7 +845,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                 if (mLinearLayout.getVisibility() == View.GONE)
                 {
-                    mImageViewOverlay.setVisibility(View.GONE);
+                    mCutOutView.setVisibility(View.GONE);
 
                     mLinearLayout.setVisibility(View.VISIBLE);
                     Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
@@ -872,9 +886,9 @@ public class UserMapActivity extends FragmentActivity implements
         mLinearLayout.setAnimation(slideUpAnimation);
         slideUpAnimation.start();
 
-        mImageViewOverlay.setVisibility(View.VISIBLE);
+        mCutOutView.setVisibility(View.VISIBLE);
         Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadein);
-        mImageViewOverlay.setAnimation(fadeInAnimation);
+        mCutOutView.setAnimation(fadeInAnimation);
         fadeInAnimation.start();
 
         ShowProfilesInBounds(true);
@@ -943,14 +957,26 @@ public class UserMapActivity extends FragmentActivity implements
 
                                 if (mAsyncTaskRequestPeek == null)
                                 {
+                                    Hashtable<Integer, Boolean> isInCutOutHash = new Hashtable<Integer, Boolean>();
+
+                                    Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
+                                    for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
+                                    {
+                                        Point markerPosition = mGoogleMap.getProjection().toScreenLocation(tapClusterItem.getPosition());
+                                        boolean inCutOut = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) < mCutOutView.mRadius;
+                                        isInCutOutHash.put(tapClusterItem.mIndex, inCutOut);
+                                    }
+
                                     //Start asynchronous request to server
-                                    mAsyncTaskRequestPeek = new AsyncTask<Void, Void, ResponseObject>()
+                                    mAsyncTaskRequestPeek = new AsyncTask<Hashtable<Integer, Boolean>, Void, ResponseObject>()
                                     {
                                         int mNumberOfRequests = 0;
 
                                         @Override
-                                        protected ResponseObject doInBackground(Void... params)
+                                        protected ResponseObject doInBackground(Hashtable<Integer, Boolean>... params)
                                         {
+                                            Hashtable<Integer, Boolean> isInCutOutHash = (Hashtable<Integer, Boolean>)params[0];
+
                                             try
                                             {
                                                 logger.info("Getting profile list from server");
@@ -966,21 +992,29 @@ public class UserMapActivity extends FragmentActivity implements
                                                 {
                                                     if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) == 0)
                                                     {
-                                                        mNumberOfRequests++;
+                                                        if(isInCutOutHash.get(tapClusterItem.mIndex) == true)
+                                                        {
+                                                            mNumberOfRequests++;
 
-                                                        requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
+                                                            requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
 
-                                                        TakeAPeekRequest takeAPeekRequest = new TakeAPeekRequest(tapClusterItem.mProfileObject.profileId, currentTimeMillis);
-                                                        DatabaseManager.getInstance().AddTakeAPeekRequest(takeAPeekRequest);
+                                                            TakeAPeekRequest takeAPeekRequest = new TakeAPeekRequest(tapClusterItem.mProfileObject.profileId, currentTimeMillis);
+                                                            DatabaseManager.getInstance().AddTakeAPeekRequest(takeAPeekRequest);
+                                                        }
                                                     }
                                                 }
 
-                                                String metaDataJson = new Gson().toJson(requestObject);
+                                                if(mNumberOfRequests > 0)
+                                                {
+                                                    String metaDataJson = new Gson().toJson(requestObject);
 
-                                                String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
-                                                String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
+                                                    String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                                    String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
 
-                                                return Transport.RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                                    return Transport.RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                                }
+
+                                                return new ResponseObject();
                                             }
                                             catch (Exception e)
                                             {
@@ -1025,7 +1059,7 @@ public class UserMapActivity extends FragmentActivity implements
                                                 mAsyncTaskRequestPeek = null;
                                             }
                                         }
-                                    }.execute();
+                                    }.execute(isInCutOutHash);
                                 }
                             }
                             catch (Exception e)
@@ -1198,16 +1232,28 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     static private final Logger logger = LoggerFactory.getLogger(TAPClusterItemRenderer.class);
 
     UserMapActivity mUserMapActivity = null;
-
+    GoogleMap mGoogleMap = null;
     Bitmap mItemSizedBitmap = null;
+    Bitmap mItemSizedBlurBitmap = null;
     Bitmap mItemSizedBitmapRequest = null;
-    Point mPointCenter = new Point(60, 90);
+    Bitmap mItemSizedBlurBitmapRequest = null;
+    CutOutView mCutOutView = null;
+    private Handler mHandlerItem = new Handler();
+    UpdateTaskItem mUpdateTaskItem = new UpdateTaskItem();
+    private Handler mHandlerCluster = new Handler();
+    UpdateTaskCluster mUpdateTaskCluster = new UpdateTaskCluster();
 
-    public TAPClusterItemRenderer(UserMapActivity userMapActivity, GoogleMap googleMap, ClusterManager clusterManager, SharedPreferences sharedPreferences)
+    Point mPointCenter = new Point(70, 100);
+    float mAnchorX = (float)0.1;
+    float mAnchorY = (float)0.9;
+
+    public TAPClusterItemRenderer(UserMapActivity userMapActivity, GoogleMap googleMap, ClusterManager clusterManager, CutOutView cutOutView, SharedPreferences sharedPreferences)
     {
         super(userMapActivity, googleMap, clusterManager);
 
         mUserMapActivity = userMapActivity;
+        mGoogleMap = googleMap;
+        mCutOutView = cutOutView;
 
         DatabaseManager.init(mUserMapActivity);
 
@@ -1224,6 +1270,16 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         try
         {
+            String itemSizedBlurBitmapPath = String.format("%sItemSizedBlurBitmap.png", Helper.GetTakeAPeekPath(mUserMapActivity));
+            mItemSizedBlurBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_blue_blur, itemSizedBlurBitmapPath, 25, 25);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When getting sized bitmap mItemSizedBlurBitmap", e);
+        }
+
+        try
+        {
             String itemSizedBitmapRequestPath = String.format("%sItemSizedBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
             mItemSizedBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_green, itemSizedBitmapRequestPath, 25, 25);
         }
@@ -1231,29 +1287,71 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         {
             Helper.Error(logger, "EXCEPTION: When getting sized bitmap mItemSizedBitmapRequest", e);
         }
+
+        try
+        {
+            String itemSizedBlurBitmapRequestPath = String.format("%sItemSizedBlurBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
+            mItemSizedBlurBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_green_blur, itemSizedBlurBitmapRequestPath, 25, 25);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When getting sized bitmap mItemSizedBlurBitmapRequest", e);
+        }
     }
 
     @Override
     protected void onBeforeClusterItemRendered(TAPClusterItem tapClusterItem, MarkerOptions markerOptions)
     {
+        mHandlerItem.removeCallbacks(mUpdateTaskItem);
+
         Bitmap iconBitmap = null;
+
+        boolean doBlur = false;
+        Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
+        if(mCutOutView.mCenter != null)
+        {
+            doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+        }
 
         if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) > 0)
         {
-            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            if(doBlur)
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+            }
+            else
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            }
         }
         else
         {
-            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            if(doBlur)
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+            }
+            else
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            }
         }
 
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
-        markerOptions.anchor((float)0.0, (float)1.0);
+        markerOptions.anchor(mAnchorX, mAnchorY);
     }
 
     @Override
     protected void onBeforeClusterRendered(Cluster<TAPClusterItem> cluster, MarkerOptions markerOptions)
     {
+        mHandlerCluster.removeCallbacks(mUpdateTaskCluster);
+
+        boolean doBlur = false;
+        Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
+        if(mCutOutView.mCenter != null)
+        {
+            doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+        }
+
         boolean hasRequest = false;
         for(TAPClusterItem tapClusterItem : cluster.getItems())
         {
@@ -1268,15 +1366,45 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         if(hasRequest == true)
         {
-            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            if(doBlur)
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+            }
+            else
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            }
         }
         else
         {
-            iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            if(doBlur)
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+            }
+            else
+            {
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+            }
         }
 
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
-        markerOptions.anchor((float)0.0, (float)1.0);
+        markerOptions.anchor(mAnchorX, mAnchorY);
+    }
+
+    @Override
+    protected void onClusterItemRendered(TAPClusterItem tapClusterItem, Marker marker)
+    {
+        //@@mHandlerItem.postDelayed(mUpdateTaskItem.Init(tapClusterItem, marker), 500);
+
+        super.onClusterItemRendered(tapClusterItem, marker);
+    }
+
+    @Override
+    protected void onClusterRendered(Cluster<TAPClusterItem> cluster, Marker marker)
+    {
+        //@@mHandlerCluster.postDelayed(mUpdateTaskCluster.Init(cluster, marker), 500);
+
+        super.onClusterRendered(cluster, marker);
     }
 
     @Override
@@ -1284,5 +1412,123 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     {
         // Render clusters for more than one person.
         return cluster.getSize() > 1;
+    }
+
+    class UpdateTaskItem implements Runnable
+    {
+        TAPClusterItem mTapClusterItem = null;
+        Marker mMarker = null;
+
+        @Override
+        public void run()
+        {
+            if(mTapClusterItem != null)
+            {
+                Bitmap iconBitmap = null;
+
+                boolean doBlur = false;
+                Point markerPosition = mGoogleMap.getProjection().toScreenLocation(mMarker.getPosition());
+                if(mCutOutView.mCenter != null)
+                {
+                    doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+                }
+
+                if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(mTapClusterItem.mProfileObject.profileId) > 0)
+                {
+                    if(doBlur)
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                    }
+                    else
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                    }
+                }
+                else
+                {
+                    if(doBlur)
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                    }
+                    else
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                    }
+                }
+
+                mMarker.setIcon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+            }
+        }
+
+        public Runnable Init(TAPClusterItem tapClusterItem, Marker marker)
+        {
+            mTapClusterItem = tapClusterItem;
+            mMarker = marker;
+            return(this);
+        }
+    }
+
+    class UpdateTaskCluster implements Runnable
+    {
+        Cluster<TAPClusterItem> mCluster = null;
+        Marker mMarker = null;
+
+        @Override
+        public void run()
+        {
+            if(mCluster != null)
+            {
+                boolean doBlur = false;
+                Point markerPosition = mGoogleMap.getProjection().toScreenLocation(mMarker.getPosition());
+                if(mCutOutView.mCenter != null)
+                {
+                    doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+                }
+
+                boolean hasRequest = false;
+                for(TAPClusterItem tapClusterItem : mCluster.getItems())
+                {
+                    if (DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) > 0)
+                    {
+                        hasRequest = true;
+                        break;
+                    }
+                }
+
+                Bitmap iconBitmap = null;
+
+                if(hasRequest == true)
+                {
+                    if(doBlur)
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                    }
+                    else
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                    }
+                }
+                else
+                {
+                    if(doBlur)
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                    }
+                    else
+                    {
+                        iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                    }
+                }
+
+                mMarker.setIcon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+            }
+        }
+
+        public Runnable Init(Cluster<TAPClusterItem> cluster, Marker marker)
+        {
+            mCluster = cluster;
+            mMarker = marker;
+            return(this);
+        }
     }
 }

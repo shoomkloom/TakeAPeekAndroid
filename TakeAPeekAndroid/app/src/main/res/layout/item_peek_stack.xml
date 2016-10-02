@@ -79,7 +79,6 @@
             android:layout_alignParentLeft="true"
             android:clickable="true"
             android:textSize="12sp"
-            android:textStyle="bold"
             android:textColor="@drawable/button_white"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"

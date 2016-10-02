@@ -286,10 +286,10 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                         }
 			        	
 			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
-			        	Helper.setTypeface(this, loginTextviewToUse, FontTypeEnum.lightFont);
+			        	Helper.setTypeface(this, loginTextviewToUse, FontTypeEnum.boldFont);
 			        	
 			        	TextView loginTextviewTypeYourPhone = (TextView)findViewById(R.id.login_textview_type_your_phone_number);
-			        	Helper.setTypeface(this, loginTextviewTypeYourPhone, FontTypeEnum.lightFont);
+			        	Helper.setTypeface(this, loginTextviewTypeYourPhone, FontTypeEnum.boldFont);
 			        	
 			        	List<String> countryISOCodes = Arrays.asList(new String[]{"hint", "AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","MM","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CX","CC","CO","KM","CG","CD","CK","CR","HR","CU","CY","CZ","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FK","FO","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GU","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JO","KZ","KE","KI","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MH","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NR","NP","NL","AN","NC","NZ","NI","NE","NG","NU","MP","KP","NO","OM","PK","PW","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RO","RU","RW","BL","WS","SM","ST","SA","SN","RS","SC","SL","SG","SK","SI","SB","SO","ZA","KR","ES","LK","SH","KN","LC","MF","PM","VC","SD","SR","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TK","TO","TT","TN","TR","TM","TC","TV","AE","UG","GB","UA","UY","US","UZ","VU","VA","VE","VN","VI","WF","YE","ZM","ZW"});
 			        	String[] countryNames = new String[]{"hint", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burma (Myanmar)","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Cocos (Keeling) Islands","Colombia","Comoros","Republic of the Congo","Dem. Rep. of the Congo","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Timor-Leste","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mayotte","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Northern Mariana Islands","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Romania","Russia","Rwanda","Saint Barthelemy","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Saint Helena","Saint Kitts and Nevis","Saint Lucia","Saint Martin","Saint Pierre and Miquelon","Saint Vincent and the Grenadines","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tokelau","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","United Arab Emirates","Uganda","United Kingdom","Ukraine","Uruguay","United States","Uzbekistan","Vanuatu","Holy See (Vatican City)","Venezuela","Vietnam","US Virgin Islands","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
@@ -313,7 +313,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			            mCountrySpinner.setSelection(mCountryArrayPosition);
 			            
 			            mMobileNumber = (EditText)(findViewById(R.id.edittext_number));
-			            Helper.setTypeface(this, mMobileNumber, FontTypeEnum.lightFont); 
+			            Helper.setTypeface(this, mMobileNumber, FontTypeEnum.lightFont);
 			            mMobileNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher(mNumberFormattingTextHandler));
                         mMobileNumber.setText(Helper.GetUserNumber(mSharedPreferences));
                         mMobileNumber.setOnEditorActionListener(new EditText.OnEditorActionListener()
@@ -334,33 +334,34 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			            
 			            //Apply underline to the terms and conditions link
 		            	TextView termAndConditionsLink = (TextView) findViewById(R.id.terms_and_conditions);
-		            	termAndConditionsLink.setMovementMethod(LinkMovementMethod.getInstance());
+                        Helper.setTypeface(this, termAndConditionsLink, FontTypeEnum.normalFont);
+                        termAndConditionsLink.setMovementMethod(LinkMovementMethod.getInstance());
 		            	String formatString = getString(R.string.create_account_terms_and_conditions);
 		            	String text = String.format(formatString, Constants.TERMS_AND_CONDITIONS_URL);
 		            	termAndConditionsLink.setText(Html.fromHtml(text)); 
 			        	
 			        	TextView buttonCreateAccount = (TextView)findViewById(R.id.button_create_account);
-			        	buttonCreateAccount.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, buttonCreateAccount, FontTypeEnum.boldFont);
-			        	
-			        	TextView loginResendCode = (TextView)findViewById(R.id.login_resend_code);
-			        	loginResendCode.setOnClickListener(ClickListener);
+                        buttonCreateAccount.setOnClickListener(ClickListener);
+
+                        TextView loginResendCode = (TextView)findViewById(R.id.login_resend_code);
 			        	Helper.setTypeface(this, loginResendCode, FontTypeEnum.lightFont);
-			        	
-			        	TextView loginResendRequestCall = (TextView)findViewById(R.id.login_resend_request_call);
+                        loginResendCode.setOnClickListener(ClickListener);
+
+                        TextView loginResendRequestCall = (TextView)findViewById(R.id.login_resend_request_call);
+                        Helper.setTypeface(this, loginResendRequestCall, FontTypeEnum.lightFont);
 			        	loginResendRequestCall.setOnClickListener(ClickListener);
-			        	Helper.setTypeface(this, loginResendRequestCall, FontTypeEnum.lightFont);
-			        	
+
 			        	TextView loginResendEditNumberMessage = (TextView)findViewById(R.id.login_resend_edit_number_message);
 			        	Helper.setTypeface(this, loginResendEditNumberMessage, FontTypeEnum.lightFont);
 			        	
 			        	TextView loginResendEditNumber = (TextView)findViewById(R.id.login_resend_edit_number);
-			        	loginResendEditNumber.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, loginResendEditNumber, FontTypeEnum.lightFont);
+                        loginResendEditNumber.setOnClickListener(ClickListener);
 
                         TextView buttonVerifyAccount = (TextView)findViewById(R.id.button_verify_account_submit);
-			        	buttonVerifyAccount.setOnClickListener(ClickListener);
 			        	Helper.setTypeface(this, buttonVerifyAccount, FontTypeEnum.boldFont);
+                        buttonVerifyAccount.setOnClickListener(ClickListener);
 
 			        	mVerificationMessageHeader = (TextView)findViewById(R.id.login_textview_verification_message_header);
 			        	Helper.setTypeface(this, mVerificationMessageHeader, FontTypeEnum.lightFont);
@@ -394,15 +395,33 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 
                         mDisplayNameValidationProgess = (ImageView)findViewById(R.id.imageview_display_name_validation_progess);
                         mButtonCreateDisplayName = (TextView)findViewById(R.id.button_create_display_name);
+                        Helper.setTypeface(this, mButtonCreateDisplayName, FontTypeEnum.boldFont);
                         mButtonCreateDisplayName.setOnClickListener(ClickListener);
 
-                        findViewById(R.id.textview_date_of_birth).setOnClickListener(ClickListener);
-                        findViewById(R.id.button_create_date_of_birth).setOnClickListener(ClickListener);
+                        TextView textviewDateOfBirth = (TextView)findViewById(R.id.textview_date_of_birth);
+                        textviewDateOfBirth.setOnClickListener(ClickListener);
+                        Helper.setTypeface(this, textviewDateOfBirth, FontTypeEnum.lightFont);
+
+                        TextView buttonCreateDateOfBirth = (TextView)findViewById(R.id.button_create_date_of_birth);
+                        buttonCreateDateOfBirth.setOnClickListener(ClickListener);
+                        Helper.setTypeface(this, buttonCreateDateOfBirth, FontTypeEnum.boldFont);
 
 			        	mLoginTextviewProgressBottom = (TextView)findViewById(R.id.login_textview_progress_bottom);
 			        	Helper.setTypeface(this, mLoginTextviewProgressBottom, FontTypeEnum.lightFont);
 			        	
 			        	new PhoneNumberUtilInitAsyncTask(mPhoneNumberUtil).execute();
+
+                        TextView textviewDisplayNameBigTitle = (TextView)findViewById(R.id.textview_display_name_big_title);
+                        Helper.setTypeface(this, textviewDisplayNameBigTitle, FontTypeEnum.boldFont);
+
+                        TextView textviewDisplayNameSmallTitle = (TextView)findViewById(R.id.textview_display_name_small_title);
+                        Helper.setTypeface(this, textviewDisplayNameSmallTitle, FontTypeEnum.boldFont);
+
+                        TextView textviewDateOfBirthBigTitle = (TextView)findViewById(R.id.textview_date_of_birth_big_title);
+                        Helper.setTypeface(this, textviewDateOfBirthBigTitle, FontTypeEnum.boldFont);
+
+                        TextView textviewDateOfBirthSmallTitle = (TextView)findViewById(R.id.textview_date_of_birth_small_title);
+                        Helper.setTypeface(this, textviewDateOfBirthSmallTitle, FontTypeEnum.boldFont);
 			        	
 			        	UpdateUI();
 			        }

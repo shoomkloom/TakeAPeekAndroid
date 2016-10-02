@@ -123,10 +123,19 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             }
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_notification_src_name);
+            Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.boldFont);
+
             viewHolder.mTextViewNotificationTime = (TextView)view.findViewById(R.id.textview_notification_time);
+            Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewNotificationTime, Helper.FontTypeEnum.boldFont);
+
             viewHolder.mTextViewNotificationAddress = (TextView)view.findViewById(R.id.textview_notification_address);
+            Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewNotificationAddress, Helper.FontTypeEnum.boldFont);
+
             viewHolder.mTextViewNotificationActionTitle = (TextView)view.findViewById(R.id.textview_notification_action_title);
+            Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewNotificationActionTitle, Helper.FontTypeEnum.boldFont);
+
             viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_notification_action);
+            Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 

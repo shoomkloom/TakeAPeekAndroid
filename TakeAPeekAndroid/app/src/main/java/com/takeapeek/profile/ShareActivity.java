@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -19,7 +18,6 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.takeapeek.MainActivity;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -99,9 +97,17 @@ public class ShareActivity extends ActionBarActivity
         logger.debug("onResume() Invoked");
 
         super.onResume();
+    }
+
+    @Override
+    public void onPause()
+    {
+        logger.debug("onPause() Invoked");
 
         long currentTimeMillis = Helper.GetCurrentTimeMillis();
         Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+
+        super.onPause();
     }
 	
 	@Override
@@ -119,7 +125,8 @@ public class ShareActivity extends ActionBarActivity
     	
 		super.onStop();
 	}
-    
+
+/*@@
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
@@ -145,19 +152,7 @@ public class ShareActivity extends ActionBarActivity
             return super.onOptionsItemSelected(item);
         }
     }
-	
-	@Override
-    public void onBackPressed() 
-    {
-    	logger.debug("onBackPressed() Invoked");
-
-    	//In case of 'Back' pressed, do the transition and allow Android to do it's thing with the history stack
-    	setResult(RESULT_OK, null);
-    	
-    	finish();
-
-    	super.onBackPressed();
-    }
+@@*/
 	
 	private void DoShare(String sharePackageName, String shareActivityName)
     {

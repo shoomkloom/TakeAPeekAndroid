@@ -127,6 +127,9 @@ public class TrendingPlacesActivity extends AppCompatActivity
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         //Initate members for UI elements
+        TextView textviewPlacesTitle = (TextView)findViewById(R.id.textview_places_title);
+        Helper.setTypeface(this, textviewPlacesTitle, Helper.FontTypeEnum.boldFont);
+
         //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.places_progress);
         mAnimationDrawableProgressAnimation = (AnimationDrawable) mImageViewProgressAnimation.getBackground();
@@ -134,6 +137,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
         mListViewFeedList = (ListView)findViewById(R.id.listview_places_list);
 
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_places_empty);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
 
@@ -222,9 +226,6 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     @Override
@@ -235,6 +236,9 @@ public class TrendingPlacesActivity extends AppCompatActivity
         mTimerHandler.removeCallbacks(mTimerRunnable);
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
+
+        long currentTimeMillis = Helper.GetCurrentTimeMillis();
+        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
         super.onPause();
     }
