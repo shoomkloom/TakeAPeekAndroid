@@ -1218,7 +1218,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 
                 //Set a timeout for validating display name
                 mHandler.removeCallbacks(mDisplayNameVerifyRunnable);
-                mHandler.postDelayed(mDisplayNameVerifyRunnable, 3000);
+                mHandler.postDelayed(mDisplayNameVerifyRunnable, 1500);
             }
         }
 

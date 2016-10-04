@@ -26,9 +26,9 @@
     <string name="permission_request">TakeAPeek needs permission for camera and audio recording.</string>
     <string name="camera_error">This device doesn\'t is not supported.</string>
     <string name="error_cannot_get_location">Could not get current location.\nPlease try again later.</string>
-    <string name="back">&lt; Back</string>
-    <string name="next">Next &gt;</string>
-    <string name="done">Done &gt;</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
     <string name="intro_create_peek">Create a Peek to Enter</string>
     <string name="intro_record_till_0">Record till you reach 0 seconds</string>
     <string name="intro_why">Why do I need to create a peek to enter?</string>

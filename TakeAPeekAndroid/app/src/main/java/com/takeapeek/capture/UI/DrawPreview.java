@@ -13,7 +13,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Pair;
 import android.view.Surface;
-import android.widget.TextView;
 
 import com.takeapeek.R;
 import com.takeapeek.capture.CameraController.CameraController;
@@ -187,15 +186,15 @@ public class DrawPreview
     	return time_s;
     }
 
-	public void onDrawPreview(Canvas canvas)
+	public void onDrawPreview(final Canvas canvas)
     {
         logger.debug("() Invoked.");
         
-		Preview preview  = main_activity.getPreview();
-		CameraController camera_controller = preview.getCameraController();
-		int ui_rotation = preview.getUIRotation();
+		final Preview preview  = main_activity.getPreview();
+		final CameraController camera_controller = preview.getCameraController();
+		final int ui_rotation = preview.getUIRotation();
 		boolean has_level_angle = preview.hasLevelAngle();
-		double level_angle = preview.getLevelAngle();
+		final double level_angle = preview.getLevelAngle();
 		boolean has_geo_direction = preview.hasGeoDirection();
 		double geo_direction = preview.getGeoDirection();
 		boolean ui_placement_right = main_activity.getMainUI().getUIPlacementRight();
@@ -617,8 +616,7 @@ public class DrawPreview
 
             {
                 long video_time = preview.getVideoTime();
-                int secs = 10 - (int)((video_time / 1000) % 60);
-                final String countdownString = String.format("%ds", secs);
+                final int secs = 10 - (int)((video_time / 1000) % 60);
 
                 main_activity.runOnUiThread(new Runnable()
 
@@ -627,8 +625,7 @@ public class DrawPreview
                     public void run()
 
                     {
-                        TextView textviewButtonVideo = (TextView)main_activity.findViewById(R.id.textview_button_video);
-                        textviewButtonVideo.setText(countdownString);
+                        main_activity.UpdateTakeVideoUI(secs);
                     }
                 });
             }

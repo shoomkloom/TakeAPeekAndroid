@@ -360,6 +360,7 @@ public class CaptureClipActivity extends Activity implements
 
         mTextviewButtonVideo = (TextView)findViewById(R.id.textview_button_video);
         Helper.setTypeface(this, mTextviewButtonVideo, Helper.FontTypeEnum.boldFont);
+        mTextviewButtonVideo.setOnTouchListener(TakeVideoTouchListener);
 
         mTextviewButtonDone = (TextView)findViewById(R.id.textview_button_done);
         Helper.setTypeface(this, mTextviewButtonDone, Helper.FontTypeEnum.boldFont);
@@ -945,6 +946,86 @@ public class CaptureClipActivity extends Activity implements
         UpdateUI();
 
     	this.takePicture();
+    }
+
+    View.OnTouchListener TakeVideoTouchListener = new View.OnTouchListener()
+    {
+        @Override
+        public boolean onTouch(View v, MotionEvent event)
+        {
+            int touchAction = event.getAction();
+
+            switch(touchAction)
+            {
+                case MotionEvent.ACTION_DOWN:
+                    mVideoCaptureStateEnum = VideoCaptureStateEnum.Capture;
+
+                    UpdateUI();
+                    CaptureClipActivity.this.takePicture();
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                    if(mVideoCaptureStateEnum == VideoCaptureStateEnum.Capture)
+                    {
+                        mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+                    }
+
+                    UpdateUI();
+                    CaptureClipActivity.this.takePicture();
+                    return true;
+            }
+
+            return false;
+        }
+    };
+
+    public void UpdateTakeVideoUI(int seconds)
+    {
+        String countdownString = String.format("%ds", seconds);
+        mTextviewButtonVideo.setText(countdownString);
+
+        switch(seconds)
+        {
+            case 9:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_0);
+                break;
+
+            case 8:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_1);
+                break;
+
+            case 7:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_2);
+                break;
+
+            case 6:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_3);
+                break;
+
+            case 5:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_4);
+                break;
+
+            case 4:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_5);
+                break;
+
+            case 3:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_6);
+                break;
+
+            case 2:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_7);
+                break;
+
+            case 1:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_8);
+                break;
+
+            case 0:
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_9);
+                break;
+        }
     }
 
 /*@@
@@ -1846,7 +1927,7 @@ public class CaptureClipActivity extends Activity implements
 		applicationInterface.trashLastImage();
     }
 @@*/
-    private void takePicture()
+    public void takePicture()
     {
         logger.debug("takePicture() Invoked.");
 
@@ -3205,8 +3286,11 @@ public class CaptureClipActivity extends Activity implements
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
                 mTextviewButtonBack.setVisibility(View.GONE);
+
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
                 mTextviewButtonVideo.setText("10s");
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
+
                 mTextviewButtonDone.setVisibility(View.GONE);
                 mCapturePreviewTitleBar.setVisibility(View.GONE);
                 mCapturePreviewTitle.setVisibility(View.GONE);
@@ -3230,8 +3314,11 @@ public class CaptureClipActivity extends Activity implements
                 mImageviewIntroClose.setVisibility(View.VISIBLE);
                 mLinearlayoutIntroDetails.setVisibility(View.VISIBLE);
                 mTextviewButtonBack.setVisibility(View.GONE);
+
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
                 mTextviewButtonVideo.setText("10s");
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
+
                 mTextviewButtonDone.setVisibility(View.GONE);
                 mCapturePreviewTitleBar.setVisibility(View.GONE);
                 mCapturePreviewTitle.setVisibility(View.GONE);
@@ -3248,7 +3335,11 @@ public class CaptureClipActivity extends Activity implements
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
                 mTextviewButtonBack.setVisibility(View.GONE);
-                mTextviewButtonVideo.setVisibility(View.VISIBLE);
+                
+				mTextviewButtonVideo.setVisibility(View.VISIBLE);
+				mTextviewButtonVideo.setText("10s");
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
+
                 mTextviewButtonDone.setVisibility(View.GONE);
                 mCapturePreviewTitleBar.setVisibility(View.GONE);
                 mCapturePreviewTitle.setVisibility(View.GONE);
