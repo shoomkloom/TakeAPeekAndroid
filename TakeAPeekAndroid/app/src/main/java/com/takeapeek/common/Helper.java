@@ -2531,7 +2531,7 @@ public class Helper
     {
         logger.debug("GetFirstRun(.) Invoked");
 
-        return sharedPreferences.getBoolean(Constants.FIRST_RUN, false);
+        return sharedPreferences.getBoolean(Constants.FIRST_RUN, true);
     }
 
     public static void SetFirstRun(Editor sharedPreferencesEditor, Boolean firstRun)

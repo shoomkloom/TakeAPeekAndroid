@@ -189,18 +189,9 @@ public class UserMapActivity extends FragmentActivity implements
         if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
                 Helper.GetDisplayNameSuccess(mSharedPreferences) == true)
         {
-            if(Helper.GetFirstRun(mSharedPreferences) == true)
+            if(ShowCaptureOnLoad() == false)
             {
-                ShowWalkthrough();
-
-                Helper.SetFirstRun(mSharedPreferences.edit(), false);
-            }
-            else
-            {
-                if(ShowCaptureOnLoad() == false)
-                {
-                    ShowUserMap();
-                }
+                ShowUserMap();
             }
         }
         else
@@ -289,7 +280,7 @@ public class UserMapActivity extends FragmentActivity implements
         {
             logger.warn(String.format("onActivityResult returned with resultCode = %d or data was null", resultCode));
 
-            if(requestCode == RESULT_AUTHENTICATE || requestCode == RESULT_CAPTURECLIP)
+            if(requestCode == RESULT_AUTHENTICATE || requestCode == RESULT_CAPTURECLIP || requestCode == RESULT_WALKTHROUGH)
             {
                 logger.info(String.format("onActivityResult: resultCode != RESULT_OK, requestCode == %d, calling finish()", requestCode));
                 finish();
@@ -498,8 +489,11 @@ public class UserMapActivity extends FragmentActivity implements
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
 
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+        if(Helper.GetFirstRun(mSharedPreferences) == false)
+        {
+            long currentTimeMillis = Helper.GetCurrentTimeMillis();
+            Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+        }
 
         super.onPause();
     }

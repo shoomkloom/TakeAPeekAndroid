@@ -1111,23 +1111,23 @@ public class CaptureClipActivity extends Activity implements
 		return cameraId;
     }
 
-/*@@
     public void clickedSwitchCamera(View view)
     {
         logger.debug("clickedSwitchCamera(.) Invoked.");
 
-		this.closePopup();
+		//@@this.closePopup();
 
 		if( this.preview.canSwitchCamera() )
         {
 			int cameraId = getNextCameraId();
-		    View switchCameraButton = (View) findViewById(R.id.switch_camera);
+		    View switchCameraButton = (View) findViewById(R.id.imageview_switch_camera);
 		    switchCameraButton.setEnabled(false); // prevent slowdown if user repeatedly clicks
 			this.preview.setCamera(cameraId);
 		    switchCameraButton.setEnabled(true);
 		}
     }
 
+/*@@
     public void clickedSwitchVideo(View view)
     {
         logger.debug("clickedSwitchVideo(.) Invoked.");
@@ -3137,6 +3137,9 @@ public class CaptureClipActivity extends Activity implements
         long currentTimeMillis = Helper.GetCurrentTimeMillis();
         Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
+        //First run ends only with first capture
+        Helper.SetFirstRun(mSharedPreferences.edit(), false);
+
         setResult(RESULT_OK);
         finish();
     }
@@ -3311,7 +3314,8 @@ public class CaptureClipActivity extends Activity implements
                 mTextviewIntroLine1.setVisibility(View.INVISIBLE);
                 mImageviewIntroArrow.setVisibility(View.INVISIBLE);
                 mTextviewIntroLine2.setVisibility(View.INVISIBLE);
-                mImageviewIntroClose.setVisibility(View.VISIBLE);
+                //@@mImageviewIntroClose.setVisibility(View.VISIBLE);
+                /*@@*/mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.VISIBLE);
                 mTextviewButtonBack.setVisibility(View.GONE);
 

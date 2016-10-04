@@ -108,9 +108,6 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         logger.debug("onResume() Invoked");
 
         super.onResume();
-
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
     }
 
     @Override
@@ -118,10 +115,17 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
     {
         logger.debug("onPause() Invoked");
 
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
-
         super.onPause();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        logger.debug("onBackPressed() Invoked");
+
+        setResult(RESULT_CANCELED);
+
+        super.onBackPressed();
     }
 
     private void setUiPageViewController()
