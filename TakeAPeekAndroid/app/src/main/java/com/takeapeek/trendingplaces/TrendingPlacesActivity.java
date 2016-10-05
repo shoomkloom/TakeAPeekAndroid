@@ -140,6 +140,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
+        findViewById(R.id.stack_image).setOnClickListener(ClickListener);
 
         mEnumActivityState = EnumActivityState.loading;
         UpdateUI();
@@ -258,6 +259,16 @@ public class TrendingPlacesActivity extends AppCompatActivity
                     Intent userMapActivityIntent = new Intent(TrendingPlacesActivity.this, UserMapActivity.class);
                     userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(userMapActivityIntent);
+
+                    break;
+
+                case R.id.stack_image:
+                    logger.info("onClick: stack_image");
+
+                    Intent userMapActivityStackIntent = new Intent(TrendingPlacesActivity.this, UserMapActivity.class);
+                    userMapActivityStackIntent.putExtra(Constants.PARAM_OPEN_STACK, "true");
+                    userMapActivityStackIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(userMapActivityStackIntent);
 
                     break;
 

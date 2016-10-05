@@ -33,6 +33,16 @@
             android:layout_centerInParent="true"
             android:textColor="@color/tap_white"/>
 
+        <ImageView
+            android:id="@+id/stack_image"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/button_stack"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="15dp" />
+
     </RelativeLayout>
 
     <ListView
