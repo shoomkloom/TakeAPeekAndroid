@@ -122,6 +122,7 @@ public class UserMapActivity extends FragmentActivity implements
     private AsyncTask<Hashtable<Integer, Boolean>, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     ImageView mImageViewNotifications = null;
+    ImageView mImageViewStack = null;
     TextView mTextViewNumNewNotifications = null;
     LinearLayout mLinearLayout = null;
     LinearLayout mLinearLayoutRequestPeek = null;
@@ -134,6 +135,7 @@ public class UserMapActivity extends FragmentActivity implements
     private CutOutView mCutOutView = null;
 
     int mUserStackItemPosition = -1;
+    boolean mOpenStack = false;
 
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
@@ -227,6 +229,9 @@ public class UserMapActivity extends FragmentActivity implements
         mImageViewNotifications = (ImageView)findViewById(R.id.notifications_image);
         mImageViewNotifications.setOnClickListener(ClickListener);
 
+        mImageViewStack = (ImageView)findViewById(R.id.stack_image);
+        mImageViewStack.setOnClickListener(ClickListener);
+
         mTextViewNumNewNotifications = (TextView)findViewById(R.id.textview_new_notifications);
         Helper.setTypeface(this, mTextViewNumNewNotifications, Helper.FontTypeEnum.normalFont);
         mTextViewNumNewNotifications.setOnClickListener(ClickListener);
@@ -264,7 +269,15 @@ public class UserMapActivity extends FragmentActivity implements
             Bundle bundle = getIntent().getExtras();
             if(bundle != null)
             {
-                mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+                String openStack = getIntent().getStringExtra(Constants.PARAM_OPEN_STACK);
+                if(openStack != null)
+                {
+                    mOpenStack = true;
+                }
+                else
+                {
+                    mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+                }
             }
         }
     }
@@ -691,6 +704,18 @@ public class UserMapActivity extends FragmentActivity implements
 
                                     mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
                                     mViewPager.setAdapter(mPeekStackPagerAdapter);
+
+                                    if(mOpenStack == true)
+                                    {
+                                        mOpenStack = false;
+
+                                        if (mClusterManagerAlgorithm != null && mClusterManagerAlgorithm.getItems().size() > 0)
+                                        {
+                                            //Show the peek stack
+                                            mUserStackItemPosition = mClusterManagerAlgorithm.getItems().iterator().next().mIndex;
+                                            ShowUserPeekStack();
+                                        }
+                                    }
                                 }
                             }
                             finally
@@ -1081,6 +1106,25 @@ public class UserMapActivity extends FragmentActivity implements
 
                     break;
 
+                case R.id.stack_image:
+                    logger.info("OnClickListener:onClick: stack_image clicked");
+
+                    if(mClusterManagerAlgorithm.getItems().size() > 0)
+                    {
+                        if(mUserStackItemPosition == -1)
+                        {
+                            //Show the peek stack
+                            mUserStackItemPosition = mClusterManagerAlgorithm.getItems().iterator().next().mIndex;
+                            ShowUserPeekStack();
+                        }
+                        else
+                        {
+                            CloseUserPeekStack();
+                        }
+                    }
+
+                    break;
+
                 case R.id.textview_trending:
                     logger.info("OnClickListener:onClick: textview_trending clicked");
 
@@ -1302,7 +1346,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         boolean doBlur = false;
         Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
-        if(mCutOutView.mCenter != null)
+        if(mUserMapActivity.mUserStackItemPosition == -1 && mCutOutView.mCenter != null)
         {
             doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
         }
