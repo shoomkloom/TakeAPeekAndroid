@@ -60,10 +60,10 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RelativeSliderLayout;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
-import com.takeapeek.common.SlideButton;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
@@ -127,11 +127,9 @@ public class UserMapActivity extends FragmentActivity implements
     LinearLayout mLinearLayout = null;
     LinearLayout mLinearLayoutRequestPeek = null;
     LinearLayout mLinearLayoutSendPeek = null;
-    TextView mTextviewTrending = null;
     TextView mTextViewStackUserName = null;
     ViewPager mViewPager = null;
     PeekStackPagerAdapter mPeekStackPagerAdapter = null;
-    SlideButton mSlideButton = null;
     private CutOutView mCutOutView = null;
 
     int mUserStackItemPosition = -1;
@@ -250,12 +248,21 @@ public class UserMapActivity extends FragmentActivity implements
         TextView textviewButtonSendPeek = (TextView)findViewById(R.id.textview_button_send_peek);
         Helper.setTypeface(this, textviewButtonSendPeek, Helper.FontTypeEnum.boldFont);
 
-        mTextviewTrending = (TextView)findViewById(R.id.textview_trending);
-        Helper.setTypeface(this, mTextviewTrending, Helper.FontTypeEnum.boldFont);
-        mTextviewTrending.setOnClickListener(ClickListener);
+        TextView textviewTrendingLocations = (TextView)findViewById(R.id.textview_trending_locations);
+        Helper.setTypeface(this, textviewTrendingLocations, Helper.FontTypeEnum.boldFont);
 
-        //@@mSlideButton = (SlideButton)findViewById(R.id.slidebutton_trending);
-        //@@mSlideButton.setSlideButtonListener(SlideListener);
+        RelativeSliderLayout relativeSliderLayout = (RelativeSliderLayout) findViewById(R.id.dragger_trending_locations);
+        relativeSliderLayout.initSliding(new RelativeSliderLayout.OnSlidedListener() {
+            @Override
+            public void onSlided()
+            {
+                logger.info("RelativeSliderLayout:onSlided: dragger_trending_locations slided");
+
+                //Show the trending locations activity
+                final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
+                startActivity(trendingIntent);
+            }
+        });
 
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
         Helper.setTypeface(this, mTextViewStackUserName, Helper.FontTypeEnum.boldFont);
@@ -913,36 +920,6 @@ public class UserMapActivity extends FragmentActivity implements
         ShowProfilesInBounds(true);
     }
 
-/*@@
-    private SlideButtonListener SlideListener = new SlideButtonListener()
-    {
-        @Override
-        public void handleSlide(boolean hide)
-        {
-            logger.info("SlideListener:handleSlide(.) invoked.");
-
-            if(hide)
-            {
-                mTextviewTrending.setVisibility(View.INVISIBLE);
-            }
-            else
-            {
-                mTextviewTrending.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        public void handleFullSlide()
-        {
-            logger.info("SlideListener:handleFullSlide() invoked.");
-
-            //Show the trending locations activity
-            final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
-            startActivity(trendingIntent);
-        }
-    };
-@@*/
-
     public View.OnClickListener ClickListener = new View.OnClickListener()
     {
         @Override
@@ -1122,15 +1099,6 @@ public class UserMapActivity extends FragmentActivity implements
                             CloseUserPeekStack();
                         }
                     }
-
-                    break;
-
-                case R.id.textview_trending:
-                    logger.info("OnClickListener:onClick: textview_trending clicked");
-
-                    //Show the trending locations activity
-                    final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
-                    startActivity(trendingIntent);
 
                     break;
 
