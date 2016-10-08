@@ -12,8 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.takeapeek.R;
+import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
@@ -38,6 +40,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
     private UserMapActivity mUserMapActivity = null;
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = null;
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
+    private final AddressLoader mAddressLoader = new AddressLoader();
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
 
@@ -61,9 +64,16 @@ public class PeekStackPagerAdapter extends PagerAdapter
         ImageView imageViewPeekThumbnail = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail);
         imageViewPeekThumbnail.setOnClickListener(ClickListener);
         imageViewPeekThumbnail.setTag(profileObject);
-        ImageView imageViewPeekThumbnailPlay = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
-        imageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
-        imageViewPeekThumbnailPlay.setTag(profileObject);
+
+        TextView textViewPeekStackTitle = (TextView)viewGroup.findViewById(R.id.peek_stack_title);
+        Helper.setTypeface(mUserMapActivity, textViewPeekStackTitle, Helper.FontTypeEnum.boldFont);
+        textViewPeekStackTitle.setOnClickListener(ClickListener);
+        textViewPeekStackTitle.setTag(profileObject);
+
+        TextView textViewPeekThumbnailPlay = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
+        Helper.setTypeface(mUserMapActivity, textViewPeekThumbnailPlay, Helper.FontTypeEnum.boldFont);
+        textViewPeekThumbnailPlay.setOnClickListener(ClickListener);
+        textViewPeekThumbnailPlay.setTag(profileObject);
 
         TextView textViewUserStackTime = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_time);
         Helper.setTypeface(mUserMapActivity, textViewUserStackTime, Helper.FontTypeEnum.normalFont);
@@ -74,6 +84,11 @@ public class PeekStackPagerAdapter extends PagerAdapter
         Helper.setTypeface(mUserMapActivity, textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
         textViewUserStackFollow.setOnClickListener(ClickListener);
         textViewUserStackFollow.setTag(position);
+
+        TextView textViewPeekStackAddress = (TextView)viewGroup.findViewById(R.id.peek_stack_address);
+        Helper.setTypeface(mUserMapActivity, textViewPeekStackAddress, Helper.FontTypeEnum.boldFont);
+        textViewPeekStackAddress.setOnClickListener(ClickListener);
+        textViewPeekStackAddress.setTag(profileObject);
 
         switch(profileObject.relationTypeEnum)
         {
@@ -96,11 +111,19 @@ public class PeekStackPagerAdapter extends PagerAdapter
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
 
+            textViewPeekStackTitle.setText(takeAPeekObject.Title);
             textViewUserStackTime.setText(Helper.GetFormttedDiffTime(mUserMapActivity, takeAPeekObject.CreationTime));
+
+            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
+            {
+                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                mAddressLoader.SetAddress(mUserMapActivity, location, textViewPeekStackAddress, mSharedPreferences);
+            }
+
         }
         else
         {
-            imageViewPeekThumbnailPlay.setVisibility(View.GONE);
+            textViewPeekThumbnailPlay.setVisibility(View.GONE);
             textViewUserStackTime.setText("No peeks found");
         }
 

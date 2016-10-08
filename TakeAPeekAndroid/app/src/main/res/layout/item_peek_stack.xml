@@ -45,7 +45,6 @@
             android:alpha="0.1"
             android:layout_below="@+id/user_peek_stack_thumbnail"
             android:background="@drawable/rounded_corner_bottom" />
--->
 
         <ImageView
             android:id = "@+id/user_peek_stack_thumbnail_play"
@@ -55,21 +54,60 @@
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/ic_video_play" />
+-->
 
         <TextView
-            android:id = "@+id/user_peek_stack_thumbnail_time"
-            android:layout_width="wrap_content"
+            android:id = "@+id/peek_stack_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:textSize="12sp"
+            android:textSize="20sp"
             android:textColor="@color/tap_white"
             android:shadowColor="@color/tap_darkgray"
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:gravity="left"
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="40dp"/>
+
+        <TextView
+            android:id = "@+id/user_peek_stack_thumbnail_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_below="@+id/peek_stack_title"
+            android:layout_alignParentLeft="true"
+            android:textSize="11sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:gravity="left"
+            android:layout_marginRight="40dp"/>
+
+        <TextView
+            android:id = "@+id/user_peek_stack_thumbnail_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp"
+            android:layout_centerInParent="true"
+            android:text="@string/view_peek"
+            android:textSize="20sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:drawableLeft="@drawable/ic_view_peek"
+            android:drawablePadding="10dp"
+            android:background="@drawable/button_border"/>
 
         <TextView
             android:id = "@+id/user_peek_stack_follow"
@@ -88,6 +126,22 @@
             android:drawableLeft="@drawable/ic_follow"
             android:drawablePadding="10dp"
             android:background="@drawable/button_white"/>
+
+        <TextView
+            android:id = "@+id/peek_stack_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/user_peek_stack_follow"
+            android:layout_alignTop="@+id/user_peek_stack_follow"
+            android:textSize="12sp"
+            android:textColor="@color/tap_white"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:gravity="right"
+            android:layout_marginRight="5dp"/>
 
         <ImageView
             android:id = "@+id/user_peek_stack_close"

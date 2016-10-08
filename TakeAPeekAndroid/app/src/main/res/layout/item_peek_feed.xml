@@ -61,7 +61,8 @@
             android:shadowDy="1"
             android:shadowRadius="1"
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
 
         <TextView
             android:id = "@+id/user_peek_feed_time"
