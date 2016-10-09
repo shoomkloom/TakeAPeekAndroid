@@ -46,6 +46,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -1119,12 +1121,16 @@ public class CaptureClipActivity extends Activity implements
 
 		if( this.preview.canSwitchCamera() )
         {
-			int cameraId = getNextCameraId();
-		    View switchCameraButton = (View) findViewById(R.id.imageview_switch_camera);
-		    switchCameraButton.setEnabled(false); // prevent slowdown if user repeatedly clicks
-			this.preview.setCamera(cameraId);
-		    switchCameraButton.setEnabled(true);
-		}
+            mImageviewSwitchCamera.setEnabled(false); // prevent slowdown if user repeatedly clicks
+
+            Animation rotationAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
+            mImageviewSwitchCamera.startAnimation(rotationAnimation);
+
+            int cameraId = getNextCameraId();
+            this.preview.setCamera(cameraId);
+
+            mImageviewSwitchCamera.setEnabled(true);
+        }
     }
 
 /*@@
@@ -3032,6 +3038,7 @@ public class CaptureClipActivity extends Activity implements
         if(preview.supportsFlash() == true)
         {
             preview.updateFlash("flash_auto");
+            mImageviewFlash.setImageResource(R.drawable.flash);
         }
     }
 
@@ -3042,6 +3049,7 @@ public class CaptureClipActivity extends Activity implements
         if(preview.supportsFlash() == true)
         {
             preview.updateFlash("flash_torch");
+            mImageviewFlash.setImageResource(R.drawable.flash_pressed);
         }
     }
 

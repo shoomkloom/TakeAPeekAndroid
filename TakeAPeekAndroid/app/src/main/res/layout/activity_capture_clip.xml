@@ -176,7 +176,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_margin="10dp"
-        android:src="@drawable/button_flash"
+        android:src="@drawable/flash"
         android:onClick="clickedToggleFlash"/>
 
     <ImageView
@@ -186,7 +186,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:src="@drawable/button_switch_camera"
+        android:src="@drawable/switch_camera"
         android:onClick="clickedSwitchCamera"/>
 
     <ImageView
