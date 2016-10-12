@@ -27,7 +27,7 @@
 
             <!-- Text above number -->
             <TextView
-                android:id="@+id/login_textview_to_use"
+                android:id="@+id/login_textview_big_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -35,7 +35,7 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:text="@string/verify_mobile_number"
@@ -43,11 +43,11 @@
                 android:textSize="35sp" />
 
             <TextView
-                android:id="@+id/login_textview_type_your_phone_number"
+                android:id="@+id/login_textview_small_title"
                 android:gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
                 android:shadowColor="@color/tap_darkgray"
@@ -110,26 +110,78 @@
                 android:background="#00000000"
                 android:textSize="16sp" />
 
-            <EditText
-                android:id="@+id/editText_SMS_code"
+            <RelativeLayout
+                android:id="@+id/relativelayout_SMS_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:textColor="@color/tap_gray"
-                android:textSize="24sp"
-                android:inputType="textNoSuggestions"
-                android:imeOptions="actionDone"
-                android:hint="@string/code_hint"
-                android:textColorHint="@color/tap_lightlightgray"
-                android:translationZ="4dp"
-                android:padding="17dp"
-                android:singleLine="true"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_white"
                 android:visibility="gone">
-            </EditText>
+
+                <EditText
+                    android:id="@+id/editText_SMS_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
+                    android:textColor="@color/tap_gray"
+                    android:textSize="24sp"
+                    android:inputType="textNoSuggestions"
+                    android:imeOptions="actionDone"
+                    android:hint="@string/code_hint"
+                    android:textColorHint="@color/tap_lightlightgray"
+                    android:translationZ="4dp"
+                    android:padding="17dp"
+                    android:singleLine="true"
+                    android:stateListAnimator="@anim/button_elevation"
+                    android:background="@drawable/button_white"
+                    android:visibility="gone">
+                </EditText>
+
+                <ImageView
+                    android:id="@+id/imageview_SMS_validation_progess"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_alignTop="@+id/editText_SMS_code"
+                    android:layout_alignRight="@+id/editText_SMS_code"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:translationZ="5dp"
+                    android:src="@drawable/progress"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+
+            <!-- Resend options -->
+            <LinearLayout
+                android:id="@+id/login_linearlayout_resend_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="5dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/login_resend_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/resend_sms_code"
+                    android:textColor="@color/linkcolor"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/login_resend_request_call"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="@string/message_request_call"
+                    android:textColor="@color/linkcolor"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+            <!-- End Resend Options -->
 
             <TextView
                 android:id="@+id/button_create_account"
@@ -364,133 +416,6 @@
         <!-- Date of Birth -->
 
 
-        <!-- Authentication progress -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="15dp"
-            android:visibility="gone" >
-
-            <!-- Text above number -->
-            <TextView
-                android:id="@+id/login_textview_verification_message_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@string/for_your_protection"
-                android:textColor="@color/tap_orange"
-                android:textSize="48sp" />
-
-            <TextView
-                android:id="@+id/login_textview_verification_message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:textColor="@color/tap_white"
-                android:textSize="24sp" />
-
-            <!-- Prefix text and code -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:layout_marginTop="45dp" >
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal" >
-
-                    <TextView
-                        android:id="@+id/login_textview_code_title"
-                        android:layout_width="130dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="right"
-                        android:text="@string/code"
-                        android:textColor="@color/tap_blue"
-                        android:textSize="24sp" />
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <!-- Text below code -->
-            <!-- Progress text and animation -->
-            <TextView
-                android:id="@+id/login_textview_progress_bottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="@string/create_account_verify_message"
-                android:textColor="@color/tap_orange"
-                android:layout_marginTop="5dp"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:id="@+id/progress_verify"
-                android:padding="10dp"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="5dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/progress" />
-
-            <!-- Resend options -->
-            <LinearLayout
-                android:id="@+id/login_linearlayout_resend_options"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="30dp" >
-
-                <TextView
-                    android:id="@+id/login_resend_code"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/resend_sms_code"
-                    android:textColor="@color/linkcolor"
-                    android:background="#00000000"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/login_resend_request_call"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/message_request_call"
-                    android:textColor="@color/linkcolor"
-                    android:layout_marginTop="10dp"
-                    android:background="#00000000"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/login_resend_edit_number_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:textColor="@color/tap_white"
-                    android:layout_marginTop="15dp"
-                    android:textSize="24sp" />
-
-                <TextView
-                    android:id="@+id/login_resend_edit_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/message_edit_phone"
-                    android:textColor="@color/linkcolor"
-                    android:layout_marginTop="10dp"
-                    android:background="#00000000"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- End Authentication progress -->
 	
-</LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

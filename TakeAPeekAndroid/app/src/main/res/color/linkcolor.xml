@@ -2,10 +2,10 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item 
         android:state_pressed="true" 
-        android:color="@color/tap_darkorange"/>
+        android:color="@color/tap_white"/>
     <item 
         android:state_focused="true" 
-        android:color="@color/tap_orange"/>
+        android:color="@color/tap_blue"/>
     <item 
-        android:color="@color/tap_orange"/>
+        android:color="@color/tap_blue"/>
 </selector>

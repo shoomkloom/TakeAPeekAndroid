@@ -151,15 +151,16 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     int mCountryArrayPosition = 0;
     ProgressDialog mProgressDialog = null;
     public SharedPreferences mSharedPreferences = null;
+    public TextView mLoginTextviewBigTitle = null;
+    public TextView mLoginTextviewSmallTitle = null;
     public EditText mMobileNumber = null;
     public EditText mEditTextSMSCode = null;
+    public ImageView mImageviewSMSValidationProgess = null;
     public EditText mEditTextDisplayName = null;
     private String mVerificationCode = null;
+    private TextView mTextviewResendSMSCode = null;
+    private TextView mTextviewRequestCall = null;
     
-    public TextView mVerificationMessageHeader = null;
-    public TextView mVerificationMessage = null;
-    public TextView mLoginTextviewProgressBottom = null;
-
     ImageView mDisplayNameValidationProgess = null;
     TextView mButtonCreateDisplayName = null;
     
@@ -284,12 +285,12 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                             mHandlerState = HandlerState.verificationSuccess;
                             UpdateUI();
                         }
-			        	
-			        	TextView loginTextviewToUse = (TextView)findViewById(R.id.login_textview_to_use);
-			        	Helper.setTypeface(this, loginTextviewToUse, FontTypeEnum.boldFont);
-			        	
-			        	TextView loginTextviewTypeYourPhone = (TextView)findViewById(R.id.login_textview_type_your_phone_number);
-			        	Helper.setTypeface(this, loginTextviewTypeYourPhone, FontTypeEnum.boldFont);
+
+                        mLoginTextviewBigTitle = (TextView)findViewById(R.id.login_textview_big_title);
+			        	Helper.setTypeface(this, mLoginTextviewBigTitle, FontTypeEnum.boldFont);
+
+                        mLoginTextviewSmallTitle = (TextView)findViewById(R.id.login_textview_small_title);
+			        	Helper.setTypeface(this, mLoginTextviewSmallTitle, FontTypeEnum.boldFont);
 			        	
 			        	List<String> countryISOCodes = Arrays.asList(new String[]{"hint", "AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","MM","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CX","CC","CO","KM","CG","CD","CK","CR","HR","CU","CY","CZ","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FK","FO","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GU","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JO","KZ","KE","KI","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MH","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NR","NP","NL","AN","NC","NZ","NI","NE","NG","NU","MP","KP","NO","OM","PK","PW","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RO","RU","RW","BL","WS","SM","ST","SA","SN","RS","SC","SL","SG","SK","SI","SB","SO","ZA","KR","ES","LK","SH","KN","LC","MF","PM","VC","SD","SR","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TK","TO","TT","TN","TR","TM","TC","TV","AE","UG","GB","UA","UY","US","UZ","VU","VA","VE","VN","VI","WF","YE","ZM","ZW"});
 			        	String[] countryNames = new String[]{"hint", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burma (Myanmar)","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Cocos (Keeling) Islands","Colombia","Comoros","Republic of the Congo","Dem. Rep. of the Congo","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Timor-Leste","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mayotte","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Northern Mariana Islands","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Romania","Russia","Rwanda","Saint Barthelemy","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Saint Helena","Saint Kitts and Nevis","Saint Lucia","Saint Martin","Saint Pierre and Miquelon","Saint Vincent and the Grenadines","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tokelau","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","United Arab Emirates","Uganda","United Kingdom","Ukraine","Uruguay","United States","Uzbekistan","Vanuatu","Holy See (Vatican City)","Venezuela","Vietnam","US Virgin Islands","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
@@ -344,34 +345,10 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			        	Helper.setTypeface(this, buttonCreateAccount, FontTypeEnum.boldFont);
                         buttonCreateAccount.setOnClickListener(ClickListener);
 
-                        TextView loginResendCode = (TextView)findViewById(R.id.login_resend_code);
-			        	Helper.setTypeface(this, loginResendCode, FontTypeEnum.lightFont);
-                        loginResendCode.setOnClickListener(ClickListener);
-
-                        TextView loginResendRequestCall = (TextView)findViewById(R.id.login_resend_request_call);
-                        Helper.setTypeface(this, loginResendRequestCall, FontTypeEnum.lightFont);
-			        	loginResendRequestCall.setOnClickListener(ClickListener);
-
-			        	TextView loginResendEditNumberMessage = (TextView)findViewById(R.id.login_resend_edit_number_message);
-			        	Helper.setTypeface(this, loginResendEditNumberMessage, FontTypeEnum.lightFont);
-			        	
-			        	TextView loginResendEditNumber = (TextView)findViewById(R.id.login_resend_edit_number);
-			        	Helper.setTypeface(this, loginResendEditNumber, FontTypeEnum.lightFont);
-                        loginResendEditNumber.setOnClickListener(ClickListener);
-
                         TextView buttonVerifyAccount = (TextView)findViewById(R.id.button_verify_account_submit);
 			        	Helper.setTypeface(this, buttonVerifyAccount, FontTypeEnum.boldFont);
                         buttonVerifyAccount.setOnClickListener(ClickListener);
 
-			        	mVerificationMessageHeader = (TextView)findViewById(R.id.login_textview_verification_message_header);
-			        	Helper.setTypeface(this, mVerificationMessageHeader, FontTypeEnum.lightFont);
-
-			        	mVerificationMessage = (TextView)findViewById(R.id.login_textview_verification_message);
-			        	Helper.setTypeface(this, mVerificationMessage, FontTypeEnum.lightFont);
-			        	
-			        	TextView loginTextviewCodeTitle = (TextView)findViewById(R.id.login_textview_code_title);
-			        	Helper.setTypeface(this, loginTextviewCodeTitle, FontTypeEnum.lightFont);
-			        	
 			        	mEditTextSMSCode = (EditText)findViewById(R.id.editText_SMS_code);
 			        	Helper.setTypeface(this, mEditTextSMSCode, FontTypeEnum.lightFont);
 			        	mEditTextSMSCode.addTextChangedListener(onTextChangedVerifyAccount);
@@ -388,6 +365,8 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                                 return false;
                             }
                         });
+
+                        mImageviewSMSValidationProgess = (ImageView)findViewById(R.id.imageview_SMS_validation_progess);
 
                         mEditTextDisplayName = (EditText)findViewById(R.id.edittext_display_name);
                         Helper.setTypeface(this, mEditTextDisplayName, FontTypeEnum.lightFont);
@@ -406,9 +385,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                         buttonCreateDateOfBirth.setOnClickListener(ClickListener);
                         Helper.setTypeface(this, buttonCreateDateOfBirth, FontTypeEnum.boldFont);
 
-			        	mLoginTextviewProgressBottom = (TextView)findViewById(R.id.login_textview_progress_bottom);
-			        	Helper.setTypeface(this, mLoginTextviewProgressBottom, FontTypeEnum.lightFont);
-			        	
 			        	new PhoneNumberUtilInitAsyncTask(mPhoneNumberUtil).execute();
 
                         TextView textviewDisplayNameBigTitle = (TextView)findViewById(R.id.textview_display_name_big_title);
@@ -422,6 +398,14 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 
                         TextView textviewDateOfBirthSmallTitle = (TextView)findViewById(R.id.textview_date_of_birth_small_title);
                         Helper.setTypeface(this, textviewDateOfBirthSmallTitle, FontTypeEnum.boldFont);
+
+                        mTextviewResendSMSCode = (TextView)findViewById(R.id.login_resend_code);
+                        mTextviewResendSMSCode.setOnClickListener(ClickListener);
+                        Helper.setTypeface(this, mTextviewResendSMSCode, FontTypeEnum.boldFont);
+
+                        mTextviewRequestCall = (TextView)findViewById(R.id.login_resend_request_call);
+                        mTextviewRequestCall.setOnClickListener(ClickListener);
+                        Helper.setTypeface(this, mTextviewRequestCall, FontTypeEnum.boldFont);
 			        	
 			        	UpdateUI();
 			        }
@@ -754,8 +738,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     	
     	try
 		{
-            Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
-
 			StopScanSMSAsyncTask();
 			
 			VerifyAccount();
@@ -910,7 +892,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     			mHandlerState = HandlerState.firstVerification;
     			UpdateUI();
 
-/*@@
             	//Set a 30 second timeout for receiving the verification SMS
             	mHandler.postDelayed(new Runnable() 
             	{
@@ -921,7 +902,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                         mHandler.sendMessage(msg);
                     }
                 }, 30000);
-@@*/
+
     			break;
     			
     		case receiveSMSTimeout:
@@ -1101,14 +1082,19 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 	    		
 	    		//Show enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.VISIBLE);
-            	
+
+                //Hide resend UI
+                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
+
 	    		break;
 	    		
 	    	case firstVerification:
 	    		UpdateButtonVerifyAccountUI();
 
-                //Hide big title
-                findViewById(R.id.login_textview_to_use).setVisibility(View.GONE);
+                //Set big title
+                mLoginTextviewBigTitle.setVisibility(View.VISIBLE);
+                mLoginTextviewBigTitle.setText(R.string.verify_mobile_number_title_verifying);
+                mLoginTextviewSmallTitle.setText(R.string.verify_mobile_number_verifying_explain);
 
                 //Hide Terms and Conditions
                 findViewById(R.id.terms_and_conditions).setVisibility(View.GONE);
@@ -1119,8 +1105,19 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                 //Disable number
                 mMobileNumber.setEnabled(false);
 
-                //Show sms code edittext
+                //Show sms code edittext and progress
+                findViewById(R.id.relativelayout_SMS_code).setVisibility(View.VISIBLE);
                 findViewById(R.id.editText_SMS_code).setVisibility(View.VISIBLE);
+
+                mImageviewSMSValidationProgess.setVisibility(View.VISIBLE);
+                Animation zoomInAnimationFirstVerification = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
+                mImageviewSMSValidationProgess.setAnimation(zoomInAnimationFirstVerification);
+                zoomInAnimationFirstVerification.start();
+                AnimationDrawable progressDrawableFirstVerification = (AnimationDrawable)mImageviewSMSValidationProgess.getDrawable();
+                progressDrawableFirstVerification.start();
+
+                //Hide resend UI
+                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
 
                 //Hide Create Account button
                 findViewById(R.id.button_create_account).setVisibility(View.GONE);
@@ -1130,29 +1127,31 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 	    		break;
 			
 	    	case receiveSMSTimeout:
-	    		//Hide enter number UI
-            	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
-            	
-            	//Show verification UI and resend bottom UI
-            	findViewById(R.id.login_textview_progress_bottom).setVisibility(View.GONE);
-            	findViewById(R.id.progress_verify).setVisibility(View.GONE);
-            	findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.VISIBLE);
-            	
-            	mVerificationMessageHeader.setText(R.string.verification_ooops);
-				mVerificationMessage.setText(R.string.sms_no_verification_message);
-	    		
-				mEditTextSMSCode.requestFocus();
-	    		
-	    		TextView loginResendEditNumberMessage = (TextView)findViewById(R.id.login_resend_edit_number_message);
-	    		numberStr = String.format("+%s %s", Helper.GetCountryPrefixCode(mSharedPreferences), mMobileNumber.getText().toString());
-	        	text = String.format(getString(R.string.login_resend_edit_number_message), numberStr);
-	        	loginResendEditNumberMessage.setText(text);
+                //Enable number
+                mMobileNumber.setEnabled(true);
+
+                //Hide verification progress
+                mImageviewSMSValidationProgess.setVisibility(View.GONE);
+                Animation fadeOutAnimationSMSTimeout = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.fadeout);
+                mImageviewSMSValidationProgess.startAnimation(fadeOutAnimationSMSTimeout);
+
+                //Show oops title and message
+                mLoginTextviewBigTitle.setVisibility(View.VISIBLE);
+                mLoginTextviewBigTitle.setText(R.string.verification_ooops);
+                mLoginTextviewSmallTitle.setText(R.string.sms_no_verification_message);
+
+            	//Show resend UI
+                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.VISIBLE);
+
 	    		break;
 	    		
 	    	case verificationSuccess:
 	    		//Hide enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
-            	
+
+                //Hide resend UI
+                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
+
             	//Show Display Name UI
                 findViewById(R.id.login_linearlayout_display_name).setVisibility(View.VISIBLE);
 
@@ -1161,18 +1160,21 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 	    	case accountCreationSuccess:
 	    		//Hide enter number UI
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
-            	
+
+                //Hide resend UI
+                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
+
 	    		break;
 
             case displayNameVerify:
 
                 mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
                 mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
-                Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
-                mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
-                zoomInAnimation.start();
-                AnimationDrawable progressDrawable = (AnimationDrawable)mDisplayNameValidationProgess.getDrawable();
-                progressDrawable.start();
+                Animation zoomInAnimationDisplayNameVerify = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
+                mDisplayNameValidationProgess.setAnimation(zoomInAnimationDisplayNameVerify);
+                zoomInAnimationDisplayNameVerify.start();
+                AnimationDrawable progressDrawableDisplayNameVerify = (AnimationDrawable)mDisplayNameValidationProgess.getDrawable();
+                progressDrawableDisplayNameVerify.start();
 
                 break;
 
@@ -1263,22 +1265,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 					}
             		break;
             		
-            	case R.id.login_resend_edit_number:
-            		logger.info("OnClickListener: 'login_resend_edit_number' clicked");
-
-					try
-					{
-						mHandlerState =  HandlerState.numberEdit;
-						UpdateUI();
-					}
-					catch (Exception e)
-					{
-						ShowCreateAccountErrorDialog(R.string.error_create_account);
-						
-						Helper.Error(logger, "EXCEPTION: Problem clicking login_resend_edit_number", e);
-					}
-            		break;
-            		
             	case R.id.login_resend_request_call:
             		logger.info("OnClickListener: 'login_resend_request_call' clicked");
 
@@ -1287,10 +1273,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             			mHandlerState =  HandlerState.receiveSMSTimeout;
 						UpdateUI();
 
-						//Hide Progress section till request is done
-						findViewById(R.id.login_textview_progress_bottom).setVisibility(View.GONE);
-		            	findViewById(R.id.progress_verify).setVisibility(View.GONE);
-						
             			//Request a call...
             			ShowCreateAccountProgressDialog(getText(R.string.request_call_progress_message).toString());
             			
