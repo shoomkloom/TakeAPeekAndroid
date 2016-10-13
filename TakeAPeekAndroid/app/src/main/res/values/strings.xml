@@ -100,6 +100,7 @@
     <string name="teaser_ok">Ok\u2026</string>
     <string name="login_resend_edit_number_message">Your number\n%1$s</string>
     <string name="code_hint">Verification code</string>
+    <string name="login_receive_sms_counter">Waiting for SMS to arrive in %1$d seconds...</string>
     <string name="profile_mobile_number">Mobile Number</string>
     <string name="button_verify">Verify</string>
     <string name="button_continue">Continue</string>

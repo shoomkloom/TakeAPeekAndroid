@@ -92,6 +92,18 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
             mHandler.sendMessage(msg);
         }
     };
+
+    int mReceiveSMSCountdown = 30;
+    Runnable mReceiveSMSCountdownRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Message msg = Message.obtain();
+            msg.arg1 = HandlerState.receiveSMSTimeout.ordinal();
+            mHandler.sendMessage(msg);
+        }
+    };
 	
 	HandlerState mHandlerState = HandlerState.numberEdit;
 	
@@ -157,13 +169,15 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     public EditText mEditTextSMSCode = null;
     public ImageView mImageviewSMSValidationProgess = null;
     public EditText mEditTextDisplayName = null;
-    private String mVerificationCode = null;
+    private TextView mLoginReceiveSMSCounter = null;
     private TextView mTextviewResendSMSCode = null;
     private TextView mTextviewRequestCall = null;
     
     ImageView mDisplayNameValidationProgess = null;
     TextView mButtonCreateDisplayName = null;
-    
+
+    private String mVerificationCode = null;
+
     private ScanSMSAsyncTask mScanSMSAsyncTask = null;
     
     private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
@@ -367,6 +381,9 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                         });
 
                         mImageviewSMSValidationProgess = (ImageView)findViewById(R.id.imageview_SMS_validation_progess);
+
+                        mLoginReceiveSMSCounter = (TextView)findViewById(R.id.login_textview_receive_sms_counter);
+                        Helper.setTypeface(this, mLoginReceiveSMSCounter, FontTypeEnum.normalFont);
 
                         mEditTextDisplayName = (EditText)findViewById(R.id.edittext_display_name);
                         Helper.setTypeface(this, mEditTextDisplayName, FontTypeEnum.lightFont);
@@ -892,6 +909,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     			mHandlerState = HandlerState.firstVerification;
     			UpdateUI();
 
+/*@@
             	//Set a 30 second timeout for receiving the verification SMS
             	mHandler.postDelayed(new Runnable() 
             	{
@@ -902,22 +920,42 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                         mHandler.sendMessage(msg);
                     }
                 }, 30000);
+@@*/
+
+                mReceiveSMSCountdown = 30;
+                mHandler.postDelayed(mReceiveSMSCountdownRunnable, 1000);
 
     			break;
     			
     		case receiveSMSTimeout:
     			logger.info("HandleMessage::receiveSMSTimeout");
-    			
-    			if(mVerificationCode == null || mVerificationCode.compareTo("") == 0)
-    			{
-    				logger.warn("Showing resend UI");
-    				
-    				//If the scan SMS process has timed out, cancel the scan and show the resend UI
-    				StopScanSMSAsyncTask();
-    				
-    				mHandlerState = HandlerState.receiveSMSTimeout;
-    				UpdateUI();
-    			}
+
+                mHandler.removeCallbacks(mReceiveSMSCountdownRunnable);
+
+                if(--mReceiveSMSCountdown > 0)
+                {
+                    //Update the counter text
+                    String smsCouterText = String.format(getString(R.string.login_receive_sms_counter), mReceiveSMSCountdown);
+                    mLoginReceiveSMSCounter.setText(smsCouterText);
+
+                    mHandler.postDelayed(mReceiveSMSCountdownRunnable, 1000);
+                }
+    			else
+                {
+                    //Hide the counter text
+                    mLoginReceiveSMSCounter.setVisibility(View.GONE);
+
+                    if (mVerificationCode == null || mVerificationCode.compareTo("") == 0)
+                    {
+                        logger.warn("Showing resend UI");
+
+                        //If the scan SMS process has timed out, cancel the scan and show the resend UI
+                        StopScanSMSAsyncTask();
+
+                        mHandlerState = HandlerState.receiveSMSTimeout;
+                        UpdateUI();
+                    }
+                }
     			break;
     			
     		case verificationSuccess:
@@ -1108,6 +1146,10 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                 //Show sms code edittext and progress
                 findViewById(R.id.relativelayout_SMS_code).setVisibility(View.VISIBLE);
                 findViewById(R.id.editText_SMS_code).setVisibility(View.VISIBLE);
+
+                mLoginReceiveSMSCounter.setVisibility(View.VISIBLE);
+                String smsCouterText = String.format(getString(R.string.login_receive_sms_counter), mReceiveSMSCountdown);
+                mLoginReceiveSMSCounter.setText(smsCouterText);
 
                 mImageviewSMSValidationProgess.setVisibility(View.VISIBLE);
                 Animation zoomInAnimationFirstVerification = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
