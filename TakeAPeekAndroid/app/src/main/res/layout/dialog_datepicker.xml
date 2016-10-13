@@ -1,39 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/gradient_yellow_fade">
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:background="@drawable/rounded_corner_small_gray">
+
+    <TextView
+        android:id="@+id/textview_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:textSize="25sp"
+        android:text="@string/date_of_birth_dialog_title"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/tap_blue"/>
+
+    <View
+        android:id="@+id/separator_top"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/textview_title"
+        android:background="@color/tap_blue"/>
 
     <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="400dp"
+        android:id="@+id/linearlayout_datepicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/separator_top"
         android:orientation="vertical"
-        android:layout_centerInParent="true"
-        android:background="@drawable/rounded_corner_small">
-
-        <TextView
-            android:id="@+id/textview_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:textSize="25sp"
-            android:text="@string/date_of_birth_dialog_title"
-            android:layout_alignParentTop="true"
-            android:textColor="@color/tap_blue"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/tap_blue"/>
+        android:background="@color/tap_white">
 
         <DatePicker
             android:id="@+id/datepicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:spinnersShown="true"
-            android:calendarViewShown="false"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:datePickerMode="spinner"
+            android:calendarViewShown="false"
+            android:theme="@android:style/Theme.Holo.Light"/>
 
     </LinearLayout>
+
+    <View
+        android:id="@+id/separator_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/linearlayout_datepicker"
+        android:background="@color/tap_blue"/>
+
+    <TextView
+        android:id="@+id/textview_button_cancel"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="25sp"
+        android:text="@string/cancel"
+        android:gravity="center"
+        android:layout_below="@+id/separator_bottom"
+        android:layout_alignParentLeft="true"
+        android:textColor="@color/tap_blue"/>
+
+    <TextView
+        android:id="@+id/textview_button_ok"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="25sp"
+        android:text="@string/ok"
+        android:gravity="center"
+        android:layout_below="@+id/separator_bottom"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/tap_blue"/>
 
 </RelativeLayout>

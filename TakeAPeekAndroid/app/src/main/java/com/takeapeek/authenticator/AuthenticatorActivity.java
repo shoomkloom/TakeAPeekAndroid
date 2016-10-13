@@ -4,7 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -1351,20 +1351,42 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                 case R.id.textview_date_of_birth:
                     logger.info("OnClickListener: 'textview_date_of_birth' clicked");
 
-/*@@
                     //Show date picker dialog
                     final Dialog datePickerDialog = new Dialog(AuthenticatorActivity.this);
                     datePickerDialog.setContentView(R.layout.dialog_datepicker);
-                    datePickerDialog.show();
-@@*/
+                    datePickerDialog.getWindow().setBackgroundDrawableResource(R.color.tap_tra‌​nsparent);
 
-                    new DatePickerDialog(
-                            AuthenticatorActivity.this,
-                            AlertDialog.THEME_HOLO_LIGHT,
-                            dateSetListener,
-                            mCalendar.get(Calendar.YEAR),
-                            mCalendar.get(Calendar.MONTH),
-                            mCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                    TextView datePickerDialogTitle = (TextView)datePickerDialog.findViewById(R.id.textview_title);
+                    Helper.setTypeface(AuthenticatorActivity.this, datePickerDialogTitle, FontTypeEnum.boldFont);
+
+                    DatePicker datePicker = (DatePicker) datePickerDialog.findViewById(R.id.datepicker);
+                    datePicker.updateDate(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
+
+                    TextView datePickerDialogButtonOK = (TextView)datePickerDialog.findViewById(R.id.textview_button_ok);
+                    Helper.setTypeface(AuthenticatorActivity.this, datePickerDialogButtonOK, FontTypeEnum.boldFont);
+                    datePickerDialogButtonOK.setOnClickListener(new OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            DatePicker datePicker = (DatePicker) datePickerDialog.findViewById(R.id.datepicker);
+                            OnDOBSelected(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+                            datePickerDialog.dismiss();
+                        }
+                    });
+
+                    TextView datePickerDialogButtonCancel = (TextView)datePickerDialog.findViewById(R.id.textview_button_cancel);
+                    Helper.setTypeface(AuthenticatorActivity.this, datePickerDialogButtonCancel, FontTypeEnum.normalFont);
+                    datePickerDialogButtonCancel.setOnClickListener(new OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            datePickerDialog.dismiss();
+                        }
+                    });
+
+                    datePickerDialog.show();
 
                     break;
 
@@ -1375,62 +1397,58 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                     finish();
 
                     break;
-            		
+
             	default: break;
             } 
         } 
     };
 
-    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+    private void OnDOBSelected(int year, int monthOfYear, int dayOfMonth)
+    {
+        mCalendar.set(Calendar.YEAR, year);
+        mCalendar.set(Calendar.MONTH, monthOfYear);
+        mCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+        new AsyncTask<Void, Void, ResponseObject>()
         {
-            mCalendar.set(Calendar.YEAR, year);
-            mCalendar.set(Calendar.MONTH, monthOfYear);
-            mCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-            new AsyncTask<Void, Void, ResponseObject>()
+            @Override
+            protected ResponseObject doInBackground(Void... params)
             {
-                @Override
-                protected ResponseObject doInBackground(Void... params)
+                try
                 {
-                    try
-                    {
-                        logger.info("Setting Date Of Birth");
+                    logger.info("Setting Date Of Birth");
 
-                        long dateOfBirthMillis = mCalendar.getTimeInMillis();
+                    long dateOfBirthMillis = mCalendar.getTimeInMillis();
 
-                        String userName = Helper.GetTakeAPeekAccountUsername(AuthenticatorActivity.this);
-                        String password = Helper.GetTakeAPeekAccountPassword(AuthenticatorActivity.this);
+                    String userName = Helper.GetTakeAPeekAccountUsername(AuthenticatorActivity.this);
+                    String password = Helper.GetTakeAPeekAccountPassword(AuthenticatorActivity.this);
 
-                        return Transport.SetDateOfBirth(AuthenticatorActivity.this, userName, password, dateOfBirthMillis, mSharedPreferences);
-                    }
-                    catch (Exception e)
-                    {
-                        Helper.Error(logger, "EXCEPTION: doInBackground: setting date of birth", e);
-                    }
-
-                    return null;
+                    return Transport.SetDateOfBirth(AuthenticatorActivity.this, userName, password, dateOfBirthMillis, mSharedPreferences);
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: doInBackground: setting date of birth", e);
                 }
 
-                @Override
-                protected void onPostExecute(ResponseObject responseObject)
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(ResponseObject responseObject)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                if(responseObject == null)
                 {
-                    logger.debug("onPostExecute(.) Invoked");
-
-                    if(responseObject == null)
-                    {
-                        Helper.Error(logger, "responseObject = null when trying set date of birth");
-                    }
-
-                    //@@This is where we can check for appropriate age
-
-                    UpdateDOBTextView();
+                    Helper.Error(logger, "responseObject = null when trying set date of birth");
                 }
-            }.execute();
-        }
-    };
+
+                //@@This is where we can check for appropriate age
+
+                UpdateDOBTextView();
+            }
+        }.execute();
+    }
 
     private void UpdateDOBTextView()
     {

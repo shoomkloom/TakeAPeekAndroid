@@ -31,5 +31,6 @@
     <color name="tap_dark_yellow_faded">#ccffd755</color>
     <color name="tap_red">#ff5537</color>
     <color name="tap_black">#000000</color>
+    <color name="tap_tra‌​nsparent">#00000000</color>
 
 </resources>
