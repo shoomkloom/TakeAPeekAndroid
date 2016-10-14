@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -35,6 +36,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UserFeedActivity extends AppCompatActivity
@@ -51,6 +55,8 @@ public class UserFeedActivity extends AppCompatActivity
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
     ImageView mImageViewPeekThumbnail = null;
     VideoView mVideoViewPeekItem = null;
+    TextView mVideoTime = null;
+    ProgressBar mVideoProgressBar = null;
     ImageView mImageViewPeekVideoProgress = null;
     AnimationDrawable mAnimationDrawableVideoProgressAnimation = null;
     ImageView mImageViewPeekThumbnailPlay = null;
@@ -89,6 +95,31 @@ public class UserFeedActivity extends AppCompatActivity
             }
 
             mTimerHandler.postDelayed(this, Constants.INTERVAL_MINUTE);
+        }
+    };
+
+    Handler mVideoTimeHandler = new Handler();
+    Runnable mVideoTimeRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            //Update Video counter
+            int durationInMillis = mVideoViewPeekItem.getDuration();
+            int currentPositionInMillis = mVideoViewPeekItem.getCurrentPosition();
+            int timeLeftInMillis = durationInMillis - currentPositionInMillis;
+            Date videoDateObject = new Date(timeLeftInMillis);
+            DateFormat dateFormat = new SimpleDateFormat("ss:SSS");
+            String formattedTime = dateFormat.format(videoDateObject);
+            mVideoTime.setText(formattedTime);
+
+            mVideoProgressBar.setMax(durationInMillis);
+            mVideoProgressBar.setProgress(currentPositionInMillis);
+
+            if(mVideoViewPeekItem.isPlaying() == true)
+            {
+                mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 50);
+            }
         }
     };
 
@@ -151,6 +182,8 @@ public class UserFeedActivity extends AppCompatActivity
         mImageViewPeekVideoProgress = (ImageView)findViewById(R.id.user_peek_feed_video_progress);
         mAnimationDrawableVideoProgressAnimation = (AnimationDrawable)mImageViewPeekVideoProgress.getBackground();
         mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
+        mVideoTime =  (TextView)findViewById(R.id.user_peek_video_time);
+        mVideoProgressBar =  (ProgressBar)findViewById(R.id.user_peek_video_progress);
         mImageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_feed_thumbnail_play);
         mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
         mImageViewPeekClose = (ImageView)findViewById(R.id.user_peek_stack_close);
@@ -240,7 +273,7 @@ public class UserFeedActivity extends AppCompatActivity
         ShowPeek(false, takeAPeekObject);
     }
 
-    public void ShowPeek(boolean fromHandler, TakeAPeekObject takeAPeekObject)
+    public void ShowPeek(boolean fromHandler, final TakeAPeekObject takeAPeekObject)
     {
         logger.debug("ShowPeek(..) Invoked");
 
@@ -255,7 +288,7 @@ public class UserFeedActivity extends AppCompatActivity
         try
         {
             String peekFilePath = Helper.GetVideoPeekFilePath(this, takeAPeekObject.TakeAPeekID);
-            File peekFile = new File(peekFilePath);
+            final File peekFile = new File(peekFilePath);
             if(peekFile.exists() == false)
             {
                 if(fromHandler == true)
@@ -275,32 +308,27 @@ public class UserFeedActivity extends AppCompatActivity
                 return;
             }
 
-/*@@
-            mVideoViewPeekItem.setVideoURI(uriVideo);
-            mVideoViewPeekItem.requestFocus();
-
             mVideoViewPeekItem.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
             {
                 @Override
                 public void onPrepared(MediaPlayer mp)
                 {
-                    mEnumActivityState = EnumActivityState.previewPlaying;
-                    UpdateUI();
+                    logger.debug("MediaPlayer.OnPreparedListener:onPrepared(.) Invoked");
 
-                    getSupportActionBar().hide();
-                    Helper.SetFullscreen(UserFeedActivity.this);
-
-                    mVideoViewPeekItem.start();
-                    mVideoViewPeekItem.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    //Start the video play time display
+                    mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 50);
                 }
             });
-*/
 
             mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
             {
                 @Override
                 public void onCompletion(MediaPlayer mp)
                 {
+                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
+
+                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
                     Helper.ClearFullscreen(UserFeedActivity.this);
                     getSupportActionBar().show();
 
@@ -314,6 +342,10 @@ public class UserFeedActivity extends AppCompatActivity
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra)
                 {
+                    logger.error("MediaPlayer.OnErrorListener:onError(...) Invoked");
+
+                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
                     Helper.ClearFullscreen(UserFeedActivity.this);
                     getSupportActionBar().show();
 
@@ -322,6 +354,24 @@ public class UserFeedActivity extends AppCompatActivity
 
                     Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
                     Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%d, %d)", getString(R.string.error_playing_peek), what, extra));
+
+                    //Delete the downloaded clip file so we can try again
+                    String peekFilePath = null;
+                    try
+                    {
+                        peekFilePath = Helper.GetVideoPeekFilePath(UserFeedActivity.this, takeAPeekObject.TakeAPeekID);
+                        File peekFile = new File(peekFilePath);
+                        if(peekFile.exists() == true)
+                        {
+                            logger.info(String.format("'%s' exists, deleting after error...", peekFilePath));
+                            peekFile.delete();
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, String.format("EXCEPTION: When trying to delete '%s'", peekFilePath));
+                    }
+
                     return true;
                 }
             });
@@ -420,6 +470,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
+                mVideoTime.setVisibility(View.GONE);
+                mVideoProgressBar.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
@@ -438,6 +490,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
+                mVideoTime.setVisibility(View.GONE);
+                mVideoProgressBar.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
@@ -455,6 +509,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
+                mVideoTime.setVisibility(View.GONE);
+                mVideoProgressBar.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
@@ -482,6 +538,8 @@ public class UserFeedActivity extends AppCompatActivity
                 });
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
+                mVideoTime.setVisibility(View.GONE);
+                mVideoProgressBar.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
@@ -500,6 +558,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
+                mVideoTime.setVisibility(View.VISIBLE);
+                mVideoProgressBar.setVisibility(View.VISIBLE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
@@ -518,6 +578,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
+                mVideoTime.setVisibility(View.GONE);
+                mVideoProgressBar.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
