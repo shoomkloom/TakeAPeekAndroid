@@ -15,13 +15,13 @@
 
         <ImageView
             android:id="@+id/imageview_settings"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_settings"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_margin="15dp"/>
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:id="@+id/textview_profile_title"
@@ -34,13 +34,13 @@
 
         <ImageView
             android:id="@+id/imageview_map"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_map"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="15dp"/>
+            android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
 

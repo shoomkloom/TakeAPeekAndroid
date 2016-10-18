@@ -3085,7 +3085,7 @@ public class CaptureClipActivity extends Activity implements
                 public void onCompletion(MediaPlayer mp)
                 {
                     //Exit full screen
-                    Helper.ClearFullscreen(CaptureClipActivity.this);
+                    Helper.ClearFullscreen(mCapturePreviewVideo);
 
                     mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
                     UpdateUI();
@@ -3100,7 +3100,7 @@ public class CaptureClipActivity extends Activity implements
                     mCapturePreviewVideo.seekTo(0);
 
                     //Exit full screen
-                    Helper.ClearFullscreen(CaptureClipActivity.this);
+                    Helper.ClearFullscreen(mCapturePreviewVideo);
 
                     mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
                     UpdateUI();
@@ -3112,16 +3112,16 @@ public class CaptureClipActivity extends Activity implements
             });
 
             //Set full screen
-            Helper.SetFullscreen(this);
+            Helper.SetFullscreen(mCapturePreviewVideo);
 
             findViewById(R.id.capture_preview_container).setVisibility(View.VISIBLE);
             mCapturePreviewVideo.start();
-            mCapturePreviewVideo.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+            //@@mCapturePreviewVideo.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         catch (Exception e)
         {
             //Exit full screen
-            Helper.ClearFullscreen(CaptureClipActivity.this);
+            Helper.ClearFullscreen(mCapturePreviewVideo);
 
             mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
             UpdateUI();

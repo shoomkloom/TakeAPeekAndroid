@@ -196,7 +196,8 @@
 
         <activity
             android:name=".userfeed.UserFeedActivity"
-            android:label="@string/title_activity_user_feed">
+            android:label="@string/title_activity_user_feed"
+            android:theme="@style/AppThemeNoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.usermap.UserMapActivity"/>
@@ -230,21 +231,24 @@
         </activity>
         <activity
             android:name=".profile.FollowingActivity"
-            android:label="@string/following">
+            android:label="@string/following"
+            android:theme="@style/AppThemeNoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>
         </activity>
         <activity
             android:name=".profile.FollowersActivity"
-            android:label="@string/followers">
+            android:label="@string/followers"
+            android:theme="@style/AppThemeNoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>
         </activity>
         <activity
             android:name=".profile.BlockedActivity"
-            android:label="@string/blocked">
+            android:label="@string/blocked"
+            android:theme="@style/AppThemeNoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.takeapeek.profile.ProfileActivity"/>

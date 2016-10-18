@@ -47,7 +47,7 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.WindowManager;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -3121,20 +3121,30 @@ public class Helper
         return thumbnailPath;
     }
 
-    public static void SetFullscreen(Activity activity)
+    public static void SetFullscreen(View decorView)
     {
-        logger.debug("SetFullscreen(.) Invoked");
+        logger.debug("SetFullscreen(View) Invoked");
 
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
 
-    public static void ClearFullscreen(Activity activity)
+    public static void ClearFullscreen(View decorView)
     {
-        logger.debug("ClearFullscreen(.) Invoked");
+        logger.debug("ClearFullscreen(View) Invoked");
 
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
     public static Drawable GetActivityIcon(Logger externalLogger, Context context, String packageName, String activityName)

@@ -15,13 +15,13 @@
 
         <ImageView
             android:id="@+id/notifications_image"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_notifications"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_margin="15dp" />
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:id="@+id/stack_name"
@@ -48,13 +48,13 @@
 
         <ImageView
             android:id="@+id/stack_image"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_stack"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="15dp" />
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
 

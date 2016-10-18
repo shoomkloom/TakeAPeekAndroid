@@ -16,15 +16,15 @@
 
         <ImageView
             android:id="@+id/imageview_profile"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_profile"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:translationZ="4dp"
-            android:stateListAnimator="@anim/button_elevation"
-            android:layout_margin="15dp"/>
+            android:stateListAnimator="@anim/button_elevation" />
 
         <TextView
             android:id="@+id/textview_notifications_title"

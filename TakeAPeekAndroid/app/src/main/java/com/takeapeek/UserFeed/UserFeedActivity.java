@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -30,6 +31,7 @@ import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ public class UserFeedActivity extends AppCompatActivity
     ListView mListViewFeedList = null;
     PeekItemAdapter mPeekItemAdapter = null;
 
+    RelativeLayout mTopBar = null;
     ImageView mImageViewProgressAnimation = null;
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
     ImageView mImageViewPeekThumbnail = null;
@@ -172,7 +175,10 @@ public class UserFeedActivity extends AppCompatActivity
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         //Initate members for UI elements
-        //Progress animation
+
+        mTopBar = (RelativeLayout)findViewById(R.id.top_bar);
+
+                //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.user_feed_progress);
         mAnimationDrawableProgressAnimation = (AnimationDrawable) mImageViewProgressAnimation.getBackground();
         //List View
@@ -182,7 +188,10 @@ public class UserFeedActivity extends AppCompatActivity
         mImageViewPeekVideoProgress = (ImageView)findViewById(R.id.user_peek_feed_video_progress);
         mAnimationDrawableVideoProgressAnimation = (AnimationDrawable)mImageViewPeekVideoProgress.getBackground();
         mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
+
         mVideoTime =  (TextView)findViewById(R.id.user_peek_video_time);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
+
         mVideoProgressBar =  (ProgressBar)findViewById(R.id.user_peek_video_progress);
         mImageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_feed_thumbnail_play);
         mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
@@ -191,6 +200,8 @@ public class UserFeedActivity extends AppCompatActivity
 
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_user_feed_empty);
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
+
+        findViewById(R.id.imageview_up).setOnClickListener(ClickListener);
 
         mThumbnailLoader = new ThumbnailLoader();
 
@@ -205,8 +216,11 @@ public class UserFeedActivity extends AppCompatActivity
 
             if(profileObject != null)
             {
-                //Set the name in the Action bar
-                getSupportActionBar().setTitle(profileObject.displayName);
+                //Set the name in the top bar
+                //@@getSupportActionBar().setTitle(profileObject.displayName);
+                TextView title = (TextView)findViewById(R.id.textview_user_feed_title);
+                Helper.setTypeface(this, title, Helper.FontTypeEnum.boldFont);
+                title.setText(profileObject.displayName);
 
                 // Setting adapter
                 mPeekItemAdapter = new PeekItemAdapter(this, R.layout.item_peek_feed, profileObject.peeks);
@@ -237,6 +251,28 @@ public class UserFeedActivity extends AppCompatActivity
         else
         {
             Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_profile));
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        logger.debug("onBackPressed() Invoked");
+
+        if(mVideoViewPeekItem != null && mVideoViewPeekItem.isPlaying() == true)
+        {
+            mVideoViewPeekItem.stopPlayback();
+
+            mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
+            Helper.ClearFullscreen(mVideoViewPeekItem);
+
+            mEnumActivityState = EnumActivityState.list;
+            UpdateUI();
+        }
+        else
+        {
+            super.onBackPressed();
         }
     }
 
@@ -295,8 +331,7 @@ public class UserFeedActivity extends AppCompatActivity
                 {
                     Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_download_peek));
 
-                    Helper.ClearFullscreen(UserFeedActivity.this);
-                    getSupportActionBar().show();
+                    Helper.ClearFullscreen(mVideoViewPeekItem);
 
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
@@ -329,8 +364,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
 
-                    Helper.ClearFullscreen(UserFeedActivity.this);
-                    getSupportActionBar().show();
+                    Helper.ClearFullscreen(mVideoViewPeekItem);
 
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
@@ -346,8 +380,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
 
-                    Helper.ClearFullscreen(UserFeedActivity.this);
-                    getSupportActionBar().show();
+                    Helper.ClearFullscreen(mVideoViewPeekItem);
 
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
@@ -382,16 +415,13 @@ public class UserFeedActivity extends AppCompatActivity
             mVideoViewPeekItem.setVideoPath(peekFilePath);
             mVideoViewPeekItem.requestFocus();
 
-            getSupportActionBar().hide();
-            Helper.SetFullscreen(UserFeedActivity.this);
+            Helper.SetFullscreen(mVideoViewPeekItem);
 
             mVideoViewPeekItem.start();
-            mVideoViewPeekItem.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         catch (Exception e)
         {
-            Helper.ClearFullscreen(UserFeedActivity.this);
-            getSupportActionBar().show();
+            Helper.ClearFullscreen(mVideoViewPeekItem);
 
             Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
             Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
@@ -423,6 +453,15 @@ public class UserFeedActivity extends AppCompatActivity
                     ShowPeek(mCurrentTakeAPeekObject);
 
                     break;
+
+                case R.id.imageview_up:
+                    logger.info("onClick: imageview_up");
+
+                    Intent userMapActivityIntent = new Intent(UserFeedActivity.this, UserMapActivity.class);
+                    userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(userMapActivityIntent);
+
+                    break;
 /*@@
 
 
@@ -450,6 +489,7 @@ public class UserFeedActivity extends AppCompatActivity
         switch(mEnumActivityState)
         {
             case loading:
+                mTopBar.setVisibility(View.VISIBLE);
                 mImageViewProgressAnimation.setVisibility(View.VISIBLE);
 
                 //Loading animation
@@ -479,6 +519,7 @@ public class UserFeedActivity extends AppCompatActivity
                 break;
 
             case list:
+                mTopBar.setVisibility(View.VISIBLE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 
@@ -498,6 +539,7 @@ public class UserFeedActivity extends AppCompatActivity
                 break;
 
             case emptyList:
+                mTopBar.setVisibility(View.VISIBLE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 
@@ -517,6 +559,7 @@ public class UserFeedActivity extends AppCompatActivity
                 break;
 
             case previewLoading:
+                mTopBar.setVisibility(View.VISIBLE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 
@@ -546,6 +589,7 @@ public class UserFeedActivity extends AppCompatActivity
                 break;
 
             case previewPlaying:
+                mTopBar.setVisibility(View.GONE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 
@@ -566,6 +610,7 @@ public class UserFeedActivity extends AppCompatActivity
                 break;
 
             case previewStopped:
+                mTopBar.setVisibility(View.VISIBLE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 

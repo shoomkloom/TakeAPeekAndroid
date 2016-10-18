@@ -7,10 +7,39 @@
     tools:context="com.takeapeek.profile.FollowersActivity"
     android:background="@color/tap_white" >
 
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/tap_blue">
+
+        <ImageView
+            android:id="@+id/imageview_up"
+            android:layout_width="65dp"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:padding="20dp"/>
+
+        <TextView
+            android:id="@+id/textview_followers_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="@string/followers"
+            android:layout_centerInParent="true"
+            android:textColor="@color/tap_white"/>
+
+    </RelativeLayout>
+
     <ListView
         android:id="@+id/listview_followers_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/top_bar"
         android:divider="@color/tap_gray_faded"
         android:dividerHeight="1dp"
         android:orientation="vertical"
@@ -22,6 +51,7 @@
         android:id="@+id/textview_followers_empty"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/top_bar"
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_followers_empty"

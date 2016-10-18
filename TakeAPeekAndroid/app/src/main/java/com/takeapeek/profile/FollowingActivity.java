@@ -1,5 +1,6 @@
 package com.takeapeek.profile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -51,6 +52,22 @@ public class FollowingActivity extends AppCompatActivity
         mListViewFollowingList = (ListView)findViewById(R.id.listview_following_list);
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_following_empty);
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
+
+        TextView followingTitle = (TextView)findViewById(R.id.textview_following_title);
+        Helper.setTypeface(this, followingTitle, Helper.FontTypeEnum.boldFont);
+
+        findViewById(R.id.imageview_up).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                logger.info("onClick: imageview_up");
+
+                Intent blockedActivityIntent = new Intent(FollowingActivity.this, ProfileActivity.class);
+                blockedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(blockedActivityIntent);
+            }
+        });
 
         RefreshAdapterData();
 

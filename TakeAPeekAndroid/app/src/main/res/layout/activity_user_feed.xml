@@ -8,6 +8,33 @@
     tools:context=".userfeed.UserFeedActivity"
     android:background="@color/tap_white" >
 
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/tap_blue">
+
+        <ImageView
+            android:id="@+id/imageview_up"
+            android:layout_width="65dp"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:padding="20dp"/>
+
+        <TextView
+            android:id="@+id/textview_user_feed_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_centerInParent="true"
+            android:textColor="@color/tap_white"/>
+
+    </RelativeLayout>
+
     <VideoView
         android:id = "@+id/user_peek_feed_video"
         android:layout_width="match_parent"
@@ -69,6 +96,7 @@
         android:id="@+id/listview_user_feed_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/top_bar"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:orientation="vertical"
@@ -80,6 +108,7 @@
         android:id="@+id/textview_user_feed_empty"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/top_bar"
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_user_feed_empty"
@@ -92,6 +121,7 @@
         android:padding="10dp"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_below="@+id/top_bar"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/progress" />
