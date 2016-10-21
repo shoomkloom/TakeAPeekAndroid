@@ -484,7 +484,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                                         String userName = Helper.GetTakeAPeekAccountUsername(NotificationPopupActivity.this);
                                         String password = Helper.GetTakeAPeekAccountPassword(NotificationPopupActivity.this);
 
-                                        return Transport.RequestPeek(NotificationPopupActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                        return new Transport().RequestPeek(NotificationPopupActivity.this, userName, password, metaDataJson, mSharedPreferences);
                                     }
                                     catch (Exception e)
                                     {

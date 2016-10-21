@@ -227,7 +227,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
         
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
         
-        if(Transport.IsConnected(this) == false)
+        if(new Transport().IsConnected(this) == false)
         {
         	logger.info("onCreate: No connection");
     		
@@ -1423,7 +1423,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                     String userName = Helper.GetTakeAPeekAccountUsername(AuthenticatorActivity.this);
                     String password = Helper.GetTakeAPeekAccountPassword(AuthenticatorActivity.this);
 
-                    return Transport.SetDateOfBirth(AuthenticatorActivity.this, userName, password, dateOfBirthMillis, mSharedPreferences);
+                    return new Transport().SetDateOfBirth(AuthenticatorActivity.this, userName, password, dateOfBirthMillis, mSharedPreferences);
                 }
                 catch (Exception e)
                 {
@@ -1510,7 +1510,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
             String userName = Helper.GetTakeAPeekAccountUsername(mAuthenticatorActivity);
             String password = Helper.GetTakeAPeekAccountPassword(mAuthenticatorActivity);
 
-            return Transport.GetDisplayName(mAuthenticatorActivity, userName, password, mProposedDisplayName, mSharedPreferences);
+            return new Transport().GetDisplayName(mAuthenticatorActivity, userName, password, mProposedDisplayName, mSharedPreferences);
         }
         catch(Exception e)
         {
@@ -1604,7 +1604,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
     	try
 		{
     		//Create the profile and ask for SMS with verification code
-    		Transport.CreateProfile(mAuthenticatorActivity, mUserName, mSharedPreferences);
+    		new Transport().CreateProfile(mAuthenticatorActivity, mUserName, mSharedPreferences);
 		}
 		catch(Exception e)
     	{
@@ -1687,7 +1687,7 @@ class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception>
 		try
     	{
 			//Ask for voice verification
-			Transport.StartVoiceVerification(mAuthenticatorActivity, mUserName, mSharedPreferences);
+			new Transport().StartVoiceVerification(mAuthenticatorActivity, mUserName, mSharedPreferences);
     	}
     	catch(Exception e)
     	{

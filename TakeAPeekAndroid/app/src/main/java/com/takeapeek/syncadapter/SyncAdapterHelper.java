@@ -180,7 +180,7 @@ public class SyncAdapterHelper implements Runnable,
                     String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
 
                     //Upload the Mutha!
-                    Transport.UploadFile(
+                    new Transport().UploadFile(
                             mContext, username, password, completedTakeAPeekJson,
                             fileToUpload, thumbnailToUpload,
                             Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
@@ -236,7 +236,7 @@ public class SyncAdapterHelper implements Runnable,
 		String takeAPeekAccountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
 		String takeAPeekAccountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
 		
-		ResponseObject responseObject = Transport.SendSyncRequest(mContext, mTracker, mSharedPreferences, takeAPeekAccountUsername, takeAPeekAccountPassword, requestObject);
+		ResponseObject responseObject = new Transport().SendSyncRequest(mContext, mTracker, mSharedPreferences, takeAPeekAccountUsername, takeAPeekAccountPassword, requestObject);
 		
 		Helper.SetProfileDetailsHaveChanged(mSharedPreferences.edit(), false);
 
@@ -269,7 +269,7 @@ public class SyncAdapterHelper implements Runnable,
 
 				try
 				{
-					Transport.UploadFile(
+					new Transport().UploadFile(
 							mContext, takeAPeekAccountUsername, takeAPeekAccountPassword,
 							null, profileImage, null, Constants.ContentTypeEnum.png,
 							mSharedPreferences);
@@ -315,7 +315,7 @@ public class SyncAdapterHelper implements Runnable,
                     String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
                     //Update server with my new location...
-                    Transport.UpdateLocation(mContext, username, password,
+                    new Transport().UpdateLocation(mContext, username, password,
                             mLastLocation.getLongitude(), mLastLocation.getLatitude(), mSharedPreferences);
 
                     logger.info(String.format("Updated new location : '%s'.", mLastLocation.toString()));

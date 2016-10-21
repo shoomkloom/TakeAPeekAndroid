@@ -135,6 +135,48 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
 
             viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity, viewHolder.mTakeAPeekObject.CreationTime));
 
+/*@@
+            if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
+            {
+                new AsyncTask<ViewHolder, Void, String>()
+                {
+                    private ViewHolder mViewHolder = null;
+
+                    @Override
+                    protected String doInBackground(ViewHolder... params)
+                    {
+                        logger.debug("doInBackground(.) Invoked");
+
+                        mViewHolder = params[0];
+
+                        try
+                        {
+                            LatLng location = new LatLng(mViewHolder.mTakeAPeekObject.Latitude, mViewHolder.mTakeAPeekObject.Longitude);
+                            return LocationHelper.FormattedAddressFromLocation(mUserFeedActivity, location);
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: When trying to get address", e);
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String text)
+                    {
+                        logger.debug("AddressCreatorTask::onPostExecute(.) Invoked");
+
+                        mViewHolder.mTextViewUserFeedAddress.setText(text);
+                        mViewHolder.mTextViewUserFeedAddress.setVisibility(View.VISIBLE);
+
+                        Animation zoomInAnimation = AnimationUtils.loadAnimation(mUserFeedActivity, R.anim.fadein);
+                        mViewHolder.mTextViewUserFeedAddress.setAnimation(zoomInAnimation);
+                        zoomInAnimation.start();
+                    }
+                }.execute(viewHolder);
+            }
+@@*/
             if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
             {
                 LatLng location = new LatLng(viewHolder.mTakeAPeekObject.Latitude, viewHolder.mTakeAPeekObject.Longitude);

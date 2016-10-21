@@ -157,7 +157,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
                     String userName = Helper.GetTakeAPeekAccountUsername(TrendingPlacesActivity.this);
                     String password = Helper.GetTakeAPeekAccountPassword(TrendingPlacesActivity.this);
 
-                    return Transport.GetTrendingPlaces(TrendingPlacesActivity.this, userName, password, mSharedPreferences);
+                    return new Transport().GetTrendingPlaces(TrendingPlacesActivity.this, userName, password, mSharedPreferences);
                 }
                 catch (Exception e)
                 {

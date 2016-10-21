@@ -169,6 +169,7 @@ public class Constants
     public static final String LOGSZIPFILE_NAME = "takeapeekLogs";
     
     public static final String TAKEAPEEK_CONTENT_TYPE_PREFIX = "application/x-takeapeek-data_";
+    public static final String PEEK_SIZE_HEADER = "Peek-Size";
     
     //Profile Image changed flag in preferences
     public static final String PROFILE_IMAGE_CHANGED = "ProfileImageChanged";

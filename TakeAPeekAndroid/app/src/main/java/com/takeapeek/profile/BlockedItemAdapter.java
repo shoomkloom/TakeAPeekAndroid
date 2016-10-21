@@ -147,7 +147,7 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 String username = Helper.GetTakeAPeekAccountUsername(mBlockedActivity);
                                 String password = Helper.GetTakeAPeekAccountPassword(mBlockedActivity);
 
-                                Transport.SetRelation(
+                                new Transport().SetRelation(
                                         mBlockedActivity, username, password,
                                         mViewHolder.mTakeAPeekBlocked.targetId,
                                         Constants.RelationTypeEnum.Unfollow.name(),

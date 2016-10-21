@@ -660,7 +660,7 @@ public class UserMapActivity extends FragmentActivity implements
                                 String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
                                 String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
 
-                                return Transport.GetProfilesInBounds(
+                                return new Transport().GetProfilesInBounds(
                                         UserMapActivity.this, userName, password,
                                         latLngBounds.northeast.latitude, latLngBounds.northeast.longitude,
                                         latLngBounds.southwest.latitude, latLngBounds.southwest.longitude,
@@ -1007,7 +1007,7 @@ public class UserMapActivity extends FragmentActivity implements
                                                     String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
                                                     String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
 
-                                                    return Transport.RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                                    return new Transport().RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
                                                 }
 
                                                 return new ResponseObject();

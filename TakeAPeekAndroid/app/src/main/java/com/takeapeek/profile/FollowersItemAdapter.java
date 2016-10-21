@@ -153,7 +153,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 String username = Helper.GetTakeAPeekAccountUsername(mFollowersActivity);
                                 String password = Helper.GetTakeAPeekAccountPassword(mFollowersActivity);
 
-                                Transport.SetRelation(
+                                new Transport().SetRelation(
                                         mFollowersActivity, username, password,
                                         mViewHolder.mTakeAPeekFollowers.sourceId,
                                         Constants.RelationTypeEnum.Follow.name(),
@@ -209,7 +209,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 String username = Helper.GetTakeAPeekAccountUsername(mFollowersActivity);
                                 String password = Helper.GetTakeAPeekAccountPassword(mFollowersActivity);
 
-                                Transport.SetRelation(
+                                new Transport().SetRelation(
                                         mFollowersActivity, username, password,
                                         mViewHolder.mTakeAPeekFollowers.sourceId,
                                         Constants.RelationTypeEnum.Block.name(),

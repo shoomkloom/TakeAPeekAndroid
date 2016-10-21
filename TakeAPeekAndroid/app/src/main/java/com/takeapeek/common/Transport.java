@@ -42,15 +42,14 @@ public class Transport
 {
 	static private final Logger logger = LoggerFactory.getLogger(Transport.class);
 	
-	public static long serverTimeDelta = 0;
-	private static ReentrantLock lock = new ReentrantLock();
+	private ReentrantLock lock = new ReentrantLock();
 	
-	/*/@@*/static String mServerRootURL = "http://takeapeek.cloudapp.net";
-	//@@*/static String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
-    //@@*/static String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-	//@@*/static String mServerRootURL = ""; //Staging address
+	/*/@@*/String mServerRootURL = "http://takeapeek.cloudapp.net";
+	//@@*/String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
+    //@@*/String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
+	//@@*/String mServerRootURL = ""; //Staging address
 	
-	public static boolean IsConnected(Context context)
+	public boolean IsConnected(Context context)
 	{
 		logger.debug("IsConnected(.) Invoked");
 
@@ -65,7 +64,7 @@ public class Transport
 		return false;
 	}
 	
-	public static ResponseObject CreateProfile(Context context, String username, SharedPreferences sharedPreferences) throws Exception
+	public ResponseObject CreateProfile(Context context, String username, SharedPreferences sharedPreferences) throws Exception
     {
 		logger.debug("CreateProfile(..) Invoked - before lock");
 		
@@ -101,12 +100,12 @@ public class Transport
 		return responseObject;
     }
 
-    public static ResponseObject StartVoiceVerification(Context context, String userName, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject StartVoiceVerification(Context context, String userName, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("StartVoiceVerification(...) Invoked - before lock");
 		
 		ResponseObject responseObject = null;
-		
+
 		lock.lock();
 		
 		try
@@ -135,7 +134,7 @@ public class Transport
 		return responseObject;
 	}
 
-    public static String GetDisplayName(Context context, String userName, String password, String proposedDisplayName, SharedPreferences sharedPreferences) throws Exception
+    public String GetDisplayName(Context context, String userName, String password, String proposedDisplayName, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetDisplayName(....) Invoked - before lock");
 
@@ -171,7 +170,7 @@ public class Transport
         return displayName;
     }
 
-    public static ResponseObject SetDateOfBirth(Context context, String userName, String password, long dateOfBirthMillis, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject SetDateOfBirth(Context context, String userName, String password, long dateOfBirthMillis, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("SetDateOfBirth(....) Invoked - before lock");
 
@@ -206,7 +205,7 @@ public class Transport
         return responseObject;
     }
 
-    public static ResponseObject UpdateLocation(Context context, String userName, String password, double longitude, double latitude, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject UpdateLocation(Context context, String userName, String password, double longitude, double latitude, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("UpdateLocation(......) Invoked - before lock");
 
@@ -242,7 +241,7 @@ public class Transport
         return responseObject;
     }
 
-    public static ArrayList<TrendingPlaceObject> GetTrendingPlaces(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    public ArrayList<TrendingPlaceObject> GetTrendingPlaces(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetTrendingPlaces(....) Invoked - before lock");
 
@@ -273,7 +272,7 @@ public class Transport
         }
     }
 
-    public static ArrayList<TakeAPeekRelation> GetAllRelations(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    public ArrayList<TakeAPeekRelation> GetAllRelations(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetAllRelations(....) Invoked - before lock");
 
@@ -313,7 +312,7 @@ public class Transport
         }
     }
 
-    public static ResponseObject RegisterFCMToken(Context context, String userName, String password, String token, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject RegisterFCMToken(Context context, String userName, String password, String token, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("RegisterFCMToken(....) Invoked.");
 
@@ -324,10 +323,10 @@ public class Transport
         nameValuePairs.add(new NameValuePair("password", password));
         nameValuePairs.add(new NameValuePair("token", token));
 
-        return Transport.DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        return DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
     }
 
-    public static ResponseObject GetProfilesInBounds(Context context, String userName, String password, double north, double east, double south, double west, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject GetProfilesInBounds(Context context, String userName, String password, double north, double east, double south, double west, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetProfilesInBounds(........) Invoked - before lock");
 
@@ -365,7 +364,7 @@ public class Transport
         return responseObject;
     }
 
-    public static ResponseObject GetPeeks(Context context, String userName, String password, String peeksProfileId, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject GetPeeks(Context context, String userName, String password, String peeksProfileId, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetPeeks(....) Invoked - before lock");
 
@@ -400,7 +399,7 @@ public class Transport
         return responseObject;
     }
 
-    public static ResponseObject GetPushNotifcationData(Context context, String userName, String password, String srcProfileId, String relatedPeekId, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject GetPushNotifcationData(Context context, String userName, String password, String srcProfileId, String relatedPeekId, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetPushNotifcationData(......) Invoked - before lock");
 
@@ -441,7 +440,7 @@ public class Transport
         return responseObject;
     }
 
-    public static String GetPeekVideoStreamURL(Context context, String username, String password, String peekId) throws Exception
+    public String GetPeekVideoStreamURL(Context context, String username, String password, String peekId) throws Exception
     {
         logger.debug("GetPeekVideoStreamURL(......) Invoked - before lock");
 
@@ -471,7 +470,7 @@ public class Transport
         return requestStr;
     }
 
-    public static void GetPeek(Context context, String username, String password, String peekId) throws Exception
+    public void GetPeek(Context context, String username, String password, String peekId) throws Exception
     {
         logger.debug("GetPeek(......) Invoked - before lock");
 
@@ -502,7 +501,7 @@ public class Transport
         }
     }
 
-    public static void PreparePeekFile(Context context, Handler handler, TakeAPeekObject takeAPeekObject)
+    public void PreparePeekFile(Context context, Handler handler, TakeAPeekObject takeAPeekObject)
     {
         new AsyncTask<Object, Void, String>()
         {
@@ -526,7 +525,7 @@ public class Transport
                     String username = Helper.GetTakeAPeekAccountUsername(mContext);
                     String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
-                    Transport.GetPeek(mContext, username, password, mTakeAPeekObject.TakeAPeekID);
+                    GetPeek(mContext, username, password, mTakeAPeekObject.TakeAPeekID);
 
                     return "success";
                 }
@@ -569,7 +568,7 @@ public class Transport
         }.execute(context, handler, takeAPeekObject);
     }
 
-    public static void GetPeekThumbnail(Context context, String username, String password, String peekId) throws Exception
+    public void GetPeekThumbnail(Context context, String username, String password, String peekId) throws Exception
     {
         logger.debug("GetPeekThumbnail(......) Invoked - before lock");
 
@@ -597,7 +596,7 @@ public class Transport
         }
     }
 
-    public static ResponseObject RequestPeek(Context context, String username, String password, String metaDataJson, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject RequestPeek(Context context, String username, String password, String metaDataJson, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("RequestPeek(.....) Invoked - before lock");
 
@@ -648,12 +647,12 @@ public class Transport
         return responseObject;
     }
 
-    public static ArrayList<ProfileObject> GetFollowersList(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
+    public ArrayList<ProfileObject> GetFollowersList(Context context, String userName, String password, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("GetFollowersList(.....) Invoked - before lock");
 		
 		ResponseObject responseObject = null;
-		
+
 		lock.lock();
 		
 		try
@@ -699,7 +698,7 @@ public class Transport
 		return responseObject.followersList;
 	}
 
-    public static ResponseObject SetRelation(Context context, String userName, String password, String targetProfileId, String relationType, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject SetRelation(Context context, String userName, String password, String targetProfileId, String relationType, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("SetRelation(......) Invoked - before lock");
 
@@ -735,12 +734,12 @@ public class Transport
         return responseObject;
     }
 
-	public static ResponseObject VerifySMSCode(Context context, String username, String smsCode, SharedPreferences sharedPreferences) throws Exception
+	public ResponseObject VerifySMSCode(Context context, String username, String smsCode, SharedPreferences sharedPreferences) throws Exception
     {
 		logger.debug("VerifySMSCode(...) Invoked - before lock");
 		
 		ResponseObject responseObject = null;
-		
+
 		lock.lock();
 		
 		try
@@ -770,7 +769,7 @@ public class Transport
 		return responseObject;
     }
 
-	public static void UploadFile(Context context, String username, String password,
+	public void UploadFile(Context context, String username, String password,
 		String metaDataJson, File fileToUpload, File thumbnailToUpload,
 		Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
@@ -819,10 +818,10 @@ public class Transport
 		}
 	}
 	
-	public static void DownloadFile(Context context, String username, String password, String contactID, String filePath) throws Exception
+	public void DownloadFile(Context context, String username, String password, String contactID, String filePath) throws Exception
 	{
 		logger.debug("DownloadFile(......) Invoked - before lock");
-		
+
 		lock.lock();
 		
 		try
@@ -845,10 +844,10 @@ public class Transport
 		}
 	}
 	
-	public static void DownloadFileByProfile(Context context, String username, String password, String profileID, String filePath) throws Exception
+	public void DownloadFileByProfile(Context context, String username, String password, String profileID, String filePath) throws Exception
 	{
 		logger.debug("DownloadFileByProfile(.....) Invoked - before lock");
-		
+
 		lock.lock();
 		
 		try
@@ -871,7 +870,7 @@ public class Transport
 		}
 	}
 
-    public static String GetRequestUrl(List<NameValuePair> nameValuePairs) throws UnsupportedEncodingException
+    public String GetRequestUrl(List<NameValuePair> nameValuePairs) throws UnsupportedEncodingException
     {
         String requestStr = String.format("%s/rest/ClientAPI?", mServerRootURL);
 
@@ -890,7 +889,7 @@ public class Transport
         return requestStr;
     }
 	
-	private static ResponseObject DoHTTPGet(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
+	private ResponseObject DoHTTPGet(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
 	{
 		logger.debug("DoHTTPGet(...) Invoked");
 
@@ -924,7 +923,7 @@ public class Transport
 		return responseObject;
 	}
 
-    public static String DoHTTPGetRequest(Context context, String requestStr, String filePath) throws Exception
+    public String DoHTTPGetRequest(Context context, String requestStr, String filePath) throws Exception
     {
         logger.debug("DoHTTPGetRequest(...) Invoked - before lock");
 
@@ -981,6 +980,8 @@ public class Transport
 
                     if(filePath != null)
                     {
+                        String fileLength = httpsURLConnection.getHeaderField(Constants.PEEK_SIZE_HEADER);
+
                         OutputStream outputStream = null;
                         try
                         {
@@ -1087,7 +1088,7 @@ public class Transport
         return responseStr;
     }
 
-	public static ResponseObject DoHTTPGetResponse(Context context, List<NameValuePair> nameValuePairs, SharedPreferences sharedPreferences) throws Exception
+	public ResponseObject DoHTTPGetResponse(Context context, List<NameValuePair> nameValuePairs, SharedPreferences sharedPreferences) throws Exception
 	{
 		logger.debug("DoHTTPGetResponse(..) Invoked");
 
@@ -1118,7 +1119,7 @@ public class Transport
 		return responseObject;
 	}
 
-	private static ResponseObject DoHTTPPost(Context context, List<NameValuePair> nameValuePairs,
+	private ResponseObject DoHTTPPost(Context context, List<NameValuePair> nameValuePairs,
 		String metaDataJson, File fileToUpload, File thumbnailToUpload,
 		Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
@@ -1352,7 +1353,7 @@ public class Transport
 	}
 
 /*@@
-    public static String uploadFileToServer(String filename, String targetUrl)
+    public String uploadFileToServer(String filename, String targetUrl)
     {
         HttpURLConnection conn = null;
         DataOutputStream dos = null;
@@ -1428,7 +1429,7 @@ public class Transport
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static void downloadFileFromServer(String filename, String urlString) throws MalformedURLException, IOException
+    public void downloadFileFromServer(String filename, String urlString) throws MalformedURLException, IOException
     {
         BufferedInputStream in = null;
         FileOutputStream fout = null;

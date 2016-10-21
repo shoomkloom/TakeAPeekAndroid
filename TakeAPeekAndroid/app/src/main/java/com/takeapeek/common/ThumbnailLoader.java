@@ -56,8 +56,9 @@ public class ThumbnailLoader
 
 		if(imageView != null)
 		{
-			//@@imageView.setImageDrawable(createThumbnailDrawable);
-            /*@@*/imageView.setTag(createThumbnailDrawable);
+            //@@ Don't do this if reloaded by timer
+            imageView.setImageResource(R.drawable.background_transparent);
+            imageView.setTag(createThumbnailDrawable);
 		}
 		
 		thumbnailCreatorTask.execute(takeAPeekObject);
@@ -86,6 +87,7 @@ public class ThumbnailLoader
         private TakeAPeekObject mTakeAPeekObject = null;
         private final WeakReference<ImageView> mImageViewReference;
         private Context mContext = null;
+        private Transport mTransport = new Transport();
 
         public ThumbnailCreatorTask(Context activity, ImageView imageView)
         {
@@ -116,8 +118,8 @@ public class ThumbnailLoader
 	    			//Download the thumbnail
 	    			String accountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
 	    			String accountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
-	    			
-	    			Transport.GetPeekThumbnail(mContext, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
+
+                    mTransport.GetPeekThumbnail(mContext, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
 
                     thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
 	    		}

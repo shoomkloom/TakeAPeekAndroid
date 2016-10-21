@@ -162,7 +162,7 @@ public class Helper
             String userName = GetTakeAPeekAccountUsername(context);
             String password = GetTakeAPeekAccountPassword(context);
 
-            return Transport.RegisterFCMToken(context, userName, password, refreshedToken, sharedPreferences);
+            return new Transport().RegisterFCMToken(context, userName, password, refreshedToken, sharedPreferences);
         }
         catch(Exception e)
         {
@@ -778,12 +778,12 @@ public class Helper
 
 				if(takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0)
 				{
-					Transport.DownloadFileByProfile(context, accountUserName, accountPassword,
+                    new Transport().DownloadFileByProfile(context, accountUserName, accountPassword,
 						takeAPeekContact.profileId, profileImageFilePath);
 				}
 				else
 				{
-					Transport.DownloadFile(context, accountUserName, accountPassword,
+                    new Transport().DownloadFile(context, accountUserName, accountPassword,
 						takeAPeekContact.userNumber, profileImageFilePath);
 				}
 			}
@@ -801,7 +801,7 @@ public class Helper
         String username = Helper.GetTakeAPeekAccountUsername(context);
         String password = Helper.GetTakeAPeekAccountPassword(context);
 
-        ArrayList<TakeAPeekRelation> takeAPeekRelationList = Transport.GetAllRelations(context, username, password, sharedPreferences);
+        ArrayList<TakeAPeekRelation> takeAPeekRelationList = new Transport().GetAllRelations(context, username, password, sharedPreferences);
 
         DatabaseManager.getInstance().ClearAllTakeAPeekRelations();
 

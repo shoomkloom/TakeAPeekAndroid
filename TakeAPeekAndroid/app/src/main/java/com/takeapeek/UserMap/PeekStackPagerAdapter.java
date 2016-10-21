@@ -59,7 +59,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
         ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
 
         LayoutInflater inflater = LayoutInflater.from(mUserMapActivity);
-        ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
+        final ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
 
         ImageView imageViewPeekThumbnail = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail);
         imageViewPeekThumbnail.setOnClickListener(ClickListener);
@@ -106,7 +106,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
         if(profileObject.peeks != null && profileObject.peeks.size() > 0)
         {
-            TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
+            final TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
 
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
@@ -116,10 +116,47 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
             if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
             {
-                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+				LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
                 mAddressLoader.SetAddress(mUserMapActivity, location, textViewPeekStackAddress, mSharedPreferences);
-            }
 
+/*@@
+                new AsyncTask<Void, Void, String>()
+                {
+                    @Override
+                    protected String doInBackground(Void... params)
+                    {
+                        logger.debug("doInBackground(.) Invoked");
+
+                        try
+                        {
+                            LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                            return LocationHelper.FormattedAddressFromLocation(mUserMapActivity, location);
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: When trying to get address", e);
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String text)
+                    {
+                        logger.debug("AddressCreatorTask::onPostExecute(.) Invoked");
+
+                        TextView textViewPeekStackAddress = (TextView)viewGroup.findViewById(R.id.peek_stack_address);
+
+                        textViewPeekStackAddress.setText(text);
+                        textViewPeekStackAddress.setVisibility(View.VISIBLE);
+
+                        Animation zoomInAnimation = AnimationUtils.loadAnimation(mUserMapActivity, R.anim.fadein);
+                        textViewPeekStackAddress.setAnimation(zoomInAnimation);
+                        zoomInAnimation.start();
+                    }
+                }.execute();
+@@*/
+            }
         }
         else
         {
@@ -219,7 +256,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                 break;
                                         }
 
-                                        return Transport.SetRelation(mUserMapActivity, userName, password, mTargetProfileObject.profileId, mRelationTypeEnum.name(), mSharedPreferences);
+                                        return new Transport().SetRelation(mUserMapActivity, userName, password, mTargetProfileObject.profileId, mRelationTypeEnum.name(), mSharedPreferences);
                                     }
                                     catch (Exception e)
                                     {

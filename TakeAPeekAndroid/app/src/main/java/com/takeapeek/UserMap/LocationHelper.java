@@ -34,7 +34,7 @@ public class LocationHelper
                 String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&key=%s",
                 location.latitude, location.longitude, googleMapsKey);
 
-        String responseStr = Transport.DoHTTPGetRequest(context, reverseGeoCodingURL, null);
+        String responseStr = new Transport().DoHTTPGetRequest(context, reverseGeoCodingURL, null);
         FormattedAddressContainer formattedAddressContainer = new Gson().fromJson(responseStr, FormattedAddressContainer.class);
 
         if(formattedAddressContainer != null && formattedAddressContainer.results != null && formattedAddressContainer.results.size() > 0)

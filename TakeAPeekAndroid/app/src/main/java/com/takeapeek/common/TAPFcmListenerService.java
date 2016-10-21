@@ -117,7 +117,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                     String accountUsername = Helper.GetTakeAPeekAccountUsername(TAPFcmListenerService.this);
                     String accountPassword = Helper.GetTakeAPeekAccountPassword(TAPFcmListenerService.this);
 
-                    ResponseObject responseObject = Transport.GetPushNotifcationData(
+                    ResponseObject responseObject = new Transport().GetPushNotifcationData(
                             TAPFcmListenerService.this, accountUsername, accountPassword,
                             takeAPeekNotification.srcProfileId, takeAPeekNotification.relatedPeekId, sharedPreferences);
 
@@ -241,7 +241,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
             String accountUsername = Helper.GetTakeAPeekAccountUsername(TAPFcmListenerService.this);
             String accountPassword = Helper.GetTakeAPeekAccountPassword(TAPFcmListenerService.this);
 
-            Transport.GetPeekThumbnail(TAPFcmListenerService.this, accountUsername, accountPassword, takeAPeekObject.TakeAPeekID);
+            new Transport().GetPeekThumbnail(TAPFcmListenerService.this, accountUsername, accountPassword, takeAPeekObject.TakeAPeekID);
 
             return BitmapFactory.decodeFile(thumbnailFullPath, bitmapFactoryOptions);
         }

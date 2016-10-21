@@ -45,6 +45,7 @@ public class AddressLoader
             AddressCreatorTask addressCreatorTask = new AddressCreatorTask(mContext, textView);
             CreateAddressObject createAddressObject = new CreateAddressObject(addressCreatorTask);
 
+            textView.setText("");
             textView.setTag(createAddressObject);
 
             addressCreatorTask.execute(location);

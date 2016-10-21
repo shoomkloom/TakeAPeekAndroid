@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_pressed="true" android:color="@color/tap_blue">
+        <shape>
+		     <!--
+		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
+		      -->  
+		    <solid android:color="@color/tap_tra‌​nsparent" />
+		</shape>
+	</item>
+
+    <item android:state_focused="true" android:color="@color/tap_tra‌​nsparent">
+        <shape>
+		     <!--
+		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
+		      -->  
+		    <solid android:color="@color/tap_white" />
+		</shape>
+	</item>
+	
+    <item android:color="@color/tap_gray">
+        <shape>
+		     <!--
+		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
+		      -->  
+		    <solid android:color="@color/tap_tra‌​nsparent" />
+		</shape>
+	</item>
+    
+</selector>

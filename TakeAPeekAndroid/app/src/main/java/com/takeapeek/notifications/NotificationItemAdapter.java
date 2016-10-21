@@ -268,7 +268,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                                                     String userName = Helper.GetTakeAPeekAccountUsername(mNotificationsActivity);
                                                     String password = Helper.GetTakeAPeekAccountPassword(mNotificationsActivity);
 
-                                                    return Transport.RequestPeek(mNotificationsActivity, userName, password, metaDataJson, mSharedPreferences);
+                                                    return new Transport().RequestPeek(mNotificationsActivity, userName, password, metaDataJson, mSharedPreferences);
                                                 }
                                                 catch (Exception e)
                                                 {

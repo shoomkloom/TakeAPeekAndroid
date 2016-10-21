@@ -147,7 +147,7 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 String username = Helper.GetTakeAPeekAccountUsername(mFollowingActivity);
                                 String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity);
 
-                                Transport.SetRelation(
+                                new Transport().SetRelation(
                                         mFollowingActivity, username, password,
                                         mViewHolder.mTakeAPeekFollowing.targetId,
                                         Constants.RelationTypeEnum.Unfollow.name(),

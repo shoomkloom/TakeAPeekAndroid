@@ -35,7 +35,7 @@ public class VerifySMSAsyncTask extends AsyncTask<String, Integer, String>
 		
 		try 
 		{
-			ResponseObject responseObject = Transport.VerifySMSCode(mAuthenticatorActivity, mAuthenticatorActivity.mUsername, mSelfMeSMSCode, mSharedPreferences);
+			ResponseObject responseObject = new Transport().VerifySMSCode(mAuthenticatorActivity, mAuthenticatorActivity.mUsername, mSelfMeSMSCode, mSharedPreferences);
 			
 			if(responseObject.password != null)
 			{

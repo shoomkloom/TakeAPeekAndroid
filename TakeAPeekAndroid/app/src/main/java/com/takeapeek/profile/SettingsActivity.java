@@ -334,7 +334,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
             String userName = Helper.GetTakeAPeekAccountUsername(mSettingsActivity);
             String password = Helper.GetTakeAPeekAccountPassword(mSettingsActivity);
 
-            return Transport.GetDisplayName(mSettingsActivity, userName, password, mProposedDisplayName, mSharedPreferences);
+            return new Transport().GetDisplayName(mSettingsActivity, userName, password, mProposedDisplayName, mSharedPreferences);
         }
         catch(Exception e)
         {

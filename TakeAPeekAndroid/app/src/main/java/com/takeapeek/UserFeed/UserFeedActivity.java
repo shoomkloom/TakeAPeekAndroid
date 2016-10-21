@@ -178,7 +178,7 @@ public class UserFeedActivity extends AppCompatActivity
 
         mTopBar = (RelativeLayout)findViewById(R.id.top_bar);
 
-                //Progress animation
+        //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.user_feed_progress);
         mAnimationDrawableProgressAnimation = (AnimationDrawable) mImageViewProgressAnimation.getBackground();
         //List View
@@ -338,7 +338,7 @@ public class UserFeedActivity extends AppCompatActivity
                 }
                 else
                 {
-                    Transport.PreparePeekFile(this, mIncomingHandler, takeAPeekObject);
+                    new Transport().PreparePeekFile(this, mIncomingHandler, takeAPeekObject);
                 }
                 return;
             }
