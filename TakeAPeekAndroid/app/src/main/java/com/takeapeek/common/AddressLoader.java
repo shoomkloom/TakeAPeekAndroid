@@ -39,17 +39,13 @@ public class AddressLoader
 	{
 		logger.debug("CreateAddressText(..) Invoked");
 
-        //If the TextView is empty, create the text
-        if(textView != null && (textView.getText() == null || textView.getText().toString().isEmpty() == true))
-        {
-            AddressCreatorTask addressCreatorTask = new AddressCreatorTask(mContext, textView);
-            CreateAddressObject createAddressObject = new CreateAddressObject(addressCreatorTask);
+        AddressCreatorTask addressCreatorTask = new AddressCreatorTask(mContext, textView);
+        CreateAddressObject createAddressObject = new CreateAddressObject(addressCreatorTask);
 
-            textView.setText("");
-            textView.setTag(createAddressObject);
+        textView.setText("");
+        textView.setTag(createAddressObject);
 
-            addressCreatorTask.execute(location);
-        }
+        addressCreatorTask.execute(location);
 	}
 
 	private static AddressCreatorTask GetAddressCreatorTask(TextView textView)
@@ -70,7 +66,7 @@ public class AddressLoader
 	class AddressCreatorTask extends AsyncTask<LatLng, Void, String>
 	{
         private LatLng mLatLng = null;
-        private final WeakReference<TextView> mTextViewReference;
+        private WeakReference<TextView> mTextViewReference;
         private Context mContext = null;
 
         public AddressCreatorTask(Context context, TextView textView)
