@@ -32,36 +32,35 @@ public class ThumbnailLoader
 	BitmapFactory.Options mBitmapFactoryOptions = null;
 
     Hashtable mAnimationStateHash = new Hashtable();
-	
+
 	public void SetThumbnail(Context activity, int position, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
 	{
-		logger.debug("SetThumbnail(..) Invoked");
+		logger.debug("SetThumbnail(......) Invoked");
 		
 		mContext = activity;
 		mSharedPreferences = sharedPreferences;
         mPosition = position;
-		
+
 		mBitmapFactoryOptions = new BitmapFactory.Options();
         mBitmapFactoryOptions.inScaled = false;
 		
 		CreateThumbnail(takeAPeekObject, imageView);
 	}
-	
+
 	private void CreateThumbnail(TakeAPeekObject takeAPeekObject, final ImageView imageView)
 	{
 		logger.debug("CreateThumbnail(..) Invoked");
-		
-		ThumbnailCreatorTask thumbnailCreatorTask = new ThumbnailCreatorTask(mContext, imageView);
-		CreateThumbnailDrawable createThumbnailDrawable = new CreateThumbnailDrawable(thumbnailCreatorTask);
 
-		if(imageView != null)
-		{
-            //@@ Don't do this if reloaded by timer
+        if(imageView != null)
+        {
+            ThumbnailCreatorTask thumbnailCreatorTask = new ThumbnailCreatorTask(mContext, imageView);
+            CreateThumbnailDrawable createThumbnailDrawable = new CreateThumbnailDrawable(thumbnailCreatorTask);
+
             imageView.setImageResource(R.drawable.background_transparent);
             imageView.setTag(createThumbnailDrawable);
-		}
-		
-		thumbnailCreatorTask.execute(takeAPeekObject);
+
+            thumbnailCreatorTask.execute(takeAPeekObject);
+        }
 	}
 	
 	private static ThumbnailCreatorTask GetThumbnailCreatorTask(ImageView imageView)
@@ -70,8 +69,7 @@ public class ThumbnailLoader
 		
 		if (imageView != null) 
 		{
-            //@@Drawable drawable = imageView.getDrawable();
-            /*@@*/Drawable drawable = (Drawable)imageView.getTag();
+            Drawable drawable = (Drawable)imageView.getTag();
             
             if (drawable instanceof CreateThumbnailDrawable)
             {
@@ -92,7 +90,7 @@ public class ThumbnailLoader
         public ThumbnailCreatorTask(Context activity, ImageView imageView)
         {
         	logger.debug("ThumbnailCreatorTask::ThumbnailCreatorTask(..) Invoked");
-        	
+
         	mImageViewReference = new WeakReference<ImageView>(imageView);
         	mContext = activity;
         	DatabaseManager.init(mContext);
@@ -108,29 +106,29 @@ public class ThumbnailLoader
         	
         	mTakeAPeekObject = params[0];
 
-        	try
-        	{
-	    		String thumbnailFullPath = Helper.GetPeekThumbnailFullPath(mContext, mTakeAPeekObject.TakeAPeekID);
-	
-	    		Bitmap thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
-	    		if(thumbnailBitmap == null)
-	    		{
-	    			//Download the thumbnail
-	    			String accountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
-	    			String accountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
+            try
+            {
+                String thumbnailFullPath = Helper.GetPeekThumbnailFullPath(mContext, mTakeAPeekObject.TakeAPeekID);
+
+                Bitmap thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
+                if (thumbnailBitmap == null)
+                {
+                    //Download the thumbnail
+                    String accountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
+                    String accountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
 
                     mTransport.GetPeekThumbnail(mContext, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
 
                     thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
-	    		}
+                }
 
-    			return thumbnailBitmap;
-        	}
-        	catch(Exception e)
-        	{
-        		Helper.Error(logger, String.format("EXCEPTION: When trying to get thumbnail for %s", mTakeAPeekObject.TakeAPeekID), e);
-        	}
-        	
+                return thumbnailBitmap;
+            }
+            catch (Exception e)
+            {
+                Helper.Error(logger, String.format("EXCEPTION: When trying to get thumbnail for %s", mTakeAPeekObject.TakeAPeekID), e);
+            }
+
         	return null;
         }
 
@@ -141,25 +139,22 @@ public class ThumbnailLoader
         protected void onPostExecute(Bitmap bitmap) 
         {
         	logger.debug("ThumbnailCreatorTask::onPostExecute(.) Invoked");
-        	
-            if (isCancelled()) 
-            {
-                bitmap = null;
-            }
 
-            if (mImageViewReference != null) 
+            if(bitmap != null && isCancelled() == false)
             {
-                ImageView imageView = mImageViewReference.get();
-                
-                ThumbnailCreatorTask thumbnailCreatorTask = GetThumbnailCreatorTask(imageView);
-                
-                // Change bitmap only if this process is still associated with it
-                if (this == thumbnailCreatorTask) 
+                if (mImageViewReference != null)
                 {
-                	//@@imageView.setBackgroundResource(0);
-                    //*@@*/imageView.setVisibility(View.INVISIBLE);
-                    imageView.setImageBitmap(bitmap);
-                    //*@@*/imageView.setVisibility(View.VISIBLE);
+                    ImageView imageView = mImageViewReference.get();
+
+                    ThumbnailCreatorTask thumbnailCreatorTask = GetThumbnailCreatorTask(imageView);
+
+                    // Change bitmap only if this process is still associated with it
+                    if (this == thumbnailCreatorTask)
+                    {
+                        //@@imageView.setBackgroundResource(0);
+                        //*@@*/imageView.setVisibility(View.INVISIBLE);
+                        imageView.setImageBitmap(bitmap);
+                        //*@@*/imageView.setVisibility(View.VISIBLE);
 /*@@/
                     Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
                     imageView.setAnimation(zoomInAnimation);
@@ -167,21 +162,22 @@ public class ThumbnailLoader
 /*@@*/
 
 /*@@*/
-                    if(mAnimationStateHash.containsKey(mPosition) == false)
-                    {
-                        mAnimationStateHash.put(mPosition, true);
+                        if (mAnimationStateHash.containsKey(mPosition) == false)
+                        {
+                            mAnimationStateHash.put(mPosition, true);
 
-                        Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadeinquick);
-                        imageView.setAnimation(zoomInAnimation);
-                        zoomInAnimation.start();
-                    }
+                            Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadeinquick);
+                            imageView.setAnimation(zoomInAnimation);
+                            zoomInAnimation.start();
+                        }
 /*@@*/
+                    }
                 }
             }
         }
     }
 	
-	static class CreateThumbnailDrawable extends AnimationDrawable 
+	class CreateThumbnailDrawable extends AnimationDrawable
 	{
         private final WeakReference<ThumbnailCreatorTask> mThumbnailCreatorTaskReference;
 

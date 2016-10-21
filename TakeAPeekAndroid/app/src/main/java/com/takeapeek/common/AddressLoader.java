@@ -39,13 +39,16 @@ public class AddressLoader
 	{
 		logger.debug("CreateAddressText(..) Invoked");
 
-        AddressCreatorTask addressCreatorTask = new AddressCreatorTask(mContext, textView);
-        CreateAddressObject createAddressObject = new CreateAddressObject(addressCreatorTask);
+        if(textView != null)
+        {
+            AddressCreatorTask addressCreatorTask = new AddressCreatorTask(mContext, textView);
+            CreateAddressObject createAddressObject = new CreateAddressObject(addressCreatorTask);
 
-        textView.setText("");
-        textView.setTag(createAddressObject);
+            textView.setText("");
+            textView.setTag(createAddressObject);
 
-        addressCreatorTask.execute(location);
+            addressCreatorTask.execute(location);
+        }
 	}
 
 	private static AddressCreatorTask GetAddressCreatorTask(TextView textView)
