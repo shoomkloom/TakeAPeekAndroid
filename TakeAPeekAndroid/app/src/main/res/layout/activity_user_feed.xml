@@ -65,8 +65,7 @@
         android:shadowDy="1"
         android:shadowRadius="1"
         android:gravity="right"
-        android:layout_marginTop="40dp"
-        android:layout_marginRight="10dp"
+        android:layout_margin="10dp"
         android:visibility="gone"/>
 
     <ProgressBar
