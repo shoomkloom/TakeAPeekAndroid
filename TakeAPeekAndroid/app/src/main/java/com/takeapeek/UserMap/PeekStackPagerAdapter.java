@@ -351,8 +351,12 @@ public class PeekStackPagerAdapter extends PagerAdapter
             ProfileObject profileObject = (ProfileObject)view.getTag();
             String profileObjectJSON = new Gson().toJson(profileObject);
 
+            TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0);
+            String takeAPeekObjectJSON = new Gson().toJson(takeAPeekObject);
+
             final Intent intent = new Intent(mUserMapActivity, UserFeedActivity.class);
             intent.putExtra(Constants.PARAM_PROFILEOBJECT, profileObjectJSON);
+            intent.putExtra(Constants.PARAM_PEEKOBJECT, takeAPeekObjectJSON);
             mUserMapActivity.startActivity(intent);
         }
         catch (Exception e)

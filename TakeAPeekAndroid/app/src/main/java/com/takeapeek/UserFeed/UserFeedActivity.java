@@ -246,7 +246,8 @@ public class UserFeedActivity extends AppCompatActivity
                     UpdateUI();
                 }
 
-                mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_MINUTE);
+                //@@ This causes a "blinking" of the list's images...
+                //@@mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_MINUTE);
             }
 
             String peekObjectJSON = intent.getStringExtra(Constants.PARAM_PEEKOBJECT);
