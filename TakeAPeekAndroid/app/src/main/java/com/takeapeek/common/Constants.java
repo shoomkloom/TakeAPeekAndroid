@@ -180,6 +180,7 @@ public class Constants
 
     //IncomingHandler message types
     public static final int HANDLER_MESSAGE_PEEK_DOWNLOADED = 10001;
+    public static final int HANDLER_MESSAGE_PEEK_PROGRESS = 10002;
 
     //flags in preferences
     public static final String PROFILE_DETAILS_CHANGED = "ProfileDetailsChanged";

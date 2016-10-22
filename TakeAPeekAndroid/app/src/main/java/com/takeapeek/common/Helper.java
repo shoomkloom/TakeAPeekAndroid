@@ -784,7 +784,7 @@ public class Helper
 				else
 				{
                     new Transport().DownloadFile(context, accountUserName, accountPassword,
-						takeAPeekContact.userNumber, profileImageFilePath);
+						takeAPeekContact.userNumber, profileImageFilePath, null);
 				}
 			}
 			catch(Exception e)

@@ -134,4 +134,14 @@
         android:background="@drawable/progress"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/textview_video_progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/user_peek_feed_video_progress"
+        android:gravity="center"
+        android:textColor="@color/tap_white"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
 </RelativeLayout>

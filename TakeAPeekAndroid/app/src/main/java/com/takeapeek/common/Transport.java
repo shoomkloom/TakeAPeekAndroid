@@ -470,7 +470,7 @@ public class Transport
         return requestStr;
     }
 
-    public void GetPeek(Context context, String username, String password, String peekId) throws Exception
+    public void GetPeek(Context context, String username, String password, String peekId, Handler downloadProgressHandler) throws Exception
     {
         logger.debug("GetPeek(......) Invoked - before lock");
 
@@ -492,7 +492,7 @@ public class Transport
 //@@            String filePath = Helper.GetPeekThumbnailFullPath(context, peekId);
             String filePath = Helper.GetVideoPeekFilePath(context, peekId);
 
-            DoHTTPGet(context, nameValuePairs, filePath);
+            DoHTTPGet(context, nameValuePairs, filePath, downloadProgressHandler);
         }
         finally
         {
@@ -525,7 +525,7 @@ public class Transport
                     String username = Helper.GetTakeAPeekAccountUsername(mContext);
                     String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
-                    GetPeek(mContext, username, password, mTakeAPeekObject.TakeAPeekID);
+                    GetPeek(mContext, username, password, mTakeAPeekObject.TakeAPeekID, mHandler);
 
                     return "success";
                 }
@@ -587,7 +587,7 @@ public class Transport
 
             String filePath = Helper.GetPeekThumbnailFullPath(context, peekId);
 
-            DoHTTPGet(context, nameValuePairs, filePath);
+            DoHTTPGet(context, nameValuePairs, filePath, null);
         }
         finally
         {
@@ -818,7 +818,7 @@ public class Transport
 		}
 	}
 	
-	public void DownloadFile(Context context, String username, String password, String contactID, String filePath) throws Exception
+	public void DownloadFile(Context context, String username, String password, String contactID, String filePath, Handler downloadProgressHandler) throws Exception
 	{
 		logger.debug("DownloadFile(......) Invoked - before lock");
 
@@ -835,7 +835,7 @@ public class Transport
 			nameValuePairs.add(new NameValuePair("password", password));
 			nameValuePairs.add(new NameValuePair("contact_id", contactID));
 	
-			DoHTTPGet(context, nameValuePairs, filePath);
+			DoHTTPGet(context, nameValuePairs, filePath, downloadProgressHandler);
 		}
 		finally
 		{
@@ -861,7 +861,7 @@ public class Transport
 			nameValuePairs.add(new NameValuePair("password", password));
 			nameValuePairs.add(new NameValuePair("profile_id", profileID));
 
-			DoHTTPGet(context, nameValuePairs, filePath);
+			DoHTTPGet(context, nameValuePairs, filePath, null);
 		}
 		finally
 		{
@@ -889,7 +889,7 @@ public class Transport
         return requestStr;
     }
 	
-	private ResponseObject DoHTTPGet(Context context, List<NameValuePair> nameValuePairs, String filePath) throws Exception
+	private ResponseObject DoHTTPGet(Context context, List<NameValuePair> nameValuePairs, String filePath, Handler downloadProgressHandler) throws Exception
 	{
 		logger.debug("DoHTTPGet(...) Invoked");
 
@@ -898,7 +898,7 @@ public class Transport
         try
 		{
             String requestStr = GetRequestUrl(nameValuePairs);
-            String responseStr = DoHTTPGetRequest(context, requestStr, filePath);
+            String responseStr = DoHTTPGetRequest(context, requestStr, filePath, downloadProgressHandler);
 
             try
             {
@@ -923,7 +923,7 @@ public class Transport
 		return responseObject;
 	}
 
-    public String DoHTTPGetRequest(Context context, String requestStr, String filePath) throws Exception
+    public String DoHTTPGetRequest(Context context, String requestStr, String filePath, final Handler downloadProgressHandler) throws Exception
     {
         logger.debug("DoHTTPGetRequest(...) Invoked - before lock");
 
@@ -980,7 +980,21 @@ public class Transport
 
                     if(filePath != null)
                     {
-                        String fileLength = httpsURLConnection.getHeaderField(Constants.PEEK_SIZE_HEADER);
+                        String fileLengthStr = httpsURLConnection.getHeaderField(Constants.PEEK_SIZE_HEADER);
+                        int fileLength = 0;
+                        try
+                        {
+                            if (fileLengthStr != null)
+                            {
+                                fileLength = Integer.parseInt(fileLengthStr);
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: When trying to parseInt", e);
+                        }
+                        int totalRead = 0;
+                        int percentProgress = 0;
 
                         OutputStream outputStream = null;
                         try
@@ -992,6 +1006,28 @@ public class Transport
                             while ((len = inputStream.read(buffer)) != -1)
                             {
                                 outputStream.write(buffer, 0, len);
+
+                                if(fileLength != 0)
+                                {
+                                    totalRead += len;
+                                    percentProgress = 100 * totalRead / fileLength;
+
+                                    if (downloadProgressHandler != null)
+                                    {
+                                        final int finalPercentProgress = percentProgress;
+                                        downloadProgressHandler.post(new Runnable()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                Message msg = Message.obtain();
+                                                msg.arg1 = Constants.HANDLER_MESSAGE_PEEK_PROGRESS;
+                                                msg.arg2 = finalPercentProgress;
+                                                downloadProgressHandler.sendMessage(msg);
+                                            }
+                                        });
+                                    }
+                                }
                             }
                         }
                         catch (Exception e)
@@ -1096,7 +1132,7 @@ public class Transport
 
         try
 		{
-            responseObject = DoHTTPGet(context, nameValuePairs, null);
+            responseObject = DoHTTPGet(context, nameValuePairs, null, null);
 
 			if(sharedPreferences != null && responseObject != null && responseObject.error != null)
 			{

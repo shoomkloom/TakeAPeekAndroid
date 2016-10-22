@@ -61,6 +61,7 @@ public class UserFeedActivity extends AppCompatActivity
     TextView mVideoTime = null;
     ProgressBar mVideoProgressBar = null;
     ImageView mImageViewPeekVideoProgress = null;
+    TextView mTextViewPeekVideoProgress = null;
     AnimationDrawable mAnimationDrawableVideoProgressAnimation = null;
     ImageView mImageViewPeekThumbnailPlay = null;
     ImageView mImageViewPeekClose = null;
@@ -160,6 +161,11 @@ public class UserFeedActivity extends AppCompatActivity
                 ShowPeek(true, (TakeAPeekObject)msg.obj);
                 break;
 
+            case Constants.HANDLER_MESSAGE_PEEK_PROGRESS:
+                int progressPercent = msg.arg2;
+                mTextViewPeekVideoProgress.setText(String.format("%d%%", progressPercent));
+                break;
+
             default:
                 logger.info("HandleMessage: default");
                 break;
@@ -187,6 +193,8 @@ public class UserFeedActivity extends AppCompatActivity
         mImageViewPeekThumbnail = (ImageView)findViewById(R.id.user_peek_feed_thumbnail);
         mImageViewPeekVideoProgress = (ImageView)findViewById(R.id.user_peek_feed_video_progress);
         mAnimationDrawableVideoProgressAnimation = (AnimationDrawable)mImageViewPeekVideoProgress.getBackground();
+        mTextViewPeekVideoProgress = (TextView)findViewById(R.id.textview_video_progress);
+        Helper.setTypeface(this, mTextViewPeekVideoProgress, Helper.FontTypeEnum.boldFont);
         mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
 
         mVideoTime =  (TextView)findViewById(R.id.user_peek_video_time);
@@ -508,6 +516,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekThumbnail.setVisibility(View.GONE);
                 mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setText("");
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoTime.setVisibility(View.GONE);
@@ -529,6 +539,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekThumbnail.setVisibility(View.GONE);
                 mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setText("");
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoTime.setVisibility(View.GONE);
@@ -549,6 +561,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekThumbnail.setVisibility(View.GONE);
                 mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setText("");
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoTime.setVisibility(View.GONE);
@@ -569,6 +583,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
                 mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
                 mImageViewPeekVideoProgress.setVisibility(View.VISIBLE);
+                mTextViewPeekVideoProgress.setVisibility(View.VISIBLE);
+                mTextViewPeekVideoProgress.setText("");
 
                 //Progress animation
                 mImageViewPeekVideoProgress.post(new Runnable()
@@ -599,6 +615,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekThumbnail.setVisibility(View.GONE);
                 mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setText("");
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
@@ -620,6 +638,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
                 mImageViewPeekThumbnailPlay.setVisibility(View.VISIBLE);
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setText("");
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
