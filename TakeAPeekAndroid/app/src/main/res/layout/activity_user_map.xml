@@ -35,12 +35,12 @@
 
         <TextView
             android:id="@+id/textview_new_notifications"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:gravity="center"
             android:padding="2dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="30dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginLeft="34dp"
             android:textSize="15sp"
             android:textColor="@color/tap_white"
             android:background="@drawable/button_red_rounded"

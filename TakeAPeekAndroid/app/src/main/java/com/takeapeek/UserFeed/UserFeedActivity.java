@@ -113,7 +113,7 @@ public class UserFeedActivity extends AppCompatActivity
             int currentPositionInMillis = mVideoViewPeekItem.getCurrentPosition();
             int timeLeftInMillis = durationInMillis - currentPositionInMillis;
             Date videoDateObject = new Date(timeLeftInMillis);
-            DateFormat dateFormat = new SimpleDateFormat("ss:SSS");
+            DateFormat dateFormat = new SimpleDateFormat("ss");
             String formattedTime = dateFormat.format(videoDateObject);
             mVideoTime.setText(formattedTime);
 
@@ -122,7 +122,7 @@ public class UserFeedActivity extends AppCompatActivity
 
             if(mVideoViewPeekItem.isPlaying() == true)
             {
-                mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 50);
+                mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
             }
         }
     };
@@ -198,7 +198,7 @@ public class UserFeedActivity extends AppCompatActivity
         mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
 
         mVideoTime =  (TextView)findViewById(R.id.user_peek_video_time);
-        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
+        Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.boldFont);
 
         mVideoProgressBar =  (ProgressBar)findViewById(R.id.user_peek_video_progress);
         mImageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_feed_thumbnail_play);
@@ -210,6 +210,7 @@ public class UserFeedActivity extends AppCompatActivity
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_up).setOnClickListener(ClickListener);
+        findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
 
         mThumbnailLoader = new ThumbnailLoader();
 
@@ -359,7 +360,7 @@ public class UserFeedActivity extends AppCompatActivity
                     logger.debug("MediaPlayer.OnPreparedListener:onPrepared(.) Invoked");
 
                     //Start the video play time display
-                    mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 50);
+                    mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
                 }
             });
 
@@ -465,10 +466,13 @@ public class UserFeedActivity extends AppCompatActivity
                 case R.id.imageview_up:
                     logger.info("onClick: imageview_up");
 
-                    Intent userMapActivityIntent = new Intent(UserFeedActivity.this, UserMapActivity.class);
-                    userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(userMapActivityIntent);
+                    OpenMapActivity();
+                    break;
 
+                case R.id.imageview_map:
+                    logger.info("onClick: imageview_map Invoked");
+
+                    OpenMapActivity();
                     break;
 /*@@
 
@@ -489,6 +493,15 @@ public class UserFeedActivity extends AppCompatActivity
             }
         }
     };
+
+    private void OpenMapActivity()
+    {
+        logger.debug("OpenMapActivity() Invoked");
+
+        Intent userMapActivityIntent = new Intent(UserFeedActivity.this, UserMapActivity.class);
+        userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(userMapActivityIntent);
+    }
 
     private void UpdateUI()
     {

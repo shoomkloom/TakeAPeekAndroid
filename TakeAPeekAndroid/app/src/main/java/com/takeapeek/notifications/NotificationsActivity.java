@@ -22,6 +22,7 @@ import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.profile.ProfileActivity;
+import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +120,8 @@ public class NotificationsActivity extends AppCompatActivity
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.cancelAll();
+
+        findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
     }
 
     private ArrayList<TakeAPeekNotification> GetTakeAPeekNotificationArray()
@@ -251,6 +254,15 @@ public class NotificationsActivity extends AppCompatActivity
                     final Intent profileIntent = new Intent(NotificationsActivity.this, ProfileActivity.class);
                     profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(profileIntent);
+                    break;
+
+                case R.id.imageview_map:
+                    logger.info("onClick: imageview_map Invoked");
+
+                    Intent userMapActivityIntent = new Intent(NotificationsActivity.this, UserMapActivity.class);
+                    userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(userMapActivityIntent);
+
                     break;
 
                 default:

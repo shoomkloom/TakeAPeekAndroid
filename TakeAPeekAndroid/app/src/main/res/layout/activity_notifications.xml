@@ -36,6 +36,16 @@
             android:layout_centerInParent="true"
             android:textColor="@color/tap_white"/>
 
+        <ImageView
+            android:id="@+id/imageview_map"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/button_map"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"/>
+
     </RelativeLayout>
 
     <ListView

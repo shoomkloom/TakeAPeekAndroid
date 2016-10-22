@@ -33,6 +33,16 @@
             android:layout_centerInParent="true"
             android:textColor="@color/tap_white"/>
 
+        <ImageView
+            android:id="@+id/imageview_map"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/button_map"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"/>
+
     </RelativeLayout>
 
     <VideoView
@@ -46,16 +56,17 @@
         android:id = "@+id/user_peek_video_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:textSize="20sp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textSize="25sp"
         android:textColor="@color/tap_white"
         android:shadowColor="@color/tap_darkgray"
         android:shadowDx="1"
         android:shadowDy="1"
         android:shadowRadius="1"
         android:gravity="right"
-        android:layout_margin="10dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="10dp"
         android:visibility="gone"/>
 
     <ProgressBar
@@ -76,8 +87,8 @@
 
     <ImageView
         android:id = "@+id/user_peek_feed_thumbnail_play"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_centerInParent="true"
         android:src="@drawable/ic_video_play"
         android:visibility="gone" />
