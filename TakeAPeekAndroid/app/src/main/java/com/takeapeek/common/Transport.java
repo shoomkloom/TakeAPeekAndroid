@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -38,13 +37,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class Transport
 {
 	static private final Logger logger = LoggerFactory.getLogger(Transport.class);
 	
 	private ReentrantLock lock = new ReentrantLock();
-	
-	/*/@@*/String mServerRootURL = "http://takeapeek.cloudapp.net";
+
+    /*/@@*/String mServerRootURL = "https://rest.peek.to";
+	//@@*/String mServerRootURL = "http://takeapeek.cloudapp.net";
 	//@@*/String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
     //@@*/String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
 	//@@*/String mServerRootURL = ""; //Staging address
@@ -70,7 +72,7 @@ public class Transport
 		
 		ResponseObject responseObject = null;
 		
-		lock.lock();
+		//@@lock.lock();
 		
 		try
 		{
@@ -93,7 +95,7 @@ public class Transport
 		}
 		finally
 		{
-			lock.unlock();
+			//@@lock.unlock();
 			logger.debug("CreateProfile(..) - after unlock");
 		}
 		
@@ -106,7 +108,7 @@ public class Transport
 		
 		ResponseObject responseObject = null;
 
-		lock.lock();
+		//@@lock.lock();
 		
 		try
 		{
@@ -127,7 +129,7 @@ public class Transport
 		}
 		finally
 		{
-			lock.unlock();
+			//@@lock.unlock();
 			logger.debug("StartVoiceVerification(...) - after unlock");
 		}
 		
@@ -140,7 +142,7 @@ public class Transport
 
         String displayName = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -163,7 +165,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetDisplayName(....) - after unlock");
         }
 
@@ -176,7 +178,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -198,7 +200,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("SetDateOfBirth(....) - after unlock");
         }
 
@@ -211,7 +213,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -234,7 +236,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("UpdateLocation(......) - after unlock");
         }
 
@@ -245,7 +247,7 @@ public class Transport
     {
         logger.debug("GetTrendingPlaces(....) Invoked - before lock");
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -267,7 +269,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetTrendingPlaces(....) - after unlock");
         }
     }
@@ -276,7 +278,7 @@ public class Transport
     {
         logger.debug("GetAllRelations(....) Invoked - before lock");
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -307,7 +309,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetAllRelations(....) - after unlock");
         }
     }
@@ -332,7 +334,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -357,7 +359,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetProfilesInBounds(........) - after unlock");
         }
 
@@ -370,7 +372,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -392,7 +394,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetPeeks(....) - after unlock");
         }
 
@@ -405,7 +407,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -433,7 +435,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetPushNotifcationData(......) - after unlock");
         }
 
@@ -444,7 +446,7 @@ public class Transport
     {
         logger.debug("GetPeekVideoStreamURL(......) Invoked - before lock");
 
-        lock.lock();
+        //@@lock.lock();
 
         String requestStr = null;
 
@@ -463,7 +465,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetPeekVideoStreamURL(......) - after unlock");
         }
 
@@ -474,7 +476,7 @@ public class Transport
     {
         logger.debug("GetPeek(......) Invoked - before lock");
 
-        lock.lock();
+        //@@lock.lock();
 
         String requestStr = null;
 
@@ -496,7 +498,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetPeek(......) - after unlock");
         }
     }
@@ -572,7 +574,7 @@ public class Transport
     {
         logger.debug("GetPeekThumbnail(......) Invoked - before lock");
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -591,7 +593,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("GetPeekThumbnail(......) - after unlock");
         }
     }
@@ -602,7 +604,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        Helper.lockProfilePicture.lock();
+        //@@lock.lock();
 
         try
         {
@@ -640,7 +642,7 @@ public class Transport
         }
         finally
         {
-            Helper.lockProfilePicture.unlock();
+            //@@lock.unlock();
             logger.debug("RequestPeek(.....) - after unlock");
         }
 
@@ -653,7 +655,7 @@ public class Transport
 		
 		ResponseObject responseObject = null;
 
-		lock.lock();
+		//@@lock.lock();
 		
 		try
 		{
@@ -674,7 +676,7 @@ public class Transport
 		}
 		finally
 		{
-			lock.unlock();
+			//@@lock.unlock();
 			logger.debug("GetFollowersList(.....) - after unlock");
 		}
 		
@@ -704,7 +706,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        lock.lock();
+        //@@lock.lock();
 
         try
         {
@@ -727,7 +729,7 @@ public class Transport
         }
         finally
         {
-            lock.unlock();
+            //@@lock.unlock();
             logger.debug("SetRelation(......) - after unlock");
         }
 
@@ -740,7 +742,7 @@ public class Transport
 		
 		ResponseObject responseObject = null;
 
-		lock.lock();
+		//@@lock.lock();
 		
 		try
 		{
@@ -762,7 +764,7 @@ public class Transport
 		}
 		finally
 		{
-			lock.unlock();
+			//@@lock.unlock();
 			logger.debug("VerifySMSCode(....) - after unlock");
 		}
 		
@@ -777,7 +779,7 @@ public class Transport
 		
 		ResponseObject responseObject = null;
 		
-		Helper.lockProfilePicture.lock();
+		//@@lock.lock();
 
 		try
 		{
@@ -813,7 +815,7 @@ public class Transport
 		}
 		finally
 		{
-			Helper.lockProfilePicture.unlock();
+			//@@lock.unlock();
 			logger.debug("UploadFile(.........) - after unlock");
 		}
 	}
@@ -822,7 +824,7 @@ public class Transport
 	{
 		logger.debug("DownloadFile(......) Invoked - before lock");
 
-		lock.lock();
+		//@@lock.lock();
 		
 		try
 		{
@@ -839,7 +841,7 @@ public class Transport
 		}
 		finally
 		{
-			lock.unlock();
+			//@@lock.unlock();
 			logger.debug("DownloadFile(......) - after unlock");
 		}
 	}
@@ -848,7 +850,7 @@ public class Transport
 	{
 		logger.debug("DownloadFileByProfile(.....) Invoked - before lock");
 
-		lock.lock();
+		//@@lock.lock();
 		
 		try
 		{
@@ -865,7 +867,7 @@ public class Transport
 		}
 		finally
 		{
-			lock.unlock();
+			//@@lock.unlock();
 			logger.debug("DownloadFileByProfile(.....) - after unlock");
 		}
 	}
@@ -927,7 +929,7 @@ public class Transport
     {
         logger.debug("DoHTTPGetRequest(...) Invoked - before lock");
 
-        Helper.lockHTTPRequest.lock();
+        lock.lock();
 
         String responseStr = null;
 
@@ -953,14 +955,14 @@ public class Transport
             {
                 int responseCode = 0;
                 //@@HttpsURLConnection httpsURLConnection = null;
-                HttpURLConnection httpsURLConnection = null;
+                HttpsURLConnection httpsURLConnection = null;
                 InputStream inputStream = null;
 
                 try
                 {
                     URL url = new URL(requestStr);
-                    //@@httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                    httpsURLConnection = (HttpURLConnection) url.openConnection();
+                    httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    //@@httpsURLConnection = (HttpURLConnection) url.openConnection();
                     httpsURLConnection.setRequestProperty("connection", "close");
                     httpsURLConnection.setRequestProperty("Cache-Control", "no-cache");
                     httpsURLConnection.setReadTimeout(20000 /* milliseconds */);
@@ -1117,7 +1119,7 @@ public class Transport
         }
         finally
         {
-            Helper.lockHTTPRequest.unlock();
+            lock.unlock();
             logger.debug("DoHTTPGetRequest(...) - after unlock");
         }
 
@@ -1163,7 +1165,7 @@ public class Transport
 
         ResponseObject responseObject = null;
 
-        Helper.lockHTTPRequest.lock();
+        lock.lock();
 
         try
         {
@@ -1187,8 +1189,7 @@ public class Transport
 
             if (IsConnected(context))
             {
-                //@@Need to change this to HttpsURLConnection
-                HttpURLConnection httpURLConnection = null;
+                HttpsURLConnection httpsURLConnection = null;
                 BufferedOutputStream outputStream = null;
                 BufferedInputStream inputStream = null;
 
@@ -1206,48 +1207,48 @@ public class Transport
                 {
                     int responseCode = 0;
                     URL url = new URL(requestStr);
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestProperty("connection", "close");
+                    httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    httpsURLConnection.setRequestProperty("connection", "close");
 
-                    httpURLConnection.setDoInput(true);
+                    httpsURLConnection.setDoInput(true);
                     // Allow Outputs
-                    httpURLConnection.setDoOutput(true);
+                    httpsURLConnection.setDoOutput(true);
                     // Don't use a cached copy.
-                    httpURLConnection.setUseCaches(false);
+                    httpsURLConnection.setUseCaches(false);
                     //@@httpURLConnection.setChunkedStreamingMode(0/*@@maxBufferSize*/);
                     // Use a post method.
-                    httpURLConnection.setRequestMethod("POST");
+                    httpsURLConnection.setRequestMethod("POST");
 
                     switch (contentType)
                     {
                         case profile_png:
                             logger.info("contentType = profile_png");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.profile_png));
+                            httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.profile_png));
                             break;
 
                         case png:
                             logger.info("contentType = png");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.png));
+                            httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.png));
                             break;
 
                         case json:
                             logger.info("contentType = json");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.json));
+                            httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.json));
                             break;
 
                         case zip:
                             logger.info("contentType = zip");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.zip));
+                            httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.zip));
                             break;
 
                         case mp4:
                             logger.info("contentType = mp4");
-                            httpURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.mp4));
+                            httpsURLConnection.setRequestProperty("Content-Type", String.format("%s%s", Constants.TAKEAPEEK_CONTENT_TYPE_PREFIX, Constants.ContentTypeEnum.mp4));
                             break;
                     }
 
                     //@@dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
-                    outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
+                    outputStream = new BufferedOutputStream(httpsURLConnection.getOutputStream());
 
                     if(metaDataJson != null && metaDataJson != "")
                     {
@@ -1296,13 +1297,13 @@ public class Transport
                     outputStream.flush();
 
                     logger.info("DoHTTPPost: Calling httpsURLConnection.connect()...");
-                    httpURLConnection.connect();
+                    httpsURLConnection.connect();
 
                     //Get the response
                     logger.info("Sent the request, getting the response");
 
-                    responseCode = httpURLConnection.getResponseCode();
-                    inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
+                    responseCode = httpsURLConnection.getResponseCode();
+                    inputStream = new BufferedInputStream(httpsURLConnection.getInputStream());
 
                     boolean isBlocked = false;
                     String responseStr = null;
@@ -1362,9 +1363,9 @@ public class Transport
                         inputStream.close();
                     }
 
-                    if(httpURLConnection != null)
+                    if(httpsURLConnection != null)
                     {
-                        httpURLConnection.disconnect();
+                        httpsURLConnection.disconnect();
                     }
                 }
             }
@@ -1381,7 +1382,7 @@ public class Transport
         }
         finally
         {
-            Helper.lockHTTPRequest.unlock();
+            lock.unlock();
             logger.debug("DoHTTPPost(.......) - after unlock");
         }
 
