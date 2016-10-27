@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">TakeAPeek</string>
-    <string name="app_name_lower">takeapeek</string>
-    <string name="label">TakeAPeek</string>
+    <string name="app_name">Peek.To</string>
+    <string name="app_name_lower">peek.to</string>
+    <string name="label">Peek.To</string>
     <string name="no_connection">No Connection</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="Error">Error</string>
     <string name="Exit">Exit</string>
-    <string name="error_play_services">No Google Play Services available, TakeAPeek cannot operate.</string>
+    <string name="error_play_services">No Google Play Services available, Peek.To cannot operate.</string>
     <string name="error_download_peek">Could not download the peek right now. Please try again later.</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -24,7 +24,7 @@
     <string name="upload">Upload</string>
     <string name="stop">Stop</string>
     <string name="description_info">Info</string>
-    <string name="permission_request">TakeAPeek needs permission for camera and audio recording.</string>
+    <string name="permission_request">Peek.To needs permission for camera and audio recording.</string>
     <string name="camera_error">This device doesn\'t is not supported.</string>
     <string name="error_cannot_get_location">Could not get current location.\nPlease try again later.</string>
     <string name="back">Back</string>
@@ -34,7 +34,7 @@
     <string name="intro_record_till_0">Record till you reach 0 seconds</string>
     <string name="intro_why">Why do I need to create a peek to enter?</string>
     <string name="intro_details_title">Why do I need to create a peek to enter?</string>
-    <string name="intro_details_text">TakeAPeek lets you see peeks from other people. By creating a peek you help them discover you and your surroundings.\n\n Only 1 peek is needed (we won\'t ask you
+    <string name="intro_details_text">Peek.To lets you see peeks from other people. By creating a peek you help them discover you and your surroundings.\n\n Only 1 peek is needed (we won\'t ask you
         again while you are here).
     </string>
     <string name="zoom">Zoom</string>
@@ -53,7 +53,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
     <!-- Create Account -->
-    <string name="create_account_activity_title">Create TakeAPeek Account</string>
+    <string name="create_account_activity_title">Create Peek.To Account</string>
     <string name="create_account_message1">Create Account</string>
     <string name="create_account_your_country">Your country\u003a</string>
     <string name="create_account_your_mobile">Mobile\u003a</string>
@@ -63,16 +63,16 @@
     <string name="create_account_terms_and_conditions">We will NEVER show your mobile number to other Peekers. Read our &lt;a href="%1$s"&gt;Privacy Policy&lt;/a&gt; to learn more.</string>
     <string name="create_account_check_terms_and_conditions">I accept the terms and conditions</string>
     <string name="create_account_ok_button">Signup</string>
-    <string name="create_account_message_bottom">By proceeding you agree to TakeAPeek</string>
+    <string name="create_account_message_bottom">By proceeding you agree to Peek.To</string>
     <string name="create_account_empty_number">Please fill in a valid number and prefix</string>
     <string name="create_account_progress_message">Creating account\u2026</string>
     <string name="create_account_enter_code_message">Enter code here</string>
     <string name="verify_account_progress_message">Verifying account\u2026</string>
     <string name="request_call_progress_message">Requesting call\u2026</string>
-    <string name="error_no_account">Error: No TakeAPeek account found. Please try to reinstall.</string>
-    <string name="error_create_account">Could not create a TakeAPeek account at this time. Please try again later.</string>
-    <string name="error_verify_account">Could not verify TakeAPeek account at this time. Please make sure you can receive SMS messages and try again.</string>
-    <string name="error_loading_authentication">There was a problem loading the Authentication view.\n\nTry running TakeAPeek again.</string>
+    <string name="error_no_account">Error: No Peek.To account found. Please try to reinstall.</string>
+    <string name="error_create_account">Could not create a Peek.To account at this time. Please try again later.</string>
+    <string name="error_verify_account">Could not verify Peek.To account at this time. Please make sure you can receive SMS messages and try again.</string>
+    <string name="error_loading_authentication">There was a problem loading the Authentication view.\n\nTry running Peek.To again.</string>
     <string name="error_authentication_no_connection">Cannot create a new account at this time, no available internet connection.\n\nPlease try again later.</string>
     <string name="error_non_valid_number">The number you filled in is not a valid mobile phone number.\n\nPlease make sure you fill in your correct number so that your friends can connect to you.
     </string>
@@ -93,9 +93,9 @@
     <string name="message_request_call"><u>Request voice code</u></string>
     <string name="verification_verified">Verified User</string>
     <string name="almost_done">Welcome\u2026</string>
-    <string name="creating_selfme_account">Creating your TakeAPeek account</string>
+    <string name="creating_selfme_account">Creating your Peek.To account</string>
     <string name="teaser_line_1">Take a picture.</string>
-    <string name="teaser_line_2">Post to<b>TakeAPeek</b>.
+    <string name="teaser_line_2">Post to<b>Peek.To</b>.
     </string>
     <string name="teaser_line_3">Done!</string>
     <string name="teaser_ok">Ok\u2026</string>
@@ -107,8 +107,8 @@
     <string name="button_continue">Continue</string>
     <string name="create_account_verify_message">Detecting verification SMS\nThis might take a few moments\u2026</string>
     <string name="error_more_than_one_account">There is more than one Self.Me account. Please delete all of them and run the Self.Me app again.</string>
-    <string name="account_already_exists">TakeAPeek account already exists.</string>
-    <string name="create_account_only_in_app">A new TakeAPeek account can only be created in the TakeAPeek app.</string>
+    <string name="account_already_exists">Peek.To account already exists.</string>
+    <string name="create_account_only_in_app">A new Peek.To account can only be created in the Peek.To app.</string>
     <string name="create_account_verify_sms_error">Illegal verification code</string>
     <string name="title_activity_capture_clip">CaptureClipActivity</string>
     <string name="title_activity_user_map">User Map</string>
@@ -117,7 +117,7 @@
     <string name="verify_mobile_number_title_verifying">Verifying...</string>
     <string name="verify_mobile_number_verifying_explain">Verifying your mobile number so we know this works!</string>
     <string name="display_name_pick_a_name">Pick a User Name</string>
-    <string name="display_name_explain">Your User Name is your identity on TakeAPeek</string>
+    <string name="display_name_explain">Your User Name is your identity on Peek.To</string>
     <string name="display_name_hint">User Name</string>
     <string name="what_is_your_birthday">What is your Birthday?</string>
     <string name="date_of_birth_explain">Just making sure you are\nold enough to peek :)</string>
@@ -196,7 +196,7 @@
 
     <!-- Walkthrough -->
     <string name="walkthrough01">
-        <b>TakeAPeek</b>
+        <b>Peek.To</b>
         lets you see what\npeople are doing right now,\nin places you care about
     </string>
     <string name="walkthrough02">Peek short clips that\nwere created in the last hour</string>
@@ -224,7 +224,7 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_of_service">Terms of Service</string>
     <string name="licenses">Licenses</string>
-    <string name="share_text">Check out TakeAPeek!</string>
+    <string name="share_text">Check out Peek.To!</string>
     <string name="error_no_share_apps">Could not find an app to share with.</string>
 
     <!-- Settings -->
