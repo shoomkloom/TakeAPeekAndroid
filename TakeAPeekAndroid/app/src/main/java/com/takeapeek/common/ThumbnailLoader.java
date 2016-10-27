@@ -85,7 +85,6 @@ public class ThumbnailLoader
         private TakeAPeekObject mTakeAPeekObject = null;
         private final WeakReference<ImageView> mImageViewReference;
         private Context mContext = null;
-        private Transport mTransport = new Transport();
 
         public ThumbnailCreatorTask(Context activity, ImageView imageView)
         {
@@ -117,7 +116,7 @@ public class ThumbnailLoader
                     String accountUsername = Helper.GetTakeAPeekAccountUsername(mContext);
                     String accountPassword = Helper.GetTakeAPeekAccountPassword(mContext);
 
-                    mTransport.GetPeekThumbnail(mContext, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
+                    new Transport().GetPeekThumbnail(mContext, accountUsername, accountPassword, mTakeAPeekObject.TakeAPeekID);
 
                     thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath, mBitmapFactoryOptions);
                 }

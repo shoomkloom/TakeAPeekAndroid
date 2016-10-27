@@ -95,7 +95,7 @@ public class Helper
 	static private ReentrantLock lockProfileData = new ReentrantLock();
 	static ReentrantLock lockTakeAPeekContactData = new ReentrantLock();
 	
-	static public ReentrantLock lockHTTPRequest = new ReentrantLock();
+	//@@static public ReentrantLock lockHTTPRequest = new ReentrantLock();
 	static public ReentrantLock lockProfilePicture = new ReentrantLock();
 	static public ReentrantLock lockNotifications = new ReentrantLock();
 	static public ReentrantLock lockContactPicture = new ReentrantLock();
@@ -535,7 +535,8 @@ public class Helper
 		
 		return showUploadDirectoryPath;
 	}
-	
+
+/*@@
 	static public void SaveBitmapToProfileImage(Context context, Bitmap bitmap) throws FileNotFoundException, IOException
 	{
 		logger.debug("SaveBitmapToProfileImage(.) Invoked - before lock");
@@ -555,6 +556,7 @@ public class Helper
 			logger.debug("SaveBitmapToProfileImage(.) - after unlock");
 		}
 	}
+@@*/
 
     static public Bitmap GetSizedBitmapFromResource(Context context, SharedPreferences sharedPreferences, int resourceId, String sizedBitmapPath, int widthInDip, int heightInDip)
     {
@@ -603,7 +605,8 @@ public class Helper
 
         return sizedBitmap;
     }
-	
+
+/*@@
 	static public Bitmap CreateThumbnailBitmap(Context context, SharedPreferences sharedPreferences, String contactBitmapPath, String takeAPeekContactThumbnailPath, int likes, int widthInDip, int heightInDip)
 	{
 		logger.debug("CreateThumbnailBitmap(......) with TakeAPeekContactUpdate Invoked - before lock");
@@ -673,6 +676,7 @@ public class Helper
         
         return takeAPeekContactThumbnail;
 	}
+@@*/
 	
 	static public  void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force) throws Exception
 	{
@@ -3216,15 +3220,18 @@ public class Helper
         	switch(fontTypeEnum)
         	{
 	        	case boldFont:
-	        		textView.setTypeface(getBoldFont(context));
-	        		break;
+	        		//@@textView.setTypeface(getBoldFont(context));
+                    textView.setTypeface(null, Typeface.BOLD);
+                    break;
 	        		
 	        	case lightFont:
-	        		textView.setTypeface(getLightFont(context));
+	        		//@@textView.setTypeface(getLightFont(context));
+                    textView.setTypeface(null, Typeface.NORMAL);
 	        		break;
 	        		
 	        	default:
-	        		textView.setTypeface(getNormalFont(context));
+	        		//@@textView.setTypeface(getNormalFont(context));
+                    textView.setTypeface(null, Typeface.NORMAL);
 	        		break;
         	}
         }

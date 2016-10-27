@@ -253,6 +253,7 @@ public class SyncAdapterHelper implements Runnable,
 	}
 @@*/
 
+/*@@
 	private void UploadChangedProfileImage() throws Exception
 	{
 		logger.debug("UploadChangedProfileImage() Invoked");
@@ -287,6 +288,7 @@ public class SyncAdapterHelper implements Runnable,
 			Helper.Error(logger, "EXCEPTION: Inside UploadChangedProfileImage", e);
 		}
 	}
+@@*/
 
     @Override
     public void onConnected(Bundle bundle)
