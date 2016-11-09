@@ -72,7 +72,10 @@ public class MainUI
         logger.info("    relative_orientation = " + relative_orientation);
 
 		int ui_rotation = (360 - relative_orientation) % 360;
-		main_activity.getPreview().setUIRotation(ui_rotation);
+        if(main_activity.getPreview() != null)
+        {
+            main_activity.getPreview().setUIRotation(ui_rotation);
+        }
 		int align_left = RelativeLayout.ALIGN_LEFT;
 		int align_right = RelativeLayout.ALIGN_RIGHT;
 		//int align_top = RelativeLayout.ALIGN_TOP;

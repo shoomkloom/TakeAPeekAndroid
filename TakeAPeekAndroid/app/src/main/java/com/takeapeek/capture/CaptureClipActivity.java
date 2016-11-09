@@ -233,6 +233,7 @@ public class CaptureClipActivity extends Activity implements
 		// determine whether we support Camera2 API
 		initCamera2Support();
 
+/*@@@*/
 		// set up window flags for normal operation
         setWindowFlagsForCamera();
 
@@ -287,7 +288,7 @@ public class CaptureClipActivity extends Activity implements
 				CaptureClipActivity.this.mainUI.onOrientationChanged(orientation);
 			}
         };
-
+/*@@@*/
 /*@@
 		// listen for gestures
         gestureDetector = new GestureDetector(this, new MyGestureDetector());
@@ -851,16 +852,29 @@ public class CaptureClipActivity extends Activity implements
         // Note that we do it here rather than customising the theme's android:windowBackground, so this doesn't affect other views - in particular, the MyPreferenceFragment settings
 		getWindow().getDecorView().getRootView().setBackgroundColor(Color.BLACK);
 
-        mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(magneticListener, mSensorMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
-        orientationEventListener.enable();
+        if(mSensorManager != null)
+        {
+            mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            mSensorManager.registerListener(magneticListener, mSensorMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        if(orientationEventListener != null)
+        {
+            orientationEventListener.enable();
+        }
 
         //@@initSpeechRecognizer();
         initSound();
 
-		mainUI.layoutUI();
+        if(mainUI != null)
+        {
+            mainUI.layoutUI();
+        }
 
-		preview.onResume();
+        if(preview != null)
+        {
+            preview.onResume();
+        }
     }
 	
 	@Override
@@ -1939,7 +1953,10 @@ public class CaptureClipActivity extends Activity implements
 
 		//@@closePopup();
 
-    	this.preview.takePicturePressed();
+        if(preview != null)
+        {
+            preview.takePicturePressed();
+        }
     }
 
 /*@@
@@ -3035,7 +3052,7 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("FlashOff() Invoked.");
 
-        if(preview.supportsFlash() == true)
+        if(preview != null && preview.supportsFlash() == true)
         {
             preview.updateFlash("flash_auto");
             mImageviewFlash.setImageResource(R.drawable.flash);

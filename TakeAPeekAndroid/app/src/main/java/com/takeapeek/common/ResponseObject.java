@@ -22,6 +22,8 @@ public class ResponseObject
 
     public ArrayList<TakeAPeekObject> peeks;
 
+    public String peekMP4StreamingURL;
+
     public ArrayList<TakeAPeekRelation> relations;
 
     public ArrayList<TrendingPlaceObject> trendingPlaces;

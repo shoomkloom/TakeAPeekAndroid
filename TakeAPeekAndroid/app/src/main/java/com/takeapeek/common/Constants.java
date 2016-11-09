@@ -185,7 +185,7 @@ public class Constants
     //flags in preferences
     public static final String PROFILE_DETAILS_CHANGED = "ProfileDetailsChanged";
     public static final String PROFILE_APPVERSION = "ProfileAppVersion";
-    public static final String VERIFICATION_SMS_PREFIX = "TakeAPeek code: ";
+    public static final String VERIFICATION_SMS_PREFIX = "Peek.To code: ";
     public static final String COUNTRY_PREFIX_CODE = "CountryPrefixCode";
     public static final String NUMBER_OF_APPEARANCES = "NumberOfAppearnces";
     public static final String NUMBER_OF_LIKES_TYPE1 = "NumberOfLikesType1";

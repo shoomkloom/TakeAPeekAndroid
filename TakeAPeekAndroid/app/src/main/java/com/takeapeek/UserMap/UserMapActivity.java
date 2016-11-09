@@ -468,14 +468,16 @@ public class UserMapActivity extends FragmentActivity implements
             }
             else
             {
-                mTextViewNumNewNotifications.setVisibility(View.GONE);
+                if(mTextViewNumNewNotifications != null)
+                {
+                    mTextViewNumNewNotifications.setVisibility(View.GONE);
+                }
             }
         }
         catch(Exception e)
         {
             Helper.Error(logger, "EXCEPTION: When trying to get number of new Notifications", e);
         }
-
     }
 
     @Override

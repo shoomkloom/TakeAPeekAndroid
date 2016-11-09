@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,9 +16,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -81,7 +85,8 @@ public class UserFeedActivity extends AppCompatActivity
         list,
         emptyList,
         previewLoading,
-        previewPlaying,
+        previewPlayingStream,
+        previewPlayingFile,
         previewStopped
     }
 
@@ -323,14 +328,28 @@ public class UserFeedActivity extends AppCompatActivity
     {
         logger.debug("ShowPeek(..) Invoked");
 
-        mCurrentTakeAPeekObject = takeAPeekObject;
-
         mEnumActivityState = EnumActivityState.previewLoading;
         UpdateUI();
 
         mThumbnailLoader.SetThumbnail(this, -1, takeAPeekObject, mImageViewPeekThumbnail, mSharedPreferences);
 
-        //Play the video, download if required
+        mCurrentTakeAPeekObject = takeAPeekObject;
+        String peekMP4StreamingURLStr = mCurrentTakeAPeekObject.PeekMP4StreamingURL;
+
+        if(fromHandler == true || peekMP4StreamingURLStr == null)
+        {
+            ShowPeekFile(fromHandler, takeAPeekObject);
+        }
+        else
+        {
+            ShowPeekStream(fromHandler, takeAPeekObject);
+        }
+    }
+
+    public void ShowPeekFile(boolean fromHandler, final TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("ShowPeekFile(..) Invoked");
+
         try
         {
             String peekFilePath = Helper.GetVideoPeekFilePath(this, takeAPeekObject.TakeAPeekID);
@@ -419,7 +438,7 @@ public class UserFeedActivity extends AppCompatActivity
                 }
             });
 
-            mEnumActivityState = EnumActivityState.previewPlaying;
+            mEnumActivityState = EnumActivityState.previewPlayingFile;
             UpdateUI();
 
             mVideoViewPeekItem.setVideoPath(peekFilePath);
@@ -435,6 +454,125 @@ public class UserFeedActivity extends AppCompatActivity
 
             Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
             Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+        }
+    }
+
+    public void ShowPeekStream(boolean fromHandler, final TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("ShowPeekStream(..) Invoked");
+
+        // Start the MediaController
+        final MediaController mediacontroller = new MediaController(this, false);
+        mediacontroller.setAnchorView(mVideoViewPeekItem);
+
+        //Play the video from stream
+        try
+        {
+            mVideoViewPeekItem.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
+            {
+                @Override
+                public void onPrepared(MediaPlayer mp)
+                {
+                    logger.debug("MediaPlayer.OnPreparedListener:onPrepared(.) Invoked");
+
+                    StyleMediaController(mediacontroller);
+                    //@@mediacontroller.show(0);
+
+                    //Start the video play time display
+                    mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
+
+                    Helper.SetFullscreen(mVideoViewPeekItem);
+                }
+            });
+
+            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+            {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
+
+                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
+                    Helper.ClearFullscreen(mVideoViewPeekItem);
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+                }
+            });
+
+            mVideoViewPeekItem.setOnErrorListener(new MediaPlayer.OnErrorListener()
+            {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra)
+                {
+                    logger.error("MediaPlayer.OnErrorListener:onError(...) Invoked");
+
+                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
+                    Helper.ClearFullscreen(mVideoViewPeekItem);
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+
+                    Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
+                    Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%d, %d)", getString(R.string.error_playing_peek), what, extra));
+
+                    return true;
+                }
+            });
+
+//@@            Helper.ClearFullscreen(mVideoViewPeekItem);
+
+            mEnumActivityState = EnumActivityState.previewPlayingStream;
+            UpdateUI();
+
+            // Get the URL from String VideoURL
+            Uri url = Uri.parse(mCurrentTakeAPeekObject.PeekMP4StreamingURL);
+            mVideoViewPeekItem.setMediaController(mediacontroller);
+            mVideoViewPeekItem.setVideoURI(url);
+            mVideoViewPeekItem.requestFocus();
+
+            mVideoViewPeekItem.start();
+        }
+        catch (Exception e)
+        {
+            Helper.ClearFullscreen(mVideoViewPeekItem);
+
+            Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
+            Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+        }
+    }
+
+    private void StyleMediaController(View view)
+    {
+        logger.debug("StyleMediaController(.) Invoked");
+
+        if (view instanceof MediaController)
+        {
+            MediaController v = (MediaController) view;
+            for(int i = 0; i < v.getChildCount(); i++)
+            {
+                StyleMediaController(v.getChildAt(i));
+            }
+        }
+        else if (view instanceof LinearLayout)
+        {
+            LinearLayout ll = (LinearLayout) view;
+            for(int i = 0; i < ll.getChildCount(); i++)
+            {
+                StyleMediaController(ll.getChildAt(i));
+            }
+        }
+        else if (view instanceof SeekBar)
+        {
+            ((SeekBar) view).setEnabled(false);
+            //@@((SeekBar) view).setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
+            //@@((SeekBar) view).setThumb(getResources().getDrawable(R.drawable.progresshandle));
+        }
+        else if (view instanceof ImageView || view instanceof TextView)
+        {
+            view.setVisibility(View.GONE);
         }
     }
 
@@ -618,7 +756,30 @@ public class UserFeedActivity extends AppCompatActivity
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
                 break;
 
-            case previewPlaying:
+            case previewPlayingStream:
+                mTopBar.setVisibility(View.GONE);
+                mImageViewProgressAnimation.setVisibility(View.GONE);
+                mAnimationDrawableProgressAnimation.stop();
+
+                mListViewFeedList.setVisibility(View.GONE);
+                mTextViewEmptyList.setVisibility(View.GONE);
+
+                mImageViewPeekThumbnail.setVisibility(View.GONE);
+                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
+                mImageViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setVisibility(View.GONE);
+                mTextViewPeekVideoProgress.setText("");
+                mAnimationDrawableVideoProgressAnimation.stop();
+
+                mVideoViewPeekItem.setVisibility(View.VISIBLE);
+                mVideoTime.setVisibility(View.VISIBLE);
+                mVideoProgressBar.setVisibility(View.GONE);
+                mImageViewPeekClose.setVisibility(View.GONE);
+
+                findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
+                break;
+
+            case previewPlayingFile:
                 mTopBar.setVisibility(View.GONE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();

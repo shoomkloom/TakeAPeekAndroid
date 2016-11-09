@@ -1,5 +1,5 @@
 #
-# generated on 2016/09/26 10:04:31
+# generated on 2016/11/08 09:20:38
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -107,6 +107,10 @@ columnName=RelatedProfileID
 # --field-start--
 fieldName=Title
 columnName=Title
+# --field-end--
+# --field-start--
+fieldName=PeekMP4StreamingURL
+columnName=PeekMP4StreamingURL
 # --field-end--
 # --table-fields-end--
 # --table-end--

@@ -3859,7 +3859,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		try
         {
 			video_method = applicationInterface.createOutputVideoMethod();
-            Helper.Error(logger, "video_method? " + video_method);
+            logger.info("video_method? " + video_method);
     		if( video_method == ApplicationInterface.VIDEOMETHOD_FILE )
             {
     			File videoFile = applicationInterface.createOutputVideoFile();

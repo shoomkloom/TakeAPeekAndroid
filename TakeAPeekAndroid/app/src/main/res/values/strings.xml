@@ -51,6 +51,8 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+    <string name="age_restriction_title">Age Restriction</string>
+    <string name="age_restriction_message">You must be atleast 13 years old to use Peek.To.</string>
 
     <!-- Create Account -->
     <string name="create_account_activity_title">Create Peek.To Account</string>

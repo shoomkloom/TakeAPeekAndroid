@@ -448,7 +448,7 @@ public class Transport
 
         //@@lock.lock();
 
-        String requestStr = null;
+        String responseStr = null;
 
         try
         {
@@ -461,7 +461,7 @@ public class Transport
             nameValuePairs.add(new NameValuePair("password", password));
             nameValuePairs.add(new NameValuePair("peek_id", peekId));
 
-            requestStr = GetRequestUrl(nameValuePairs);
+            responseStr = GetRequestUrl(nameValuePairs);
         }
         finally
         {
@@ -469,7 +469,7 @@ public class Transport
             logger.debug("GetPeekVideoStreamURL(......) - after unlock");
         }
 
-        return requestStr;
+        return responseStr;
     }
 
     public void GetPeek(Context context, String username, String password, String peekId, Handler downloadProgressHandler) throws Exception
@@ -500,6 +500,34 @@ public class Transport
         {
             //@@lock.unlock();
             logger.debug("GetPeek(......) - after unlock");
+        }
+    }
+
+    public String GetPeekMP4StreamingURL(Context context, String username, String password, String peekId, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetPeekMP4StreamingURL(......) Invoked - before lock");
+
+        //@@lock.lock();
+
+        try
+        {
+            logger.debug("GetPeekMP4StreamingURL(.....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_peek_mp4_streaming_url"));
+            nameValuePairs.add(new NameValuePair("user_name", username));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peek_id", peekId));
+
+            ResponseObject responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+
+            return responseObject.peekMP4StreamingURL;
+        }
+        finally
+        {
+            //@@lock.unlock();
+            logger.debug("GetPeekMP4StreamingURL(......) - after unlock");
         }
     }
 

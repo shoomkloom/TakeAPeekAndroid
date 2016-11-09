@@ -83,6 +83,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -738,6 +739,21 @@ public class Helper
 		
 		return responseTakeAPeekPhotoFilePath;
 	}
+
+    static public int GetDiffYears(Calendar first, Calendar last)
+    {
+        logger.debug("GetDiffYears(..) Invoked");
+
+        int diff = last.get(Calendar.YEAR) - first.get(Calendar.YEAR);
+
+        if (first.get(Calendar.MONTH) > last.get(Calendar.MONTH) ||
+            (first.get(Calendar.MONTH) == last.get(Calendar.MONTH) && first.get(Calendar.DATE) > last.get(Calendar.DATE)))
+        {
+            diff--;
+        }
+
+        return diff;
+    }
 	
 	static public void DownloadProfileImage(Context context, String accountUserName, String accountPassword, ProfileObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
 	{
@@ -3134,7 +3150,7 @@ public class Helper
         // doesn't resize when the system bars hide and show.
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        //@@| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                         | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar

@@ -47,4 +47,7 @@ public class TakeAPeekObject
 
     @DatabaseField(columnName = "Title")
     public String Title = null;
+
+    @DatabaseField(columnName = "PeekMP4StreamingURL")
+    public String PeekMP4StreamingURL;
 }
