@@ -28,7 +28,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -49,6 +48,7 @@ import com.takeapeek.common.Helper;
 import com.takeapeek.common.Helper.FontTypeEnum;
 import com.takeapeek.common.PhoneNumberFormattingTextWatcher;
 import com.takeapeek.common.ResponseObject;
+import com.takeapeek.common.TAPDatePicker;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 
@@ -1359,7 +1359,8 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                     TextView datePickerDialogTitle = (TextView)datePickerDialog.findViewById(R.id.textview_title);
                     Helper.setTypeface(AuthenticatorActivity.this, datePickerDialogTitle, FontTypeEnum.boldFont);
 
-                    DatePicker datePicker = (DatePicker) datePickerDialog.findViewById(R.id.datepicker);
+                    TAPDatePicker datePicker = (TAPDatePicker) datePickerDialog.findViewById(R.id.datepicker);
+                    datePicker.setStyle(null);
                     datePicker.updateDate(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
 
                     TextView datePickerDialogButtonOK = (TextView)datePickerDialog.findViewById(R.id.textview_button_ok);
@@ -1369,9 +1370,11 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                         @Override
                         public void onClick(View v)
                         {
-                            DatePicker datePicker = (DatePicker) datePickerDialog.findViewById(R.id.datepicker);
-                            OnDOBSelected(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-                            datePickerDialog.dismiss();
+                            TAPDatePicker datePicker = (TAPDatePicker) datePickerDialog.findViewById(R.id.datepicker);
+                            if(OnDOBSelected(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth()))
+                            {
+                                datePickerDialog.dismiss();
+                            }
                         }
                     });
 
@@ -1403,11 +1406,38 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
         } 
     };
 
-    private void OnDOBSelected(int year, int monthOfYear, int dayOfMonth)
+    private boolean OnDOBSelected(int year, int monthOfYear, int dayOfMonth)
     {
         mCalendar.set(Calendar.YEAR, year);
         mCalendar.set(Calendar.MONTH, monthOfYear);
         mCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+        //Check for appropriate age
+        if(Helper.GetDiffYears(mCalendar, Calendar.getInstance()) < 13)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            // set title
+            alertDialogBuilder.setTitle(R.string.age_restriction_title);
+
+            // set dialog message
+            alertDialogBuilder
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setMessage(R.string.age_restriction_message)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog,int id)
+                        {
+                            dialog.dismiss();
+                        }
+                    });
+
+            // create and show alert dialog
+            alertDialogBuilder.create().show();
+
+            return false;
+        }
 
         new AsyncTask<Void, Void, ResponseObject>()
         {
@@ -1443,11 +1473,11 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                     Helper.Error(logger, "responseObject = null when trying set date of birth");
                 }
 
-                //@@This is where we can check for appropriate age
-
                 UpdateDOBTextView();
             }
         }.execute();
+
+        return true;
     }
 
     private void UpdateDOBTextView()

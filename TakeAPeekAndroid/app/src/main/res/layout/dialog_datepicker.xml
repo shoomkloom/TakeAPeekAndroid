@@ -31,7 +31,7 @@
         android:orientation="vertical"
         android:background="@color/tap_white">
 
-        <DatePicker
+        <com.takeapeek.common.TAPDatePicker
             android:id="@+id/datepicker"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
