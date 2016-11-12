@@ -9,6 +9,7 @@
     <string name="Exit">Exit</string>
     <string name="error_play_services">No Google Play Services available, Peek.To cannot operate.</string>
     <string name="error_download_peek">Could not download the peek right now. Please try again later.</string>
+    <string name="error_permissions">Peek.To needs all permissions to work properly. Please Allow all permissions.</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

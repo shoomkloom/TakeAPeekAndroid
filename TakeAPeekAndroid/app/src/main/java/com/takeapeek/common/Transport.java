@@ -78,8 +78,8 @@ public class Transport
 		{
 			logger.debug("CreateProfile(..) - inside lock");
 			
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();  
-	
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
 			nameValuePairs.add(new NameValuePair("action_type", "create_profile"));
 			//@@nameValuePairs.add(new NameValuePair("action_type", "create_profile_nosms"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
