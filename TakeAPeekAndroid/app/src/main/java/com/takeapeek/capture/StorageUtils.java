@@ -74,12 +74,24 @@ public class StorageUtils
 		last_media_scanned = null;
 	}
 
+    /** Sends the intents to announce the new file to other Android applications. E.g., cloud storage applications like
+     *  OwnCloud use this to listen for new photos/videos to automatically upload.
+     *  Note that on Android 7 onwards, these broadcasts are deprecated and won't have any effect - see:
+     *  https://developer.android.com/reference/android/hardware/Camera.html#ACTION_NEW_PICTURE
+     *  Listeners like OwnCloud should instead be using
+     *  https://developer.android.com/reference/android/app/job/JobInfo.Builder.html#addTriggerContentUri(android.app.job.JobInfo.TriggerContentUri)
+     *  See https://github.com/owncloud/android/issues/1675 for OwnCloud's discussion on this.
+     */
 	void announceUri(Uri uri, boolean is_new_picture, boolean is_new_video)
     {
         logger.debug("announceUri(...) Invoked.");
 
 		logger.info("announceUri: " + uri);
-    	if( is_new_picture )
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.N )
+        {
+            // see note above; the intents won't be delivered, so might as well save the trouble of trying to send them
+        }
+        else if( is_new_picture )
         {
     		// note, we reference the string directly rather than via Camera.ACTION_NEW_PICTURE, as the latter class is now deprecated - but we still need to broadcast the string for other apps
     		context.sendBroadcast(new Intent( "android.hardware.action.NEW_PICTURE" , uri));
@@ -119,7 +131,16 @@ public class StorageUtils
     		context.sendBroadcast(new Intent("android.hardware.action.NEW_VIDEO", uri));
     	}
 	}
-	
+
+    /** Sends a "broadcast" for the new file. This is necessary so that Android recognises the new file without needing a reboot:
+     *  - So that they show up when connected to a PC using MTP.
+     *  - For JPEGs, so that they show up in gallery applications.
+     *  - This also calls announceUri() on the resultant Uri for the new file.
+     *  - Note this should also be called after deleting a file.
+     *  - Note that for DNG files, MediaScannerConnection.scanFile() doesn't result in the files being shown in gallery applications.
+     *    This may well be intentional, since most gallery applications won't read DNG files anyway. But it's still important to
+     *    call this function for DNGs, so that they show up on MTP.
+     */
     public void broadcastFile(final File file, final boolean is_new_picture, final boolean is_new_video, final boolean set_last_scanned)
     {
         logger.debug("broadcastFile(....) Invoked.");
@@ -357,8 +378,8 @@ public class StorageUtils
 
 		return file;
 	}
-	
-	private String createMediaFilename(int type, int count, String extension, Date current_date)
+
+    private String createMediaFilename(int type, String suffix, int count, String extension, Date current_date)
     {
         logger.debug("createMediaFilename(....) Invoked.");
 
@@ -383,12 +404,12 @@ public class StorageUtils
         if( type == MEDIA_TYPE_IMAGE )
         {
     		String prefix = mSharedPreferences.getString(PreferenceKeys.getSavePhotoPrefixPreferenceKey(), "IMG_");
-    		mediaFilename = prefix + timeStamp + index + "." + extension;
+            mediaFilename = prefix + timeStamp + suffix + index + "." + extension;
         }
         else if( type == MEDIA_TYPE_VIDEO )
         {
     		String prefix = mSharedPreferences.getString(PreferenceKeys.getSaveVideoPrefixPreferenceKey(), "VID_");
-    		mediaFilename = prefix + timeStamp + index + "." + extension;
+            mediaFilename = prefix + timeStamp + suffix + index + "." + extension;
         }
         else
         {
@@ -401,7 +422,7 @@ public class StorageUtils
     
     // only valid if !isUsingSAF()
     @SuppressLint("SimpleDateFormat")
-	File createOutputMediaFile(int type, String extension, Date current_date) throws IOException
+    File createOutputMediaFile(int type, String suffix, String extension, Date current_date) throws IOException
     {
         logger.debug("createOutputMediaFile(...) Invoked.");
 
@@ -422,7 +443,7 @@ public class StorageUtils
         File mediaFile = null;
         for(int count=0;count<100;count++)
         {
-        	String mediaFilename = createMediaFilename(type, count, extension, current_date);
+            String mediaFilename = createMediaFilename(type, suffix, count, extension, current_date);
             mediaFile = new File(mediaStorageDir.getPath() + File.separator + mediaFilename);
             if( !mediaFile.exists() )
             {
@@ -441,7 +462,7 @@ public class StorageUtils
 
     // only valid if isUsingSAF()
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    Uri createOutputMediaFileSAF(int type, String extension, Date current_date) throws IOException
+    Uri createOutputMediaFileSAF(int type, String suffix, String extension, Date current_date) throws IOException
     {
         logger.debug("createOutputMediaFileSAF(...) Invoked.");
 
@@ -473,7 +494,7 @@ public class StorageUtils
 	        	throw new RuntimeException();
 	        }
 	        // note that DocumentsContract.createDocument will automatically append to the filename if it already exists
-	        String mediaFilename = createMediaFilename(type, 0, extension, current_date);
+            String mediaFilename = createMediaFilename(type, suffix, 0, extension, current_date);
 		    Uri fileUri = DocumentsContract.createDocument(context.getContentResolver(), docUri, mimeType, mediaFilename);   
 	    	logger.info("returned fileUri: " + fileUri);
 			if( fileUri == null )
@@ -515,10 +536,10 @@ public class StorageUtils
 		logger.info("getLatestMedia: " + (video ? "video" : "images"));
 		if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED )
         {
-			// needed for Android 6, in case users deny storage permission, otherwise we get java.lang.SecurityException from ContentResolver.query()
-			// see https://developer.android.com/training/permissions/requesting.html
-			// currently we don't bother requesting the permission, as still using targetSdkVersion 22
-			// we restrict check to Android 6 or later just in case, see note in LocationSupplier.setupLocationListener()
+            // needed for Android 6, in case users deny storage permission, otherwise we get java.lang.SecurityException from ContentResolver.query()
+            // see https://developer.android.com/training/permissions/requesting.html
+            // we now request storage permission before opening the camera, but keep this here just in case
+            // we restrict check to Android 6 or later just in case, see note in LocationSupplier.setupLocationListener()
 			Helper.Error(logger, "don't have READ_EXTERNAL_STORAGE permission");
 			return null;
 		}

@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /** Provides support using Android's original camera API
  *  android.hardware.Camera.
@@ -32,13 +31,20 @@ public class CameraController1 extends CameraController
     private int display_orientation = 0;
     private Camera.CameraInfo camera_info = new Camera.CameraInfo();
 	private String iso_key = null;
+    private ErrorCallback camera_error_cb = null;
 
-	public CameraController1(int cameraId) throws com.takeapeek.capture.CameraController.CameraControllerException
+    /** Opens the camera device.
+     * @param cameraId Which camera to open (must be between 0 and CameraControllerManager1.getNumberOfCameras()-1).
+     * @param camera_error_cb onError() will be called if the camera closes due to serious error. No more calls to the CameraController1 object should be made (though a new one can be created, to try reopening the camera).
+     * @throws CameraControllerException if the camera device fails to open.
+     */
+    public CameraController1(int cameraId, final ErrorCallback camera_error_cb) throws CameraControllerException
     {
 		super(cameraId);
         logger.debug("CameraController1(.) Invoked");
         logger.info("create new CameraController1: " + cameraId);
 
+        this.camera_error_cb = camera_error_cb;
 		try
         {
 			camera = Camera.open(cameraId);
@@ -78,11 +84,12 @@ public class CameraController1 extends CameraController
 	    	parameters.set("cam_mode", 1);
 	    	setCameraParameters(parameters);
 		}*/
-		
-		camera.setErrorCallback(new CameraErrorCallback());
+
+        final CameraErrorCallback camera_error_callback = new CameraErrorCallback();
+        camera.setErrorCallback(camera_error_callback);
 	}
 	
-	private static class CameraErrorCallback implements Camera.ErrorCallback
+	private class CameraErrorCallback implements Camera.ErrorCallback
     {
 		@Override
 		public void onError(int error, Camera camera)
@@ -95,6 +102,11 @@ public class CameraController1 extends CameraController
 			if( error == android.hardware.Camera.CAMERA_ERROR_SERVER_DIED )
             {
                 Helper.Error(logger, "    CAMERA_ERROR_SERVER_DIED");
+
+                CameraController1.this.camera.release();
+                CameraController1.this.camera = null;
+                // need to communicate the problem to the application
+                CameraController1.this.camera_error_cb.onError();
 			}
 			else if( error == android.hardware.Camera.CAMERA_ERROR_UNKNOWN  )
             {
@@ -148,7 +160,7 @@ public class CameraController1 extends CameraController
     {
         logger.debug("convertFlashModesToValues(.) Invoked");
 
-		List<String> output_modes = new Vector<String>();
+		List<String> output_modes = new ArrayList<String>();
 
 		if( supported_flash_modes != null )
         {
@@ -179,6 +191,29 @@ public class CameraController1 extends CameraController
                 logger.info("supports flash_red_eye");
 			}
 		}
+
+        // Samsung Galaxy S7 at least for front camera has supported_flash_modes: auto, beach, portrait?!
+        // so rather than checking supported_flash_modes, we should check output_modes here
+        // this is always why we check whether the size is greater than 1, rather than 0 (this also matches
+        // the check we do in Preview.setupCameraParameters()).
+        if( output_modes.size() > 1 )
+        {
+        }
+        else
+        {
+            if( isFrontFacing() )
+            {
+                output_modes.clear(); // clear any pre-existing mode (see note above about Samsung Galaxy S7)
+                output_modes.add("flash_off");
+                output_modes.add("flash_frontscreen_on");
+            }
+            else
+            {
+                // probably best to not return any modes, rather than one mode (see note about about Samsung Galaxy S7)
+                output_modes.clear();
+            }
+        }
+
 		return output_modes;
 	}
 
@@ -186,7 +221,7 @@ public class CameraController1 extends CameraController
     {
         logger.debug("convertFocusModesToValues(.) Invoked");
 
-		List<String> output_modes = new Vector<String>();
+		List<String> output_modes = new ArrayList<String>();
 
 		if( supported_focus_modes != null )
         {
@@ -351,7 +386,7 @@ public class CameraController1 extends CameraController
         logger.debug("getDefaultExposureTime() Invoked");
 
 		// not supported for CameraController1
-		return 0l;
+		return 0L;
 	}
 
 	// important, from docs:
@@ -479,11 +514,11 @@ public class CameraController1 extends CameraController
 			// split shouldn't return null
 			if( isos_array.length > 0 )
             {
-				values = new ArrayList<String>();				
-				for(int i=0;i< isos_array.length;i++)
+                values = new ArrayList<>();
+                for(String iso : isos_array)
                 {
-					values.add(isos_array[i]);
-				}
+                    values.add(iso);
+                }
 			}
 		}
 
@@ -494,9 +529,16 @@ public class CameraController1 extends CameraController
 			if( parameters.get(iso_key) == null )
             {
 				iso_key = "nv-picture-iso"; // LG dual P990
-				if( parameters.get(iso_key) == null )
+                if( parameters.get(iso_key) == null )
                 {
-                    iso_key = null; // not supported
+                    if ( Build.MODEL.contains("Z00") )
+                    {
+                        iso_key = "iso"; // Asus Zenfone 2 Z00A and Z008: see https://sourceforge.net/p/opencamera/tickets/183/
+                    }
+                    else
+                    {
+                        iso_key = null; // not supported
+                    }
                 }
 			}
 		}
@@ -534,6 +576,7 @@ public class CameraController1 extends CameraController
 				// set a default for some devices which have an iso_key, but don't give a list of supported ISOs
 				values = new ArrayList<String>();
 				values.add("auto");
+                values.add("50");
 				values.add("100");
 				values.add("200");
 				values.add("400");
@@ -586,7 +629,7 @@ public class CameraController1 extends CameraController
         logger.debug("getExposureTime() Invoked");
 
 		// not supported for CameraController1
-		return 0l;
+		return 0L;
 	}
 
 	@Override
@@ -643,6 +686,26 @@ public class CameraController1 extends CameraController
         logger.info("new preview size: " + parameters.getPreviewSize().width + ", " + parameters.getPreviewSize().height);
 
     	setCameraParameters(parameters);
+    }
+
+    @Override
+    public void setExpoBracketing(boolean want_expo_bracketing) {
+        // not supported for CameraController1
+    }
+
+    @Override
+    public void setExpoBracketingNImages(int n_images) {
+        // not supported for CameraController1
+    }
+
+    @Override
+    public void setExpoBracketingStops(double stops) {
+        // not supported for CameraController1
+    }
+
+    @Override
+    public void setUseExpoFastBurst(boolean use_expo_fast_burst) {
+        // not supported for CameraController1
     }
 	
 	@Override
@@ -1450,9 +1513,9 @@ public class CameraController1 extends CameraController
         }
 	}
 	
-	public void takePicture(final CameraController.PictureCallback picture, final ErrorCallback error)
+	public void takePictureNow(final CameraController.PictureCallback picture, final ErrorCallback error)
     {
-        logger.debug("takePicture(..) Invoked");
+        logger.debug("takePictureNow(..) Invoked");
 
     	Camera.ShutterCallback shutter = new TakePictureShutterCallback();
         Camera.PictureCallback camera_jpeg = picture == null ? null : new Camera.PictureCallback()
@@ -1476,9 +1539,35 @@ public class CameraController1 extends CameraController
 			error.onError();
 		}
 	}
+
+    public void takePicture(final CameraController.PictureCallback picture, final ErrorCallback error)
+    {
+/*@@
+        if( frontscreen_flash ) {
+            if( MyDebug.LOG )
+                Log.d(TAG, "front screen flash");
+            picture.onFrontScreenTurnOn();
+            // take picture after a delay, to allow autoexposure and autofocus to update (unlike CameraController2, we can't tell when this happens, so we just wait for a fixed delay)
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable(){
+                @Override
+                public void run(){
+                    if( MyDebug.LOG )
+                        Log.d(TAG, "take picture after delay for front screen flash");
+                    if( camera != null ) { // make sure camera wasn't released in the meantime
+                        takePictureNow(picture, error);
+                    }
+                }
+            }, 1000);
+            return;
+        }
+@@*/
+        takePictureNow(picture, error);
+    }
 	
 	public void setDisplayOrientation(int degrees)
     {
+        // rest of code from http://developer.android.com/reference/android/hardware/Camera.html#setDisplayOrientation(int)
         logger.debug("setDisplayOrientation(.) Invoked");
 
 	    int result = 0;

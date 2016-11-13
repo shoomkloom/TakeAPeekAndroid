@@ -27,13 +27,14 @@ public abstract class CameraController
 {
     static private final Logger logger = LoggerFactory.getLogger(CameraController.class);
 
-	int cameraId = 0;
+    private volatile int cameraId = 0; // must be volatile for test project reading the state
 
-	public static final long EXPOSURE_TIME_DEFAULT = 1000000000l/30;
+    public static final long EXPOSURE_TIME_DEFAULT = 1000000000L/30;
 
 	// for testing:
 	public int count_camera_parameters_exception = 0;
 	public int count_precapture_timeout = 0;
+    public boolean test_wait_capture_result = false; // whether to test delayed capture result in Camera2 API
 
 	public static class CameraFeatures
     {
@@ -54,12 +55,13 @@ public abstract class CameraController
 		public int min_iso = 0;
 		public int max_iso = 0;
 		public boolean supports_exposure_time = false;
-		public long min_exposure_time = 0l;
-		public long max_exposure_time = 0l;
+		public long min_exposure_time = 0L;
+		public long max_exposure_time = 0L;
 		public int min_exposure = 0;
 		public int max_exposure = 0;
 		public float exposure_step = 0.0f;
 		public boolean can_disable_shutter_sound = false;
+        public boolean supports_expo_bracketing = false;
 		public boolean supports_raw = false;
 	}
 
@@ -116,32 +118,40 @@ public abstract class CameraController
 	
 	public static interface FaceDetectionListener
     {
-		public abstract void onFaceDetection(Face[] faces);
+		void onFaceDetection(Face[] faces);
 	}
-	
-	public static interface PictureCallback
+
+    public interface PictureCallback
     {
-		public abstract void onCompleted(); // called after all relevant on*PictureTaken() callbacks have been called and returned
-		public abstract void onPictureTaken(byte[] data);
-		/** Only called if RAW is requested.
-		 *  Caller should call image.close() and dngCreator.close() when done with the image.
-		 */
-		public abstract void onRawPictureTaken(DngCreator dngCreator, Image image);
-	}
+        void onCompleted(); // called after all relevant on*PictureTaken() callbacks have been called and returned
+        void onPictureTaken(byte[] data);
+        /** Only called if RAW is requested.
+         *  Caller should call image.close() and dngCreator.close() when done with the image.
+         */
+        void onRawPictureTaken(DngCreator dngCreator, Image image);
+        /** Only called if burst is requested.
+         */
+        void onBurstPictureTaken(List<byte[]> images);
+        /* This is called for flash_frontscreen_auto or flash_frontscreen_on mode to indicate the caller should light up the screen
+         * (for flash_frontscreen_auto it will only be called if the scene is considered dark enough to require the screen flash).
+         * The screen flash can be removed when or after onCompleted() is called.
+         */
+        void onFrontScreenTurnOn();
+    }
 	
 	public static interface AutoFocusCallback
     {
-		public abstract void onAutoFocus(boolean success);
+		void onAutoFocus(boolean success);
 	}
 	
 	public static interface ContinuousFocusMoveCallback
     {
-		public abstract void onContinuousFocusMove(boolean start);
+		void onContinuousFocusMove(boolean start);
 	}
 	
 	public static interface ErrorCallback
     {
-		public abstract void onError();
+		void onError();
 	}
 	
 	public static class Face
@@ -197,7 +207,32 @@ public abstract class CameraController
     public abstract void setPictureSize(int width, int height);
     public abstract CameraController.Size getPreviewSize();
     public abstract void setPreviewSize(int width, int height);
+    public abstract void setExpoBracketing(boolean want_expo_bracketing);
+    /** n_images must be an odd number greater than 1.
+     */
+    public abstract void setExpoBracketingNImages(int n_images);
+    public abstract void setExpoBracketingStops(double stops);
+    public abstract void setUseExpoFastBurst(boolean use_expo_fast_burst);
 	public abstract void setRaw(boolean want_raw);
+    /**
+     * setUseCamera2FakeFlash() should be called after creating the CameraController, and before calling getCameraFeatures() or
+     * starting the preview (as it changes the available flash modes).
+     * "Fake flash" is an alternative mode for handling flash, for devices that have poor Camera2 support - typical symptoms
+     * include precapture never starting, flash not firing, photos being over or under exposed.
+     * Instead, we fake the precapture and flash simply by turning on the torch. After turning on torch, we wait for ae to stop
+     * scanning (and af too, as it can start scanning in continuous mode) - this is effectively the equivalent of precapture -
+     * before taking the photo.
+     * In auto-focus mode, we make the decision ourselves based on the current ISO.
+     * We also handle the flash firing for autofocus by turning the torch on and off too. Advantages are:
+     *   - The flash tends to be brighter, and the photo can end up overexposed as a result if capture follows the autofocus.
+     *   - Some devices also don't seem to fire flash for autofocus in Camera2 mode (e.g., Samsung S7)
+     *   - When capture follows autofocus, we need to make the same decision for firing flash for both the autofocus and the capture.
+     */
+    public void setUseCamera2FakeFlash(boolean use_fake_precapture) {
+    }
+    public boolean getUseCamera2FakeFlash() {
+        return false;
+    }
 	public abstract void setVideoStabilization(boolean enabled);
 	public abstract boolean getVideoStabilization();
 	public abstract int getJpegQuality();
@@ -246,6 +281,9 @@ public abstract class CameraController
 	public abstract void reconnect() throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract void setPreviewDisplay(SurfaceHolder holder) throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract void setPreviewTexture(SurfaceTexture texture) throws com.takeapeek.capture.CameraController.CameraControllerException;
+    /** Starts the camera preview.
+     *  @throws CameraControllerException if the camera preview fails to start.
+     */
 	public abstract void startPreview() throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract void stopPreview();
 	public abstract boolean startFaceDetection();
@@ -262,6 +300,9 @@ public abstract class CameraController
 	public abstract void initVideoRecorderPrePrepare(MediaRecorder video_recorder);
 	public abstract void initVideoRecorderPostPrepare(MediaRecorder video_recorder) throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract String getParametersString();
+    public boolean captureResultIsAEScanning() {
+        return false;
+    }
 	public boolean captureResultHasIso() {
 		return false;
 	}
@@ -274,7 +315,8 @@ public abstract class CameraController
 	public long captureResultExposureTime() {
 		return 0;
 	}
-	public boolean captureResultHasFrameDuration() {
+/*@@
+    public boolean captureResultHasFrameDuration() {
 		return false;
 	}
 	public long captureResultFrameDuration() {
@@ -289,9 +331,9 @@ public abstract class CameraController
 	public float captureResultFocusDistanceMax() {
 		return 0.0f;
 	}
-
+@@*/
 	// gets the available values of a generic mode, e.g., scene, color etc, and makes sure the requested mode is available
-	protected SupportedValues checkModeIsSupported(List<String> values, String value, String default_value)
+	SupportedValues checkModeIsSupported(List<String> values, String value, String default_value)
     {
         logger.debug("checkModeIsSupported(...) Invoked");
 

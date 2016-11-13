@@ -1169,6 +1169,17 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                 Helper.Error(logger, "test failing to open camera");
 				throw new CameraControllerException();
 			}
+            CameraController.ErrorCallback cameraErrorCallback = new CameraController.ErrorCallback()
+            {
+                public void onError()
+                {
+                    if( camera_controller != null )
+                    {
+                        camera_controller = null;
+                        //@@applicationInterface.onCameraError();
+                    }
+                }
+            };
 	        if( using_android_l )
             {
 	    		CameraController.ErrorCallback previewErrorCallback = new CameraController.ErrorCallback()
@@ -1179,10 +1190,12 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 	        			applicationInterface.onFailedStartPreview();
 	        	    }
 	    		};
-	        	camera_controller = new CameraController2(this.getContext(), cameraId, previewErrorCallback);
+	        	camera_controller = new CameraController2(this.getContext(), cameraId, previewErrorCallback, cameraErrorCallback);
 	        }
 	        else
-				camera_controller = new CameraController1(cameraId);
+            {
+                camera_controller = new CameraController1(cameraId, cameraErrorCallback);
+            }
 			//throw new CameraControllerException(); // uncomment to test camera not opening
 		}
 		catch(CameraControllerException e)
@@ -4460,6 +4473,25 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                     Helper.Error(logger, "applicationInterface.onRawPictureTaken failed");
 				}
 			}
+
+            public void onBurstPictureTaken(List<byte[]> images)
+            {
+                // n.b., this is automatically run in a different thread
+                initDate();
+
+                success = true;
+/*@@
+                if( !applicationInterface.onBurstPictureTaken(images, current_date) )
+                {
+                    success = false;
+                }
+@@*/
+            }
+
+            public void onFrontScreenTurnOn()
+            {
+                //@@applicationInterface.turnFrontScreenFlashOn();
+            }
     	};
 
         CameraController.ErrorCallback errorCallback = new CameraController.ErrorCallback()

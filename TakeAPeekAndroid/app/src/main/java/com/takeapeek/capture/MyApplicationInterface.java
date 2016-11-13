@@ -212,7 +212,7 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("createOutputVideoSAF() Invoked.");
 
-		return storageUtils.createOutputMediaFileSAF(com.takeapeek.capture.StorageUtils.MEDIA_TYPE_VIDEO, "mp4", new Date());
+		return storageUtils.createOutputMediaFileSAF(com.takeapeek.capture.StorageUtils.MEDIA_TYPE_VIDEO, "", "mp4", new Date());
 	}
 
 	@Override
