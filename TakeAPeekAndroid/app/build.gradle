@@ -9,8 +9,8 @@ android {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 37
-        versionName "0.9.37 beta"
+        versionCode 38
+        versionName "0.9.38 beta"
     }
     buildTypes {
         release {

@@ -619,7 +619,6 @@ public class DrawPreview
                 final int secs = 10 - (int)((video_time / 1000) % 60);
 
                 main_activity.runOnUiThread(new Runnable()
-
                 {
                     @Override
                     public void run()

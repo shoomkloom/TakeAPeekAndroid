@@ -26,4 +26,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
+    <style name="AppTheme.SeekBar" parent="Widget.AppCompat.SeekBar" >
+        <item name="colorAccent">#ff0000</item>
+    </style>
+
 </resources>

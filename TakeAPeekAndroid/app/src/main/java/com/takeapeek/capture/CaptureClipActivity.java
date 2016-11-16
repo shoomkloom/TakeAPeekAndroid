@@ -977,7 +977,7 @@ public class CaptureClipActivity extends Activity implements
                     mVideoCaptureStateEnum = VideoCaptureStateEnum.Capture;
 
                     UpdateUI();
-                    CaptureClipActivity.this.takePicture();
+                    takePicture();
                     return true;
 
                 case MotionEvent.ACTION_UP:
@@ -987,13 +987,24 @@ public class CaptureClipActivity extends Activity implements
                     }
 
                     UpdateUI();
-                    CaptureClipActivity.this.takePicture();
+
+                    StopVideoCapture();
                     return true;
             }
 
             return false;
         }
     };
+
+    public void StopVideoCapture()
+    {
+        logger.debug("StopVideoCapture() Invoked.");
+
+        if(preview != null && preview.isVideoRecording())
+        {
+            takePicture();
+        }
+    }
 
     public void UpdateTakeVideoUI(int seconds)
     {
@@ -1345,6 +1356,15 @@ public class CaptureClipActivity extends Activity implements
     public void onBackPressed()
     {
         logger.debug("onBackPressed() Invoked.");
+
+        if(preview != null && preview.isVideoRecording())
+        {
+            takePicture();
+
+            mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+            UpdateUI();
+            return;
+        }
 
         setResult(RESULT_CANCELED);
 
@@ -3175,6 +3195,8 @@ public class CaptureClipActivity extends Activity implements
 
         mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
         UpdateUI();
+
+        StopVideoCapture();
 
         mCompletedTakeAPeekObject = new TakeAPeekObject();
         mCompletedTakeAPeekObject.FilePath = videoFilePath;

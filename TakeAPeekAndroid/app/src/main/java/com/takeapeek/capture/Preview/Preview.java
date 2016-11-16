@@ -1729,8 +1729,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				logger.info("check video quality: " + video_quality.get(i));
 
 				CamcorderProfile profile = getCamcorderProfile(video_quality.get(i));
-				//@@if( profile.videoFrameWidth == 1280 && profile.videoFrameHeight == 720 )
-                if( profile.videoFrameWidth == 1024 && profile.videoFrameHeight == 768 )
+				if( profile.videoFrameWidth == 1280 && profile.videoFrameHeight == 720 )
+                //@@if( profile.videoFrameWidth == 1024 && profile.videoFrameHeight == 768 )
                 {
 					current_video_quality = i;
 					break;
@@ -2190,7 +2190,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
 		}
 
-		String bitrate_value = "1000000";//@@applicationInterface.getVideoBitratePref();
+		String bitrate_value = "3000000"; //@@applicationInterface.getVideoBitratePref();
 		if( !bitrate_value.equals("default") )
         {
 			try
