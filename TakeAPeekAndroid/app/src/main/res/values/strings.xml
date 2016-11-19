@@ -58,6 +58,7 @@
     <!-- Create Account -->
     <string name="create_account_activity_title">Create Peek.To Account</string>
     <string name="create_account_message1">Create Account</string>
+    <string name="create_account_country">Country</string>
     <string name="create_account_your_country">Your country\u003a</string>
     <string name="create_account_your_mobile">Mobile\u003a</string>
     <string name="create_account_your_name">Your Name\u003a</string>

@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.Html;
@@ -40,8 +41,6 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.takeapeek.R;
-import com.takeapeek.common.AutoFitTextureView;
-import com.takeapeek.common.CameraPreviewBGActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.common.Helper;
@@ -64,7 +63,7 @@ import java.util.Locale;
 /**
  * Activity which displays login screen to the user.
  */
-public class AuthenticatorActivity extends CameraPreviewBGActivity
+public class AuthenticatorActivity extends AppCompatActivity
 {
 	static private final Logger logger = LoggerFactory.getLogger(AuthenticatorActivity.class);
 
@@ -160,6 +159,7 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
     public String mPassword = "";
     Spinner mCountrySpinner = null;
     int[] mCountryPrefixCodes = null;
+    int[] mCountryFlagCodes = null;
     int mCountryArrayPosition = 0;
     ProgressDialog mProgressDialog = null;
     public SharedPreferences mSharedPreferences = null;
@@ -309,10 +309,11 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
 			        	List<String> countryISOCodes = Arrays.asList(new String[]{"hint", "AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","MM","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CX","CC","CO","KM","CG","CD","CK","CR","HR","CU","CY","CZ","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FK","FO","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GU","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JO","KZ","KE","KI","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MH","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NR","NP","NL","AN","NC","NZ","NI","NE","NG","NU","MP","KP","NO","OM","PK","PW","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RO","RU","RW","BL","WS","SM","ST","SA","SN","RS","SC","SL","SG","SK","SI","SB","SO","ZA","KR","ES","LK","SH","KN","LC","MF","PM","VC","SD","SR","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TK","TO","TT","TN","TR","TM","TC","TV","AE","UG","GB","UA","UY","US","UZ","VU","VA","VE","VN","VI","WF","YE","ZM","ZW"});
 			        	String[] countryNames = new String[]{"hint", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burma (Myanmar)","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Cocos (Keeling) Islands","Colombia","Comoros","Republic of the Congo","Dem. Rep. of the Congo","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Timor-Leste","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mayotte","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Northern Mariana Islands","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Romania","Russia","Rwanda","Saint Barthelemy","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Saint Helena","Saint Kitts and Nevis","Saint Lucia","Saint Martin","Saint Pierre and Miquelon","Saint Vincent and the Grenadines","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tokelau","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","United Arab Emirates","Uganda","United Kingdom","Ukraine","Uruguay","United States","Uzbekistan","Vanuatu","Holy See (Vatican City)","Venezuela","Vietnam","US Virgin Islands","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
 			        	mCountryPrefixCodes = new int[]{-1, 93,355,213,1684,376,244,1264,672,1268,54,374,297,61,43,994,1242,973,880,1246,375,32,501,229,1441,975,591,387,267,55,1284,673,359,226,95,257,855,237,1,238,1345,236,235,56,86,61,61,57,269,242,243,682,506,385,53,357,420,45,253,1767,1809,670,593,20,503,240,291,372,251,500,298,679,358,33,689,241,220,995,49,233,350,30,299,1473,1671,502,224,245,592,509,504,852,36,354,91,62,98,964,353,44,972,39,225,1876,81,962,7,254,686,965,996,856,371,961,266,231,218,423,370,352,853,389,261,265,60,960,223,356,692,222,230,262,52,691,373,377,976,382,1664,212,258,264,674,977,31,599,687,64,505,227,234,683,1670,850,47,968,92,680,507,675,595,51,63,870,48,351,1,974,40,7,250,590,685,378,239,966,221,381,248,232,65,421,386,677,252,27,82,34,94,290,1869,1758,1599,508,1784,249,597,268,46,41,963,886,992,255,66,228,690,676,1868,216,90,993,1649,688,971,256,44,380,598,1,998,678,39,58,84,1340,681,967,260,263};
+                        mCountryFlagCodes = new int[]{-1, 93,355,213,1684,376,244,1264,672,1268,54,374,297,61,43,994,1242,973,880,1246,375,32,501,229,1441,975,591,387,267,55,1284,673,359,226,95,257,855,237,1,238,1345,236,235,56,86,61,61,57,269,242,243,682,506,385,53,357,420,45,253,1767,1809,670,593,20,503,240,291,372,251,500,298,679,358,33,689,241,220,995,49,233,350,30,299,1473,1671,502,224,245,592,509,504,852,36,354,91,62,98,964,353,44,972,39,225,1876,81,962,7,254,686,965,996,856,371,961,266,231,218,423,370,352,853,389,261,265,60,960,223,356,692,222,230,262,52,691,373,377,976,382,1664,212,258,264,674,977,31,599,687,64,505,227,234,683,1670,850,47,968,92,680,507,675,595,51,63,870,48,351,1,974,40,7,250,590,685,378,239,966,221,381,248,232,65,421,386,677,252,27,82,34,94,290,1869,1758,1599,508,1784,249,597,268,46,41,963,886,992,255,66,228,690,676,1868,216,90,993,1649,688,971,256,44,380,598,1,998,678,39,58,84,1340,681,967,260,263};
 			        	
 			        	mCountrySpinner = (Spinner)findViewById(R.id.SpinnerCountry);
 			        	mCountrySpinner.setTag("countrySpinner");
-			        	mCountrySpinner.setAdapter(new CountrySpinnerAdapter(this, R.layout.country_spinner_item, countryNames, mCountryPrefixCodes, countryISOCodes));
+			        	mCountrySpinner.setAdapter(new CountrySpinnerAdapter(this, R.layout.country_spinner_item, countryNames, mCountryPrefixCodes, countryISOCodes, mCountryFlagCodes));
 			        	mCountrySpinner.setOnItemSelectedListener(onItemSelectedListener);
 
 			        	if(mCountryArrayPosition == 0)
@@ -345,8 +346,6 @@ public class AuthenticatorActivity extends CameraPreviewBGActivity
                             }
                         });
 
-                        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
-			            
 			            //Apply underline to the terms and conditions link
 		            	TextView termAndConditionsLink = (TextView) findViewById(R.id.terms_and_conditions);
                         Helper.setTypeface(this, termAndConditionsLink, FontTypeEnum.normalFont);

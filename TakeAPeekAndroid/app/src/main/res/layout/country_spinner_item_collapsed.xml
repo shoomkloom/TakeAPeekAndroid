@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-	android:layout_width="match_parent"
+	android:layout_width="wrap_content"
 	android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/itemTextCountryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:textSize="15sp"
+        android:text="@string/create_account_country"
+        android:textColor="@color/pt_gray" />
+
+    <ImageView
+        android:id="@+id/itemImageCountryFlag"
+        android:layout_width="30dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/itemTextCountryTitle"
+        android:layout_marginLeft="10dp"
+        android:scaleType="fitCenter" />
 	
 	<TextView
 	    android:id="@+id/itemTextCountryName"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:layout_height="25dp"
 	    android:lines="1"
 	    android:ellipsize="end"
-        android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:gravity="left"
-        android:textStyle="bold"
-	    android:textColor="@color/tap_gray" />
+        android:textSize="16sp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/itemTextCountryTitle"
+        android:layout_toRightOf="@+id/itemImageCountryFlag"
+        android:layout_alignBottom="@+id/itemImageCountryFlag"
+        android:gravity="center"
+	    android:textColor="@color/pt_darkgray" />
 
 	</RelativeLayout>

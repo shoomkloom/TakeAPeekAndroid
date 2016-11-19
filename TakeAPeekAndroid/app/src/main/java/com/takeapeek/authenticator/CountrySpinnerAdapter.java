@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.takeapeek.R;
@@ -32,8 +33,9 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 	String[] mCountryNames;
 	int[] mCountryPrefixCodes;
 	List<String> mCountryISOCodes;
+    int[] mCountryFlagCodes;
 	
-	public CountrySpinnerAdapter(Activity activity, int textViewResourceId, String[] countryNames, int[] countryPrefixCodes, List<String> countryISOCodes) 
+	public CountrySpinnerAdapter(Activity activity, int textViewResourceId, String[] countryNames, int[] countryPrefixCodes, List<String> countryISOCodes, int[] countryFlagCodes)
 	{            
 		super(activity, textViewResourceId, countryNames);   
 		
@@ -41,6 +43,7 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		mCountryNames = countryNames;
 		mCountryPrefixCodes = countryPrefixCodes;
 		mCountryISOCodes = countryISOCodes;
+        mCountryFlagCodes = countryFlagCodes;
 	}   
 	
 	@Override        
@@ -51,16 +54,20 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 	
 	@Override        
 	public View getView(int position, View convertView, ViewGroup parent) 
-	{            
+	{
 		return getCollapsedDropDownItemView(position, convertView, parent);
 	}
-	
-	public View getCollapsedDropDownItemView(int position, View convertView, ViewGroup parent) 
+
+	public View getCollapsedDropDownItemView(int position, View convertView, ViewGroup parent)
 	{  
 		logger.debug("getCollapsedDropDownItemView(...)");
 		
 		LayoutInflater inflater = mActivity.getLayoutInflater();            
-		View row = inflater.inflate(R.layout.country_spinner_item_collapsed, parent, false);            
+		View row = inflater.inflate(R.layout.country_spinner_item_collapsed, parent, false);
+
+        ImageView flag = (ImageView)row.findViewById(R.id.itemImageCountryFlag);
+        //@@flag.setImageResource(mCountryFlagCodes[position]);
+        /*@@*/flag.setImageResource(R.drawable.us);
 		
 		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
         Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
@@ -73,7 +80,7 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		}
 		else
 		{
-			labelText = String.format("%s (+%d)", mCountryNames[position], countryPrefix);
+			labelText = String.format("+%d %s", countryPrefix, mCountryISOCodes.get(position));
 		}
 		label.setText(labelText);  
 		Helper.setTypeface(mActivity, label, FontTypeEnum.lightFont);
@@ -86,8 +93,12 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		logger.debug("getExpandedDropDownItemView(...)");
 		
 		LayoutInflater inflater = mActivity.getLayoutInflater();            
-		View row = inflater.inflate(R.layout.country_spinner_item, parent, false);            
-		
+		View row = inflater.inflate(R.layout.country_spinner_item, parent, false);
+
+        ImageView flag = (ImageView)row.findViewById(R.id.itemImageCountryFlag);
+        //@@flag.setImageResource(mCountryFlagCodes[position]);
+        /*@@*/flag.setImageResource(R.drawable.us);
+
 		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
         Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
 
@@ -99,15 +110,16 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		{
 			String labelText = String.format("%s", mActivity.getString(R.string.create_account_country_spinner_long_prompt));
 			label.setText(labelText);
-			label.setTextColor(Color.parseColor("#dfe6cd"));
-			
+            label.setTextColor(Color.parseColor("#283238"));
+
+            flag.setVisibility(View.GONE);
 			prefix.setVisibility(View.GONE);
 		}
 		else
 		{
 			label.setText(mCountryNames[position]); 
 			
-			String prefixText = String.valueOf(mCountryPrefixCodes[position]); 
+			String prefixText = "+" + String.valueOf(mCountryPrefixCodes[position]);
 			prefix.setText(prefixText); 
 			
 			Helper.setTypeface(mActivity, prefix, FontTypeEnum.lightFont);

@@ -4,108 +4,149 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    tools:ignore="ContentDescription,HardcodedText" >
+    tools:ignore="ContentDescription" >
 
-    <com.takeapeek.common.AutoFitTextureView
-        android:id="@+id/texture"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:background="@drawable/gradient_yellow_fade">
+        android:background="@drawable/gradient_green_fade"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:id="@+id/login_gray_background"
+            android:layout_height="250dp"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/gradient_gray_fade"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/birds_clouds"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp" />
+
+        <ImageView
+            android:id="@+id/login_imageview_screen_logo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/login_center_image_number" />
+
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="210dp"
+            android:src="@drawable/mountains_left" />
+
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="200dp"
+            android:src="@drawable/mountains_right" />
+
+        <!-- Text above number -->
+        <TextView
+            android:id="@+id/login_textview_big_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_above="@+id/login_textview_small_title"
+            android:shadowColor="@color/tap_darkgray"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:text="@string/verify_mobile_number"
+            android:textColor="@color/tap_white"
+            android:textSize="25sp"
+            android:background="@color/pt_tra‌​nsparent"/>
+
+        <TextView
+            android:id="@+id/login_textview_small_title"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="70dp"
+            android:layout_marginRight="70dp"
+            android:shadowColor="@color/tap_darkgray"
+            android:layout_above="@+id/login_linearlayout_fill_number"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:text="@string/verify_mobile_number_explain"
+            android:textColor="@color/tap_white"
+            android:textSize="15sp" />
 
         <!-- Fill number and send -->
         <LinearLayout
             android:id="@+id/login_linearlayout_fill_number"
-            android:layout_height="match_parent"
+            android:layout_height="280dp"
             android:layout_width="match_parent"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/rounded_corner_small"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="30dp"
+            android:translationZ="4dp"
+            android:visibility="visible">
 
-            <!-- Text above number -->
-            <TextView
-                android:id="@+id/login_textview_big_title"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:shadowColor="@color/tap_darkgray"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:text="@string/verify_mobile_number"
-                android:textColor="@color/tap_white"
-                android:textSize="35sp" />
+                android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" >
 
-            <TextView
-                android:id="@+id/login_textview_small_title"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:shadowColor="@color/tap_darkgray"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:text="@string/verify_mobile_number_explain"
-                android:textColor="@color/tap_white"
-                android:textSize="20sp" />
+                <Spinner
+                    android:id="@+id/SpinnerCountry"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_weight="5"
+                    android:gravity="left"
+                    android:popupBackground="@drawable/rounded_corner_small"
+                    android:spinnerMode="dropdown" />
 
-            <Spinner
-                android:id="@+id/SpinnerCountry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:translationZ="4dp"
-                android:textSize="24sp"
-                android:padding="17dp"
-                android:spinnerMode="dialog"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_white"/>
+                <EditText
+                    android:id="@+id/edittext_number"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/pt_darkgray"
+                    android:textSize="18sp"
+                    android:hint="@string/profile_mobile_number"
+                    android:textColorHint="@color/pt_gray_2"
+                    android:inputType="phone"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1" />
 
-            <EditText
-                android:id="@+id/edittext_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:textColor="@color/tap_gray"
-                android:textSize="24sp"
-                android:hint="@string/profile_mobile_number"
-                android:textColorHint="@color/tap_lightlightgray"
-                android:inputType="phone"
-                android:imeOptions="actionDone"
-                android:translationZ="4dp"
-                android:padding="17dp"
-                android:singleLine="true"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_white" >
-            </EditText>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/terms_and_conditions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:shadowColor="@color/tap_darkgray"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
+                android:layout_marginBottom="25dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/create_account_message_bottom"
-                android:textColor="@color/tap_white"
+                android:textColor="@color/pt_gray"
                 android:textColorLink="@color/linkcolor"
                 android:textSize="16sp" />
 
@@ -119,33 +160,26 @@
                     android:id="@+id/editText_SMS_code"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginLeft="25dp"
-                    android:layout_marginRight="25dp"
-                    android:textColor="@color/tap_gray"
-                    android:textSize="24sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColor="@color/pt_darkgray"
+                    android:textSize="18sp"
                     android:inputType="textNoSuggestions"
                     android:imeOptions="actionDone"
                     android:hint="@string/code_hint"
-                    android:textColorHint="@color/tap_lightlightgray"
-                    android:translationZ="4dp"
-                    android:padding="17dp"
-                    android:singleLine="true"
-                    android:stateListAnimator="@anim/button_elevation"
-                    android:background="@drawable/button_white"
+                    android:textColorHint="@color/pt_gray_2"
                     android:visibility="gone">
                 </EditText>
 
                 <ImageView
                     android:id="@+id/imageview_SMS_validation_progess"
-                    android:layout_width="55dp"
-                    android:layout_height="55dp"
-                    android:layout_alignTop="@+id/editText_SMS_code"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignBottom="@+id/editText_SMS_code"
                     android:layout_alignRight="@+id/editText_SMS_code"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
                     android:layout_marginRight="5dp"
-                    android:translationZ="5dp"
                     android:src="@drawable/progress"
                     android:visibility="gone"/>
 
@@ -156,13 +190,10 @@
                 android:gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:shadowColor="@color/tap_darkgray"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:textColor="@color/tap_white"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="38dp"
+                android:textColor="@color/pt_gray"
                 android:textSize="15sp"
                 android:visibility="gone" />
 
@@ -172,27 +203,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="5dp"
                 android:visibility="gone">
 
                 <TextView
                     android:id="@+id/login_resend_code"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="@string/resend_sms_code"
                     android:textColor="@color/linkcolor"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/login_resend_request_call"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="@string/message_request_call"
                     android:textColor="@color/linkcolor"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
 
             </LinearLayout>
             <!-- End Resend Options -->
@@ -201,31 +232,31 @@
                 android:id="@+id/button_create_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/tap_white"
+                android:textColor="@color/pt_white"
                 android:textSize="24sp"
                 android:text="@string/button_verify"
                 android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:translationZ="4dp"
                 android:enabled="false"
                 android:padding="17dp"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_green" />
+                android:background="@drawable/button_red" />
 
             <TextView
                 android:id="@+id/button_verify_account_submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/tap_white"
+                android:textColor="@color/pt_white"
                 android:textSize="24sp"
                 android:text="@string/button_continue"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:translationZ="4dp"
@@ -233,7 +264,7 @@
                 android:padding="17dp"
                 android:singleLine="true"
                 android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_green"
+                android:background="@drawable/button_red"
                 android:visibility="gone"/>
 
         </LinearLayout>
@@ -430,6 +461,6 @@
         <!-- Date of Birth -->
 
 
-	
-    </LinearLayout>
+
+    </RelativeLayout>
 </RelativeLayout>
