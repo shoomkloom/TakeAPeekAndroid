@@ -2646,19 +2646,36 @@ public class Helper
     //Display Name Success
     public static Boolean GetDisplayNameSuccess(SharedPreferences sharedPreferences)
     {
-        logger.debug("GetUniqueIndex(.) Invoked");
+        logger.debug("GetDisplayNameSuccess(.) Invoked");
 
         return sharedPreferences.getBoolean(Constants.DISPLAY_NAME_SUCCESS, false);
     }
 
     public static void SetDisplayNameSuccess(Editor sharedPreferencesEditor, Boolean displayNameSuccess)
     {
-        logger.debug("SetUniqueIndex(..) Invoked");
+        logger.debug("SetDisplayNameSuccess(..) Invoked");
 
         sharedPreferencesEditor.putBoolean(Constants.DISPLAY_NAME_SUCCESS, displayNameSuccess);
         sharedPreferencesEditor.commit();
     }
     //Display Name Success
+
+    //DOB Success
+    public static Boolean GetDOBSuccess(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetDOBSuccess(.) Invoked");
+
+        return sharedPreferences.getBoolean(Constants.DOB_SUCCESS, false);
+    }
+
+    public static void SetDOBSuccess(Editor sharedPreferencesEditor, Boolean dobSuccess)
+    {
+        logger.debug("SetDOBSuccess(..) Invoked");
+
+        sharedPreferencesEditor.putBoolean(Constants.DOB_SUCCESS, dobSuccess);
+        sharedPreferencesEditor.commit();
+    }
+    //DOB Success Success
     
     public static ProfileStateEnum GetProfileState(SharedPreferences sharedPreferences)
     {

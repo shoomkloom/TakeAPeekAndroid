@@ -66,9 +66,11 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		View row = inflater.inflate(R.layout.country_spinner_item_collapsed, parent, false);
 
         ImageView flag = (ImageView)row.findViewById(R.id.itemImageCountryFlag);
-        //@@flag.setImageResource(mCountryFlagCodes[position]);
-        /*@@*/flag.setImageResource(R.drawable.us);
-		
+        if(position > 0)
+        {
+            flag.setImageResource(mCountryFlagCodes[position]);
+        }
+
 		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
         Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
 
@@ -96,8 +98,10 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 		View row = inflater.inflate(R.layout.country_spinner_item, parent, false);
 
         ImageView flag = (ImageView)row.findViewById(R.id.itemImageCountryFlag);
-        //@@flag.setImageResource(mCountryFlagCodes[position]);
-        /*@@*/flag.setImageResource(R.drawable.us);
+        if(position > 0)
+        {
+            flag.setImageResource(mCountryFlagCodes[position]);
+        }
 
 		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
         Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);

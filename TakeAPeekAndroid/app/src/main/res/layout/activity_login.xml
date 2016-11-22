@@ -71,7 +71,8 @@
             android:text="@string/verify_mobile_number"
             android:textColor="@color/tap_white"
             android:textSize="25sp"
-            android:background="@color/pt_tra‌​nsparent"/>
+            android:background="@color/pt_tra‌​nsparent"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/login_textview_small_title"
@@ -88,10 +89,11 @@
             android:shadowRadius="1"
             android:text="@string/verify_mobile_number_explain"
             android:textColor="@color/tap_white"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:visibility="gone"/>
 
         <!-- Fill number and send -->
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/login_linearlayout_fill_number"
             android:layout_height="280dp"
             android:layout_width="match_parent"
@@ -102,11 +104,13 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="30dp"
             android:translationZ="4dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <LinearLayout
+                android:id="@+id/login_linearlayout_spinner_and_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:orientation="horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp" >
@@ -118,6 +122,7 @@
                     android:layout_weight="5"
                     android:gravity="left"
                     android:popupBackground="@drawable/rounded_corner_small"
+                    android:dropDownWidth="300dp"
                     android:spinnerMode="dropdown" />
 
                 <EditText
@@ -129,7 +134,7 @@
                     android:textColor="@color/pt_darkgray"
                     android:textSize="18sp"
                     android:hint="@string/profile_mobile_number"
-                    android:textColorHint="@color/pt_gray_2"
+                    android:textColorHint="@color/pt_gray"
                     android:inputType="phone"
                     android:imeOptions="actionDone"
                     android:maxLines="1" />
@@ -140,6 +145,7 @@
                 android:id="@+id/terms_and_conditions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/login_linearlayout_spinner_and_number"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="25dp"
                 android:layout_marginLeft="20dp"
@@ -154,6 +160,7 @@
                 android:id="@+id/relativelayout_SMS_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/login_linearlayout_spinner_and_number"
                 android:visibility="gone">
 
                 <EditText
@@ -168,7 +175,7 @@
                     android:inputType="textNoSuggestions"
                     android:imeOptions="actionDone"
                     android:hint="@string/code_hint"
-                    android:textColorHint="@color/pt_gray_2"
+                    android:textColorHint="@color/pt_gray"
                     android:visibility="gone">
                 </EditText>
 
@@ -190,6 +197,7 @@
                 android:gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                android:layout_below="@+id/relativelayout_SMS_code"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="38dp"
@@ -202,6 +210,7 @@
                 android:id="@+id/login_linearlayout_resend_options"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/relativelayout_SMS_code"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -232,13 +241,14 @@
                 android:id="@+id/button_create_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:textColor="@color/pt_white"
                 android:textSize="24sp"
                 android:text="@string/button_verify"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_gravity="center"
+                android:layout_gravity="bottom"
                 android:gravity="center"
                 android:translationZ="4dp"
                 android:enabled="false"
@@ -251,31 +261,31 @@
                 android:id="@+id/button_verify_account_submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:textColor="@color/pt_white"
                 android:textSize="24sp"
                 android:text="@string/button_continue"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_gravity="center"
+                android:layout_gravity="bottom"
                 android:gravity="center"
                 android:translationZ="4dp"
                 android:enabled="false"
                 android:padding="17dp"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:stateListAnimator="@anim/button_elevation"
                 android:background="@drawable/button_red"
                 android:visibility="gone"/>
 
-        </LinearLayout>
+        </RelativeLayout>
         <!-- End fill number and send -->
 
         <!-- Display Name-->
         <RelativeLayout
-            android:id="@+id/login_linearlayout_display_name"
+            android:id="@+id/login_relativelayout_display_name"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:orientation="vertical"
             android:visibility="gone" >
 
             <!-- Text above number -->
@@ -284,90 +294,104 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:layout_above="@+id/textview_display_name_small_title"
                 android:shadowColor="@color/tap_darkgray"
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:text="@string/display_name_pick_a_name"
                 android:textColor="@color/tap_white"
-                android:textSize="35sp" />
+                android:textSize="25sp"
+                android:background="@color/pt_tra‌​nsparent"/>
 
             <TextView
                 android:id="@+id/textview_display_name_small_title"
                 android:gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/textview_display_name_big_title"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="70dp"
                 android:shadowColor="@color/tap_darkgray"
+                android:layout_above="@+id/login_linearlayout_display_name"
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
                 android:text="@string/display_name_explain"
                 android:textColor="@color/tap_white"
-                android:textSize="20sp" />
+                android:textSize="15sp"/>
 
-            <EditText
-                android:id="@+id/edittext_display_name"
+            <RelativeLayout
+                android:id="@+id/login_linearlayout_display_name"
+                android:layout_height="280dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_below="@+id/textview_display_name_small_title"
-                android:textColor="@color/tap_gray"
-                android:textSize="24sp"
-                android:hint="@string/display_name_hint"
-                android:textColorHint="@color/tap_lightlightgray"
-                android:inputType="textCapWords|textNoSuggestions"
-                android:imeOptions="actionDone"
-                android:paddingTop="17dp"
-                android:paddingBottom="17dp"
-                android:paddingLeft="17dp"
-                android:paddingRight="64dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:singleLine="true"
-                android:translationZ="4dp"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_white" >
-            </EditText>
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/rounded_corner_small"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="30dp"
+                android:translationZ="4dp">
 
-            <ImageView
-                android:id="@+id/imageview_display_name_validation_progess"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignTop="@+id/edittext_display_name"
-                android:layout_alignRight="@+id/edittext_display_name"
-                android:layout_marginTop="7dp"
-                android:layout_marginRight="7dp"
-                android:translationZ="5dp"
-                android:src="@drawable/progress"
-                android:visibility="gone"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp">
 
-            <TextView
-                android:id="@+id/button_create_display_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/edittext_display_name"
-                android:textColor="@color/tap_white"
-                android:textSize="24sp"
-                android:text="@string/button_continue"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:translationZ="4dp"
-                android:enabled="false"
-                android:padding="17dp"
-                android:singleLine="true"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_green" />
+                    <EditText
+                        android:id="@+id/edittext_display_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textColor="@color/pt_darkgray"
+                        android:textSize="18sp"
+                        android:hint="@string/display_name_hint"
+                        android:textColorHint="@color/pt_gray"
+                        android:inputType="textCapWords|textNoSuggestions"
+                        android:imeOptions="actionDone"
+                        android:paddingRight="60dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:maxLines="1" />
+
+                    <ImageView
+                        android:id="@+id/imageview_display_name_validation_progess"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_alignBottom="@+id/edittext_display_name"
+                        android:layout_alignRight="@+id/edittext_display_name"
+                        android:translationZ="5dp"
+                        android:src="@drawable/progress"
+                        android:visibility="gone"/>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/button_create_display_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:textColor="@color/pt_white"
+                    android:textSize="24sp"
+                    android:text="@string/button_continue"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:translationZ="4dp"
+                    android:enabled="false"
+                    android:padding="17dp"
+                    android:maxLines="1"
+                    android:stateListAnimator="@anim/button_elevation"
+                    android:background="@drawable/button_red" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
@@ -387,74 +411,83 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:layout_above="@+id/textview_date_of_birth_small_title"
                 android:shadowColor="@color/tap_darkgray"
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:text="@string/what_is_your_birthday"
                 android:textColor="@color/tap_white"
-                android:textSize="35sp" />
+                android:textSize="25sp"
+                android:background="@color/pt_tra‌​nsparent"/>
 
             <TextView
                 android:id="@+id/textview_date_of_birth_small_title"
                 android:gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/textview_date_of_birth_big_title"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="70dp"
                 android:shadowColor="@color/tap_darkgray"
+                android:layout_above="@+id/login_linearlayout_fill_dob"
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
                 android:text="@string/date_of_birth_explain"
                 android:textColor="@color/tap_white"
-                android:textSize="20sp" />
+                android:textSize="15sp"/>
 
-            <TextView
-                android:id="@+id/textview_date_of_birth"
+            <RelativeLayout
+                android:id="@+id/login_linearlayout_fill_dob"
+                android:layout_height="280dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_below="@+id/textview_date_of_birth_small_title"
-                android:textColor="@color/tap_gray"
-                android:textSize="24sp"
-                android:hint="@string/date_of_birth_hint"
-                android:textColorHint="@color/tap_lightlightgray"
-                android:paddingTop="17dp"
-                android:paddingBottom="17dp"
-                android:paddingLeft="17dp"
-                android:paddingRight="17dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:translationZ="4dp"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_white" />
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/rounded_corner_small"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="30dp"
+                android:translationZ="4dp">
 
-            <TextView
-                android:id="@+id/button_create_date_of_birth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/textview_date_of_birth"
-                android:textColor="@color/tap_white"
-                android:textSize="24sp"
-                android:text="@string/button_continue"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:translationZ="4dp"
-                android:enabled="false"
-                android:padding="17dp"
-                android:singleLine="true"
-                android:stateListAnimator="@anim/button_elevation"
-                android:background="@drawable/button_green" />
+                <EditText
+                    android:id="@+id/edittext_date_of_birth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/pt_darkgray"
+                    android:textSize="18sp"
+                    android:hint="@string/date_of_birth_hint"
+                    android:inputType="none"
+                    android:layout_alignParentTop="true"
+                    android:textColorHint="@color/pt_gray"
+                    android:layout_marginTop="60dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+                <TextView
+                    android:id="@+id/button_create_date_of_birth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:textColor="@color/pt_white"
+                    android:textSize="24sp"
+                    android:text="@string/button_continue"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:translationZ="4dp"
+                    android:enabled="false"
+                    android:padding="17dp"
+                    android:maxLines="1"
+                    android:stateListAnimator="@anim/button_elevation"
+                    android:background="@drawable/button_red" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

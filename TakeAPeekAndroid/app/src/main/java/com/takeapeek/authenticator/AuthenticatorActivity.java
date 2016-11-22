@@ -60,6 +60,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import static com.takeapeek.R.id.login_imageview_screen_logo;
+import static com.takeapeek.R.id.login_textview_big_title;
+import static com.takeapeek.R.id.login_textview_small_title;
+
 /**
  * Activity which displays login screen to the user.
  */
@@ -163,6 +167,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     int mCountryArrayPosition = 0;
     ProgressDialog mProgressDialog = null;
     public SharedPreferences mSharedPreferences = null;
+    public ImageView mLoginImageviewScreenLogo = null;
     public TextView mLoginTextviewBigTitle = null;
     public TextView mLoginTextviewSmallTitle = null;
     public EditText mMobileNumber = null;
@@ -259,6 +264,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 	        
 	        Account takeAPeekAccount = null;
             Boolean displayNameSuccess = Helper.GetDisplayNameSuccess(mSharedPreferences);
+            Boolean dobSuccess = Helper.GetDOBSuccess(mSharedPreferences);
 
 			try 
 			{
@@ -270,7 +276,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 				Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_more_than_one_account));
 			}
 			
-	    	if(takeAPeekAccount != null && displayNameSuccess == true)
+	    	if(takeAPeekAccount != null && displayNameSuccess == true && dobSuccess == true)
 	    	{
 	    		logger.info("onCreate: A TakeAPeek account already exists");
 	    		
@@ -292,6 +298,23 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        {
 			        	setContentView(R.layout.activity_login);
 
+                        mLoginImageviewScreenLogo = (ImageView)findViewById(login_imageview_screen_logo);
+
+                        mLoginTextviewBigTitle = (TextView)findViewById(login_textview_big_title);
+                        Helper.setTypeface(this, mLoginTextviewBigTitle, FontTypeEnum.boldFont);
+
+                        mLoginTextviewSmallTitle = (TextView)findViewById(login_textview_small_title);
+                        Helper.setTypeface(this, mLoginTextviewSmallTitle, FontTypeEnum.boldFont);
+
+                        mEditTextDisplayName = (EditText)findViewById(R.id.edittext_display_name);
+                        Helper.setTypeface(this, mEditTextDisplayName, FontTypeEnum.lightFont);
+                        mEditTextDisplayName.addTextChangedListener(onTextChangedDisplayName);
+
+                        mDisplayNameValidationProgess = (ImageView)findViewById(R.id.imageview_display_name_validation_progess);
+                        mButtonCreateDisplayName = (TextView)findViewById(R.id.button_create_display_name);
+                        Helper.setTypeface(this, mButtonCreateDisplayName, FontTypeEnum.boldFont);
+                        mButtonCreateDisplayName.setOnClickListener(ClickListener);
+
                         if(takeAPeekAccount != null && displayNameSuccess == false)
                         {
                             logger.info("Account exists but display name failed.");
@@ -300,16 +323,18 @@ public class AuthenticatorActivity extends AppCompatActivity
                             UpdateUI();
                         }
 
-                        mLoginTextviewBigTitle = (TextView)findViewById(R.id.login_textview_big_title);
-			        	Helper.setTypeface(this, mLoginTextviewBigTitle, FontTypeEnum.boldFont);
+                        if(takeAPeekAccount != null && dobSuccess == false)
+                        {
+                            logger.info("Account exists but DOB failed.");
 
-                        mLoginTextviewSmallTitle = (TextView)findViewById(R.id.login_textview_small_title);
-			        	Helper.setTypeface(this, mLoginTextviewSmallTitle, FontTypeEnum.boldFont);
-			        	
-			        	List<String> countryISOCodes = Arrays.asList(new String[]{"hint", "AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","MM","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CX","CC","CO","KM","CG","CD","CK","CR","HR","CU","CY","CZ","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FK","FO","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GU","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JO","KZ","KE","KI","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MH","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NR","NP","NL","AN","NC","NZ","NI","NE","NG","NU","MP","KP","NO","OM","PK","PW","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RO","RU","RW","BL","WS","SM","ST","SA","SN","RS","SC","SL","SG","SK","SI","SB","SO","ZA","KR","ES","LK","SH","KN","LC","MF","PM","VC","SD","SR","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TK","TO","TT","TN","TR","TM","TC","TV","AE","UG","GB","UA","UY","US","UZ","VU","VA","VE","VN","VI","WF","YE","ZM","ZW"});
-			        	String[] countryNames = new String[]{"hint", "Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burma (Myanmar)","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Cocos (Keeling) Islands","Colombia","Comoros","Republic of the Congo","Dem. Rep. of the Congo","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Timor-Leste","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mayotte","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Northern Mariana Islands","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Romania","Russia","Rwanda","Saint Barthelemy","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Saint Helena","Saint Kitts and Nevis","Saint Lucia","Saint Martin","Saint Pierre and Miquelon","Saint Vincent and the Grenadines","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tokelau","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","United Arab Emirates","Uganda","United Kingdom","Ukraine","Uruguay","United States","Uzbekistan","Vanuatu","Holy See (Vatican City)","Venezuela","Vietnam","US Virgin Islands","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
-			        	mCountryPrefixCodes = new int[]{-1, 93,355,213,1684,376,244,1264,672,1268,54,374,297,61,43,994,1242,973,880,1246,375,32,501,229,1441,975,591,387,267,55,1284,673,359,226,95,257,855,237,1,238,1345,236,235,56,86,61,61,57,269,242,243,682,506,385,53,357,420,45,253,1767,1809,670,593,20,503,240,291,372,251,500,298,679,358,33,689,241,220,995,49,233,350,30,299,1473,1671,502,224,245,592,509,504,852,36,354,91,62,98,964,353,44,972,39,225,1876,81,962,7,254,686,965,996,856,371,961,266,231,218,423,370,352,853,389,261,265,60,960,223,356,692,222,230,262,52,691,373,377,976,382,1664,212,258,264,674,977,31,599,687,64,505,227,234,683,1670,850,47,968,92,680,507,675,595,51,63,870,48,351,1,974,40,7,250,590,685,378,239,966,221,381,248,232,65,421,386,677,252,27,82,34,94,290,1869,1758,1599,508,1784,249,597,268,46,41,963,886,992,255,66,228,690,676,1868,216,90,993,1649,688,971,256,44,380,598,1,998,678,39,58,84,1340,681,967,260,263};
-                        mCountryFlagCodes = new int[]{-1, 93,355,213,1684,376,244,1264,672,1268,54,374,297,61,43,994,1242,973,880,1246,375,32,501,229,1441,975,591,387,267,55,1284,673,359,226,95,257,855,237,1,238,1345,236,235,56,86,61,61,57,269,242,243,682,506,385,53,357,420,45,253,1767,1809,670,593,20,503,240,291,372,251,500,298,679,358,33,689,241,220,995,49,233,350,30,299,1473,1671,502,224,245,592,509,504,852,36,354,91,62,98,964,353,44,972,39,225,1876,81,962,7,254,686,965,996,856,371,961,266,231,218,423,370,352,853,389,261,265,60,960,223,356,692,222,230,262,52,691,373,377,976,382,1664,212,258,264,674,977,31,599,687,64,505,227,234,683,1670,850,47,968,92,680,507,675,595,51,63,870,48,351,1,974,40,7,250,590,685,378,239,966,221,381,248,232,65,421,386,677,252,27,82,34,94,290,1869,1758,1599,508,1784,249,597,268,46,41,963,886,992,255,66,228,690,676,1868,216,90,993,1649,688,971,256,44,380,598,1,998,678,39,58,84,1340,681,967,260,263};
+                            mHandlerState = HandlerState.dateOfBirth;
+                            UpdateUI();
+                        }
+
+			        	List<String> countryISOCodes = Arrays.asList(new String[]{"hint", "AF","AL","DZ","AD","AO","AI","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","MM","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CO","KM","CG","CD","CR","HR","CU","CY","CZ","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GD","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JO","KZ","KE","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MR","MU","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NP","NL","AN","NZ","NI","NE","NG","KP","NO","OM","PK","PW","PA","PG","PY","PE","PH","PL","PT","PR","QA","RO","RU","RW","WS","SM","ST","SA","SN","RS","SC","SL","SG","SK","SI","SB","SO","ZA","KR","ES","LK","SH","KN","LC","VC","SD","SR","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TO","TT","TN","TR","TM","TC","AE","UG","GB","UA","UY","US","UZ","VU","VE","VN","YE","ZM","ZW"});
+			        	String[] countryNames = new String[]{"hint", "Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burma (Myanmar)","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Colombia","Comoros","Republic of the Congo","Dem. Rep. of the Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Timor-Leste","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nepal","Netherlands","Netherlands Antilles","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Romania","Russia","Rwanda","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Saint Helena","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","United Arab Emirates","Uganda","United Kingdom","Ukraine","Uruguay","United States","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"};
+			        	mCountryPrefixCodes = new int[]{-1, 93,355,213,376,244,1264,1268,54,374,297,61,43,994,1242,973,880,1246,375,32,501,229,1441,975,591,387,267,55,1284,673,359,226,95,257,855,237,1,238,1345,236,235,56,86,57,269,242,243,506,385,53,357,420,45,253,1767,1809,670,593,20,503,240,291,372,251,679,358,33,689,241,220,995,49,233,350,30,1473,502,224,245,592,509,504,852,36,354,91,62,98,964,353,44,972,39,225,1876,81,962,7,254,965,996,856,371,961,266,231,218,423,370,352,853,389,261,265,60,960,223,356,222,230,52,691,373,377,976,382,1664,212,258,264,977,31,599,64,505,227,234,850,47,968,92,680,507,675,595,51,63,48,351,1,974,40,7,250,685,378,239,966,221,381,248,232,65,421,386,677,252,27,82,34,94,290,1869,1758,1784,249,597,268,46,41,963,886,992,255,66,228,676,1868,216,90,993,1649,971,256,44,380,598,1,998,678,58,84,967,260,263};
+                        mCountryFlagCodes = new int[]{-1, R.drawable.af,R.drawable.al,R.drawable.dz,R.drawable.ad,R.drawable.ao,R.drawable.ai,R.drawable.ag,R.drawable.ar,R.drawable.am,R.drawable.aw,R.drawable.au,R.drawable.at,R.drawable.az,R.drawable.bs,R.drawable.bh,R.drawable.bd,R.drawable.bb,R.drawable.by,R.drawable.be,R.drawable.bz,R.drawable.bj,R.drawable.bm,R.drawable.bt,R.drawable.bo,R.drawable.ba,R.drawable.bw,R.drawable.br,R.drawable.vg,R.drawable.bn,R.drawable.bg,R.drawable.bf,R.drawable.mm,R.drawable.bi,R.drawable.kh,R.drawable.cm,R.drawable.ca,R.drawable.cv,R.drawable.ky,R.drawable.cf,R.drawable.td,R.drawable.cl,R.drawable.cn,R.drawable.co,R.drawable.km,R.drawable.cg,R.drawable.cd,R.drawable.cr,R.drawable.hr,R.drawable.cu,R.drawable.cy,R.drawable.cz,R.drawable.dk,R.drawable.dj,R.drawable.dm,R.drawable.d_o,R.drawable.tl,R.drawable.ec,R.drawable.eg,R.drawable.sv,R.drawable.gq,R.drawable.er,R.drawable.ee,R.drawable.et,R.drawable.fj,R.drawable.fi,R.drawable.fr,R.drawable.pf,R.drawable.ga,R.drawable.gm,R.drawable.ge,R.drawable.de,R.drawable.gh,R.drawable.gi,R.drawable.gr,R.drawable.gd,R.drawable.gt,R.drawable.gn,R.drawable.gw,R.drawable.gy,R.drawable.ht,R.drawable.hn,R.drawable.hk,R.drawable.hu,R.drawable.is,R.drawable.in,R.drawable.id,R.drawable.ir,R.drawable.iq,R.drawable.ie,R.drawable.im,R.drawable.il,R.drawable.it,R.drawable.ci,R.drawable.jm,R.drawable.jp,R.drawable.jo,R.drawable.kz,R.drawable.ke,R.drawable.kw,R.drawable.kg,R.drawable.la,R.drawable.lv,R.drawable.lb,R.drawable.ls,R.drawable.lr,R.drawable.ly,R.drawable.li,R.drawable.lt,R.drawable.lu,R.drawable.mo,R.drawable.mk,R.drawable.mg,R.drawable.mw,R.drawable.my,R.drawable.mv,R.drawable.ml,R.drawable.mt,R.drawable.mr,R.drawable.mu,R.drawable.mx,R.drawable.fm,R.drawable.md,R.drawable.mc,R.drawable.mn,R.drawable.me,R.drawable.ms,R.drawable.ma,R.drawable.mz,R.drawable.na,R.drawable.np,R.drawable.nl,R.drawable.an,R.drawable.nz,R.drawable.ni,R.drawable.ne,R.drawable.ng,R.drawable.kp,R.drawable.no,R.drawable.om,R.drawable.pk,R.drawable.pw,R.drawable.pa,R.drawable.pg,R.drawable.py,R.drawable.pe,R.drawable.ph,R.drawable.pl,R.drawable.pt,R.drawable.pr,R.drawable.qa,R.drawable.ro,R.drawable.ru,R.drawable.rw,R.drawable.ws,R.drawable.sm,R.drawable.st,R.drawable.sa,R.drawable.sn,R.drawable.rs,R.drawable.sc,R.drawable.sl,R.drawable.sg,R.drawable.sk,R.drawable.si,R.drawable.sb,R.drawable.so,R.drawable.za,R.drawable.kr,R.drawable.es,R.drawable.lk,R.drawable.sh,R.drawable.kn,R.drawable.lc,R.drawable.vc,R.drawable.sd,R.drawable.sr,R.drawable.sz,R.drawable.se,R.drawable.ch,R.drawable.sy,R.drawable.tw,R.drawable.tj,R.drawable.tz,R.drawable.th,R.drawable.tg,R.drawable.to,R.drawable.tt,R.drawable.tn,R.drawable.tr,R.drawable.tm,R.drawable.tc,R.drawable.ae,R.drawable.ug,R.drawable.gb,R.drawable.ua,R.drawable.uy,R.drawable.us,R.drawable.uz,R.drawable.vu,R.drawable.ve,R.drawable.vn,R.drawable.ye,R.drawable.zm,R.drawable.zw};
 			        	
 			        	mCountrySpinner = (Spinner)findViewById(R.id.SpinnerCountry);
 			        	mCountrySpinner.setTag("countrySpinner");
@@ -384,16 +409,7 @@ public class AuthenticatorActivity extends AppCompatActivity
                         mLoginReceiveSMSCounter = (TextView)findViewById(R.id.login_textview_receive_sms_counter);
                         Helper.setTypeface(this, mLoginReceiveSMSCounter, FontTypeEnum.normalFont);
 
-                        mEditTextDisplayName = (EditText)findViewById(R.id.edittext_display_name);
-                        Helper.setTypeface(this, mEditTextDisplayName, FontTypeEnum.lightFont);
-                        mEditTextDisplayName.addTextChangedListener(onTextChangedDisplayName);
-
-                        mDisplayNameValidationProgess = (ImageView)findViewById(R.id.imageview_display_name_validation_progess);
-                        mButtonCreateDisplayName = (TextView)findViewById(R.id.button_create_display_name);
-                        Helper.setTypeface(this, mButtonCreateDisplayName, FontTypeEnum.boldFont);
-                        mButtonCreateDisplayName.setOnClickListener(ClickListener);
-
-                        TextView textviewDateOfBirth = (TextView)findViewById(R.id.textview_date_of_birth);
+                        EditText textviewDateOfBirth = (EditText)findViewById(R.id.edittext_date_of_birth);
                         textviewDateOfBirth.setOnClickListener(ClickListener);
                         Helper.setTypeface(this, textviewDateOfBirth, FontTypeEnum.lightFont);
 
@@ -1118,6 +1134,8 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		UpdateButtonCreateAccountUI();
 	    		
 	    		//Show enter number UI
+                findViewById(R.id.login_textview_big_title).setVisibility(View.VISIBLE);
+                findViewById(R.id.login_textview_small_title).setVisibility(View.VISIBLE);
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.VISIBLE);
 
                 //Hide resend UI
@@ -1170,6 +1188,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    	case receiveSMSTimeout:
                 //Enable number
                 mMobileNumber.setEnabled(true);
+                mCountrySpinner.setEnabled(true);
 
                 //Hide verification progress
                 mImageviewSMSValidationProgess.setVisibility(View.GONE);
@@ -1188,18 +1207,23 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		
 	    	case verificationSuccess:
 	    		//Hide enter number UI
-            	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
+                findViewById(R.id.login_textview_big_title).setVisibility(View.GONE);
+                findViewById(R.id.login_textview_small_title).setVisibility(View.GONE);
+                findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
 
                 //Hide resend UI
                 findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
 
             	//Show Display Name UI
-                findViewById(R.id.login_linearlayout_display_name).setVisibility(View.VISIBLE);
+                mLoginImageviewScreenLogo.setImageResource(R.drawable.login_center_image_name);
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.VISIBLE);
 
 	    		break;
 	    		
 	    	case accountCreationSuccess:
 	    		//Hide enter number UI
+                findViewById(R.id.login_textview_big_title).setVisibility(View.GONE);
+                findViewById(R.id.login_textview_small_title).setVisibility(View.GONE);
             	findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
 
                 //Hide resend UI
@@ -1208,6 +1232,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		break;
 
             case displayNameVerify:
+
 
                 mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
                 mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
@@ -1220,8 +1245,9 @@ public class AuthenticatorActivity extends AppCompatActivity
                 break;
 
             case dateOfBirth:
+                mLoginImageviewScreenLogo.setImageResource(R.drawable.login_center_image_dob);
 
-                findViewById(R.id.login_linearlayout_display_name).setVisibility(View.GONE);
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.GONE);
                 findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.VISIBLE);
 
                 break;
@@ -1339,6 +1365,8 @@ public class AuthenticatorActivity extends AppCompatActivity
                 case R.id.button_create_display_name:
                     logger.info("OnClickListener: 'button_create_display_name' clicked");
 
+                    Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
+
                     Helper.SetDisplayNameSuccess(mSharedPreferences.edit(), true);
                     Helper.SetProfileDisplayName(mSharedPreferences.edit(), mEditTextDisplayName.getText().toString());
 
@@ -1347,7 +1375,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 
                     break;
 
-                case R.id.textview_date_of_birth:
+                case R.id.edittext_date_of_birth:
                     logger.info("OnClickListener: 'textview_date_of_birth' clicked");
 
                     //Show date picker dialog
@@ -1394,6 +1422,10 @@ public class AuthenticatorActivity extends AppCompatActivity
 
                 case R.id.button_create_date_of_birth:
                     logger.info("OnClickListener: 'button_create_date_of_birth' clicked");
+
+                    Helper.HideVirtualKeyboard(AuthenticatorActivity.this);
+
+                    Helper.SetDOBSuccess(mSharedPreferences.edit(), true);
 
                     setResult(RESULT_OK);
                     finish();
@@ -1487,7 +1519,7 @@ public class AuthenticatorActivity extends AppCompatActivity
         formatter.setTimeZone(mCalendar.getTimeZone());
         String formattedDate = formatter.format(mCalendar.getTime());
 
-        ((TextView)findViewById(R.id.textview_date_of_birth)).setText(formattedDate);
+        ((EditText)findViewById(R.id.edittext_date_of_birth)).setText(formattedDate);
 
         //Enable the 'Continue' button
         findViewById(R.id.button_create_date_of_birth).setEnabled(true);

@@ -80,8 +80,8 @@ public class Transport
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
-			nameValuePairs.add(new NameValuePair("action_type", "create_profile"));
-			//@@nameValuePairs.add(new NameValuePair("action_type", "create_profile_nosms"));
+            //@@nameValuePairs.add(new NameValuePair("action_type", "create_profile"));
+			nameValuePairs.add(new NameValuePair("action_type", "create_profile_nosms"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
 			nameValuePairs.add(new NameValuePair("platform", "Android"));
 			
