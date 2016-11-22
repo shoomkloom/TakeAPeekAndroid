@@ -1,5 +1,6 @@
 package com.takeapeek.authenticator;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
@@ -10,11 +11,14 @@ import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -72,6 +76,8 @@ public class AuthenticatorActivity extends AppCompatActivity
 	static private final Logger logger = LoggerFactory.getLogger(AuthenticatorActivity.class);
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final int REQUEST_SMS_PERMISSION_CODE = 10001;
+    private static final int REQUEST_PERMISSION_CODE = 10002;
 
 	enum HandlerState
 	{
@@ -409,7 +415,7 @@ public class AuthenticatorActivity extends AppCompatActivity
                         mLoginReceiveSMSCounter = (TextView)findViewById(R.id.login_textview_receive_sms_counter);
                         Helper.setTypeface(this, mLoginReceiveSMSCounter, FontTypeEnum.normalFont);
 
-                        EditText textviewDateOfBirth = (EditText)findViewById(R.id.edittext_date_of_birth);
+                        TextView textviewDateOfBirth = (TextView)findViewById(R.id.textview_date_of_birth);
                         textviewDateOfBirth.setOnClickListener(ClickListener);
                         Helper.setTypeface(this, textviewDateOfBirth, FontTypeEnum.lightFont);
 
@@ -646,43 +652,10 @@ public class AuthenticatorActivity extends AppCompatActivity
 
         mAccountManager.addAccountExplicitly(account, mPassword, null);
 
-/*@@
-        //Set TakeAPeek contacts to be visible by default
-        ContentProviderClient client = getContentResolver().acquireContentProviderClient(ContactsContract.AUTHORITY_URI);
-        ContentValues values = new ContentValues();
-        values.put(Groups.ACCOUNT_NAME, mUsername);
-        values.put(Groups.ACCOUNT_TYPE, Constants.TAKEAPEEK_ACCOUNT_TYPE);
-        values.put(Settings.UNGROUPED_VISIBLE, true);
-        try
-        {
-        	Builder builder = Settings.CONTENT_URI.buildUpon();
-        	builder.appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true");
-        	Uri uri = builder.build();
-        	client.insert(uri, values);
-        }
-        catch (Exception e)
-        {
-        	Helper.Error(logger, "EXCEPTION: when adding account", e);
-        }
-@@*/
-
         DismissProgressDialog();
-        
-        mHandler.postDelayed(new Runnable() 
-    	{
-            public void run() 
-            {
-//@@                Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoominbounce);
-//@@                findViewById(R.id.relativelayout_verification_code).setAnimation(zoomInAnimation);
-                
-                Message msg = Message.obtain();
-                msg.arg1 = HandlerState.verificationSuccess.ordinal();
-                mHandler.sendMessage(msg);
-                
-//@@                zoomInAnimation.start();
-            }
-        }, 500);
-        
+
+        DoVerificationSuccess();
+
         //Set Profile state as 'Active'
 		Helper.SetProfileState(mSharedPreferences.edit(), ProfileStateEnum.Active);
 
@@ -722,32 +695,183 @@ public class AuthenticatorActivity extends AppCompatActivity
             }
         }.execute();
     }
-    
+
+    private void DoVerificationSuccess()
+    {
+        logger.debug("DoVerificationSuccess() Invoked");
+
+        mHandler.postDelayed(new Runnable()
+        {
+            public void run()
+            {
+                Message msg = Message.obtain();
+                msg.arg1 = HandlerState.verificationSuccess.ordinal();
+                mHandler.sendMessage(msg);
+            }
+        }, 500);
+    }
+
     private void ShowSMSVerificationUI()
     {
     	logger.debug("ShowSMSVerificationUI() Invoked");
     	
     	mHandlerState = HandlerState.firstVerification;
     	
-    	//Set and run the first flyin animation after a delay
-    	mHandler.postDelayed(new Runnable() 
+    	mHandler.postDelayed(new Runnable()
     	{
             public void run() 
             {
-//@@                Animation flyInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.flyin);
-//@@                findViewById(R.id.login_linearlayout_auth_progress).setAnimation(flyInAnimation);
-                
                 Message msg = Message.obtain();
                 msg.arg1 = HandlerState.firstVerification.ordinal();
                 mHandler.sendMessage(msg);
-                
-//@@                flyInAnimation.start();
             }
         }, 500);
-    	
-    	//Scan SMS messages for verification code in an AsyncTask
-    	mScanSMSAsyncTask = new ScanSMSAsyncTask(this);
-    	mScanSMSAsyncTask.execute();
+
+        if(CheckSMSPermission() == true)
+        {
+            //Scan SMS messages for verification code in an AsyncTask
+            mScanSMSAsyncTask = new ScanSMSAsyncTask(this);
+            mScanSMSAsyncTask.execute();
+        }
+        else
+        {
+            RequestSMSPermission();
+        }
+    }
+
+    public boolean CheckSMSPermission()
+    {
+        logger.debug("CheckSMSPermission() Invoked");
+
+        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void RequestSMSPermission()
+    {
+        logger.debug("RequestSMSPermission() Invoked");
+
+        ActivityCompat.requestPermissions(AuthenticatorActivity.this, new String[]
+                {
+                        Manifest.permission.READ_SMS
+
+                }, REQUEST_SMS_PERMISSION_CODE);
+    }
+
+    private boolean CheckPermissions()
+    {
+        logger.debug("CheckPermissions() Invoked");
+
+        int numberOfPermissions = 6;
+        int permissionTypeArray[] = new int[numberOfPermissions];
+
+        permissionTypeArray[0] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
+        permissionTypeArray[1] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissionTypeArray[2] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionTypeArray[3] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
+        permissionTypeArray[4] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        permissionTypeArray[5] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        for(int i=0; i<numberOfPermissions; i++)
+        {
+            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void RequestPermissions()
+    {
+        logger.debug("RequestPermissions() Invoked");
+
+        ActivityCompat.requestPermissions(AuthenticatorActivity.this, new String[]
+                {
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+
+                }, REQUEST_PERMISSION_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        logger.debug("onRequestPermissionsResult(...) Invoked");
+
+        switch (requestCode)
+        {
+            case REQUEST_SMS_PERMISSION_CODE:
+
+                boolean smsPermissionGranted = true;
+                if (grantResults.length > 0)
+                {
+                    for (int grantResult : grantResults)
+                    {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED)
+                        {
+                            smsPermissionGranted = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(smsPermissionGranted == true)
+                {
+                    //Scan SMS messages for verification code in an AsyncTask
+                    mScanSMSAsyncTask = new ScanSMSAsyncTask(this);
+                    mScanSMSAsyncTask.execute();
+                }
+
+                break;
+
+            case REQUEST_PERMISSION_CODE:
+
+                boolean allPermissionsGranted = true;
+                if (grantResults.length > 0)
+                {
+                    for (int grantResult : grantResults)
+                    {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED)
+                        {
+                            allPermissionsGranted = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(allPermissionsGranted == true)
+                {
+                    FinishCreateAccount();
+                }
+                else
+                {
+                    //Some permissions were denied, ask again
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthenticatorActivity.this);
+
+                    alert.setTitle(R.string.permissions_title);
+                    alert.setMessage(R.string.error_permissions);
+                    alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            dialogInterface.dismiss();
+                            RequestPermissions();
+                        }
+                    });
+                    alert.show();
+                }
+
+                break;
+
+            default:
+                break;
+        }
     }
     
     public void ScanSMSAsyncTaskPostExecute(String takeAPeekVerificationCode)
@@ -793,8 +917,16 @@ public class AuthenticatorActivity extends AppCompatActivity
     	else
     	{
     		mPassword = result;
-    		
-    		FinishCreateAccount();
+
+
+                if (CheckPermissions() == true)
+                {
+                    FinishCreateAccount();
+                }
+                else
+                {
+                    RequestPermissions();
+                }
     	}
     }
     
@@ -1375,7 +1507,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 
                     break;
 
-                case R.id.edittext_date_of_birth:
+                case R.id.textview_date_of_birth:
                     logger.info("OnClickListener: 'textview_date_of_birth' clicked");
 
                     //Show date picker dialog
@@ -1519,7 +1651,7 @@ public class AuthenticatorActivity extends AppCompatActivity
         formatter.setTimeZone(mCalendar.getTimeZone());
         String formattedDate = formatter.format(mCalendar.getTime());
 
-        ((EditText)findViewById(R.id.edittext_date_of_birth)).setText(formattedDate);
+        ((TextView)findViewById(R.id.textview_date_of_birth)).setText(formattedDate);
 
         //Enable the 'Continue' button
         findViewById(R.id.button_create_date_of_birth).setEnabled(true);

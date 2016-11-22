@@ -288,7 +288,7 @@
             android:layout_width="match_parent"
             android:visibility="gone" >
 
-            <!-- Text above number -->
+            <!-- Text above name -->
             <TextView
                 android:id="@+id/textview_display_name_big_title"
                 android:layout_width="match_parent"
@@ -347,7 +347,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:textColor="@color/pt_darkgray"
-                        android:textSize="18sp"
+                        android:textSize="24sp"
                         android:hint="@string/display_name_hint"
                         android:textColorHint="@color/pt_gray"
                         android:inputType="textCapWords|textNoSuggestions"
@@ -452,18 +452,27 @@
                 android:layout_marginBottom="30dp"
                 android:translationZ="4dp">
 
-                <EditText
-                    android:id="@+id/edittext_date_of_birth"
+                <TextView
+                    android:id="@+id/textview_date_of_birth"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:textColor="@color/pt_darkgray"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     android:hint="@string/date_of_birth_hint"
                     android:inputType="none"
                     android:layout_alignParentTop="true"
                     android:textColorHint="@color/pt_gray"
                     android:layout_marginTop="60dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/textview_date_of_birth"
+                    android:background="@color/pt_darkgray"
+                    android:layout_marginTop="5dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp" />
 

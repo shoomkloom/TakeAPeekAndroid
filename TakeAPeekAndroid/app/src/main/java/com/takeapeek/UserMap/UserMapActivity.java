@@ -111,8 +111,6 @@ public class UserMapActivity extends FragmentActivity implements
     Handler mHandler = new Handler();
     SharedPreferences mSharedPreferences = null;
 
-    public static final int REQUEST_PERMISSION_CODE = 10001;
-
     GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
     ClusterManager<TAPClusterItem> mClusterManager = null;
@@ -157,112 +155,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         DatabaseManager.init(this);
 
-        DoStartApplication();
-    }
-
-    private void DoStartApplication()
-    {
-        logger.debug("DoStartApplication() Invoked");
-
-        if(CheckPermissions() == true)
-        {
-            AppLoadLogic();
-        }
-        else
-        {
-            RequestPermissions();
-        }
-    }
-
-    private void RequestPermissions()
-    {
-        logger.debug("RequestPermissions() Invoked");
-
-        ActivityCompat.requestPermissions(UserMapActivity.this, new String[]
-                {
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.READ_SMS,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-
-                }, REQUEST_PERMISSION_CODE);
-    }
-
-    public boolean CheckPermissions()
-    {
-        logger.debug("CheckPermissions() Invoked");
-
-        int numberOfPermissions = 7;
-        int permissionTypeArray[] = new int[numberOfPermissions];
-
-        permissionTypeArray[0] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
-        permissionTypeArray[1] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
-        permissionTypeArray[2] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-        permissionTypeArray[3] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        permissionTypeArray[4] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS);
-        permissionTypeArray[5] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
-        permissionTypeArray[6] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        for(int i=0; i<numberOfPermissions; i++)
-        {
-            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
-        logger.debug("onRequestPermissionsResult(...) Invoked");
-
-        switch (requestCode)
-        {
-            case REQUEST_PERMISSION_CODE:
-
-                boolean allPermissionsGranted = true;
-                if (grantResults.length > 0)
-                {
-                    for (int grantResult : grantResults)
-                    {
-                        if (grantResult != PackageManager.PERMISSION_GRANTED)
-                        {
-                            allPermissionsGranted = false;
-                            break;
-                        }
-                    }
-                }
-
-                if(allPermissionsGranted == false)
-                {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(UserMapActivity.this);
-
-                    alert.setTitle(R.string.app_name);
-                    alert.setMessage(R.string.error_permissions);
-                    alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            dialogInterface.dismiss();
-                            DoStartApplication();
-                        }
-                    });
-                    alert.show();
-                }
-                else
-                {
-                    DoStartApplication();
-                }
-
-                break;
-        }
+        AppLoadLogic();
     }
 
     /**
