@@ -3,9 +3,7 @@
        android:shape="oval" android:useLevel="true"
        android:dither="true">
 
-    <size android:height="13dip" android:width="13dip"/>
+    <size android:height="15dip" android:width="15dip"/>
 
-    <solid android:color="@color/tap_white"/>
-
-    <stroke android:width="10px" android:color="@color/tap_black_faded"/>
+    <solid android:color="@color/pt_green"/>
 </shape>

@@ -188,7 +188,7 @@ public class CameraPreviewBGActivity extends AppCompatActivity
 
         logger.debug("onCreate(.) Invoked");
 
-        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
+//@@        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
     }
 
     @Override

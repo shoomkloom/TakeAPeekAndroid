@@ -21,14 +21,12 @@ public class ViewPagerAdapter extends PagerAdapter
     private Context mContext;
     private int[] mImageResources;
     private int[] mStringResources;
-    private int[] mTextGravity;
 
-    public ViewPagerAdapter(Context context, int[] imageResources, int[] stringResources, int[] textGravity)
+    public ViewPagerAdapter(Context context, int[] imageResources, int[] stringResources)
     {
         mContext = context;
         mImageResources = imageResources;
         mStringResources = stringResources;
-        mTextGravity = textGravity;
     }
 
     @Override
@@ -55,7 +53,6 @@ public class ViewPagerAdapter extends PagerAdapter
 
             TextView textView = (TextView) itemView.findViewById(R.id.text_pager_item);
             Helper.setTypeface(mContext, textView, Helper.FontTypeEnum.normalFont);
-            textView.setGravity(mTextGravity[position]);
             textView.setText(mStringResources[position]);
         }
         catch(Exception e)

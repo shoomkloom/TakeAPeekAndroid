@@ -9,7 +9,7 @@
     </item>
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/tap_green" />
+            <solid android:color="@color/pt_green" />
             <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
                      android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
         </shape>
@@ -25,7 +25,7 @@
     <!-- focused -->
     <item android:state_enabled="true">
         <shape>
-            <solid android:color="@color/tap_green" />
+            <solid android:color="@color/pt_green" />
             <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
                      android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
         </shape>

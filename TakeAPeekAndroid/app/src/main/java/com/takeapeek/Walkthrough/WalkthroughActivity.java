@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -13,15 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.takeapeek.R;
-import com.takeapeek.common.AutoFitTextureView;
-import com.takeapeek.common.CameraPreviewBGActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WalkthroughActivity extends CameraPreviewBGActivity implements ViewPager.OnPageChangeListener, View.OnClickListener
+public class WalkthroughActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener
 {
     static private final Logger logger = LoggerFactory.getLogger(WalkthroughActivity.class);
 
@@ -55,16 +53,6 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
             R.string.walkthrough06
     };
 
-    private int[] mTextGravity =
-    {
-            Gravity.CENTER_HORIZONTAL|Gravity.TOP,
-            Gravity.CENTER_HORIZONTAL|Gravity.TOP,
-            Gravity.CENTER_HORIZONTAL|Gravity.TOP,
-            Gravity.CENTER_HORIZONTAL|Gravity.TOP,
-            Gravity.CENTER_HORIZONTAL|Gravity.TOP,
-            Gravity.CENTER
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -79,9 +67,11 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         mViewPager = (ViewPager) findViewById(R.id.pager_introduction);
         mViewPager.setClipToPadding(false);
 
+/*@@
         int pixels = Helper.dipToPx(50);
         mViewPager.setPadding(pixels, 0, pixels, 0);
         //@@mViewPager.setPageMargin(-100);
+@@*/
 
         mTextViewButtonSkip = (TextView) findViewById(R.id.textview_button_skip);
         Helper.setTypeface(this, mTextViewButtonSkip, Helper.FontTypeEnum.boldFont);
@@ -93,13 +83,11 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
 
         mLinearLayoutIndicator = (LinearLayout) findViewById(R.id.viewPagerCountDots);
 
-        mAdapter = new ViewPagerAdapter(WalkthroughActivity.this, mImageResources, mStringResources, mTextGravity);
+        mAdapter = new ViewPagerAdapter(WalkthroughActivity.this, mImageResources, mStringResources);
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(this);
         setUiPageViewController();
-
-        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
     }
 
     @Override
@@ -138,7 +126,7 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         for (int i = 0; i < dotsCount; i++)
         {
             dots[i] = new ImageView(this);
-            dots[i].setImageDrawable(getResources().getDrawable(R.drawable.nonselecteditem_dot));
+            dots[i].setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.nonselecteditem_dot, null));
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams
             (
@@ -201,6 +189,7 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
         if (position + 1 == dotsCount)
         {
             mLinearLayoutIndicator.setVisibility(View.GONE);
+            mTextViewButtonSkip.setVisibility(View.GONE);
 
             mTextViewButtonLetsGo.setVisibility(View.VISIBLE);
             Animation letsgoZoomInAnimation = AnimationUtils.loadAnimation(this, R.anim.zoomin);
@@ -212,6 +201,10 @@ public class WalkthroughActivity extends CameraPreviewBGActivity implements View
             if(mTextViewButtonLetsGo.getVisibility() == View.VISIBLE)
             {
                 mTextViewButtonLetsGo.setVisibility(View.GONE);
+                mTextViewButtonSkip.setVisibility(View.VISIBLE);
+                Animation skipZoomInAnimation = AnimationUtils.loadAnimation(this, R.anim.zoomin);
+                mTextViewButtonSkip.setAnimation(skipZoomInAnimation);
+                skipZoomInAnimation.start();
 
                 mLinearLayoutIndicator.setVisibility(View.VISIBLE);
                 Animation dotsZoomInAnimation = AnimationUtils.loadAnimation(this, R.anim.zoomin);

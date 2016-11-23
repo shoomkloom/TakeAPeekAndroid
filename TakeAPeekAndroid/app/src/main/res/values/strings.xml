@@ -200,15 +200,12 @@
     <string name="place_number_of_peeks">%1$d peeks</string>
 
     <!-- Walkthrough -->
-    <string name="walkthrough01">
-        <b>Peek.To</b>
-        lets you see what\npeople are doing right now,\nin places you care about
-    </string>
-    <string name="walkthrough02">Peek short clips that\nwere created in the last hour</string>
+    <string name="walkthrough01">Peek.To lets you see what\npeople are doing right now,\nin places you care about</string>
+    <string name="walkthrough02">Peek short videos that\nwere created in the last hour</string>
     <string name="walkthrough03">Anonymously view,\nrequest and create Peeks</string>
     <string name="walkthrough04">Find places to peek</string>
-    <string name="walkthrough05">Peek with a simple click</string>
-    <string name="walkthrough06">We\'ll do the rest</string>
+    <string name="walkthrough05">Peek with a simple tap</string>
+    <string name="walkthrough06">Get notified when your friends are online,\nor somebody uploads a new Peek.</string>
     <string name="skip">Skip</string>
     <string name="lets_go">Let\'s go!</string>
 

@@ -23,7 +23,7 @@
     <color name="tap_white">#ffffff</color>
     <color name="tap_white_faded">#ddffffff</color>
     <color name="tap_darkgreen">#4c9c29</color>
-    <color name="tap_green">#55af2d</color>
+
     <color name="tap_lightgreen">#55cc41</color>
     <color name="tap_yellow_faded">#ccffeb5f</color>
     <color name="tap_yellow_faded2">#eeffeb5f</color>
@@ -33,6 +33,7 @@
     <color name="tap_black">#000000</color>
     <color name="tap_tra‌​nsparent">#00000000</color>
 
+    <color name="pt_green">#55af2d</color>
     <color name="pt_darkgray">#283238</color>
     <color name="pt_gray">#93a4ad</color>
     <color name="pt_red">#ec407a</color>
