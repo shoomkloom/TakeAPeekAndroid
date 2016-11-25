@@ -96,8 +96,8 @@
 
             <ImageView
                 android:id = "@+id/user_peek_notification_thumbnail_play"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_centerInParent="true"
                 android:src="@drawable/ic_video_play" />
 

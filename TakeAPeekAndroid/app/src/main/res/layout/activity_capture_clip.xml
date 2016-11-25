@@ -182,42 +182,38 @@
         android:onClick="clickedToggleFlash"/>
 
     <ImageView
+        android:id="@+id/imageview_capture_countdown"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="0dp"
+        android:src="@drawable/take_video_10"/>
+
+    <ImageView
         android:id="@+id/imageview_switch_camera"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:src="@drawable/switch_camera"
+        android:src="@drawable/camera_back"
         android:onClick="clickedSwitchCamera"/>
-
-    <ImageView
-        android:id="@+id/imageview_intro_close"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginRight="30dp"
-        android:src="@drawable/button_close"
-        android:onClick="clickedIntroDetailsClose"
-        android:visibility="gone"/>
 
     <LinearLayout
         android:id="@+id/linearlayout_intro_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@+id/imageview_intro_close"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="60dp"
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
-        android:background="@drawable/dark_rounded_corner_small"
+        android:background="@drawable/rounded_corner_small_green"
         android:onClick="clickedIntroDetailsClose"
-        android:visibility="gone">
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/textview_intro_details_title"
@@ -246,6 +242,17 @@
             android:paddingRight="20dp" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/imageview_intro_close"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignTop="@+id/linearlayout_intro_details"
+        android:layout_alignRight="@+id/linearlayout_intro_details"
+        android:src="@drawable/button_close"
+        android:layout_margin="5dp"
+        android:onClick="clickedIntroDetailsClose"
+        android:visibility="invisible"/>
+
     <RelativeLayout
         android:id="@+id/relativelayout_intro"
         android:layout_width="match_parent"
@@ -253,50 +260,51 @@
         android:layout_above="@+id/relativelayout_tap_bar"
         android:layout_centerHorizontal="true" >
 
-        <TextView
-            android:id="@+id/textview_intro_line1"
+        <LinearLayout
+            android:id="@+id/linearlayout_intro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/intro_create_peek"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:textColor="#ffffff"
-            android:gravity="center_horizontal"
-            android:textSize="25sp"
-            android:background="@drawable/dark_rounded_corner"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:visibility="invisible"/>
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:orientation="vertical"
+            android:onClick="clickedIntroWhy"
+            android:background="@drawable/rounded_corner_small_green"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/textview_intro_line1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/intro_create_peek"
+                android:textColor="@color/pt_white"
+                android:gravity="center_horizontal"
+                android:padding="5dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/textview_intro_line2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/intro_why"
+                android:textColor="@color/pt_white"
+                android:gravity="center_horizontal"
+                android:padding="5dp"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/imageview_intro_arrow"
             android:layout_width="wrap_content"
             android:layout_height="160dp"
-            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/linearlayout_intro"
             android:src="@drawable/intro_arrow_down"
-            android:layout_below="@+id/textview_intro_line1"
-            android:visibility="invisible"/>
-
-        <TextView
-            android:id="@+id/textview_intro_line2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/intro_why"
-            android:layout_below="@+id/textview_intro_line1"
-            android:layout_centerHorizontal="true"
-            android:textColor="#ffffff"
-            android:gravity="center_horizontal"
-            android:textSize="17sp"
-            android:background="@drawable/dark_rounded_corner"
-            android:layout_marginTop="20dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:onClick="clickedIntroWhy"
-            android:visibility="invisible"/>
+            android:visibility="visible"
+            android:layout_centerHorizontal="true"/>
 
         <TextView
             android:id="@+id/textview_intro_line3"
@@ -307,35 +315,30 @@
             android:layout_centerHorizontal="true"
             android:textColor="#ffffff"
             android:gravity="center_horizontal"
-            android:textSize="17sp"
-            android:background="@drawable/dark_rounded_corner"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp" />
+            android:textSize="14sp"
+            android:background="@drawable/rounded_corner_small_green"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp" />
 
     </RelativeLayout>
 
     <!-- Clip title and preview -->
-    <TextView
-        android:id="@+id/capture_preview_title_bar"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:textColor="@color/tap_white"
-        android:gravity="center"
-        android:textSize="25sp"
-        android:background="@color/tap_blue" />
-
     <EditText
         android:id="@+id/capture_preview_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/enter_peek_title_here"
-        android:layout_below="@+id/capture_preview_title_bar"
-        android:layout_margin="20dp"
+        android:textColorHint="@color/pt_gray"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:textSize="20sp"
-        android:textColor="@color/tap_darkgray"
-        android:singleLine="true"
+        android:textColor="@color/pt_darkgray"
+        android:maxLines="1"
         android:inputType="textCapSentences"
         android:theme="@style/AppTheme.EditText"/>
 
@@ -345,27 +348,37 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="70dp"
         android:layout_below="@+id/capture_preview_title"
-        android:background="@color/tap_white" >
+        android:visibility="visible">
 
         <ImageView
             android:id = "@+id/capture_preview_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:scaleType="centerCrop"
-            android:background="@color/tap_lightgray" />
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:id = "@+id/capture_preview_thumbnail_play"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_centerInParent="true"
             android:src="@drawable/ic_video_play"
             android:onClick="clickedPreviewPlay" />
 
     </RelativeLayout>
+
+    <View
+        android:id = "@+id/corner_overlay_on_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@+id/capture_preview_thumbnail_layout"
+        android:layout_alignBottom="@+id/capture_preview_thumbnail_layout"
+        android:layout_alignLeft="@+id/capture_preview_thumbnail_layout"
+        android:layout_alignRight="@+id/capture_preview_thumbnail_layout"
+        android:background="@drawable/rounded_corner_overlay_white"
+        android:visibility="gone" />
 
     <!-- END Clip title and preview -->
 
@@ -378,7 +391,7 @@
         android:paddingRight="15dp"
         android:paddingTop="12dp"
         android:paddingBottom="12dp"
-        android:background="@color/tap_blue_faded">
+        android:background="@color/pt_transparent_faded">
 
         <TextView
             android:id="@+id/textview_button_back"
@@ -399,7 +412,6 @@
             android:id="@+id/textview_button_video"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:text="10s"
             android:textSize="25sp"
             android:textColor="#ffffff"
             android:gravity="center"

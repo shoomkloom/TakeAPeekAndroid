@@ -33,6 +33,8 @@
     <color name="tap_black">#000000</color>
     <color name="tap_tra‌​nsparent">#00000000</color>
 
+    <color name="pt_transparent_faded">#55aaaaaa</color>
+    <color name="pt_green_faded">#cc66bb6a</color>
     <color name="pt_green">#55af2d</color>
     <color name="pt_darkgray">#283238</color>
     <color name="pt_gray">#93a4ad</color>

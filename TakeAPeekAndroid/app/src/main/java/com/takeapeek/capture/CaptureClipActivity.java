@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
 import android.speech.SpeechRecognizer;
@@ -64,6 +65,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.takeapeek.R;
+import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CameraController.CameraController;
 import com.takeapeek.capture.CameraController.CameraControllerManager2;
 import com.takeapeek.capture.Preview.Preview;
@@ -82,13 +84,16 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import static com.takeapeek.R.id.linearlayout_intro;
+
 /** The main Activity for Open Camera.
  */
 public class CaptureClipActivity extends Activity implements
 //@@        AudioListener.AudioListenerCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener
+        LocationListener,
+        Animation.AnimationListener
 {
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
 
@@ -100,7 +105,7 @@ public class CaptureClipActivity extends Activity implements
 	private Sensor mSensorMagnetic = null;
 	private MainUI mainUI = null;
 	private com.takeapeek.capture.MyApplicationInterface applicationInterface = null;
-	private Preview preview = null;
+	private Preview mPreview = null;
 	private OrientationEventListener orientationEventListener = null;
 	private boolean supports_auto_stabilise = false;
 	private boolean supports_force_video_4k = false;
@@ -111,6 +116,8 @@ public class CaptureClipActivity extends Activity implements
     private boolean screen_is_locked = false; // whether screen is "locked" - this is Open Camera's own lock to guard against accidental presses, not the standard Android lock
     private Map<Integer, Bitmap> preloaded_bitmap_resources = new Hashtable<Integer, Bitmap>();
 	private ValueAnimator gallery_save_anim = null;
+    private Animation mAnimationFlipToMiddle;
+    private Animation mAnimationFlipFromMiddle;
 
     private SoundPool sound_pool = null;
 	private SparseIntArray sound_ids = null;
@@ -136,10 +143,10 @@ public class CaptureClipActivity extends Activity implements
 	public String test_last_saved_image = null;
 
     ImageView mImageviewFlash = null;
+    ImageView mImageviewCaptureCountdown = null;
     ImageView mImageviewSwitchCamera = null;
-    TextView mTextviewIntroLine1 = null;
+    LinearLayout mLinearLayoutIntro = null;
     ImageView mImageviewIntroArrow = null;
-    TextView mTextviewIntroLine2 = null;
     ImageView mImageviewIntroClose = null;
     RelativeLayout mRelativelayoutIntro = null;
     LinearLayout mLinearlayoutIntroDetails = null;
@@ -147,11 +154,63 @@ public class CaptureClipActivity extends Activity implements
     TextView mTextviewButtonBack = null;
     TextView mTextviewButtonVideo = null;
     TextView mTextviewButtonDone = null;
-    TextView mCapturePreviewTitleBar = null;
     EditText mCapturePreviewTitle = null;
     RelativeLayout mCapturePreviewThumbnailLayout = null;
+    View mCornerOverlayOnThumbnail = null;
     ImageView mCapturePreviewThumbnail = null;
     VideoView mCapturePreviewVideo = null;
+
+    @Override
+    public void onAnimationStart(Animation animation)
+    {
+        //Do nothing
+    }
+
+    @Override
+    public void onAnimationEnd(Animation animation)
+    {
+        if (animation == mAnimationFlipToMiddle)
+        {
+            if (mPreview.getCameraId() == 0)
+            {
+                mImageviewSwitchCamera.setImageResource(R.drawable.camera_front);
+                mImageviewFlash.setVisibility(View.GONE);
+                Animation zoomOutAnimation = AnimationUtils.loadAnimation(CaptureClipActivity.this, R.anim.zoomout);
+                mImageviewFlash.setAnimation(zoomOutAnimation);
+                zoomOutAnimation.start();
+                FlashOff();
+            }
+            else
+            {
+                mImageviewSwitchCamera.setImageResource(R.drawable.camera_back);
+                mImageviewFlash.setVisibility(View.VISIBLE);
+                Animation zoomInAnimation = AnimationUtils.loadAnimation(CaptureClipActivity.this, R.anim.zoomin);
+                mImageviewFlash.setAnimation(zoomInAnimation);
+                zoomInAnimation.start();
+            }
+
+            mImageviewSwitchCamera.clearAnimation();
+            mImageviewSwitchCamera.setAnimation(mAnimationFlipFromMiddle);
+            mImageviewSwitchCamera.startAnimation(mAnimationFlipFromMiddle);
+
+            mHandler.postDelayed(new Runnable()
+            {
+                public void run()
+                {
+                    int cameraId = getNextCameraId();
+                    mPreview.setCamera(cameraId);
+                }
+            }, 500);
+        }
+
+        mImageviewSwitchCamera.setEnabled(true);
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation)
+    {
+        //Do nothing
+    }
 
     enum VideoCaptureStateEnum
     {
@@ -271,7 +330,7 @@ public class CaptureClipActivity extends Activity implements
 		//@@mainUI.clearSeekBar();
 
 		// set up the camera and its preview
-        preview = new Preview(applicationInterface, savedInstanceState, ((ViewGroup) this.findViewById(R.id.preview)));
+        mPreview = new Preview(applicationInterface, savedInstanceState, ((ViewGroup) this.findViewById(R.id.preview)));
 
 		// initialise on-screen button visibility
 	    //@@View switchCameraButton = (View) findViewById(R.id.switch_camera);
@@ -333,7 +392,13 @@ public class CaptureClipActivity extends Activity implements
         textToSpeechSuccess = false;
 
         //Start TAP specific code
+        mAnimationFlipToMiddle = AnimationUtils.loadAnimation(this, R.anim.flip_to_middle);
+        mAnimationFlipToMiddle.setAnimationListener(this);
+        mAnimationFlipFromMiddle = AnimationUtils.loadAnimation(this, R.anim.flip_from_middle);
+        mAnimationFlipFromMiddle.setAnimationListener(this);
+
         mImageviewFlash = (ImageView)findViewById(R.id.imageview_flash);
+        mImageviewCaptureCountdown = (ImageView)findViewById(R.id.imageview_capture_countdown);
         mImageviewSwitchCamera = (ImageView)findViewById(R.id.imageview_switch_camera);
 
         TextView textviewIntroDetailsTitle = (TextView)findViewById(R.id.textview_intro_details_title);
@@ -342,13 +407,15 @@ public class CaptureClipActivity extends Activity implements
         TextView textviewIntroDetailsText = (TextView)findViewById(R.id.textview_intro_details_text);
         Helper.setTypeface(this, textviewIntroDetailsText, Helper.FontTypeEnum.boldFont);
 
-        mTextviewIntroLine1 = (TextView)findViewById(R.id.textview_intro_line1);
-        Helper.setTypeface(this, mTextviewIntroLine1, Helper.FontTypeEnum.boldFont);
+        mLinearLayoutIntro = (LinearLayout)findViewById(R.id.linearlayout_intro);
+
+        TextView textviewIntroLine1 = (TextView)findViewById(R.id.textview_intro_line1);
+        Helper.setTypeface(this, textviewIntroLine1, Helper.FontTypeEnum.boldFont);
+
+        TextView textviewIntroLine2 = (TextView)findViewById(R.id.textview_intro_line2);
+        Helper.setTypeface(this, textviewIntroLine2, Helper.FontTypeEnum.boldFont);
 
         mImageviewIntroArrow = (ImageView)findViewById(R.id.imageview_intro_arrow);
-
-        mTextviewIntroLine2 = (TextView)findViewById(R.id.textview_intro_line2);
-        Helper.setTypeface(this, mTextviewIntroLine2, Helper.FontTypeEnum.boldFont);
 
         TextView textviewIntroLine3 = (TextView)findViewById(R.id.textview_intro_line3);
         Helper.setTypeface(this, textviewIntroLine3, Helper.FontTypeEnum.boldFont);
@@ -362,33 +429,16 @@ public class CaptureClipActivity extends Activity implements
         Helper.setTypeface(this, mTextviewButtonBack, Helper.FontTypeEnum.boldFont);
 
         mTextviewButtonVideo = (TextView)findViewById(R.id.textview_button_video);
-        Helper.setTypeface(this, mTextviewButtonVideo, Helper.FontTypeEnum.boldFont);
         mTextviewButtonVideo.setOnTouchListener(TakeVideoTouchListener);
 
         mTextviewButtonDone = (TextView)findViewById(R.id.textview_button_done);
         Helper.setTypeface(this, mTextviewButtonDone, Helper.FontTypeEnum.boldFont);
 
-        mCapturePreviewTitleBar = (TextView)findViewById(R.id.capture_preview_title_bar);
-        Helper.setTypeface(this, mCapturePreviewTitleBar, Helper.FontTypeEnum.boldFont);
-
         mCapturePreviewTitle = (EditText)findViewById(R.id.capture_preview_title);
-        Helper.setTypeface(this, mCapturePreviewTitle, Helper.FontTypeEnum.boldFont);
-        mCapturePreviewTitle.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3){}
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int arg1, int arg2, int arg3) {}
-
-            @Override
-            public void afterTextChanged(Editable arg0)
-            {
-                mCapturePreviewTitleBar.setText(arg0.toString().trim());
-            }
-        });
+        Helper.setTypeface(this, mCapturePreviewTitle, Helper.FontTypeEnum.normalFont);
 
         mCapturePreviewThumbnailLayout = (RelativeLayout)findViewById(R.id.capture_preview_thumbnail_layout);
+        mCornerOverlayOnThumbnail = findViewById(R.id.corner_overlay_on_thumbnail);
         mCapturePreviewThumbnail = (ImageView)findViewById(R.id.capture_preview_thumbnail);
         mCapturePreviewVideo = (VideoView)findViewById(R.id.capture_preview_video);
 
@@ -742,11 +792,11 @@ public class CaptureClipActivity extends Activity implements
             case KeyEvent.KEYCODE_FOCUS:
 			{
 				// important not to repeatedly request focus, even though preview.requestAutoFocus() will cancel - causes problem with hardware camera key where a half-press means to focus
-				if( !preview.isFocusWaiting() )
+				if( !mPreview.isFocusWaiting() )
                 {
                     logger.info("request focus due to focus key");
 
-    				preview.requestAutoFocus();
+                    mPreview.requestAutoFocus();
 				}
 	            return true;
 			}
@@ -816,7 +866,7 @@ public class CaptureClipActivity extends Activity implements
         {
             logger.debug("accelerometerListener:onSensorChanged(.) Invoked.");
 
-			preview.onAccelerometerSensorChanged(event);
+            mPreview.onAccelerometerSensorChanged(event);
 		}
 	};
 	
@@ -832,7 +882,7 @@ public class CaptureClipActivity extends Activity implements
         {
             logger.debug("magneticListener:onSensorChanged(.) Invoked.");
 
-			preview.onMagneticSensorChanged(event);
+            mPreview.onMagneticSensorChanged(event);
 		}
 	};
 
@@ -871,9 +921,9 @@ public class CaptureClipActivity extends Activity implements
             mainUI.layoutUI();
         }
 
-        if(preview != null)
+        if(mPreview != null)
         {
-            preview.onResume();
+            mPreview.onResume();
         }
     }
 	
@@ -922,7 +972,7 @@ public class CaptureClipActivity extends Activity implements
             mGoogleApiClient.disconnect();
         }
 
-		preview.onPause();
+        mPreview.onPause();
     }
 
     @Override
@@ -932,7 +982,7 @@ public class CaptureClipActivity extends Activity implements
 
 		// configuration change can include screen orientation (landscape/portrait) when not locked (when settings is open)
 		// needed if app is paused/resumed when settings is open and device is in portrait mode
-        preview.setCameraDisplayOrientation();
+        mPreview.setCameraDisplayOrientation();
 
         super.onConfigurationChanged(newConfig);
     }
@@ -1000,7 +1050,7 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("StopVideoCapture() Invoked.");
 
-        if(preview != null && preview.isVideoRecording())
+        if(mPreview != null && mPreview.isVideoRecording())
         {
             takePicture();
         }
@@ -1014,43 +1064,43 @@ public class CaptureClipActivity extends Activity implements
         switch(seconds)
         {
             case 9:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_0);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_9);
                 break;
 
             case 8:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_1);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_8);
                 break;
 
             case 7:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_2);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_7);
                 break;
 
             case 6:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_3);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_6);
                 break;
 
             case 5:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_4);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_5);
                 break;
 
             case 4:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_5);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_4);
                 break;
 
             case 3:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_6);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_3);
                 break;
 
             case 2:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_7);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_2);
                 break;
 
             case 1:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_8);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_1);
                 break;
 
             case 0:
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_9);
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_0);
                 break;
         }
     }
@@ -1123,13 +1173,13 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("getNextCameraId() Invoked.");
 
-		int cameraId = preview.getCameraId();
+		int cameraId = mPreview.getCameraId();
 
         logger.info("current cameraId: " + cameraId);
 
-		if( this.preview.canSwitchCamera() )
+		if( this.mPreview.canSwitchCamera() )
         {
-			int n_cameras = preview.getCameraControllerManager().getNumberOfCameras();
+			int n_cameras = mPreview.getCameraControllerManager().getNumberOfCameras();
 			cameraId = (cameraId+1) % n_cameras;
 		}
 
@@ -1144,17 +1194,13 @@ public class CaptureClipActivity extends Activity implements
 
 		//@@this.closePopup();
 
-		if( this.preview.canSwitchCamera() )
+		if( this.mPreview.canSwitchCamera() )
         {
             mImageviewSwitchCamera.setEnabled(false); // prevent slowdown if user repeatedly clicks
 
-            Animation rotationAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate);
-            mImageviewSwitchCamera.startAnimation(rotationAnimation);
-
-            int cameraId = getNextCameraId();
-            this.preview.setCamera(cameraId);
-
-            mImageviewSwitchCamera.setEnabled(true);
+            mImageviewSwitchCamera.clearAnimation();
+            mImageviewSwitchCamera.setAnimation(mAnimationFlipToMiddle);
+            mImageviewSwitchCamera.startAnimation(mAnimationFlipToMiddle);
         }
     }
 
@@ -1228,7 +1274,7 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("clickedExposureLock(.) Invoked.");
 
-    	this.preview.toggleExposureLock();
+    	this.mPreview.toggleExposureLock();
     }
 
 /*@@
@@ -1277,13 +1323,13 @@ public class CaptureClipActivity extends Activity implements
 
     	String saved_focus_value = null;
 
-    	if( preview.getCameraController() != null && preview.isVideo() && !preview.focusIsVideo() )
+    	if( mPreview.getCameraController() != null && mPreview.isVideo() && !mPreview.focusIsVideo() )
         {
-    		saved_focus_value = preview.getCurrentFocusValue(); // n.b., may still be null
+    		saved_focus_value = mPreview.getCurrentFocusValue(); // n.b., may still be null
 			// make sure we're into continuous video mode
 			// workaround for bug on Samsung Galaxy S5 with UHD, where if the user switches to another (non-continuous-video) focus mode, then goes to Settings, then returns and records video, the preview freezes and the video is corrupted
 			// so to be safe, we always reset to continuous video mode, and then reset it afterwards
-			preview.updateFocusForVideo(false);
+            mPreview.updateFocusForVideo(false);
     	}
 
         logger.info("saved_focus_value: " + saved_focus_value);
@@ -1294,15 +1340,15 @@ public class CaptureClipActivity extends Activity implements
 		// but need workaround for Nexus 7 bug, where scene mode doesn't take effect unless the camera is restarted - I can reproduce this with other 3rd party camera apps, so may be a Nexus 7 issue...
 		boolean need_reopen = false;
 
-        if( preview.getCameraController() != null )
+        if( mPreview.getCameraController() != null )
         {
-			String scene_mode = preview.getCameraController().getSceneMode();
+			String scene_mode = mPreview.getCameraController().getSceneMode();
 
             logger.info("scene mode was: " + scene_mode);
 
 			String key = com.takeapeek.capture.PreferenceKeys.getSceneModePreferenceKey();
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-			String value = sharedPreferences.getString(key, preview.getCameraController().getDefaultSceneMode());
+			String value = sharedPreferences.getString(key, mPreview.getCameraController().getDefaultSceneMode());
 
 			if( !value.equals(scene_mode) )
             {
@@ -1330,16 +1376,16 @@ public class CaptureClipActivity extends Activity implements
         {
             block_startup_toast = true;
         }
-		if( need_reopen || preview.getCameraController() == null )
+		if( need_reopen || mPreview.getCameraController() == null )
         { // if camera couldn't be opened before, might as well try again
-			preview.onPause();
-			preview.onResume();
+            mPreview.onPause();
+            mPreview.onResume();
 		}
 		else
         {
-			preview.setCameraDisplayOrientation(); // need to call in case the preview rotation option was changed
-			preview.pausePreview();
-			preview.setupCamera(false);
+            mPreview.setCameraDisplayOrientation(); // need to call in case the preview rotation option was changed
+            mPreview.pausePreview();
+            mPreview.setupCamera(false);
 		}
 
         block_startup_toast = false;
@@ -1348,7 +1394,7 @@ public class CaptureClipActivity extends Activity implements
         {
             logger.info("switch focus back to: " + saved_focus_value);
 
-    		preview.updateFocus(saved_focus_value, true, false);
+            mPreview.updateFocus(saved_focus_value, true, false);
     	}
     }
     
@@ -1357,7 +1403,7 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("onBackPressed() Invoked.");
 
-        if(preview != null && preview.isVideoRecording())
+        if(mPreview != null && mPreview.isVideoRecording())
         {
             takePicture();
 
@@ -1973,9 +2019,9 @@ public class CaptureClipActivity extends Activity implements
 
 		//@@closePopup();
 
-        if(preview != null)
+        if(mPreview != null)
         {
-            preview.takePicturePressed();
+            mPreview.takePicturePressed();
         }
     }
 
@@ -2076,9 +2122,9 @@ public class CaptureClipActivity extends Activity implements
 
 	    super.onSaveInstanceState(state);
 
-	    if( this.preview != null )
+	    if( this.mPreview != null )
         {
-	    	preview.onSaveInstanceState(state);
+            mPreview.onSaveInstanceState(state);
 	    }
 
         if( this.applicationInterface != null )
@@ -2091,14 +2137,14 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("supportsExposureButton() Invoked.");
 
-		if( preview.getCameraController() == null )
+		if( mPreview.getCameraController() == null )
         {
             return false;
         }
-		String iso_value = mSharedPreferences.getString(PreferenceKeys.getISOPreferenceKey(), preview.getCameraController().getDefaultISO());
+		String iso_value = mSharedPreferences.getString(PreferenceKeys.getISOPreferenceKey(), mPreview.getCameraController().getDefaultISO());
 
-		boolean manual_iso = !iso_value.equals(preview.getCameraController().getDefaultISO());
-		boolean supports_exposure = preview.supportsExposures() || (manual_iso && preview.supportsISORange() );
+		boolean manual_iso = !iso_value.equals(mPreview.getCameraController().getDefaultISO());
+		boolean supports_exposure = mPreview.supportsExposures() || (manual_iso && mPreview.supportsISORange() );
 
         return supports_exposure;
 	}
@@ -2107,15 +2153,15 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("cameraSetup() Invoked.");
 
-		if( this.supportsForceVideo4K() && preview.usingCamera2API() )
+		if( this.supportsForceVideo4K() && mPreview.usingCamera2API() )
         {
             logger.info("using Camera2 API, so can disable the force 4K option");
 
 			this.disableForceVideo4K();
 		}
-		if( this.supportsForceVideo4K() && preview.getSupportedVideoSizes() != null )
+		if( this.supportsForceVideo4K() && mPreview.getSupportedVideoSizes() != null )
         {
-			for(CameraController.Size size : preview.getSupportedVideoSizes())
+			for(CameraController.Size size : mPreview.getSupportedVideoSizes())
             {
 				if( size.width >= 3840 && size.height >= 2160 )
                 {
@@ -2127,12 +2173,12 @@ public class CaptureClipActivity extends Activity implements
 		}
 
         logger.info("set up zoom");
-        logger.info("has_zoom? " + preview.supportsZoom());
+        logger.info("has_zoom? " + mPreview.supportsZoom());
         {
 		    //@@ZoomControls zoomControls = (ZoomControls) findViewById(R.id.zoom);
 		    SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
 
-			if( preview.supportsZoom() )
+			if( mPreview.supportsZoom() )
             {
 /*@@
 				if(mSharedPreferences.getBoolean(PreferenceKeys.getShowZoomControlsPreferenceKey(), false) )
@@ -2163,8 +2209,8 @@ public class CaptureClipActivity extends Activity implements
 @@*/
 				
 				zoomSeekBar.setOnSeekBarChangeListener(null); // clear an existing listener - don't want to call the listener when setting up the progress bar to match the existing state
-				zoomSeekBar.setMax(preview.getMaxZoom());
-				zoomSeekBar.setProgress(preview.getMaxZoom()-preview.getCameraController().getZoom());
+				zoomSeekBar.setMax(mPreview.getMaxZoom());
+				zoomSeekBar.setProgress(mPreview.getMaxZoom()-mPreview.getCameraController().getZoom());
 				zoomSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
                 {
 					@Override
@@ -2172,7 +2218,7 @@ public class CaptureClipActivity extends Activity implements
                     {
                         logger.info("zoom onProgressChanged: " + progress);
 
-						preview.zoomTo(preview.getMaxZoom()-progress);
+                        mPreview.zoomTo(mPreview.getMaxZoom()-progress);
 					}
 
 					@Override
@@ -2494,7 +2540,7 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("getPreview() Invoked.");
 
-    	return this.preview;
+    	return this.mPreview;
     }
     
     public MainUI getMainUI()
@@ -2545,7 +2591,7 @@ public class CaptureClipActivity extends Activity implements
 
         logger.info("always_show? " + always_show);
 
-		CameraController camera_controller = preview.getCameraController();
+		CameraController camera_controller = mPreview.getCameraController();
 
 		if( camera_controller == null || this.camera_in_background )
         {
@@ -2558,9 +2604,9 @@ public class CaptureClipActivity extends Activity implements
 
 		boolean simple = true;
 
-		if( preview.isVideo() )
+		if( mPreview.isVideo() )
         {
-			CamcorderProfile profile = preview.getCamcorderProfile();
+			CamcorderProfile profile = mPreview.getCamcorderProfile();
 			String bitrate_string = "";
 
 			if( profile.videoBitRate >= 10000000 )
@@ -2608,7 +2654,7 @@ public class CaptureClipActivity extends Activity implements
 				simple = false;
 			}
 
-            if(mSharedPreferences.getBoolean(PreferenceKeys.getVideoFlashPreferenceKey(), false) && preview.supportsFlash() ) {
+            if(mSharedPreferences.getBoolean(PreferenceKeys.getVideoFlashPreferenceKey(), false) && mPreview.supportsFlash() ) {
 				//@@toast_string += "\n" + getResources().getString(R.string.preference_video_flash);
 				simple = false;
 			}
@@ -2647,7 +2693,7 @@ public class CaptureClipActivity extends Activity implements
         if( !iso_value.equals(camera_controller.getDefaultISO()) )
         {
 			toast_string += "\nISO: " + iso_value;
-			if( preview.supportsExposureTime() ) {
+			if( mPreview.supportsExposureTime() ) {
 				long exposure_time_value = mSharedPreferences.getLong(PreferenceKeys.getExposureTimePreferenceKey(), camera_controller.getDefaultExposureTime());
 				//@@toast_string += " " + preview.getExposureTimeString(exposure_time_value);
 			}
@@ -3057,8 +3103,8 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("clickedToggleFlash(.) Invoked.");
 
-        String currentFlashValue = preview.getCurrentFlashValue();
-        if(currentFlashValue == null || currentFlashValue.compareTo("flash_auto") == 0)
+        String currentFlashValue = mPreview.getCurrentFlashValue();
+        if (currentFlashValue == null || currentFlashValue.compareTo("flash_auto") == 0)
         {
             FlashOn();
         }
@@ -3072,9 +3118,9 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("FlashOff() Invoked.");
 
-        if(preview != null && preview.supportsFlash() == true)
+        if(mPreview != null && mPreview.supportsFlash() == true)
         {
-            preview.updateFlash("flash_auto");
+            mPreview.updateFlash("flash_auto");
             mImageviewFlash.setImageResource(R.drawable.flash);
         }
     }
@@ -3083,9 +3129,9 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("FlashOn() Invoked.");
 
-        if(preview.supportsFlash() == true)
+        if(mPreview.supportsFlash() == true)
         {
-            preview.updateFlash("flash_torch");
+            mPreview.updateFlash("flash_torch");
             mImageviewFlash.setImageResource(R.drawable.flash_pressed);
         }
     }
@@ -3172,7 +3218,7 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("clickedDone(.) Invoked.");
 
-        mCompletedTakeAPeekObject.Title = mCapturePreviewTitleBar.getText().toString();
+        mCompletedTakeAPeekObject.Title = mCapturePreviewTitle.getText().toString();
 
         UploadRecordedVideo(mCompletedTakeAPeekObject);
 
@@ -3322,29 +3368,30 @@ public class CaptureClipActivity extends Activity implements
         {
             case Start:
                 mImageviewFlash.setVisibility(View.VISIBLE);
+                mImageviewCaptureCountdown.setVisibility(View.GONE);
                 mImageviewSwitchCamera.setVisibility(View.VISIBLE);
                 mRelativelayoutIntro.setVisibility(View.VISIBLE);
-                mTextviewIntroLine1.setVisibility(View.VISIBLE);
+                mLinearLayoutIntro.setVisibility(View.VISIBLE);
                 mImageviewIntroArrow.setVisibility(View.VISIBLE);
 
+/*@@
                 if(Helper.GetFirstCapture(mSharedPreferences) == true)
                 {
-                    mTextviewIntroLine2.setVisibility(View.VISIBLE);
                     Helper.SetFirstCapture(mSharedPreferences.edit(), false);
                 }
+@@*/
 
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
                 mTextviewButtonBack.setVisibility(View.GONE);
 
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
-                mTextviewButtonVideo.setText("10s");
                 mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
 
                 mTextviewButtonDone.setVisibility(View.GONE);
-                mCapturePreviewTitleBar.setVisibility(View.GONE);
                 mCapturePreviewTitle.setVisibility(View.GONE);
                 mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+                mCornerOverlayOnThumbnail.setVisibility(View.GONE);
 
                 findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.tap_black));
 
@@ -3352,35 +3399,38 @@ public class CaptureClipActivity extends Activity implements
                 findViewById(R.id.zoom_seekbar).setVisibility(View.VISIBLE);
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
+                mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_transparent_faded));
+
                 break;
 
             case Details:
                 mImageviewFlash.setVisibility(View.VISIBLE);
+                mImageviewCaptureCountdown.setVisibility(View.GONE);
                 mImageviewSwitchCamera.setVisibility(View.VISIBLE);
                 mRelativelayoutIntro.setVisibility(View.VISIBLE);
-                mTextviewIntroLine1.setVisibility(View.INVISIBLE);
+                mLinearLayoutIntro.setVisibility(View.INVISIBLE);
                 mImageviewIntroArrow.setVisibility(View.INVISIBLE);
-                mTextviewIntroLine2.setVisibility(View.INVISIBLE);
-                //@@mImageviewIntroClose.setVisibility(View.VISIBLE);
-                /*@@*/mImageviewIntroClose.setVisibility(View.GONE);
+                mImageviewIntroClose.setVisibility(View.VISIBLE);
                 mLinearlayoutIntroDetails.setVisibility(View.VISIBLE);
                 mTextviewButtonBack.setVisibility(View.GONE);
 
                 mTextviewButtonVideo.setVisibility(View.VISIBLE);
-                mTextviewButtonVideo.setText("10s");
                 mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
 
                 mTextviewButtonDone.setVisibility(View.GONE);
-                mCapturePreviewTitleBar.setVisibility(View.GONE);
                 mCapturePreviewTitle.setVisibility(View.GONE);
                 mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+                mCornerOverlayOnThumbnail.setVisibility(View.GONE);
 
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
+
+                mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_transparent_faded));
 
                 break;
 
             case Capture:
                 mImageviewFlash.setVisibility(View.VISIBLE);
+                mImageviewCaptureCountdown.setVisibility(View.VISIBLE);
                 mImageviewSwitchCamera.setVisibility(View.GONE);
                 mRelativelayoutIntro.setVisibility(View.GONE);
                 mImageviewIntroClose.setVisibility(View.GONE);
@@ -3388,15 +3438,16 @@ public class CaptureClipActivity extends Activity implements
                 mTextviewButtonBack.setVisibility(View.GONE);
                 
 				mTextviewButtonVideo.setVisibility(View.VISIBLE);
-				mTextviewButtonVideo.setText("10s");
-                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video_pressed);
 
                 mTextviewButtonDone.setVisibility(View.GONE);
-                mCapturePreviewTitleBar.setVisibility(View.GONE);
                 mCapturePreviewTitle.setVisibility(View.GONE);
                 mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+                mCornerOverlayOnThumbnail.setVisibility(View.GONE);
 
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
+
+                mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_transparent_faded));
 
                 break;
 
@@ -3405,21 +3456,25 @@ public class CaptureClipActivity extends Activity implements
 
             case Finish:
                 mImageviewFlash.setVisibility(View.GONE);
+                mImageviewCaptureCountdown.setVisibility(View.GONE);
                 mImageviewSwitchCamera.setVisibility(View.GONE);
                 mRelativelayoutIntro.setVisibility(View.GONE);
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
                 mTextviewButtonBack.setVisibility(View.VISIBLE);
                 mTextviewButtonVideo.setVisibility(View.GONE);
+                mTextviewButtonVideo.setBackgroundResource(R.drawable.take_video);
                 mTextviewButtonDone.setVisibility(View.VISIBLE);
-                mCapturePreviewTitleBar.setVisibility(View.VISIBLE);
                 mCapturePreviewTitle.setVisibility(View.VISIBLE);
                 mCapturePreviewThumbnailLayout.setVisibility(View.VISIBLE);
+                mCornerOverlayOnThumbnail.setVisibility(View.VISIBLE);
 
-                findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.tap_white));
+                findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.pt_white));
                 findViewById(R.id.preview).setVisibility(View.INVISIBLE);
                 findViewById(R.id.zoom_seekbar).setVisibility(View.INVISIBLE);
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
+
+                mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_green_faded));
 
                 FlashOff();
                 break;

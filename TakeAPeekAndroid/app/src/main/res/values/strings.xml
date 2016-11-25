@@ -41,7 +41,7 @@
     </string>
     <string name="zoom">Zoom</string>
     <string name="clip_will_be_sent">Your Peek will be sent as soon as possible.</string>
-    <string name="enter_peek_title_here">Enter Peek title here...</string>
+    <string name="enter_peek_title_here">Add a title to your Peek</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
