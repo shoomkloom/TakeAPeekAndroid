@@ -9,8 +9,8 @@ android {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 41
-        versionName "0.9.41 beta"
+        versionCode 42
+        versionName "0.9.42 beta"
     }
     buildTypes {
         release {
@@ -38,6 +38,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-places:9.8.0'
     compile 'com.android.support:support-v4:25.0.0'
     compile 'com.google.maps.android:android-maps-utils:0.4'
+    compile 'com.github.crosswall:Android-Coverflow:release-v1.0.4'
 }
 
 

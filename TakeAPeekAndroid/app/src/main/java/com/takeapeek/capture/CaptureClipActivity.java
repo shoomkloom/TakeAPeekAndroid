@@ -1058,9 +1058,6 @@ public class CaptureClipActivity extends Activity implements
 
     public void UpdateTakeVideoUI(int seconds)
     {
-        String countdownString = String.format("%ds", seconds);
-        mTextviewButtonVideo.setText(countdownString);
-
         switch(seconds)
         {
             case 9:

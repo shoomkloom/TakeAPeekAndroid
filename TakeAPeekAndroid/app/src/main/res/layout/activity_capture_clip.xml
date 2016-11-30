@@ -325,27 +325,12 @@
     </RelativeLayout>
 
     <!-- Clip title and preview -->
-    <EditText
-        android:id="@+id/capture_preview_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/enter_peek_title_here"
-        android:textColorHint="@color/pt_gray"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textSize="20sp"
-        android:textColor="@color/pt_darkgray"
-        android:maxLines="1"
-        android:inputType="textCapSentences"
-        android:theme="@style/AppTheme.EditText"/>
 
     <RelativeLayout
         android:id = "@+id/capture_preview_thumbnail_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="70dp"
@@ -451,6 +436,25 @@
             android:layout_centerInParent="true" />
 
     </RelativeLayout>
+
+    <EditText
+        android:id="@+id/capture_preview_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_peek_title_here"
+        android:textColorHint="@color/pt_gray"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textSize="20sp"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/pt_darkgray"
+        android:maxLines="1"
+        android:inputType="textCapSentences"
+        android:background="@drawable/button_white"
+        android:padding="15dp"
+        android:translationZ="4dp"
+        android:theme="@style/AppTheme.EditText" />
 
     <!-- END TAP specific layout -->
     

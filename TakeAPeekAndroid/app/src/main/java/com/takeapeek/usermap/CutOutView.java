@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.takeapeek.R;
+import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class CutOutView extends View
     public int mRadius = 0;
     public int mWhite = 0;
     public int mInternalRadius = 150;
+    public int mDotBackRadius = 35;
     public int mDotRadius = 25;
 
     public CutOutView(Context context)
@@ -64,7 +66,8 @@ public class CutOutView extends View
 
         if (mCenter == null)
         {
-            mCenter = new Point(getWidth()/2, getHeight()/2);
+            int pixelsFromBottom = Helper.dipToPx(60) / 2;
+            mCenter = new Point(getWidth()/2, (getHeight()/2) - pixelsFromBottom);
 
             if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
             {
@@ -85,21 +88,21 @@ public class CutOutView extends View
 
         //Paint the area surrounding the circle
         Paint mPaint = new Paint();
-        mPaint.setColor(ContextCompat.getColor(mContext, R.color.tap_blue));
-        mPaint.setAlpha(70);
+        mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_gray_4));
+        mPaint.setAlpha(150);
         mPaint.setAntiAlias(true);
         canvas.drawRect(0, 0, getWidth(), getHeight(), mPaint);
 
         //Paint the border of the circle
         mPaint = new Paint();
-        mPaint.setColor(ContextCompat.getColor(mContext, R.color.tap_white));
+        mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_gray_4));
         mPaint.setAlpha(255);
         mPaint.setAntiAlias(true);
         canvas.drawCircle(mCenter.x, mCenter.y, mWhite, mPaint);
 
         //"Cut" the inside of the circle
         mPaint = new Paint();
-        mPaint.setColor(ContextCompat.getColor(mContext, R.color.tap_white));
+        mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_white));
         mPaint.setAlpha(0);
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.TRANSPARENT);
@@ -117,15 +120,22 @@ public class CutOutView extends View
 
         //Paint the central circle
         mPaint = new Paint();
-        mPaint.setColor(ContextCompat.getColor(mContext, R.color.tap_white));
-        mPaint.setAlpha(150);
+        mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_white));
+        mPaint.setAlpha(50);
         mPaint.setAntiAlias(true);
         canvas.drawCircle(mCenter.x, mCenter.y, mInternalRadius, mPaint);
 
-        //Paint the central red dot
+        //Paint the dot background
         mPaint = new Paint();
-        mPaint.setColor(ContextCompat.getColor(mContext, R.color.tap_red));
-        mPaint.setAlpha(200);
+        mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_white));
+        mPaint.setAlpha(230);
+        mPaint.setAntiAlias(true);
+        canvas.drawCircle(mCenter.x, mCenter.y, mDotBackRadius, mPaint);
+
+        //Paint the central dot
+        mPaint = new Paint();
+        mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_green_2));
+        mPaint.setAlpha(230);
         mPaint.setAntiAlias(true);
         canvas.drawCircle(mCenter.x, mCenter.y, mDotRadius, mPaint);
     }

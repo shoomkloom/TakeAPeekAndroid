@@ -33,18 +33,20 @@
     <color name="tap_black">#000000</color>
     <color name="tap_tra‌​nsparent">#00000000</color>
 
-    <color name="pt_transparent_faded">#55aaaaaa</color>
+    <color name="pt_red">#ec407a</color>
     <color name="pt_green_faded">#cc66bb6a</color>
     <color name="pt_green">#55af2d</color>
-    <color name="pt_darkgray">#283238</color>
-    <color name="pt_gray">#93a4ad</color>
-    <color name="pt_red">#ec407a</color>
-    <color name="pt_shadow_gray">#AA303030</color>
     <color name="pt_green_1">#81c784</color>
     <color name="pt_green_2">#66bb6a</color>
+    <color name="pt_darkgray">#283238</color>
+    <color name="pt_shadow_gray">#AA303030</color>
+    <color name="pt_gray">#93a4ad</color>
     <color name="pt_gray_1">#f7f8f9</color>
     <color name="pt_gray_2">#eceff1</color>
+    <color name="pt_gray_3">#f2f4f5</color>
+    <color name="pt_gray_4">#e3e3e3</color>
     <color name="pt_white">#ffffff</color>
     <color name="pt_tra‌​nsparent">#00000000</color>
+    <color name="pt_transparent_faded">#55aaaaaa</color>
 
 </resources>

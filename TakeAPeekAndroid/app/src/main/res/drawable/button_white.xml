@@ -8,8 +8,8 @@
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
 		      -->  
 		    <solid android:color="@color/tap_white" />
-		    <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-		     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+		    <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+		     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
 		</shape>
 	</item>
 
@@ -19,8 +19,8 @@
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
 		      -->  
 		    <solid android:color="@color/tap_white" />
-            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+                     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
 		</shape>
 	</item>
 	
@@ -30,8 +30,8 @@
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
 		      -->  
 		    <solid android:color="@color/tap_white" />
-            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+                     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
 		</shape>
 	</item>
     

@@ -65,21 +65,23 @@ public class PeekStackPagerAdapter extends PagerAdapter
         imageViewPeekThumbnail.setOnClickListener(ClickListener);
         imageViewPeekThumbnail.setTag(profileObject);
 
+/*@@
         TextView textViewPeekStackTitle = (TextView)viewGroup.findViewById(R.id.peek_stack_title);
         Helper.setTypeface(mUserMapActivity, textViewPeekStackTitle, Helper.FontTypeEnum.boldFont);
         textViewPeekStackTitle.setOnClickListener(ClickListener);
         textViewPeekStackTitle.setTag(profileObject);
-
+@@*/
         TextView textViewPeekThumbnailPlay = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
         Helper.setTypeface(mUserMapActivity, textViewPeekThumbnailPlay, Helper.FontTypeEnum.boldFont);
         textViewPeekThumbnailPlay.setOnClickListener(ClickListener);
         textViewPeekThumbnailPlay.setTag(profileObject);
 
+/*@@
         TextView textViewUserStackTime = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_time);
         Helper.setTypeface(mUserMapActivity, textViewUserStackTime, Helper.FontTypeEnum.normalFont);
         textViewUserStackTime.setOnClickListener(ClickListener);
         textViewUserStackTime.setTag(profileObject);
-
+@@*/
         TextView textViewUserStackFollow = (TextView)viewGroup.findViewById(R.id.user_peek_stack_follow);
         Helper.setTypeface(mUserMapActivity, textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
         textViewUserStackFollow.setOnClickListener(ClickListener);
@@ -101,8 +103,10 @@ public class PeekStackPagerAdapter extends PagerAdapter
                 break;
         }
 
+/*@@
         ImageView imageViewClose = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_close);
         imageViewClose.setOnClickListener(ClickListener);
+@@*/
 
         if(profileObject.peeks != null && profileObject.peeks.size() > 0)
         {
@@ -111,9 +115,10 @@ public class PeekStackPagerAdapter extends PagerAdapter
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
 
+/*@@
             textViewPeekStackTitle.setText(takeAPeekObject.Title);
             textViewUserStackTime.setText(Helper.GetFormttedDiffTime(mUserMapActivity, takeAPeekObject.CreationTime));
-
+@@*/
             if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
             {
 				LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
@@ -161,7 +166,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
         else
         {
             textViewPeekThumbnailPlay.setVisibility(View.GONE);
-            textViewUserStackTime.setText("No peeks found");
+//@@            textViewUserStackTime.setText("No peeks found");
         }
 
         collection.addView(viewGroup);
@@ -207,11 +212,12 @@ public class PeekStackPagerAdapter extends PagerAdapter
                     GotoUserPeekListActivity(v);
                     break;
 
+/*@@
                 case R.id.user_peek_stack_thumbnail_time:
                     logger.info("onClick: user_peek_stack_thumbnail_time");
                     GotoUserPeekListActivity(v);
                     break;
-
+@@*/
                 case R.id.user_peek_stack_follow:
                     logger.info("onClick: user_peek_stack_follow");
 
@@ -329,13 +335,14 @@ public class PeekStackPagerAdapter extends PagerAdapter
                     GotoUserPeekListActivity(v);
                     break;
 
+/*@@
                 case R.id.user_peek_stack_close:
                     logger.info("onClick: user_peek_stack_close");
 
                     mUserMapActivity.CloseUserPeekStack();
 
                     break;
-
+@@*/
                 default:
                     break;
             }

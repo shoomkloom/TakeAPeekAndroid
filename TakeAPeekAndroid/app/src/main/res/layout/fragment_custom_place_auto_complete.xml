@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:padding="4dp"
-    android:background="@drawable/rounded_corner_large" >
+    android:translationZ="4dp"
+    android:background="@drawable/button_white" >
 
     <EditText
         android:id="@+id/editWorkLocation"
@@ -15,11 +16,11 @@
         android:drawablePadding="5dp"
         android:hint="@string/search_location"
         android:singleLine="true"
-        android:textColor="@color/tap_darkgray"
+        android:textColor="@color/pt_darkgray"
         android:inputType="textNoSuggestions"
         android:textSize="16sp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:background="#00ffffff"/>
+        android:background="@color/pt_tra‌​nsparent"/>
 
 </LinearLayout>

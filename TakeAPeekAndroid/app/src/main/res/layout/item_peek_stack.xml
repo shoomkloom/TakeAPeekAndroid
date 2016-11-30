@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:background="@color/tap_blue" >
+                android:layout_height="200dp"
+                android:background="@color/pt_gray_1" >
 
     <RelativeLayout
         android:id = "@+id/user_peek_stack_thumbnail_layout"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="200dp"
         android:layout_centerHorizontal="true" >
 
         <ImageView
             android:id = "@+id/user_peek_stack_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="200dp"
             android:layout_alignParentTop="true"
             android:scaleType="centerCrop" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="200dp"
             android:layout_alignBottom="@+id/user_peek_stack_thumbnail"
             android:layout_alignLeft="@id/user_peek_stack_thumbnail"
             android:layout_alignRight="@+id/user_peek_stack_thumbnail"
             android:layout_alignTop="@id/user_peek_stack_thumbnail"
-            android:background="@drawable/rounded_corner_overlay_blue" />
+            android:background="@drawable/rounded_corner_overlay_gray" />
 
 <!--
         <View
@@ -54,7 +54,6 @@
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/ic_video_play" />
--->
 
         <TextView
             android:id = "@+id/peek_stack_title"
@@ -88,6 +87,8 @@
             android:shadowRadius="1"
             android:gravity="left"
             android:layout_marginRight="40dp"/>
+-->
+
 
         <TextView
             android:id = "@+id/user_peek_stack_thumbnail_play"
@@ -113,8 +114,8 @@
             android:id = "@+id/user_peek_stack_follow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
             android:clickable="true"
             android:textSize="12sp"
             android:textColor="@drawable/button_white"
@@ -143,6 +144,7 @@
             android:gravity="right"
             android:layout_marginRight="5dp"/>
 
+<!--
         <ImageView
             android:id = "@+id/user_peek_stack_close"
             android:layout_width="30dp"
@@ -151,6 +153,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/button_close" />
+-->
 
     </RelativeLayout>
 </RelativeLayout>

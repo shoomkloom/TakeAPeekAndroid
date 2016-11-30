@@ -194,7 +194,7 @@
     <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s users</string>
 
     <!-- Trending Places -->
-    <string name="places_title">Trendng Locations</string>
+    <string name="places_title">Trending Locations</string>
     <string name="error_request_trending_places">There was an error getting Trending Places, please try again later.</string>
     <string name="textview_places_empty">Could not get the list of Trending Places right now, please try again later.</string>
     <string name="place_number_of_peeks">%1$d peeks</string>

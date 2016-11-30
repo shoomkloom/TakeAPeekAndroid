@@ -1,14 +1,10 @@
 package com.takeapeek.usermap;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -18,17 +14,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +73,7 @@ import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
 import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.ormlite.TakeAPeekRequest;
 import com.takeapeek.trendingplaces.TrendingPlacesActivity;
@@ -88,6 +87,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
+
+import me.crosswall.lib.coverflow.CoverFlow;
+import me.crosswall.lib.coverflow.core.PagerContainer;
+
+import static android.R.attr.fragment;
+import static com.takeapeek.R.id.user_peek_stack;
 
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -130,10 +135,14 @@ public class UserMapActivity extends FragmentActivity implements
     ImageView mImageViewNotifications = null;
     ImageView mImageViewStack = null;
     TextView mTextViewNumNewNotifications = null;
-    LinearLayout mLinearLayout = null;
+    RelativeLayout mRelativeLayoutSearchBar = null;
     LinearLayout mLinearLayoutRequestPeek = null;
     LinearLayout mLinearLayoutSendPeek = null;
     TextView mTextViewStackUserName = null;
+    TextView mTextViewStackPeekTitle = null;
+    TextView mTextViewStackPeekTime = null;
+    RelativeLayout mLayoutPeekStack = null;
+    PagerContainer mPagerContainer = null;
     ViewPager mViewPager = null;
     PeekStackPagerAdapter mPeekStackPagerAdapter = null;
     private CutOutView mCutOutView = null;
@@ -243,8 +252,15 @@ public class UserMapActivity extends FragmentActivity implements
 
         UpdateNumberOfNewNotifications();
 
-        mLinearLayout = (LinearLayout) findViewById(R.id.user_peek_stack);
+        mRelativeLayoutSearchBar = (RelativeLayout) findViewById(R.id.relativelayout_searchbar);
         mCutOutView = (CutOutView)findViewById(R.id.cutOut);
+
+        LinearLayout linearLayoutButtonMapControl = (LinearLayout)findViewById(R.id.button_map_control);
+        linearLayoutButtonMapControl.setOnClickListener(ClickListener);
+
+        LinearLayout linearLayoutButtonMapControlClose = (LinearLayout)findViewById(R.id.button_map_control_close);
+        linearLayoutButtonMapControlClose.setOnClickListener(ClickListener);
+
         mLinearLayoutRequestPeek = (LinearLayout)findViewById(R.id.button_request_peek);
         mLinearLayoutRequestPeek.setOnClickListener(ClickListener);
         TextView textviewButtonRequestPeek = (TextView)findViewById(R.id.textview_button_request_peek);
@@ -274,8 +290,22 @@ public class UserMapActivity extends FragmentActivity implements
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
         Helper.setTypeface(this, mTextViewStackUserName, Helper.FontTypeEnum.boldFont);
 
-        mViewPager = (ViewPager) findViewById(R.id.user_peek_stack_viewpager);
+        mTextViewStackPeekTitle = (TextView)findViewById(R.id.peek_stack_title);
+        mTextViewStackPeekTime = (TextView)findViewById(R.id.user_peek_stack_time);
+
+        mLayoutPeekStack =  (RelativeLayout) findViewById(R.id.user_peek_stack);
+        mPagerContainer = (PagerContainer) findViewById(R.id.user_peek_pager_container);
+        mViewPager = mPagerContainer.getViewPager();
+        mViewPager.setClipChildren(false);
+        mViewPager.setOffscreenPageLimit(15);
         mViewPager.addOnPageChangeListener(PageChangeListener);
+
+        new CoverFlow.Builder()
+                .with(mViewPager)
+                .scale(0.3f)
+                .pagerMargin(Helper.dipToPx(-25))
+                .spaceSize(0f)
+                .build();
 
         final Intent intent = getIntent();
         if(intent != null)
@@ -387,7 +417,7 @@ public class UserMapActivity extends FragmentActivity implements
             long currentTimeMillis = Helper.GetCurrentTimeMillis();
             long lastCaptureMillis = Helper.GetLastCapture(mSharedPreferences);
 
-            if (currentTimeMillis - lastCaptureMillis > Constants.INTERVAL_MINUTE)
+            if (currentTimeMillis - lastCaptureMillis > Constants.INTERVAL_TENMINUTES)
             {
                 showCaptureOnLoad = true;
 
@@ -647,7 +677,7 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 boundsLock.lock();
 
-                if ((force == true || mLinearLayout.getVisibility() == View.GONE) &&
+                if ((force == true || mLayoutPeekStack.getVisibility() == View.GONE) &&
                         mAsyncTaskGetProfilesInBounds == null)
                 {
                     //Start asynchronous request to server
@@ -848,7 +878,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         Point pointHalfScreenAbove = new Point(
                 markerScreenPosition.x,
-                markerScreenPosition.y - (container_height / 4));
+                markerScreenPosition.y);
 
         LatLng aboveMarkerLatLng = projection.fromScreenLocation(pointHalfScreenAbove);
 
@@ -878,17 +908,22 @@ public class UserMapActivity extends FragmentActivity implements
 
                 UpdateBelowProjection(markerLatLng);
 
-                if (mLinearLayout.getVisibility() == View.GONE)
+                if (mLayoutPeekStack.getVisibility() == View.GONE)
                 {
                     mCutOutView.setVisibility(View.GONE);
 
-                    mLinearLayout.setVisibility(View.VISIBLE);
+                    mRelativeLayoutSearchBar.setVisibility(View.GONE);
+                    mLayoutPeekStack.setVisibility(View.VISIBLE);
                     Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
-                    mLinearLayout.setAnimation(slideDownAnimation);
+                    mLayoutPeekStack.setAnimation(slideDownAnimation);
                     slideDownAnimation.start();
 
                     ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
+                    TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
+
                     mTextViewStackUserName.setText(profileObject.displayName);
+                    mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
+                    mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
                 }
             }
             catch (Exception e)
@@ -915,10 +950,11 @@ public class UserMapActivity extends FragmentActivity implements
         mTextViewStackUserName.setText("");
 
         //Hide the user peek stack
-        mLinearLayout.setVisibility(View.GONE);
+        mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
+        mLayoutPeekStack.setVisibility(View.GONE);
 
         Animation slideUpAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slideup);
-        mLinearLayout.setAnimation(slideUpAnimation);
+        mLayoutPeekStack.setAnimation(slideUpAnimation);
         slideUpAnimation.start();
 
         mCutOutView.setVisibility(View.VISIBLE);
@@ -938,6 +974,30 @@ public class UserMapActivity extends FragmentActivity implements
 
             switch (v.getId())
             {
+                case R.id.button_map_control:
+                    logger.info("onClick: button_map_control clicked");
+
+                    //@@Some animations would be nice
+                    findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_transparent_faded)));
+                    findViewById(R.id.button_map_control).setVisibility(View.GONE);
+                    findViewById(R.id.button_map_control_close).setVisibility(View.VISIBLE);
+                    findViewById(R.id.button_send_peek).setVisibility(View.VISIBLE);
+                    findViewById(R.id.button_request_peek).setVisibility(View.VISIBLE);
+
+                    break;
+
+                case R.id.button_map_control_close:
+                    logger.info("onClick: button_map_control clicked");
+
+                    //@@Some animations would be nice
+                    findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_tra‌​nsparent)));
+                    findViewById(R.id.button_map_control).setVisibility(View.VISIBLE);
+                    findViewById(R.id.button_map_control_close).setVisibility(View.GONE);
+                    findViewById(R.id.button_send_peek).setVisibility(View.GONE);
+                    findViewById(R.id.button_request_peek).setVisibility(View.GONE);
+
+                    break;
+
                 case R.id.button_send_peek:
                     logger.info("OnClickListener:onClick: button_send_peek clicked");
 
@@ -1120,9 +1180,24 @@ public class UserMapActivity extends FragmentActivity implements
     ViewPager.OnPageChangeListener PageChangeListener = new ViewPager.OnPageChangeListener()
     {
         @Override
-        public void onPageScrollStateChanged(int arg0)
+        public void onPageScrollStateChanged(int state)
         {
-            // TODO Auto-generated method stub
+            View userPeekBackground = findViewById(R.id.user_peek_background);
+
+            switch(state)
+            {
+                case ViewPager.SCROLL_STATE_IDLE:
+                    userPeekBackground.setVisibility(View.VISIBLE);
+                    break;
+
+                case ViewPager.SCROLL_STATE_DRAGGING:
+                    userPeekBackground.setVisibility(View.INVISIBLE);
+                    break;
+
+                case ViewPager.SCROLL_STATE_SETTLING:
+                    userPeekBackground.setVisibility(View.INVISIBLE);
+                    break;
+            }
         }
 
         @Override
@@ -1137,6 +1212,7 @@ public class UserMapActivity extends FragmentActivity implements
             mUserStackItemPosition = index;
 
             ProfileObject profileObject = GetProfileObjectByPosition(index);
+            TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
 
             ClusterManagerSingleItem(index);
 
@@ -1144,6 +1220,8 @@ public class UserMapActivity extends FragmentActivity implements
             UpdateBelowProjection(profileObjectLocation);
 
             mTextViewStackUserName.setText(profileObject.displayName);
+            mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
+            mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
         }
     };
 
@@ -1276,7 +1354,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBitmapPath = String.format("%sItemSizedBitmap.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_blue, itemSizedBitmapPath, 25, 25);
+            mItemSizedBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_regular, itemSizedBitmapPath, 25, 25);
         }
         catch(Exception e)
         {
@@ -1286,7 +1364,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBlurBitmapPath = String.format("%sItemSizedBlurBitmap.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBlurBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_blue_blur, itemSizedBlurBitmapPath, 25, 25);
+            mItemSizedBlurBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_regular_blur, itemSizedBlurBitmapPath, 25, 25);
         }
         catch(Exception e)
         {
@@ -1296,7 +1374,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBitmapRequestPath = String.format("%sItemSizedBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_green, itemSizedBitmapRequestPath, 25, 25);
+            mItemSizedBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_request, itemSizedBitmapRequestPath, 25, 25);
         }
         catch(Exception e)
         {
@@ -1306,7 +1384,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBlurBitmapRequestPath = String.format("%sItemSizedBlurBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBlurBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_green_blur, itemSizedBlurBitmapRequestPath, 25, 25);
+            mItemSizedBlurBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_request_blur, itemSizedBlurBitmapRequestPath, 25, 25);
         }
         catch(Exception e)
         {
@@ -1325,7 +1403,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
         if(mUserMapActivity.mUserStackItemPosition == -1 && mCutOutView.mCenter != null)
         {
-            doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+            doBlur = false;//@@Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
         }
 
         if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) > 0)
@@ -1364,7 +1442,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
         if(mCutOutView.mCenter != null)
         {
-            doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+            doBlur = false;//@@Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
         }
 
         boolean hasRequest = false;
@@ -1445,7 +1523,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
                 Point markerPosition = mGoogleMap.getProjection().toScreenLocation(mMarker.getPosition());
                 if(mCutOutView.mCenter != null)
                 {
-                    doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+                    doBlur = false;//@@Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
                 }
 
                 if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(mTapClusterItem.mProfileObject.profileId) > 0)
@@ -1497,7 +1575,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
                 Point markerPosition = mGoogleMap.getProjection().toScreenLocation(mMarker.getPosition());
                 if(mCutOutView.mCenter != null)
                 {
-                    doBlur = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
+                    doBlur = false;//@@Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
                 }
 
                 boolean hasRequest = false;

@@ -273,6 +273,7 @@ public class Constants
 
     public static final long INTERVAL_FIVESECONDS = 5000L; //Millis per 5 seconds
     public static final long INTERVAL_TENSECONDS = 10000L; //Millis per 10 seconds
+    public static final long INTERVAL_TENMINUTES = 600000L; //Millis per 10 minutes
     public static final long INTERVAL_MINUTE = 60000L; //Millis per minute
     public static final long INTERVAL_HOUR = 3600000L; //Millis per hour
     public static final long INTERVAL_DAY = 86400000L; //Millis per day;
