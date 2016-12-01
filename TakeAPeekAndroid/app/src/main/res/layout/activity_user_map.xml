@@ -21,6 +21,7 @@
             android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_notifications"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true" />
 
@@ -53,7 +54,9 @@
             android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_stack"
-            android:layout_alignParentTop="true" android:layout_alignParentEnd="true"/>
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -104,7 +107,7 @@
     <RelativeLayout
         android:id = "@+id/user_peek_stack"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
+        android:layout_height="320dp"
         android:orientation="vertical"
         android:translationZ="2dp"
         android:background="@drawable/gradient_gray_fade"
@@ -118,36 +121,60 @@
             android:background="@drawable/rounded_corner_small"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="50dp"
             android:padding="15dp"
             android:translationZ="4dp">
 
-        <TextView
-            android:id = "@+id/peek_stack_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/user_peek_stack_time"
-            android:textSize="20sp"
-            android:textColor="@color/pt_darkgray"
-            android:gravity="left" />
+            <TextView
+                android:id = "@+id/peek_stack_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/user_peek_stack_time"
+                android:textSize="20sp"
+                android:textColor="@color/pt_darkgray"
+                android:gravity="left" />
+
+            <TextView
+                android:id = "@+id/user_peek_stack_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:textSize="11sp"
+                android:textColor="@color/pt_red"
+                android:gravity="left" />
+
+        </RelativeLayout>
 
         <TextView
-            android:id = "@+id/user_peek_stack_time"
+            android:id = "@+id/peek_stack_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:textSize="11sp"
-            android:textColor="@color/pt_red"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="30dp"
+            android:textSize="13sp"
+            android:text="Some Text"
+            android:textColor="@color/pt_gray"
+            android:background="@color/pt_white"
             android:gravity="left" />
 
-        </RelativeLayout>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="28dp"
+            android:layout_marginBottom="8dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_peek_address"/>
 
         <me.crosswall.lib.coverflow.core.PagerContainer
             android:id="@+id/user_peek_pager_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/pt_tra‌​nsparent"
-            android:translationZ="4dp">
+            android:translationZ="4dp" android:layout_alignParentTop="true" android:layout_alignParentStart="true">
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/user_peek_stack_viewpager"

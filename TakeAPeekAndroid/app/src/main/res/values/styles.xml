@@ -5,7 +5,8 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/tap_lightgray</item>
+        <item name="colorAccent">@color/pt_gray_1</item>
+        <item name="android:colorControlHighlight">@color/pt_red</item>
     </style>
 
     <style name="AppTheme.EditText" parent="AppTheme">

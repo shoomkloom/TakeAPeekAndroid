@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.common.AddressLoader;
@@ -87,19 +86,22 @@ public class PeekStackPagerAdapter extends PagerAdapter
         textViewUserStackFollow.setOnClickListener(ClickListener);
         textViewUserStackFollow.setTag(position);
 
+/*@@
         TextView textViewPeekStackAddress = (TextView)viewGroup.findViewById(R.id.peek_stack_address);
         Helper.setTypeface(mUserMapActivity, textViewPeekStackAddress, Helper.FontTypeEnum.boldFont);
         textViewPeekStackAddress.setOnClickListener(ClickListener);
         textViewPeekStackAddress.setTag(profileObject);
-
+@@*/
         switch(profileObject.relationTypeEnum)
         {
             case Follow:
                 textViewUserStackFollow.setText(R.string.unfollow);
+                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
                 break;
 
             default:
                 textViewUserStackFollow.setText(R.string.follow);
+                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
                 break;
         }
 
@@ -119,11 +121,12 @@ public class PeekStackPagerAdapter extends PagerAdapter
             textViewPeekStackTitle.setText(takeAPeekObject.Title);
             textViewUserStackTime.setText(Helper.GetFormttedDiffTime(mUserMapActivity, takeAPeekObject.CreationTime));
 @@*/
+/*@@
             if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
             {
 				LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
                 mAddressLoader.SetAddress(mUserMapActivity, location, textViewPeekStackAddress, mSharedPreferences);
-
+@@*/
 /*@@
                 new AsyncTask<Void, Void, String>()
                 {
@@ -161,7 +164,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                     }
                 }.execute();
 @@*/
-            }
+//@@        }
         }
         else
         {

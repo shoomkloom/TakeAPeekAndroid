@@ -154,6 +154,7 @@
     <string name="error_set_relation_block">There was an error blocking %1$s. Please try again later.</string>
     <string name="error_set_relation_report">There was an error reporting %1$s. Please try again later.</string>
     <string name="view_peek">View Peek</string>
+    <string name="unknown_location">Unknown Location</string>
 
     <!-- Notifications -->
     <string name="title_activity_notifications">Notifications</string>

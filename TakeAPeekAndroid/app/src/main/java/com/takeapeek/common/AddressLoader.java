@@ -119,6 +119,10 @@ public class AddressLoader
                 // Change text only if this process is still associated with it
                 if (this == addressCreatorTask)
                 {
+                    if(text == null)
+                    {
+                        text = mContext.getString(R.string.unknown_location);
+                    }
                 	textView.setText(text);
                     textView.setVisibility(View.VISIBLE);
 
