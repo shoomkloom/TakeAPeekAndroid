@@ -309,6 +309,7 @@
                     android:layout_height="50dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="5dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/button_peek_send" />
 
             </LinearLayout>
@@ -341,6 +342,7 @@
                     android:layout_height="50dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="5dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/button_peek_request" />
 
             </LinearLayout>

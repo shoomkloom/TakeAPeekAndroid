@@ -61,6 +61,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.takeapeek.R;
 import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CaptureClipActivity;
+import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
@@ -92,6 +93,7 @@ import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
 import static android.R.attr.fragment;
+import static com.takeapeek.R.id.peek_stack_address;
 import static com.takeapeek.R.id.user_peek_stack;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -141,6 +143,7 @@ public class UserMapActivity extends FragmentActivity implements
     TextView mTextViewStackUserName = null;
     TextView mTextViewStackPeekTitle = null;
     TextView mTextViewStackPeekTime = null;
+    TextView mTextViewStackPeekAddress = null;
     RelativeLayout mLayoutPeekStack = null;
     PagerContainer mPagerContainer = null;
     ViewPager mViewPager = null;
@@ -292,6 +295,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         mTextViewStackPeekTitle = (TextView)findViewById(R.id.peek_stack_title);
         mTextViewStackPeekTime = (TextView)findViewById(R.id.user_peek_stack_time);
+        mTextViewStackPeekAddress = (TextView)findViewById(R.id.peek_stack_address);
 
         mLayoutPeekStack =  (RelativeLayout) findViewById(R.id.user_peek_stack);
         mPagerContainer = (PagerContainer) findViewById(R.id.user_peek_pager_container);
@@ -914,9 +918,11 @@ public class UserMapActivity extends FragmentActivity implements
 
                     mRelativeLayoutSearchBar.setVisibility(View.GONE);
                     mLayoutPeekStack.setVisibility(View.VISIBLE);
+/*@@
                     Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
                     mLayoutPeekStack.setAnimation(slideDownAnimation);
                     slideDownAnimation.start();
+@@*/
 
                     ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
                     TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
@@ -924,6 +930,19 @@ public class UserMapActivity extends FragmentActivity implements
                     mTextViewStackUserName.setText(profileObject.displayName);
                     mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
                     mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
+
+                    if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
+                    {
+                        mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
+                        AddressLoader addressLoader = new AddressLoader();
+
+                        LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                        addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
+                    }
+                    else
+                    {
+                        mTextViewStackPeekAddress.setVisibility(View.GONE);
+                    }
                 }
             }
             catch (Exception e)
@@ -952,10 +971,11 @@ public class UserMapActivity extends FragmentActivity implements
         //Hide the user peek stack
         mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
         mLayoutPeekStack.setVisibility(View.GONE);
-
+/*@@
         Animation slideUpAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slideup);
         mLayoutPeekStack.setAnimation(slideUpAnimation);
         slideUpAnimation.start();
+@@*/
 
         mCutOutView.setVisibility(View.VISIBLE);
         Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadein);
@@ -1222,6 +1242,19 @@ public class UserMapActivity extends FragmentActivity implements
             mTextViewStackUserName.setText(profileObject.displayName);
             mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
             mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
+
+            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
+            {
+                mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
+                AddressLoader addressLoader = new AddressLoader();
+
+                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
+            }
+            else
+            {
+                mTextViewStackPeekAddress.setVisibility(View.GONE);
+            }
         }
     };
 
@@ -1336,9 +1369,9 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     private Handler mHandlerCluster = new Handler();
     UpdateTaskCluster mUpdateTaskCluster = new UpdateTaskCluster();
 
-    Point mPointCenter = new Point(70, 100);
-    float mAnchorX = (float)0.1;
-    float mAnchorY = (float)0.9;
+    Point mPointCenter = new Point(60, 100);
+    float mAnchorX = (float)0.5;
+    float mAnchorY = (float)1.0;
 
     public TAPClusterItemRenderer(UserMapActivity userMapActivity, GoogleMap googleMap, ClusterManager clusterManager, CutOutView cutOutView, SharedPreferences sharedPreferences)
     {
@@ -1410,22 +1443,22 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         {
             if(doBlur)
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
             }
         }
         else
         {
             if(doBlur)
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
             }
         }
 
@@ -1461,22 +1494,22 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         {
             if(doBlur)
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
             }
         }
         else
         {
             if(doBlur)
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
             }
         }
 
