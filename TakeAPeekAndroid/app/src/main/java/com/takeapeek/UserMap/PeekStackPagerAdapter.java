@@ -92,16 +92,20 @@ public class PeekStackPagerAdapter extends PagerAdapter
         textViewPeekStackAddress.setOnClickListener(ClickListener);
         textViewPeekStackAddress.setTag(profileObject);
 @@*/
+        ImageView peekStackFollowImage = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_follow_image);
+
         switch(profileObject.relationTypeEnum)
         {
             case Follow:
                 textViewUserStackFollow.setText(R.string.unfollow);
-                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
+                textViewUserStackFollow.setBackgroundResource(R.drawable.button_gray);
+                peekStackFollowImage.setImageResource(R.drawable.ic_unfollow);
                 break;
 
             default:
                 textViewUserStackFollow.setText(R.string.follow);
-                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
+                textViewUserStackFollow.setBackgroundResource(R.drawable.button_green);
+                peekStackFollowImage.setImageResource(R.drawable.ic_follow);
                 break;
         }
 
@@ -298,17 +302,23 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                         }
                                         else
                                         {
+                                            ImageView peekStackFollowImage = (ImageView)mTextViewFollowButton.getRootView().findViewById(R.id.user_peek_stack_follow_image);
+
                                             String message = mTargetProfileObject.displayName;
                                             switch(mRelationTypeEnum)
                                             {
                                                 case Follow:
                                                     message = String.format(mUserMapActivity.getString(R.string.set_relation_follow), mTargetProfileObject.displayName);
                                                     mTextViewFollowButton.setText(R.string.unfollow);
+                                                    mTextViewFollowButton.setBackgroundResource(R.drawable.button_gray);
+                                                    peekStackFollowImage.setImageResource(R.drawable.ic_unfollow);
                                                     break;
 
                                                 default:
                                                     message = String.format(mUserMapActivity.getString(R.string.set_relation_unfollow), mTargetProfileObject.displayName);
                                                     mTextViewFollowButton.setText(R.string.follow);
+                                                    mTextViewFollowButton.setBackgroundResource(R.drawable.button_green);
+                                                    peekStackFollowImage.setImageResource(R.drawable.ic_follow);
                                                     break;
                                             }
 

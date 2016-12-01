@@ -3,31 +3,31 @@
     <item android:state_enabled="false">
         <shape>
             <solid android:color="@color/tap_lightgray" />
-            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+                     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
         </shape>
     </item>
     <item android:state_pressed="false">
         <shape>
             <solid android:color="@color/pt_green" />
-            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+                     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
         </shape>
     </item>
     <!-- pressed -->
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/tap_lightgreen" />
-            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <solid android:color="@color/pt_green_1" />
+            <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+                     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
         </shape>
     </item>
     <!-- focused -->
     <item android:state_enabled="true">
         <shape>
             <solid android:color="@color/pt_green" />
-            <corners android:bottomRightRadius="40dp" android:bottomLeftRadius="40dp"
-                     android:topLeftRadius="40dp" android:topRightRadius="40dp"/>
+            <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
+                     android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
         </shape>
     </item>
 </selector>

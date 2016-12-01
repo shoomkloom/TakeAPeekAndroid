@@ -161,6 +161,7 @@
             android:gravity="left" />
 
         <ImageView
+            android:id = "@+id/peek_stack_address_image"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginLeft="28dp"

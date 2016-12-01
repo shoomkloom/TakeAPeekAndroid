@@ -17,7 +17,7 @@
     <!-- pressed -->
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/pt_gray" />
+            <solid android:color="@color/pt_gray_2" />
             <corners android:bottomRightRadius="5dp" android:bottomLeftRadius="5dp"
                      android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
         </shape>
