@@ -16,10 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.Hashtable;
 
 public class AddressLoader
 {
 	static private final Logger logger = LoggerFactory.getLogger(AddressLoader.class);
+
+    static private Hashtable<String, String> mLocationAddressHash = new Hashtable<String, String>();
 	
 	Context mContext = null;
 
@@ -38,6 +41,22 @@ public class AddressLoader
 	private void CreateAddressText(LatLng location, final TextView textView)
 	{
 		logger.debug("CreateAddressText(..) Invoked");
+
+        String locationStr = location.toString();
+        if(mLocationAddressHash.containsKey(locationStr) == true)
+        {
+            String address = mLocationAddressHash.get(locationStr);
+            if(address != null && address.isEmpty() == false)
+            {
+                textView.setText(address);
+                textView.setVisibility(View.VISIBLE);
+
+                Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
+                textView.setAnimation(zoomInAnimation);
+                zoomInAnimation.start();
+                return;
+            }
+        }
 
         if(textView != null)
         {
@@ -123,6 +142,10 @@ public class AddressLoader
                     {
                         text = mContext.getString(R.string.unknown_location);
                     }
+
+                    String locationStr = mLatLng.toString();
+                    mLocationAddressHash.put(locationStr, text);
+
                 	textView.setText(text);
                     textView.setVisibility(View.VISIBLE);
 
