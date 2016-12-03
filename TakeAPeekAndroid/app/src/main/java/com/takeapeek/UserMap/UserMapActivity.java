@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.location.Address;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,10 +18,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -71,6 +70,7 @@ import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
+import com.takeapeek.common.ZoomedAddressCreator;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
 import com.takeapeek.ormlite.DatabaseManager;
@@ -92,9 +92,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
-import static android.R.attr.fragment;
-import static com.takeapeek.R.id.peek_stack_address;
-import static com.takeapeek.R.id.user_peek_stack;
+import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -132,6 +130,7 @@ public class UserMapActivity extends FragmentActivity implements
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
+    private ZoomedAddressCreator mZoomedAddressCreator = null;
     private AsyncTask<Hashtable<Integer, Boolean>, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     ImageView mImageViewNotifications = null;
@@ -307,7 +306,7 @@ public class UserMapActivity extends FragmentActivity implements
         new CoverFlow.Builder()
                 .with(mViewPager)
                 .scale(0.3f)
-                .pagerMargin(Helper.dipToPx(-25))
+                .pagerMargin(dipToPx(-25))
                 .spaceSize(0f)
                 .build();
 
@@ -684,6 +683,33 @@ public class UserMapActivity extends FragmentActivity implements
                 if ((force == true || mLayoutPeekStack.getVisibility() == View.GONE) &&
                         mAsyncTaskGetProfilesInBounds == null)
                 {
+                    if(mZoomedAddressCreator != null)
+                    {
+                        mZoomedAddressCreator.cancel(true);
+                    }
+
+                    int gapDPInPixels = Helper.dipToPx(20);
+
+                    LatLng center = mGoogleMap.getCameraPosition().target;
+                    Point pointCenter = mGoogleMap.getProjection().toScreenLocation(center);
+                    Point pointToTheLeft = new Point(pointCenter.x - gapDPInPixels, pointCenter.y);
+                    Point pointToTheRight = new Point(pointCenter.x + gapDPInPixels, pointCenter.y);
+                    LatLng latlngToTheLeft = mGoogleMap.getProjection().fromScreenLocation(pointToTheLeft);
+                    LatLng latlngToTheRight = mGoogleMap.getProjection().fromScreenLocation(pointToTheRight);
+
+                    mZoomedAddressCreator = new ZoomedAddressCreator(this, latlngToTheLeft, latlngToTheRight, mTextViewStackUserName);
+                    mZoomedAddressCreator.execute();
+
+/*@@
+                    try
+                    {
+                        mTextViewStackUserName.setText(GetZoomedAddress());
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When calling GetZoomedAddress", e);
+                    }
+@@*/
                     //Start asynchronous request to server
                     mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
                     {
@@ -792,6 +818,79 @@ public class UserMapActivity extends FragmentActivity implements
 
         mLastCallMs = snap;
         mLatLngBounds = latLngBounds;
+    }
+
+    private String GetZoomedAddress() throws Exception
+    {
+        logger.debug("GetZoomedAddress() Invoked");
+
+        LatLng center = mGoogleMap.getCameraPosition().target;
+        Point pointCenter = mGoogleMap.getProjection().toScreenLocation(center);
+        Point pointToTheLeft = new Point(pointCenter.x - 100, pointCenter.y);
+        Point pointToTheRight = new Point(pointCenter.x + 100, pointCenter.y);
+        LatLng latlngToTheLeft = mGoogleMap.getProjection().fromScreenLocation(pointToTheLeft);
+        LatLng latlngToTheRight = mGoogleMap.getProjection().fromScreenLocation(pointToTheRight);
+
+        Address addressLeft = LocationHelper.AddressFromLocation(this, latlngToTheLeft);
+        Address addressRight = LocationHelper.AddressFromLocation(this, latlngToTheRight);
+
+        String countryNameLeft = addressLeft.getCountryName();
+        String countryNameRight = addressRight.getCountryName();
+
+        String adminAreaLeft = addressLeft.getAdminArea();
+        String adminAreaRight = addressRight.getAdminArea();
+
+        String subAdminAreaLeft = addressLeft.getSubAdminArea();
+        String subAdminAreaRight = addressRight.getSubAdminArea();
+
+        String localityLeft = addressLeft.getLocality();
+        String localityRight = addressRight.getLocality();
+
+        String subLocalityLeft = addressLeft.getSubLocality();
+        String subLocalityRight = addressRight.getSubLocality();
+
+        String thoroughfareLeft = addressLeft.getThoroughfare();
+        String thoroughfareRight = addressRight.getThoroughfare();
+
+        String foundAddress = "";
+
+        if(thoroughfareLeft != null && thoroughfareRight != null &&
+                thoroughfareLeft.compareTo(thoroughfareRight) == 0)
+        {
+            foundAddress += thoroughfareLeft + ", ";
+        }
+        if(subLocalityLeft != null && subLocalityRight != null &&
+                subLocalityLeft.compareTo(subLocalityRight) == 0)
+        {
+            foundAddress += subLocalityLeft + ", ";
+        }
+        if(localityLeft != null && localityRight != null &&
+                localityLeft.compareTo(localityRight) == 0)
+        {
+            foundAddress += localityLeft + ", ";
+        }
+        if(subAdminAreaLeft != null && subAdminAreaRight != null &&
+                subAdminAreaLeft.compareTo(subAdminAreaRight) == 0)
+        {
+            foundAddress += subAdminAreaLeft + ", ";
+        }
+        if(adminAreaLeft != null && adminAreaRight != null &&
+                adminAreaLeft.compareTo(adminAreaRight) == 0)
+        {
+            foundAddress += adminAreaLeft + ", ";
+        }
+        if(countryNameLeft != null && countryNameRight != null &&
+                countryNameLeft.compareTo(countryNameRight) == 0)
+        {
+            foundAddress += countryNameLeft;
+        }
+
+        if(foundAddress.isEmpty() == true)
+        {
+            foundAddress = "Earth";
+        }
+
+        return foundAddress;
     }
 
     private void ClusterManagerSingleItem(int position)
@@ -934,6 +1033,7 @@ public class UserMapActivity extends FragmentActivity implements
                     if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
                     {
                         mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
+                        findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
                         AddressLoader addressLoader = new AddressLoader();
 
                         LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
@@ -942,6 +1042,7 @@ public class UserMapActivity extends FragmentActivity implements
                     else
                     {
                         mTextViewStackPeekAddress.setVisibility(View.GONE);
+                        findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
                     }
                 }
             }
@@ -1246,6 +1347,7 @@ public class UserMapActivity extends FragmentActivity implements
             if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
             {
                 mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
+                findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
                 AddressLoader addressLoader = new AddressLoader();
 
                 LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
@@ -1254,6 +1356,7 @@ public class UserMapActivity extends FragmentActivity implements
             else
             {
                 mTextViewStackPeekAddress.setVisibility(View.GONE);
+                findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
             }
         }
     };

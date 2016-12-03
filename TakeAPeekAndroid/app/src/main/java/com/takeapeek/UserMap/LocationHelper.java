@@ -39,7 +39,47 @@ public class LocationHelper
 
         if(formattedAddressContainer != null && formattedAddressContainer.results != null && formattedAddressContainer.results.size() > 0)
         {
+            String postCode = null;
+            String streetNumber = null;
+
+            //Find the post code
+            for(AddressComponent addressComponent : formattedAddressContainer.results.get(0).address_components)
+            {
+                for(String type : addressComponent.types)
+                {
+                    if(type.compareTo("postal_code") == 0)
+                    {
+                        postCode = addressComponent.long_name;
+                    }
+                    else if(type.compareTo("street_number") == 0)
+                    {
+                        streetNumber = addressComponent.long_name;
+                    }
+                }
+
+                if(postCode != null)
+                {
+                    break;
+                }
+            }
+
             formattedAddress = formattedAddressContainer.results.get(0).formatted_address;
+
+            if(postCode != null)
+            {
+                formattedAddress = formattedAddress.replace(postCode, "");
+            }
+            if(streetNumber != null)
+            {
+                formattedAddress = formattedAddress.replace(streetNumber, "");
+            }
+
+            formattedAddress = formattedAddress.trim();
+            formattedAddress = formattedAddress.replace(",,", ",");
+            formattedAddress = formattedAddress.replace(", ,", ",");
+            formattedAddress = formattedAddress.replace("  ", " ");
+            formattedAddress = formattedAddress.replace(" ,", ",");
+
         }
 
         return formattedAddress;
@@ -145,8 +185,16 @@ public class LocationHelper
         public ArrayList<FormattedAddress> results;
     }
 
+    class AddressComponent
+    {
+        public String long_name;
+        public String short_name;
+        public ArrayList<String> types;
+    }
+
     class FormattedAddress
     {
-        String formatted_address;
+        public ArrayList<AddressComponent> address_components;
+        public String formatted_address;
     }
 }
