@@ -851,7 +851,7 @@ public class AuthenticatorActivity extends AppCompatActivity
                 else
                 {
                     //Some permissions were denied, ask again
-                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthenticatorActivity.this);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthenticatorActivity.this, R.style.AppThemeAlertDialog);
 
                     alert.setTitle(R.string.permissions_title);
                     alert.setMessage(R.string.error_permissions);
@@ -1578,7 +1578,7 @@ public class AuthenticatorActivity extends AppCompatActivity
         //Check for appropriate age
         if(Helper.GetDiffYears(mCalendar, Calendar.getInstance()) < 13)
         {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog);
 
             // set title
             alertDialogBuilder.setTitle(R.string.age_restriction_title);
@@ -1587,7 +1587,7 @@ public class AuthenticatorActivity extends AppCompatActivity
             alertDialogBuilder
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setMessage(R.string.age_restriction_message)
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog,int id)

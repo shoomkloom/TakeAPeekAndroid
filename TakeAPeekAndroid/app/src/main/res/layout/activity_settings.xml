@@ -97,7 +97,8 @@
                     android:textColorHint="@color/tap_lightlightgray"
                     android:inputType="textCapWords|textNoSuggestions"
                     android:imeOptions="actionDone"
-                    android:singleLine="true" />
+                    android:theme="@style/AppTheme.EditText"
+                    android:maxLines="1" />
 
                 <ImageView
                     android:id="@+id/imageview_display_name_validation_progess"

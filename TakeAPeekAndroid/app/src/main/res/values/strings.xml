@@ -98,7 +98,7 @@
     <string name="message_request_call"><u>Request voice code</u></string>
     <string name="verification_verified">Verified User</string>
     <string name="almost_done">Welcome\u2026</string>
-    <string name="creating_selfme_account">Creating your Peek.To account</string>
+    <string name="creating_peekto_account">Creating your Peek.To account</string>
     <string name="teaser_line_1">Take a picture.</string>
     <string name="teaser_line_2">Post to<b>Peek.To</b>.
     </string>
@@ -111,7 +111,7 @@
     <string name="button_verify">Verify</string>
     <string name="button_continue">Continue</string>
     <string name="create_account_verify_message">Detecting verification SMS\nThis might take a few moments\u2026</string>
-    <string name="error_more_than_one_account">There is more than one Self.Me account. Please delete all of them and run the Self.Me app again.</string>
+    <string name="error_more_than_one_account">There is more than one Peek.To account. Please delete all of them and run the Peek.To app again.</string>
     <string name="account_already_exists">Peek.To account already exists.</string>
     <string name="create_account_only_in_app">A new Peek.To account can only be created in the Peek.To app.</string>
     <string name="create_account_verify_sms_error">Illegal verification code</string>

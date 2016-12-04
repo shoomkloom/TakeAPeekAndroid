@@ -92,6 +92,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
+import static com.takeapeek.common.Helper.GetFormattedNumberStr;
 import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -1472,7 +1473,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     private Handler mHandlerCluster = new Handler();
     UpdateTaskCluster mUpdateTaskCluster = new UpdateTaskCluster();
 
-    Point mPointCenter = new Point(60, 100);
+    Point mPointCenter = new Point(60, 80);
     float mAnchorX = (float)0.5;
     float mAnchorY = (float)1.0;
 
@@ -1487,10 +1488,13 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         DatabaseManager.init(mUserMapActivity);
 
         //Get sized images
+        int markerWidth = 40;
+        int markerHeight = 40;
+
         try
         {
             String itemSizedBitmapPath = String.format("%sItemSizedBitmap.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_regular, itemSizedBitmapPath, 25, 25);
+            mItemSizedBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_regular, itemSizedBitmapPath, markerWidth, markerHeight);
         }
         catch(Exception e)
         {
@@ -1500,7 +1504,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBlurBitmapPath = String.format("%sItemSizedBlurBitmap.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBlurBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_regular_blur, itemSizedBlurBitmapPath, 25, 25);
+            mItemSizedBlurBitmap = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_regular_blur, itemSizedBlurBitmapPath, markerWidth, markerHeight);
         }
         catch(Exception e)
         {
@@ -1510,7 +1514,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBitmapRequestPath = String.format("%sItemSizedBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_request, itemSizedBitmapRequestPath, 25, 25);
+            mItemSizedBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_request, itemSizedBitmapRequestPath, markerWidth, markerHeight);
         }
         catch(Exception e)
         {
@@ -1520,7 +1524,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         try
         {
             String itemSizedBlurBitmapRequestPath = String.format("%sItemSizedBlurBitmapRequest.png", Helper.GetTakeAPeekPath(mUserMapActivity));
-            mItemSizedBlurBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_request_blur, itemSizedBlurBitmapRequestPath, 25, 25);
+            mItemSizedBlurBitmapRequest = Helper.GetSizedBitmapFromResource(mUserMapActivity, sharedPreferences, R.drawable.marker_request_blur, itemSizedBlurBitmapRequestPath, markerWidth, markerHeight);
         }
         catch(Exception e)
         {
@@ -1592,27 +1596,42 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         }
 
         Bitmap iconBitmap = null;
+        String formattedNumber = Helper.GetFormattedNumberStr(cluster.getSize());
+        int textSize = 60;
+        int formattedNumberLength = formattedNumber.length();
+        if(formattedNumberLength > 5)
+        {
+            textSize = 30;
+        }
+        else if(formattedNumberLength > 4)
+        {
+            textSize = 40;
+        }
+        else if(formattedNumberLength > 3)
+        {
+            textSize = 50;
+        }
 
         if(hasRequest == true)
         {
             if(doBlur)
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmapRequest, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmapRequest, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER);
             }
         }
         else
         {
             if(doBlur)
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBlurBitmap, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
             {
-                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, String.valueOf(cluster.getSize()), mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
+                iconBitmap = Helper.OverlayText(mUserMapActivity, mItemSizedBitmap, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER);
             }
         }
 

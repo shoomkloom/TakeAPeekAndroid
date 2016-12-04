@@ -13,7 +13,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/tap_lightgray</item>
+        <item name="colorAccent">@color/pt_darkgray</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="AppTheme">
@@ -30,5 +30,15 @@
     <style name="AppTheme.SeekBar" parent="Widget.AppCompat.SeekBar" >
         <item name="colorAccent">#ff0000</item>
     </style>
+
+    <style name="AppThemeAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/pt_green</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">@color/pt_darkgray</item>
+        <!-- Used for the background -->
+        <item name="android:background">@color/pt_white</item>
+    </style>
+
 
 </resources>

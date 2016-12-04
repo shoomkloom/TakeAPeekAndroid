@@ -137,6 +137,7 @@
                     android:textColorHint="@color/pt_gray"
                     android:inputType="phone"
                     android:imeOptions="actionDone"
+                    android:theme="@style/AppTheme.EditText"
                     android:maxLines="1" />
 
             </LinearLayout>
@@ -176,6 +177,7 @@
                     android:imeOptions="actionDone"
                     android:hint="@string/code_hint"
                     android:textColorHint="@color/pt_gray"
+                    android:theme="@style/AppTheme.EditText"
                     android:visibility="gone">
                 </EditText>
 
@@ -356,6 +358,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
+                        android:theme="@style/AppTheme.EditText"
                         android:maxLines="1" />
 
                     <ImageView
