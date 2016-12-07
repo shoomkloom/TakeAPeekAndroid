@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -168,7 +167,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
                             .build();
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
-                    findViewById(R.id.corner_overlay_on_map).setVisibility(View.VISIBLE);
+                    findViewById(R.id.corner_overlay_on_map_top).setVisibility(View.VISIBLE);
+                    findViewById(R.id.corner_overlay_on_map_bottom).setVisibility(View.VISIBLE);
 
                     TextView textViewDisplayNameRequest = (TextView)findViewById(R.id.request_displayname_on_map);
                     Helper.setTypeface(this, textViewDisplayNameRequest, Helper.FontTypeEnum.normalFont);
@@ -273,7 +273,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
                             .build();
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
-                    findViewById(R.id.corner_overlay_on_map).setVisibility(View.VISIBLE);
+                    findViewById(R.id.corner_overlay_on_map_top).setVisibility(View.VISIBLE);
+                    findViewById(R.id.corner_overlay_on_map_bottom).setVisibility(View.VISIBLE);
 
                     TextView textViewDisplayNameFollow = (TextView)findViewById(R.id.request_displayname_on_map);
                     textViewDisplayNameFollow.setVisibility(View.VISIBLE);

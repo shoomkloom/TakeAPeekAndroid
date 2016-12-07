@@ -1,98 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:background="@color/tap_white"
-    android:padding="10dp">
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:layout_marginBottom="10dp"
+    android:background="@color/pt_gray_1">
 
     <RelativeLayout
-        android:id = "@+id/user_peek_feed_thumbnail_layout"
+        android:id = "@+id/user_peek_feed_background"
+        android:layout_height="130dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true" >
-
-        <ImageView
-            android:id = "@+id/user_peek_feed_thumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:scaleType="centerCrop" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/user_peek_feed_thumbnail"
-            android:layout_alignLeft="@id/user_peek_feed_thumbnail"
-            android:layout_alignRight="@+id/user_peek_feed_thumbnail"
-            android:layout_alignTop="@id/user_peek_feed_thumbnail"
-            android:background="@drawable/rounded_corner_overlay_white" />
-
-        <ImageView
-            android:id = "@+id/user_peek_feed_thumbnail_play"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_video_play" />
+        android:layout_below="@+id/user_peek_feed_thumbnail"
+        android:background="@drawable/rounded_corner_bottom"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:translationZ="4dp">
 
         <TextView
             android:id = "@+id/user_peek_feed_displayname"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/user_peek_feed_title"
             android:textSize="20sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/pt_darkgray"
+            android:gravity="left" />
 
         <TextView
             android:id = "@+id/user_peek_feed_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/user_peek_feed_displayname"
-            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/user_peek_feed_time"
             android:textSize="18sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/pt_darkgray"
+            android:gravity="left" />
 
         <TextView
             android:id = "@+id/user_peek_feed_time"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:textSize="15sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"/>
+            android:layout_above="@+id/user_peek_feed_divider"
+            android:textSize="11sp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/pt_red"
+            android:gravity="left" />
+
+        <View
+            android:id = "@+id/user_peek_feed_divider"
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:background="@color/pt_gray_5"
+            android:layout_above="@+id/user_peek_feed_address"/>
 
         <TextView
             android:id = "@+id/user_peek_feed_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:textSize="13sp"
+            android:textColor="@color/pt_gray"
+            android:background="@drawable/rounded_corner_bottom"
+            android:translationZ="4dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:layout_alignParentBottom="true" />
+
+        <ImageView
+            android:id = "@+id/peek_stack_feed_address_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="5dp"
             android:layout_alignParentBottom="true"
-            android:textSize="15sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:gravity="center"
-            android:paddingBottom="10dp" />
+            android:layout_alignParentLeft="true"
+            android:translationZ="4dp"
+            android:src="@drawable/ic_peek_address"/>
 
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/user_peek_feed_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_height="200dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/pt_gray_2"
+        android:scaleType="centerCrop"
+        android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id = "@+id/user_peek_feed_thumbnail_play"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_video_play" />
+
+    <View
+        android:id = "@+id/corner_overlay_on_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_height="200dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_corner_overlay_gray" />
+
+    <View
+        android:id = "@+id/view_padder"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_below="@+id/user_peek_feed_background"
+        android:background="@color/pt_gray_1" />
+
 
 </RelativeLayout>

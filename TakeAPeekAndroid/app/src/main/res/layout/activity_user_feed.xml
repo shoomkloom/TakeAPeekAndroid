@@ -6,32 +6,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".userfeed.UserFeedActivity"
-    android:background="@color/tap_white" >
+    android:background="@color/pt_gray_1" >
 
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/tap_blue">
+        android:translationZ="4dp"
+        android:background="@color/pt_gray_1">
 
         <ImageView
             android:id="@+id/imageview_up"
-            android:layout_width="65dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_back"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:padding="20dp"/>
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"/>
 
         <TextView
             android:id="@+id/textview_user_feed_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="70dp"
+            android:layout_marginRight="70dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:gravity="center"
-            android:textSize="20sp"
-            android:layout_centerInParent="true"
-            android:textColor="@color/tap_white"/>
+            android:textSize="18sp"
+            android:textColor="@color/pt_darkgray"/>
 
         <ImageView
             android:id="@+id/imageview_map"
@@ -40,8 +45,9 @@
             android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_map"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"/>
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>
 
