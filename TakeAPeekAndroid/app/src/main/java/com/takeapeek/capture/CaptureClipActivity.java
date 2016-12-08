@@ -27,15 +27,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.SparseIntArray;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -65,7 +62,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.takeapeek.R;
-import com.takeapeek.authenticator.AuthenticatorActivity;
 import com.takeapeek.capture.CameraController.CameraController;
 import com.takeapeek.capture.CameraController.CameraControllerManager2;
 import com.takeapeek.capture.Preview.Preview;
@@ -83,8 +79,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
-import static com.takeapeek.R.id.linearlayout_intro;
 
 /** The main Activity for Open Camera.
  */
@@ -1060,6 +1054,10 @@ public class CaptureClipActivity extends Activity implements
     {
         switch(seconds)
         {
+            case 10:
+                mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_10);
+                break;
+
             case 9:
                 mImageviewCaptureCountdown.setImageResource(R.drawable.take_video_9);
                 break;

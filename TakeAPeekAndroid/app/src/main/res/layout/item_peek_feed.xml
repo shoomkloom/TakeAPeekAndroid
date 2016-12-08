@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="5dp"
     android:layout_marginBottom="10dp"
-    android:background="@color/pt_gray_1">
+    android:background="@color/pt_gray_2">
 
     <RelativeLayout
         android:id = "@+id/user_peek_feed_background"
@@ -87,7 +87,7 @@
         android:layout_marginRight="30dp"
         android:layout_height="200dp"
         android:layout_alignParentTop="true"
-        android:background="@color/pt_gray_2"
+        android:background="@color/pt_gray_4"
         android:scaleType="centerCrop"
         android:layout_centerHorizontal="true"/>
 
@@ -114,6 +114,6 @@
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:layout_below="@+id/user_peek_feed_background"
-        android:background="@color/pt_gray_1" />
+        android:background="@color/pt_gray_2" />
 
 </RelativeLayout>
