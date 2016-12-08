@@ -65,27 +65,18 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:paddingLeft="30dp"
+            android:paddingLeft="5dp"
             android:paddingRight="30dp"
             android:textSize="13sp"
             android:textColor="@color/pt_gray"
             android:background="@drawable/rounded_corner_bottom"
+            android:drawableLeft="@drawable/peek_address"
+            android:drawablePadding="5dp"
             android:translationZ="4dp"
             android:maxLines="1"
             android:ellipsize="end"
             android:gravity="left"
             android:layout_alignParentBottom="true" />
-
-        <ImageView
-            android:id = "@+id/peek_stack_feed_address_image"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="5dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:translationZ="4dp"
-            android:src="@drawable/ic_peek_address"/>
 
     </RelativeLayout>
 
@@ -102,10 +93,11 @@
 
     <ImageView
         android:id = "@+id/user_peek_feed_thumbnail_play"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_video_play" />
 
     <View
@@ -114,9 +106,8 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_height="200dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/rounded_corner_overlay_gray" />
+        android:background="@drawable/rounded_corner_overlay_gray"
+        android:layout_alignParentTop="true"/>
 
     <View
         android:id = "@+id/view_padder"
@@ -124,6 +115,5 @@
         android:layout_height="5dp"
         android:layout_below="@+id/user_peek_feed_background"
         android:background="@color/pt_gray_1" />
-
 
 </RelativeLayout>

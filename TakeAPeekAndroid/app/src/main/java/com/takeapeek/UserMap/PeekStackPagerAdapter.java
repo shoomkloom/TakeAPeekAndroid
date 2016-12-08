@@ -64,55 +64,29 @@ public class PeekStackPagerAdapter extends PagerAdapter
         imageViewPeekThumbnail.setOnClickListener(ClickListener);
         imageViewPeekThumbnail.setTag(profileObject);
 
-/*@@
-        TextView textViewPeekStackTitle = (TextView)viewGroup.findViewById(R.id.peek_stack_title);
-        Helper.setTypeface(mUserMapActivity, textViewPeekStackTitle, Helper.FontTypeEnum.boldFont);
-        textViewPeekStackTitle.setOnClickListener(ClickListener);
-        textViewPeekStackTitle.setTag(profileObject);
-@@*/
-        TextView textViewPeekThumbnailPlay = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
-        Helper.setTypeface(mUserMapActivity, textViewPeekThumbnailPlay, Helper.FontTypeEnum.boldFont);
+        ImageView textViewPeekThumbnailPlay = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
         textViewPeekThumbnailPlay.setOnClickListener(ClickListener);
         textViewPeekThumbnailPlay.setTag(profileObject);
 
-/*@@
-        TextView textViewUserStackTime = (TextView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_time);
-        Helper.setTypeface(mUserMapActivity, textViewUserStackTime, Helper.FontTypeEnum.normalFont);
-        textViewUserStackTime.setOnClickListener(ClickListener);
-        textViewUserStackTime.setTag(profileObject);
-@@*/
         TextView textViewUserStackFollow = (TextView)viewGroup.findViewById(R.id.user_peek_stack_follow);
         Helper.setTypeface(mUserMapActivity, textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
         textViewUserStackFollow.setOnClickListener(ClickListener);
         textViewUserStackFollow.setTag(position);
-
-/*@@
-        TextView textViewPeekStackAddress = (TextView)viewGroup.findViewById(R.id.peek_stack_address);
-        Helper.setTypeface(mUserMapActivity, textViewPeekStackAddress, Helper.FontTypeEnum.boldFont);
-        textViewPeekStackAddress.setOnClickListener(ClickListener);
-        textViewPeekStackAddress.setTag(profileObject);
-@@*/
-        ImageView peekStackFollowImage = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_follow_image);
 
         switch(profileObject.relationTypeEnum)
         {
             case Follow:
                 textViewUserStackFollow.setText(R.string.unfollow);
                 textViewUserStackFollow.setBackgroundResource(R.drawable.button_gray);
-                peekStackFollowImage.setImageResource(R.drawable.ic_unfollow);
+                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
                 break;
 
             default:
                 textViewUserStackFollow.setText(R.string.follow);
                 textViewUserStackFollow.setBackgroundResource(R.drawable.button_green);
-                peekStackFollowImage.setImageResource(R.drawable.ic_follow);
+                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
                 break;
         }
-
-/*@@
-        ImageView imageViewClose = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_close);
-        imageViewClose.setOnClickListener(ClickListener);
-@@*/
 
         if(profileObject.peeks != null && profileObject.peeks.size() > 0)
         {
@@ -120,60 +94,10 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
-
-/*@@
-            textViewPeekStackTitle.setText(takeAPeekObject.Title);
-            textViewUserStackTime.setText(Helper.GetFormttedDiffTime(mUserMapActivity, takeAPeekObject.CreationTime));
-@@*/
-/*@@
-            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
-            {
-				LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                mAddressLoader.SetAddress(mUserMapActivity, location, textViewPeekStackAddress, mSharedPreferences);
-@@*/
-/*@@
-                new AsyncTask<Void, Void, String>()
-                {
-                    @Override
-                    protected String doInBackground(Void... params)
-                    {
-                        logger.debug("doInBackground(.) Invoked");
-
-                        try
-                        {
-                            LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                            return LocationHelper.FormattedAddressFromLocation(mUserMapActivity, location);
-                        }
-                        catch (Exception e)
-                        {
-                            Helper.Error(logger, "EXCEPTION: When trying to get address", e);
-                        }
-
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String text)
-                    {
-                        logger.debug("AddressCreatorTask::onPostExecute(.) Invoked");
-
-                        TextView textViewPeekStackAddress = (TextView)viewGroup.findViewById(R.id.peek_stack_address);
-
-                        textViewPeekStackAddress.setText(text);
-                        textViewPeekStackAddress.setVisibility(View.VISIBLE);
-
-                        Animation zoomInAnimation = AnimationUtils.loadAnimation(mUserMapActivity, R.anim.fadein);
-                        textViewPeekStackAddress.setAnimation(zoomInAnimation);
-                        zoomInAnimation.start();
-                    }
-                }.execute();
-@@*/
-//@@        }
         }
         else
         {
             textViewPeekThumbnailPlay.setVisibility(View.GONE);
-//@@            textViewUserStackTime.setText("No peeks found");
         }
 
         collection.addView(viewGroup);
@@ -219,12 +143,6 @@ public class PeekStackPagerAdapter extends PagerAdapter
                     GotoUserPeekListActivity(v);
                     break;
 
-/*@@
-                case R.id.user_peek_stack_thumbnail_time:
-                    logger.info("onClick: user_peek_stack_thumbnail_time");
-                    GotoUserPeekListActivity(v);
-                    break;
-@@*/
                 case R.id.user_peek_stack_follow:
                     logger.info("onClick: user_peek_stack_follow");
 
@@ -302,8 +220,6 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                         }
                                         else
                                         {
-                                            ImageView peekStackFollowImage = (ImageView)mTextViewFollowButton.getRootView().findViewById(R.id.user_peek_stack_follow_image);
-
                                             String message = mTargetProfileObject.displayName;
                                             switch(mRelationTypeEnum)
                                             {
@@ -311,14 +227,14 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                     message = String.format(mUserMapActivity.getString(R.string.set_relation_follow), mTargetProfileObject.displayName);
                                                     mTextViewFollowButton.setText(R.string.unfollow);
                                                     mTextViewFollowButton.setBackgroundResource(R.drawable.button_gray);
-                                                    peekStackFollowImage.setImageResource(R.drawable.ic_unfollow);
+                                                    mTextViewFollowButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
                                                     break;
 
                                                 default:
                                                     message = String.format(mUserMapActivity.getString(R.string.set_relation_unfollow), mTargetProfileObject.displayName);
                                                     mTextViewFollowButton.setText(R.string.follow);
                                                     mTextViewFollowButton.setBackgroundResource(R.drawable.button_green);
-                                                    peekStackFollowImage.setImageResource(R.drawable.ic_follow);
+                                                    mTextViewFollowButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
                                                     break;
                                             }
 
@@ -348,14 +264,6 @@ public class PeekStackPagerAdapter extends PagerAdapter
                     GotoUserPeekListActivity(v);
                     break;
 
-/*@@
-                case R.id.user_peek_stack_close:
-                    logger.info("onClick: user_peek_stack_close");
-
-                    mUserMapActivity.CloseUserPeekStack();
-
-                    break;
-@@*/
                 default:
                     break;
             }

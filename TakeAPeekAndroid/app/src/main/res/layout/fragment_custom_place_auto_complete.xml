@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:drawableLeft="@drawable/ic_place"
+        android:drawableLeft="@drawable/place"
         android:drawablePadding="5dp"
         android:hint="@string/search_location"
         android:singleLine="true"
@@ -21,6 +21,7 @@
         android:textSize="16sp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
+        android:paddingLeft="5dp"
         android:theme="@style/AppTheme.EditText"
         android:background="@color/pt_tra‌​nsparent"/>
 

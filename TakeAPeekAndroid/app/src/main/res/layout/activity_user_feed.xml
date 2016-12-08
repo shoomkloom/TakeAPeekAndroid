@@ -19,7 +19,7 @@
             android:id="@+id/imageview_up"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:padding="17dp"
+            android:padding="18dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_back"
             android:background="?android:attr/selectableItemBackgroundBorderless"

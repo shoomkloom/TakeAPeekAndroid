@@ -90,26 +90,13 @@
             android:layout_marginRight="40dp"/>
 -->
 
-
-        <TextView
+        <ImageView
             android:id = "@+id/user_peek_stack_thumbnail_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
-            android:paddingLeft="22dp"
-            android:paddingRight="22dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_centerInParent="true"
-            android:text="@string/view_peek"
-            android:textSize="20sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:drawableLeft="@drawable/ic_view_peek"
-            android:drawablePadding="10dp"
-            android:background="@drawable/button_border"/>
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_video_play" />
 
         <TextView
             android:id = "@+id/user_peek_stack_follow"
@@ -120,25 +107,16 @@
             android:clickable="true"
             android:textSize="14sp"
             android:textColor="@color/pt_white"
-            android:paddingLeft="30dp"
+            android:paddingLeft="5dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:layout_margin="10dp"
+            android:drawableLeft="@drawable/follow"
+            android:drawablePadding="5dp"
             android:text="@string/follow"
             android:translationZ="4dp"
             android:stateListAnimator="@anim/button_elevation"
             android:background="@drawable/button_green"/>
-
-        <ImageView
-            android:id = "@+id/user_peek_stack_follow_image"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/ic_follow"
-            android:translationZ="4dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="86dp" />
 
         <TextView
             android:id = "@+id/peek_stack_address"
