@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.MediaController;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -62,8 +61,7 @@ public class UserFeedActivity extends AppCompatActivity
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
     ImageView mImageViewPeekThumbnail = null;
     VideoView mVideoViewPeekItem = null;
-    TextView mVideoTime = null;
-    ProgressBar mVideoProgressBar = null;
+    ImageView mVideoCountDown = null;
     ImageView mImageViewPeekVideoProgress = null;
     TextView mTextViewPeekVideoProgress = null;
     AnimationDrawable mAnimationDrawableVideoProgressAnimation = null;
@@ -118,12 +116,10 @@ public class UserFeedActivity extends AppCompatActivity
             int currentPositionInMillis = mVideoViewPeekItem.getCurrentPosition();
             int timeLeftInMillis = durationInMillis - currentPositionInMillis;
             Date videoDateObject = new Date(timeLeftInMillis);
-            DateFormat dateFormat = new SimpleDateFormat("ss");
+            DateFormat dateFormat = new SimpleDateFormat("s");
             String formattedTime = dateFormat.format(videoDateObject);
-            mVideoTime.setText(formattedTime);
-
-            mVideoProgressBar.setMax(durationInMillis);
-            mVideoProgressBar.setProgress(currentPositionInMillis);
+            int countDown = Integer.parseInt(formattedTime);
+            UpdateVideoCountdownUI(countDown);
 
             if(mVideoViewPeekItem.isPlaying() == true)
             {
@@ -202,10 +198,9 @@ public class UserFeedActivity extends AppCompatActivity
         Helper.setTypeface(this, mTextViewPeekVideoProgress, Helper.FontTypeEnum.boldFont);
         mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
 
-        mVideoTime =  (TextView)findViewById(R.id.user_peek_video_time);
+        mVideoCountDown = (ImageView)findViewById(R.id.imageview_video_countdown);
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.boldFont);
 
-        mVideoProgressBar =  (ProgressBar)findViewById(R.id.user_peek_video_progress);
         mImageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_feed_thumbnail_play);
         mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
         mImageViewPeekClose = (ImageView)findViewById(R.id.user_peek_stack_close);
@@ -381,6 +376,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     //Start the video play time display
                     mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
+                    mVideoCountDown.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -461,10 +457,6 @@ public class UserFeedActivity extends AppCompatActivity
     {
         logger.debug("ShowPeekStream(..) Invoked");
 
-        // Start the MediaController
-        final MediaController mediacontroller = new MediaController(this, false);
-        mediacontroller.setAnchorView(mVideoViewPeekItem);
-
         //Play the video from stream
         try
         {
@@ -475,11 +467,9 @@ public class UserFeedActivity extends AppCompatActivity
                 {
                     logger.debug("MediaPlayer.OnPreparedListener:onPrepared(.) Invoked");
 
-                    StyleMediaController(mediacontroller);
-                    //@@mediacontroller.show(0);
-
                     //Start the video play time display
                     mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
+                    mVideoCountDown.setVisibility(View.VISIBLE);
 
                     Helper.SetFullscreen(mVideoViewPeekItem);
                 }
@@ -522,14 +512,11 @@ public class UserFeedActivity extends AppCompatActivity
                 }
             });
 
-//@@            Helper.ClearFullscreen(mVideoViewPeekItem);
-
             mEnumActivityState = EnumActivityState.previewPlayingStream;
             UpdateUI();
 
             // Get the URL from String VideoURL
             Uri url = Uri.parse(mCurrentTakeAPeekObject.PeekMP4StreamingURL);
-            mVideoViewPeekItem.setMediaController(mediacontroller);
             mVideoViewPeekItem.setVideoURI(url);
             mVideoViewPeekItem.requestFocus();
 
@@ -642,6 +629,56 @@ public class UserFeedActivity extends AppCompatActivity
         startActivity(userMapActivityIntent);
     }
 
+    public void UpdateVideoCountdownUI(int seconds)
+    {
+        switch(seconds)
+        {
+            case 10:
+                mVideoCountDown.setImageResource(R.drawable.take_video_10);
+                break;
+
+            case 9:
+                mVideoCountDown.setImageResource(R.drawable.take_video_9);
+                break;
+
+            case 8:
+                mVideoCountDown.setImageResource(R.drawable.take_video_8);
+                break;
+
+            case 7:
+                mVideoCountDown.setImageResource(R.drawable.take_video_7);
+                break;
+
+            case 6:
+                mVideoCountDown.setImageResource(R.drawable.take_video_6);
+                break;
+
+            case 5:
+                mVideoCountDown.setImageResource(R.drawable.take_video_5);
+                break;
+
+            case 4:
+                mVideoCountDown.setImageResource(R.drawable.take_video_4);
+                break;
+
+            case 3:
+                mVideoCountDown.setImageResource(R.drawable.take_video_3);
+                break;
+
+            case 2:
+                mVideoCountDown.setImageResource(R.drawable.take_video_2);
+                break;
+
+            case 1:
+                mVideoCountDown.setImageResource(R.drawable.take_video_1);
+                break;
+
+            case 0:
+                mVideoCountDown.setImageResource(R.drawable.take_video_0);
+                break;
+        }
+    }
+
     private void UpdateUI()
     {
         logger.debug("UpdateUI() Invoked");
@@ -672,8 +709,7 @@ public class UserFeedActivity extends AppCompatActivity
                 mTextViewPeekVideoProgress.setText("");
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
-                mVideoTime.setVisibility(View.GONE);
-                mVideoProgressBar.setVisibility(View.GONE);
+                mVideoCountDown.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
@@ -695,8 +731,7 @@ public class UserFeedActivity extends AppCompatActivity
                 mTextViewPeekVideoProgress.setText("");
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
-                mVideoTime.setVisibility(View.GONE);
-                mVideoProgressBar.setVisibility(View.GONE);
+                mVideoCountDown.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
@@ -717,8 +752,7 @@ public class UserFeedActivity extends AppCompatActivity
                 mTextViewPeekVideoProgress.setText("");
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
-                mVideoTime.setVisibility(View.GONE);
-                mVideoProgressBar.setVisibility(View.GONE);
+                mVideoCountDown.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
@@ -749,8 +783,7 @@ public class UserFeedActivity extends AppCompatActivity
                 });
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mVideoTime.setVisibility(View.GONE);
-                mVideoProgressBar.setVisibility(View.GONE);
+                mVideoCountDown.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
@@ -772,8 +805,6 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mVideoTime.setVisibility(View.VISIBLE);
-                mVideoProgressBar.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
@@ -795,8 +826,6 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mVideoTime.setVisibility(View.VISIBLE);
-                mVideoProgressBar.setVisibility(View.VISIBLE);
                 mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
@@ -818,8 +847,7 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
-                mVideoTime.setVisibility(View.GONE);
-                mVideoProgressBar.setVisibility(View.GONE);
+                mVideoCountDown.setVisibility(View.GONE);
                 mImageViewPeekClose.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));

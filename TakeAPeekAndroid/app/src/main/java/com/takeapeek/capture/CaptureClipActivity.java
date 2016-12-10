@@ -3192,6 +3192,9 @@ public class CaptureClipActivity extends Activity implements
             //Set full screen
             Helper.SetFullscreen(mCapturePreviewVideo);
 
+            mVideoCaptureStateEnum = VideoCaptureStateEnum.Preview;
+            UpdateUI();
+
             findViewById(R.id.capture_preview_container).setVisibility(View.VISIBLE);
             mCapturePreviewVideo.start();
             //@@mCapturePreviewVideo.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -3447,6 +3450,7 @@ public class CaptureClipActivity extends Activity implements
                 break;
 
             case Preview:
+                mCapturePreviewTitle.setVisibility(View.GONE);
                 break;
 
             case Finish:
@@ -3469,7 +3473,7 @@ public class CaptureClipActivity extends Activity implements
                 findViewById(R.id.zoom_seekbar).setVisibility(View.INVISIBLE);
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
-                mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_green_faded));
+                mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_green_2));
 
                 FlashOff();
                 break;
