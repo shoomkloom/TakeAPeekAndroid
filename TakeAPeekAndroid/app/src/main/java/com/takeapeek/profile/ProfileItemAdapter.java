@@ -3,7 +3,6 @@ package com.takeapeek.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +29,6 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
 
     ProfileActivity mProfileActivity = null;
     List<Integer> mProfileTitlesList = null;
-    int mFollowingNumber = 0;
-    int mFollowersNumber = 0;
-    int mBlockedNumber = 0;
 
     private static LayoutInflater mLayoutInflater = null;
 
@@ -41,8 +37,6 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
     private class ViewHolder
     {
         TextView mTextViewTitle = null;
-        TextView mTextViewNumber = null;
-        TextView mTextviewInviteFriends = null;
 
         int Position = -1;
     }
@@ -62,16 +56,6 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
         mSharedPreferences = mProfileActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         DatabaseManager.init(mProfileActivity);
-
-        String profileId = Helper.GetProfileId(mSharedPreferences);
-        if(profileId != null)
-        {
-            mFollowingNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(profileId).size();
-
-            mFollowersNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowers(profileId).size();
-
-            mBlockedNumber = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(profileId).size();
-        }
     }
 
     @Override
@@ -106,14 +90,6 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
             viewHolder.mTextViewTitle = (TextView)view.findViewById(R.id.textview_profile_item_name);
             Helper.setTypeface(mProfileActivity, viewHolder.mTextViewTitle, Helper.FontTypeEnum.normalFont);
 
-            viewHolder.mTextViewNumber = (TextView)view.findViewById(R.id.textview_profile_number);
-            Helper.setTypeface(mProfileActivity, viewHolder.mTextViewNumber, Helper.FontTypeEnum.normalFont);
-
-            viewHolder.mTextviewInviteFriends = (TextView)view.findViewById(R.id.textview_profile_invite_friends);
-            Helper.setTypeface(mProfileActivity, viewHolder.mTextviewInviteFriends, Helper.FontTypeEnum.boldFont);
-            viewHolder.mTextviewInviteFriends.setOnClickListener(ClickListener);
-            viewHolder.mTextviewInviteFriends.setTag(viewHolder);
-
             view.setTag(viewHolder);
         }
         else
@@ -124,41 +100,8 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
         viewHolder.Position = position;
         if(mProfileTitlesList != null)
         {
-            switch(mProfileTitlesList.get(position))
-            {
-                case R.string.following:
-                    viewHolder.mTextViewTitle.setText(R.string.following);
-                    viewHolder.mTextViewNumber.setVisibility(View.VISIBLE);
-                    viewHolder.mTextViewNumber.setText(String.format("%d", mFollowingNumber));
-                    break;
+            viewHolder.mTextViewTitle.setText(mProfileTitlesList.get(position));
 
-                case R.string.followers:
-                    viewHolder.mTextViewTitle.setText(R.string.followers);
-                    viewHolder.mTextViewNumber.setVisibility(View.VISIBLE);
-                    viewHolder.mTextViewNumber.setText(String.format("%d", mFollowersNumber));
-                    break;
-
-                case R.string.blocked:
-                    viewHolder.mTextViewTitle.setText(R.string.blocked);
-                    viewHolder.mTextViewNumber.setVisibility(View.VISIBLE);
-                    viewHolder.mTextViewNumber.setText(String.format("%d", mBlockedNumber));
-                    break;
-
-                case R.string.invite_friends:
-                    viewHolder.mTextViewTitle.setVisibility(View.GONE);
-                    viewHolder.mTextViewNumber.setVisibility(View.GONE);
-                    viewHolder.mTextviewInviteFriends.setVisibility(View.VISIBLE);
-                    break;
-
-                default:
-                    viewHolder.mTextViewTitle.setText(mProfileTitlesList.get(position));
-                    viewHolder.mTextViewNumber.setVisibility(View.GONE);
-                    viewHolder.mTextviewInviteFriends.setVisibility(View.GONE);
-                    /*@@*/
-                    view.setBackgroundColor(Color.RED);
-                    /*@@*/
-                    break;
-            }
         }
 
         return view;
@@ -184,30 +127,6 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
                 default:
                     switch (mProfileTitlesList.get(viewHolder.Position))
                     {
-                        case R.string.following:
-                            final Intent followingIntent = new Intent(mProfileActivity, FollowingActivity.class);
-                            followingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            mProfileActivity.startActivity(followingIntent);
-                            break;
-
-                        case R.string.followers:
-                            final Intent followersIntent = new Intent(mProfileActivity, FollowersActivity.class);
-                            followersIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            mProfileActivity.startActivity(followersIntent);
-                            break;
-
-                        case R.string.blocked:
-                            final Intent blockedIntent = new Intent(mProfileActivity, BlockedActivity.class);
-                            blockedIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            mProfileActivity.startActivity(blockedIntent);
-                            break;
-
-                        case R.string.invite_friends:
-                            final Intent inviteFriendsIntent2 = new Intent(mProfileActivity, ShareActivity.class);
-                            inviteFriendsIntent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            mProfileActivity.startActivity(inviteFriendsIntent2);
-                            break;
-
                         case R.string.support:
                             Toast.makeText(mProfileActivity, "Support", Toast.LENGTH_SHORT).show();
                             break;

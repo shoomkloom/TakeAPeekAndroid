@@ -47,8 +47,11 @@
     <color name="pt_gray_4">#e3e3e3</color>
     <color name="pt_gray_5">#ebedee</color>
     <color name="pt_gray_6">#7c909b</color>
+    <color name="pt_gray_6_faded">#ee7c909b</color>
     <color name="pt_gray_7">#647c8a</color>
+    <color name="pt_gray_8">#b2bec4</color>
     <color name="pt_white">#ffffff</color>
+    <color name="pt_white_faded">#55dddddd</color>
     <color name="pt_tra‌​nsparent">#00000000</color>
     <color name="pt_transparent_faded">#55aaaaaa</color>
 

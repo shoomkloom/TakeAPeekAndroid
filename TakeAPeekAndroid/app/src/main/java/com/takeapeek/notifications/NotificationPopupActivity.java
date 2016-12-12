@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -114,17 +115,22 @@ public class NotificationPopupActivity extends FragmentActivity implements
         ImageView imageViewButtonClose = (ImageView)findViewById(R.id.button_close);
         imageViewButtonClose.setOnClickListener(ClickListener);
         TextView textViewTitleBig = (TextView)findViewById(R.id.big_title);
-        Helper.setTypeface(this, textViewTitleBig, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, textViewTitleBig, Helper.FontTypeEnum.normalFont);
         TextView textViewTitleSmall = (TextView)findViewById(R.id.small_title);
         Helper.setTypeface(this, textViewTitleSmall, Helper.FontTypeEnum.normalFont);
+
+        findViewById(R.id.button_control).setOnClickListener(ClickListener);
+        findViewById(R.id.button_control_close).setOnClickListener(ClickListener);
 
         LinearLayout linearLayoutButtonSend = (LinearLayout)findViewById(R.id.button_send_peek);
         TextView textviewButtonSendPeek = (TextView)findViewById(R.id.textview_button_send_peek);
         Helper.setTypeface(this, textviewButtonSendPeek, Helper.FontTypeEnum.boldFont);
+        linearLayoutButtonSend.setOnClickListener(ClickListener);
 
         LinearLayout linearLayoutButtonRequest = (LinearLayout)findViewById(R.id.button_request_peek);
         TextView textviewButtonRequestPeek = (TextView)findViewById(R.id.textview_button_request_peek);
         Helper.setTypeface(this, textviewButtonRequestPeek, Helper.FontTypeEnum.boldFont);
+        linearLayoutButtonRequest.setOnClickListener(ClickListener);
 
         RelativeLayout.LayoutParams relativeLayoutParamsSend = null;
         RelativeLayout.LayoutParams relativeLayoutParamsRequest = null;
@@ -150,8 +156,11 @@ public class NotificationPopupActivity extends FragmentActivity implements
             TextView textViewUserFeedTime = (TextView)findViewById(R.id.user_peek_notification_thumbnail_time);
             Helper.setTypeface(this, textViewUserFeedTime, Helper.FontTypeEnum.normalFont);
 
-            TextView textViewUserFeedAddress = (TextView)findViewById(R.id.user_peek_notification_thumbnail_address);
-            Helper.setTypeface(this, textViewUserFeedAddress, Helper.FontTypeEnum.normalFont);
+            TextView textViewLocation = (TextView)findViewById(R.id.request_location_on_map);
+            Helper.setTypeface(this, textViewLocation, Helper.FontTypeEnum.normalFont);
+
+            TextView textViewDisplayName = (TextView)findViewById(R.id.request_displayname_on_map);
+            Helper.setTypeface(this, textViewDisplayName, Helper.FontTypeEnum.normalFont);
 
             switch(mPushNotificationTypeEnum)
             {
@@ -167,67 +176,62 @@ public class NotificationPopupActivity extends FragmentActivity implements
                             .build();
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
-                    findViewById(R.id.corner_overlay_on_map_top).setVisibility(View.VISIBLE);
-                    findViewById(R.id.corner_overlay_on_map_bottom).setVisibility(View.VISIBLE);
 
-                    TextView textViewDisplayNameRequest = (TextView)findViewById(R.id.request_displayname_on_map);
-                    Helper.setTypeface(this, textViewDisplayNameRequest, Helper.FontTypeEnum.normalFont);
-                    textViewDisplayNameRequest.setVisibility(View.VISIBLE);
-                    textViewDisplayNameRequest.setText(mProfileObject.displayName);
+                    textViewDisplayName.setVisibility(View.VISIBLE);
+                    textViewDisplayName.setText(mProfileObject.displayName);
 
-                    TextView textViewLocationRequest = (TextView)findViewById(R.id.request_location_on_map);
-                    Helper.setTypeface(this, textViewLocationRequest, Helper.FontTypeEnum.normalFont);
-                    textViewLocationRequest.setVisibility(View.VISIBLE);
+                    textViewLocation.setVisibility(View.VISIBLE);
 
                     if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
                     {
                         LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
 
                         mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocationRequest, mSharedPreferences);
+                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
                     }
 
                     //Titles
-                    textViewTitleBig.setText(String.format(getString(R.string.request_big_title), mProfileObject.displayName));
+                    textViewTitleBig.setText(getString(R.string.request_big_title));
                     textViewTitleSmall.setText(R.string.request_small_title);
 
-                    //Send Peek button
-                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
-                    relativeLayoutParamsSend.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
-
+                    //Control buttons
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
-                    linearLayoutButtonSend.setOnClickListener(ClickListener);
+                    linearLayoutButtonRequest.setVisibility(View.GONE);
 
                     break;
 
                 case response:
                     findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
 
+                    TextView textViewPeekTitle = (TextView)findViewById(R.id.peek_notification_title);
+                    textViewPeekTitle.setText(mTakeAPeekObject.Title);
+                    Helper.setTypeface(this, textViewPeekTitle, Helper.FontTypeEnum.normalFont);
+
                     mThumbnailLoader = new ThumbnailLoader();
                     mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
 
                     textViewUserFeedTime.setText(Helper.GetFormttedDiffTime(this, mTakeAPeekObject.CreationTime));
+
+                    textViewDisplayName.setVisibility(View.VISIBLE);
+                    textViewDisplayName.setText(mProfileObject.displayName);
+
+                    textViewLocation.setVisibility(View.VISIBLE);
 
                     if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
                     {
                         LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
 
                         mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewUserFeedAddress, mSharedPreferences);
+                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
                     }
 
                     //Titles
-                    textViewTitleBig.setText(String.format(getString(R.string.response_big_title), mProfileObject.displayName));
+                    textViewTitleBig.setText(getString(R.string.response_big_title));
                     textViewTitleSmall.setText(R.string.response_small_title);
 
-                    //Send Peek button
-                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
-                    relativeLayoutParamsSend.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
-
+                    //Control buttons
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
-                    linearLayoutButtonSend.setOnClickListener(ClickListener);
+                    linearLayoutButtonRequest.setVisibility(View.GONE);
 
                     break;
 
@@ -239,25 +243,26 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     textViewUserFeedTime.setText(Helper.GetFormttedDiffTime(this, mTakeAPeekObject.CreationTime));
 
+                    textViewDisplayName.setVisibility(View.VISIBLE);
+                    textViewDisplayName.setText(mProfileObject.displayName);
+
+                    textViewLocation.setVisibility(View.VISIBLE);
+
                     if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
                     {
                         LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
 
                         mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewUserFeedAddress, mSharedPreferences);
+                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
                     }
 
                     //Titles
-                    textViewTitleBig.setText(String.format(getString(R.string.peek_big_title), mProfileObject.displayName));
+                    textViewTitleBig.setText(getString(R.string.peek_big_title));
                     textViewTitleSmall.setText(R.string.peek_small_title);
 
-                    //Send Peek button
-                    relativeLayoutParamsSend = (RelativeLayout.LayoutParams) linearLayoutButtonSend.getLayoutParams();
-                    relativeLayoutParamsSend.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    linearLayoutButtonSend.setLayoutParams(relativeLayoutParamsSend);
-
+                    //Control buttons
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
-                    linearLayoutButtonSend.setOnClickListener(ClickListener);
+                    linearLayoutButtonRequest.setVisibility(View.GONE);
 
                     break;
 
@@ -273,26 +278,22 @@ public class NotificationPopupActivity extends FragmentActivity implements
                             .build();
 
                     findViewById(R.id.map).setVisibility(View.VISIBLE);
-                    findViewById(R.id.corner_overlay_on_map_top).setVisibility(View.VISIBLE);
-                    findViewById(R.id.corner_overlay_on_map_bottom).setVisibility(View.VISIBLE);
 
-                    TextView textViewDisplayNameFollow = (TextView)findViewById(R.id.request_displayname_on_map);
-                    textViewDisplayNameFollow.setVisibility(View.VISIBLE);
-                    textViewDisplayNameFollow.setText(mProfileObject.displayName);
+                    textViewDisplayName.setVisibility(View.VISIBLE);
+                    textViewDisplayName.setText(mProfileObject.displayName);
 
-                    TextView textViewLocationFollow = (TextView)findViewById(R.id.request_location_on_map);
-                    textViewLocationFollow.setVisibility(View.VISIBLE);
+                    textViewLocation.setVisibility(View.VISIBLE);
 
                     if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
                     {
                         LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
 
                         mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocationFollow, mSharedPreferences);
+                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
                     }
 
                     //Titles
-                    textViewTitleBig.setText(String.format(getString(R.string.follow_big_title), mProfileObject.displayName));
+                    textViewTitleBig.setText(getString(R.string.follow_big_title));
                     textViewTitleSmall.setVisibility(View.GONE);
 
                     //Send Peek button
@@ -303,13 +304,9 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
                     linearLayoutButtonSend.setOnClickListener(ClickListener);
 
-                    //Request Peek button
-                    relativeLayoutParamsRequest = (RelativeLayout.LayoutParams) linearLayoutButtonRequest.getLayoutParams();
-                    relativeLayoutParamsRequest.addRule(RelativeLayout.ALIGN_RIGHT);
-                    linearLayoutButtonRequest.setLayoutParams(relativeLayoutParamsRequest);
-
+                    //Control buttons
+                    linearLayoutButtonSend.setVisibility(View.GONE);
                     linearLayoutButtonRequest.setVisibility(View.VISIBLE);
-                    linearLayoutButtonRequest.setOnClickListener(ClickListener);
 
                     break;
 
@@ -446,6 +443,22 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     logger.info("onClick: button_close clicked");
                     finish();
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
+                    break;
+
+                case R.id.button_control:
+                    logger.info("onClick: button_control clicked");
+
+                    findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(NotificationPopupActivity.this, R.color.pt_white_faded)));
+                    findViewById(R.id.button_control).setVisibility(View.GONE);
+                    findViewById(R.id.button_control_background_close).setVisibility(View.VISIBLE);
+                    break;
+
+                case R.id.button_control_close:
+                    logger.info("onClick: button_control clicked");
+
+                    findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(NotificationPopupActivity.this, R.color.pt_tra‌​nsparent)));
+                    findViewById(R.id.button_control).setVisibility(View.VISIBLE);
+                    findViewById(R.id.button_control_background_close).setVisibility(View.GONE);
                     break;
 
                 case R.id.button_send_peek:

@@ -5,21 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.takeapeek.trendingplaces.TrendingPlacesActivity"
-    android:background="@color/tap_white">
+    android:background="@color/pt_gray_2">
 
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/tap_blue">
+        android:background="@color/pt_gray_1">
 
         <ImageView
             android:id="@+id/imageview_map"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:padding="17dp"
+            android:padding="18dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_map"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"/>
 
@@ -31,15 +32,16 @@
             android:textSize="20sp"
             android:text="@string/places_title"
             android:layout_centerInParent="true"
-            android:textColor="@color/tap_white"/>
+            android:textColor="@color/pt_darkgray"/>
 
         <ImageView
             android:id="@+id/stack_image"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:padding="17dp"
+            android:padding="18dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_stack"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true" />
 
@@ -65,7 +67,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_places_empty"
-        android:textColor="@color/tap_white"
+        android:textColor="@color/pt_darkgray"
         android:textSize="24sp"
         android:visibility="gone" />
 

@@ -6,15 +6,52 @@
     android:layout_marginBottom="10dp"
     android:background="@color/pt_gray_2">
 
+    <ImageView
+        android:id="@+id/user_peek_feed_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_height="200dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/pt_gray_4"
+        android:scaleType="centerCrop"
+        android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id = "@+id/user_peek_feed_thumbnail_play"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_video_play" />
+
+    <View
+        android:id = "@+id/corner_overlay_on_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_height="200dp"
+        android:background="@drawable/rounded_corner_overlay_gray"
+        android:layout_alignParentTop="true"/>
+
+    <View
+        android:id = "@+id/view_padder"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_below="@+id/user_peek_feed_background"
+        android:background="@color/pt_gray_2" />
+
     <RelativeLayout
         android:id = "@+id/user_peek_feed_background"
         android:layout_height="130dp"
         android:layout_width="match_parent"
-        android:layout_below="@+id/user_peek_feed_thumbnail"
         android:background="@drawable/rounded_corner_bottom"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:translationZ="4dp">
+        android:translationZ="4dp"
+        android:layout_below="@+id/user_peek_feed_thumbnail"
+        android:layout_centerHorizontal="true">
 
         <TextView
             android:id = "@+id/user_peek_feed_displayname"
@@ -79,41 +116,5 @@
             android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
-
-    <ImageView
-        android:id="@+id/user_peek_feed_thumbnail"
-        android:layout_width="match_parent"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_height="200dp"
-        android:layout_alignParentTop="true"
-        android:background="@color/pt_gray_4"
-        android:scaleType="centerCrop"
-        android:layout_centerHorizontal="true"/>
-
-    <ImageView
-        android:id = "@+id/user_peek_feed_thumbnail_play"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_video_play" />
-
-    <View
-        android:id = "@+id/corner_overlay_on_thumbnail"
-        android:layout_width="match_parent"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_height="200dp"
-        android:background="@drawable/rounded_corner_overlay_gray"
-        android:layout_alignParentTop="true"/>
-
-    <View
-        android:id = "@+id/view_padder"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_below="@+id/user_peek_feed_background"
-        android:background="@color/pt_gray_2" />
 
 </RelativeLayout>

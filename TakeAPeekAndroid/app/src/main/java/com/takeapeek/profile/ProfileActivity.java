@@ -28,6 +28,9 @@ public class ProfileActivity extends AppCompatActivity
 
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
+    int mFollowingNumber = 0;
+    int mFollowersNumber = 0;
+    int mBlockedNumber = 0;
 
     ListView mListViewProfileList = null;
 
@@ -49,6 +52,30 @@ public class ProfileActivity extends AppCompatActivity
 
         DatabaseManager.init(this);
 
+        String profileId = Helper.GetProfileId(mSharedPreferences);
+        if(profileId != null)
+        {
+            mFollowingNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(profileId).size();
+            mFollowersNumber = DatabaseManager.getInstance().GetTakeAPeekRelationFollowers(profileId).size();
+            mBlockedNumber = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(profileId).size();
+        }
+
+        TextView textviewFollowingNumnber = (TextView)findViewById(R.id.textview_profile_following_number);
+        Helper.setTypeface(this, textviewFollowingNumnber, Helper.FontTypeEnum.normalFont);
+        textviewFollowingNumnber.setText(String.format("%d", mFollowingNumber));
+
+        TextView textviewFollowersNumnber = (TextView)findViewById(R.id.textview_profile_followers_number);
+        Helper.setTypeface(this, textviewFollowersNumnber, Helper.FontTypeEnum.normalFont);
+        textviewFollowersNumnber.setText(String.format("%d", mFollowersNumber));
+
+        TextView textviewBlockedNumnber = (TextView)findViewById(R.id.textview_profile_blocked_number);
+        Helper.setTypeface(this, textviewBlockedNumnber, Helper.FontTypeEnum.normalFont);
+        textviewBlockedNumnber.setText(String.format("%d", mBlockedNumber));
+
+        findViewById(R.id.layout_profile_following).setOnClickListener(ClickListener);
+        findViewById(R.id.layout_profile_followers).setOnClickListener(ClickListener);
+        findViewById(R.id.layout_profile_blocked).setOnClickListener(ClickListener);
+
         String displayName = Helper.GetProfileDisplayName(mSharedPreferences);
         TextView textviewProfileTitle = (TextView)findViewById(R.id.textview_profile_title);
         Helper.setTypeface(this, textviewProfileTitle, Helper.FontTypeEnum.boldFont);
@@ -59,11 +86,15 @@ public class ProfileActivity extends AppCompatActivity
 
         findViewById(R.id.imageview_settings).setOnClickListener(ClickListener);
         findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
+
+        TextView textviewInviteFriends = (TextView)findViewById(R.id.textview_profile_invite_friends);
+        Helper.setTypeface(this, textviewInviteFriends, Helper.FontTypeEnum.boldFont);
+        textviewInviteFriends.setOnClickListener(ClickListener);
     }
 
     private void InitList()
     {
-        List<Integer> profileTitlesList = Arrays.asList(new Integer[]{R.string.following, R.string.followers, R.string.blocked, R.string.invite_friends, R.string.support, R.string.privacy_policy, R.string.terms_of_service, R.string.licenses});
+        List<Integer> profileTitlesList = Arrays.asList(new Integer[]{R.string.support, R.string.privacy_policy, R.string.terms_of_service, R.string.licenses});
 
         mProfileItemAdapter = new ProfileItemAdapter(this, R.layout.item_profile, profileTitlesList);
         mListViewProfileList.setAdapter(mProfileItemAdapter);
@@ -110,7 +141,39 @@ public class ProfileActivity extends AppCompatActivity
 
                     final Intent userMapActivityIntent = new Intent(ProfileActivity.this, UserMapActivity.class);
                     userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    ProfileActivity.this.startActivity(userMapActivityIntent);
+                    startActivity(userMapActivityIntent);
+                    break;
+
+                case R.id.textview_profile_invite_friends:
+                    logger.info("OnClickListener:onClick(.) textview_profile_invite_friends Invoked");
+
+                    final Intent inviteFriendsIntent1 = new Intent(ProfileActivity.this, ShareActivity.class);
+                    inviteFriendsIntent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(inviteFriendsIntent1);
+                    break;
+
+                case R.id.layout_profile_following:
+                    logger.info("OnClickListener:onClick(.) layout_profile_following Invoked");
+
+                    final Intent followingIntent = new Intent(ProfileActivity.this, FollowingActivity.class);
+                    followingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(followingIntent);
+                    break;
+
+                case R.id.layout_profile_followers:
+                    logger.info("OnClickListener:onClick(.) layout_profile_followers Invoked");
+
+                    final Intent followersIntent = new Intent(ProfileActivity.this, FollowersActivity.class);
+                    followersIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(followersIntent);
+                    break;
+
+                case R.id.layout_profile_blocked:
+                    logger.info("OnClickListener:onClick(.) layout_profile_blocked Invoked");
+
+                    final Intent blockedIntent = new Intent(ProfileActivity.this, BlockedActivity.class);
+                    blockedIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(blockedIntent);
                     break;
 
                 default:

@@ -1,129 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:background="@color/tap_white"
-    android:padding="10dp">
+    android:layout_height="295dp"
+    android:background="@color/pt_gray_2">
+
+    <ImageView
+        android:id="@+id/place_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_height="200dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/pt_gray_4"
+        android:scaleType="centerCrop"
+        android:layout_centerHorizontal="true"/>
+
+    <View
+        android:id = "@+id/corner_overlay_on_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_height="200dp"
+        android:background="@drawable/rounded_corner_overlay_gray"
+        android:layout_alignParentTop="true"/>
+
+    <View
+        android:id = "@+id/view_padder"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_below="@+id/user_peek_feed_background"
+        android:background="@color/pt_gray_2" />
 
     <RelativeLayout
-        android:id = "@+id/place_thumbnail_layout"
+        android:id = "@+id/user_peek_feed_background"
+        android:layout_height="70dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true" >
-
-        <ImageView
-            android:id = "@+id/place_thumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:scaleType="centerCrop" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/place_thumbnail"
-            android:layout_alignLeft="@id/place_thumbnail"
-            android:layout_alignRight="@+id/place_thumbnail"
-            android:layout_alignTop="@id/place_thumbnail"
-            android:background="@drawable/rounded_corner_overlay_white" />
-
-        <!--
-        <ImageView
-            android:id = "@+id/user_peek_feed_thumbnail_play"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_video_play" />
-
-        <TextView
-            android:id = "@+id/user_peek_feed_displayname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:textSize="20sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"/>
-
-        <TextView
-            android:id = "@+id/user_peek_feed_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/user_peek_feed_displayname"
-            android:layout_alignParentLeft="true"
-            android:textSize="18sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"/>
-
-        <TextView
-            android:id = "@+id/user_peek_feed_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:textSize="15sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"/>
-        -->
+        android:background="@drawable/rounded_corner_bottom"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:translationZ="4dp"
+        android:layout_below="@+id/place_thumbnail"
+        android:layout_centerHorizontal="true">
 
         <TextView
             android:id = "@+id/place_address"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:layout_marginTop="60dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:gravity="center"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/dark_rounded_corner"
-            android:visibility="invisible"/>
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_above="@+id/place_number_of_peeks"
+            android:textSize="15sp"
+            android:ellipsize="middle"
+            android:maxLines="1"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/pt_darkgray"
+            android:gravity="left" />
 
         <TextView
             android:id = "@+id/place_number_of_peeks"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:textSize="15sp"
-            android:textColor="@color/tap_white"
-            android:shadowColor="@color/tap_darkgray"
-            android:layout_marginTop="240dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:gravity="center"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/dark_rounded_corner"/>
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentBottom="true"
+            android:textSize="11sp"
+            android:textColor="@color/pt_red"
+            android:gravity="left" />
 
     </RelativeLayout>
-
 </RelativeLayout>

@@ -104,7 +104,7 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
             viewHolder.mImagePlaceThumbnail.setOnClickListener(ClickListener);
 
             viewHolder.mTextViewPlaceAddress = (TextView)view.findViewById(R.id.place_address);
-            Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewPlaceAddress, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewPlaceAddress, Helper.FontTypeEnum.boldFont);
 
             viewHolder.mTextViewNumberOfPeeks = (TextView)view.findViewById(R.id.place_number_of_peeks);
             Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewNumberOfPeeks, Helper.FontTypeEnum.normalFont);

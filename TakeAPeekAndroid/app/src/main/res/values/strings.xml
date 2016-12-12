@@ -186,14 +186,14 @@
 
     <!-- Notification popup activity -->
     <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
-    <string name="request_big_title">%1$s is asking you for a Peek</string>
+    <string name="request_big_title">is asking you for a Peek</string>
     <string name="request_small_title">Show them why you are special</string>
-    <string name="response_big_title">%1$s sent you a Peek</string>
+    <string name="response_big_title">sent you a Peek</string>
     <string name="response_small_title">Check it out!</string>
-    <string name="peek_big_title">%1$s created a Peek just now</string>
+    <string name="peek_big_title">created a Peek just now</string>
     <string name="peek_small_title">Check it out!</string>
-    <string name="follow_big_title">%1$s is now following you</string>
-    <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s users</string>
+    <string name="follow_big_title">is now following you</string>
+    <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s</string>
 
     <!-- Trending Places -->
     <string name="places_title">Trending Locations</string>

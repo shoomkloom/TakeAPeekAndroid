@@ -1,49 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:background="#ffffff" >
+                android:layout_height="wrap_content">
 
     <TextView
         android:id = "@+id/textview_profile_item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:gravity="center"
-        android:textSize="24sp"
-        android:textColor="@color/tap_gray"/>
-
-    <TextView
-        android:id = "@+id/textview_profile_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:textSize="15sp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textColor="@color/tap_white"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/button_blue_rounded"
-        android:visibility="gone"/>
-
-    <TextView
-        android:id = "@+id/textview_profile_invite_friends"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:textSize="22sp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:textColor="@color/tap_white"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:translationZ="4dp"
-        android:stateListAnimator="@anim/button_elevation"
-        android:text="@string/invite_friends"
-        android:background="@drawable/button_green"
-        android:visibility="gone"/>
+        android:layout_height="match_parent"
+        android:gravity="left"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:textSize="16sp"
+        android:textColor="@color/pt_darkgray"
+        android:background="?android:attr/selectableItemBackground" />
 
 </RelativeLayout>
