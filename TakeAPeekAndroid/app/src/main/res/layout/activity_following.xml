@@ -5,23 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.takeapeek.profile.FollowingActivity"
-    android:background="@color/tap_white" >
+    android:background="@drawable/gradient_gray_fade" >
 
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/tap_blue">
+        android:background="@color/pt_green_2">
 
         <ImageView
             android:id="@+id/imageview_up"
-            android:layout_width="65dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_back"
+            android:src="@drawable/ic_back_white"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:padding="20dp"/>
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="17dp"/>
 
         <TextView
             android:id="@+id/textview_following_title"
@@ -39,13 +40,16 @@
         android:id="@+id/listview_following_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/top_bar"
-        android:divider="@color/tap_gray_faded"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:divider="@color/pt_gray"
         android:dividerHeight="1dp"
         android:orientation="vertical"
-        android:listSelector="@android:color/transparent"
+        android:layout_below="@+id/top_bar"
+        android:listSelector="@color/pt_tra‌​nsparent"
         android:drawSelectorOnTop="true"
-        android:animateLayoutChanges="true" />
+        android:animateLayoutChanges="true"
+        android:background="@color/pt_tra‌​nsparent"/>
 
     <TextView
         android:id="@+id/textview_following_empty"
@@ -55,7 +59,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_following_empty"
-        android:textColor="@color/tap_gray"
+        android:textColor="@color/pt_darkgray"
         android:textSize="20sp"
         android:visibility="gone" />
 

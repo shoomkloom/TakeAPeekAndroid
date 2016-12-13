@@ -3,7 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="20dp"
-                android:background="#ffffff" >
+                android:background="pt_gray_2" >
 
     <TextView
         android:id = "@+id/textview_blocked_src_name"
@@ -30,6 +30,6 @@
         android:text="@string/blocked_unblock"
         android:translationZ="4dp"
         android:stateListAnimator="@anim/button_elevation"
-        android:background="@drawable/button_blue" />
+        android:background="@drawable/button_gray" />
 
 </RelativeLayout>

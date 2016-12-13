@@ -6,13 +6,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.takeapeek.notifications.NotificationsActivity"
-    android:background="@color/tap_white" >
+    android:background="@drawable/gradient_gray_fade" >
 
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/tap_blue">
+        android:background="@color/pt_green_2">
 
         <ImageView
             android:id="@+id/imageview_profile"
@@ -23,8 +23,7 @@
             android:src="@drawable/button_profile"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:translationZ="4dp"
-            android:stateListAnimator="@anim/button_elevation" />
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
 
         <TextView
             android:id="@+id/textview_notifications_title"
@@ -34,7 +33,7 @@
             android:textSize="20sp"
             android:text="@string/title_activity_notifications"
             android:layout_centerInParent="true"
-            android:textColor="@color/tap_white"/>
+            android:textColor="@color/pt_white"/>
 
         <ImageView
             android:id="@+id/imageview_map"
@@ -44,6 +43,7 @@
             android:scaleType="fitCenter"
             android:src="@drawable/button_map"
             android:layout_centerVertical="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
@@ -52,12 +52,16 @@
         android:id="@+id/listview_notifications_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@color/tap_gray_faded"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:divider="@color/pt_gray"
         android:dividerHeight="1dp"
         android:orientation="vertical"
-        android:listSelector="@android:color/transparent"
+        android:layout_below="@+id/top_bar"
+        android:listSelector="@color/pt_tra‌​nsparent"
         android:drawSelectorOnTop="true"
-        android:animateLayoutChanges="true" />
+        android:animateLayoutChanges="true"
+        android:background="@color/pt_tra‌​nsparent"/>
 
     <TextView
         android:id="@+id/textview_notifications_empty"
@@ -66,8 +70,8 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_notifications_empty"
-        android:textColor="@color/tap_gray"
-        android:textSize="24sp"
+        android:textColor="@color/pt_darkgray"
+        android:textSize="20sp"
         android:visibility="gone" />
 
 </LinearLayout>

@@ -3,7 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="20dp"
-                android:background="#ffffff" >
+                android:background="@color/pt_gray_2" >
 
     <TextView
         android:id = "@+id/textview_following_src_name"
@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:gravity="center"
         android:textSize="24sp"
-        android:textColor="@color/tap_gray"/>
+        android:textColor="@color/pt_darkgray"/>
 
     <TextView
         android:id = "@+id/textview_following_action"
@@ -29,6 +29,6 @@
         android:text="@string/following_unfollow"
         android:translationZ="4dp"
         android:stateListAnimator="@anim/button_elevation"
-        android:background="@drawable/button_blue" />
+        android:background="@drawable/button_gray" />
 
 </RelativeLayout>

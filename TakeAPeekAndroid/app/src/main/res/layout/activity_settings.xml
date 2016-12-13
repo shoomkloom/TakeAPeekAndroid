@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".profile.ProfileActivity"
-    android:background="@color/tap_white" >
+    android:background="@drawable/gradient_gray_fade" >
 
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/tap_blue">
+        android:background="@color/pt_green_2">
 
         <TextView
             android:id="@+id/textview_settings_title"
@@ -31,6 +31,7 @@
             android:scaleType="fitCenter"
             android:src="@drawable/button_profile"
             android:layout_centerVertical="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
@@ -39,6 +40,7 @@
         android:id="@+id/scrollback_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="10dp"
         android:layout_below="@+id/top_bar">
 
         <LinearLayout
@@ -50,33 +52,24 @@
                 android:id="@+id/textview_profile_account_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:text="@string/my_account_title"
                 android:layout_alignParentLeft="true"
-                android:textColor="@color/tap_lightgray"
-                android:background="@color/tap_verylightgray"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/tap_lightgray" />
+                android:textColor="@color/pt_red"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="5dp">
+                android:layout_height="80dp" >
 
                 <TextView
                     android:id="@+id/textview_profile_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:text="@string/name"
                     android:layout_alignParentLeft="true"
-                    android:textColor="@color/tap_gray"/>
+                    android:textColor="@color/pt_darkgray"/>
 
                 <EditText
                     android:id="@+id/edittext_display_name"
@@ -86,7 +79,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_toRightOf="@+id/textview_profile_name"
                     android:textColor="@color/tap_gray"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:layout_marginRight="30dp"
                     android:layout_marginLeft="2dp"
                     android:paddingTop="12dp"
@@ -94,7 +87,7 @@
                     android:paddingRight="5dp"
                     android:gravity="center"
                     android:hint="@string/display_name_hint"
-                    android:textColorHint="@color/tap_lightlightgray"
+                    android:textColorHint="@color/pt_gray"
                     android:inputType="textCapWords|textNoSuggestions"
                     android:imeOptions="actionDone"
                     android:theme="@style/AppTheme.EditText"
@@ -115,33 +108,31 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/tap_lightgray" />
+                android:background="@color/pt_gray" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp">
+                android:layout_height="80dp" >
 
                 <TextView
                     android:id="@+id/textview_profile_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:text="@string/mobile_number"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:textColor="@color/tap_gray"/>
+                    android:textColor="@color/pt_darkgray"/>
 
                 <TextView
                     android:id="@+id/textview_profile_number_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:gravity="right"
                     android:layout_alignParentRight="true"
-                    android:textColor="@color/tap_gray"/>
+                    android:textColor="@color/pt_darkgray"/>
 
             </RelativeLayout>
 
@@ -154,33 +145,25 @@
                 android:id="@+id/textview_profile_advanced_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
                 android:textSize="20sp"
+                android:layout_marginTop="20dp"
                 android:text="@string/advanced_title"
                 android:layout_alignParentLeft="true"
-                android:textColor="@color/tap_lightgray"
-                android:background="@color/tap_verylightgray"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/tap_lightgray" />
+                android:textColor="@color/pt_red" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp">
+                android:layout_height="80dp" >
 
                 <TextView
                     android:id="@+id/textview_show_notifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:text="@string/show_notifications"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:textColor="@color/tap_gray"/>
+                    android:textColor="@color/pt_darkgray"/>
 
                 <Switch
                     android:id="@+id/switch_show_notifications"

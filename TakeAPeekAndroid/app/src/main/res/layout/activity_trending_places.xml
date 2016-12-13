@@ -17,7 +17,7 @@
             android:id="@+id/imageview_map"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:padding="18dp"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_map"
             android:background="?android:attr/selectableItemBackgroundBorderless"
@@ -38,7 +38,7 @@
             android:id="@+id/stack_image"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:padding="18dp"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/button_stack"
             android:background="?android:attr/selectableItemBackgroundBorderless"
@@ -68,7 +68,7 @@
         android:gravity="center"
         android:text="@string/textview_places_empty"
         android:textColor="@color/pt_darkgray"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:visibility="gone" />
 
     <ImageView

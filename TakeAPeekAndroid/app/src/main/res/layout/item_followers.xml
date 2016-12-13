@@ -3,7 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="20dp"
-                android:background="#ffffff" >
+                android:background="@color/pt_gray_2" >
 
     <TextView
         android:id = "@+id/textview_followers_src_name"
@@ -12,8 +12,7 @@
         android:layout_alignParentLeft="true"
         android:gravity="center"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/tap_gray"/>
+        android:textColor="@color/pt_darkgray"/>
 
     <TextView
         android:id = "@+id/textview_followers_follow_action"
@@ -25,7 +24,7 @@
         android:paddingBottom="5dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:textColor="@color/tap_white"
+        android:textColor="@color/pt_white"
         android:layout_alignParentRight="true"
         android:text="@string/followers_follow"
         android:translationZ="4dp"
@@ -42,11 +41,11 @@
         android:paddingBottom="5dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:textColor="@color/tap_white"
+        android:textColor="@color/pt_white"
         android:layout_toLeftOf="@+id/textview_followers_follow_action"
         android:text="@string/followers_block"
         android:translationZ="4dp"
         android:stateListAnimator="@anim/button_elevation"
-        android:background="@drawable/button_blue" />
+        android:background="@drawable/button_gray" />
 
 </RelativeLayout>

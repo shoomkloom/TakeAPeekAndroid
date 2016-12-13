@@ -19,7 +19,7 @@
             android:id="@+id/imageview_up"
             android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:padding="18dp"
+            android:padding="17dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_back"
             android:background="?android:attr/selectableItemBackgroundBorderless"
@@ -126,8 +126,8 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/textview_user_feed_empty"
-        android:textColor="@color/tap_white"
-        android:textSize="24sp"
+        android:textColor="@color/pt_darkgray"
+        android:textSize="20sp"
         android:visibility="gone" />
 
     <ImageView

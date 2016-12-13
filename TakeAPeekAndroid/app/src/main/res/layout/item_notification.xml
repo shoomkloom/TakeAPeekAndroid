@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#ffffff" >
+                android:background="@color/pt_gray_2" >
 
     <TextView
         android:id = "@+id/textview_notification_src_name"
@@ -10,57 +10,66 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:textSize="24sp"
-        android:textColor="@color/tap_blue2"
+        android:textSize="18sp"
+        android:textColor="@color/pt_red"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
 
     <TextView
-        android:id = "@+id/textview_notification_time"
-        android:layout_width="wrap_content"
+        android:id = "@+id/textview_notification_action_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/textview_notification_src_name"
+        android:textSize="18sp"
+        android:textColor="@color/pt_darkgray"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        android:id = "@+id/textview_notification_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textview_notification_src_name"
         android:textSize="15sp"
-        android:textColor="@color/tap_lightgray"
-        android:layout_margin="10dp" />
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@color/pt_red"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"/>
 
     <TextView
         android:id = "@+id/textview_notification_address"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textview_notification_src_name"
-        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textview_notification_time"
         android:textSize="15sp"
-        android:textColor="@color/tap_lightgray"
-        android:layout_marginLeft="10dp" />
-
-    <TextView
-        android:id = "@+id/textview_notification_action_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textview_notification_address"
-        android:layout_alignParentLeft="true"
-        android:textSize="24sp"
-        android:textColor="@color/tap_blue"
-        android:layout_marginTop="15dp"
+        android:maxLines="1"
+        android:ellipsize="middle"
+        android:textColor="@color/pt_gray"
+        android:layout_marginTop="7dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp" />
 
     <TextView
         android:id = "@+id/textview_notification_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_below="@+id/textview_notification_address"
+        android:layout_margin="10dp"
         android:textSize="15sp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:textColor="@color/tap_white"
-        android:layout_alignParentRight="true"
+        android:textColor="@color/pt_white"
+        android:layout_alignParentLeft="true"
         android:translationZ="4dp"
-        android:stateListAnimator="@anim/button_elevation"
-        android:layout_alignBaseline="@+id/textview_notification_action_title" />
+        android:stateListAnimator="@anim/button_elevation" />
 
 </RelativeLayout>

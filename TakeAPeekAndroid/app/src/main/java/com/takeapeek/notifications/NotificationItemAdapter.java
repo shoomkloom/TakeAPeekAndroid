@@ -168,25 +168,25 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                 case request:
                     viewHolder.mTextViewButton.setText(R.string.textview_send_peek);
                     viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_request);
-                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_blue);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_green);
                     break;
 
                 case response:
                     viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
                     viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_response);
-                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_gray);
                     break;
 
                 case peek:
                     viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
                     viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_peek);
-                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_orange);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_gray);
                     break;
 
                 case follow:
                     viewHolder.mTextViewButton.setText(R.string.textview_request_peek);
                     viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_follow);
-                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_green);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_red);
                     break;
 
                 default: break;
