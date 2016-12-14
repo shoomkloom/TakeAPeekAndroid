@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#81c784</color>
-    <color name="colorPrimaryDark">#66bb6a</color>
+    <color name="colorPrimary">#66ba69</color>
+    <color name="colorPrimaryDark">#62b366</color>
     <color name="colorAccent">#FF4081</color>
 
     <color name="tap_lightgray">#8c8c8c</color>
