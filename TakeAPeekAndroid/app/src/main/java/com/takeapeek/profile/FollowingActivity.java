@@ -71,40 +71,7 @@ public class FollowingActivity extends AppCompatActivity
 
         RefreshAdapterData();
 
-        //Get the updated relation list and update the list
-        new AsyncTask<FollowingActivity, Void, Boolean>()
-        {
-            FollowingActivity mFollowingActivity = null;
-
-            @Override
-            protected Boolean doInBackground(FollowingActivity... params)
-            {
-                mFollowingActivity = params[0];
-
-                try
-                {
-                    Helper.UpdateRelations(mFollowingActivity, mSharedPreferences);
-                    return true;
-                }
-                catch(Exception e)
-                {
-                    Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
-                }
-
-                return false;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result)
-            {
-                logger.debug("onPostExecute(.) Invoked");
-
-                if(result == true)
-                {
-                    RefreshAdapterData();
-                }
-            }
-        }.execute(FollowingActivity.this);
+        UpdateRelations();
     }
 
     public void RefreshAdapterData()
@@ -141,6 +108,46 @@ public class FollowingActivity extends AppCompatActivity
         }
     }
 
+    public void UpdateRelations()
+    {
+        logger.debug("UpdateRelations() Invoked");
+
+        //Get the updated relation list and update the list
+        new AsyncTask<FollowingActivity, Void, Boolean>()
+        {
+            FollowingActivity mFollowingActivity = null;
+
+            @Override
+            protected Boolean doInBackground(FollowingActivity... params)
+            {
+                mFollowingActivity = params[0];
+
+                try
+                {
+                    Helper.UpdateRelations(mFollowingActivity, mSharedPreferences);
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                if(result == true)
+                {
+                    RefreshAdapterData();
+                }
+            }
+        }.execute(FollowingActivity.this);
+    }
+
     private List<TakeAPeekRelation> GetTakeAPeekFollowingList()
     {
         logger.debug("GetTakeAPeekFollowingArray() Invoked");
@@ -150,7 +157,7 @@ public class FollowingActivity extends AppCompatActivity
 
         if(profileId != null)
         {
-            takeAPeekFollowingArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationFollowing(profileId);
+            takeAPeekFollowingArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationAllFollowing(profileId);
         }
 
         return takeAPeekFollowingArrayList;

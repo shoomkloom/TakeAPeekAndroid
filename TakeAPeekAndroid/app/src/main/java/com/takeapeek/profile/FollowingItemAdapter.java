@@ -173,7 +173,7 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mFollowingActivity.RefreshAdapterData();
+                                mFollowingActivity.UpdateRelations();
 
                                 String message = String.format(mFollowingActivity.getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
                                 Toast.makeText(mFollowingActivity, message, Toast.LENGTH_LONG).show();

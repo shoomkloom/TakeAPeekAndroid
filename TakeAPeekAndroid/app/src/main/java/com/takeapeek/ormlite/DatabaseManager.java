@@ -826,41 +826,7 @@ public class DatabaseManager
         return takeAPeekRelationList;
     }
 
-    public TakeAPeekRelation GetTakeAPeekRelation(String relationId)
-    {
-        logger.debug("GetTakeAPeekRelation(.) Invoked - before lock");
-
-        TakeAPeekRelation takeAPeekRelation = null;
-
-        lockTakeAPeekRelation.lock();
-        try
-        {
-            logger.debug("GetTakeAPeekRelation(.) - inside lock");
-
-            try
-            {
-                takeAPeekRelation = getHelper().GetTakeAPeekRelationDao().queryBuilder().
-                        where().eq("notificationId", relationId).queryForFirst();
-            }
-            catch (SQLException e)
-            {
-                Helper.Error(logger, "SQLException", e);
-            }
-        }
-        catch (Exception e)
-        {
-            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekRelation with relationID=%s", relationId), e);
-        }
-        finally
-        {
-            lockTakeAPeekRelation.unlock();
-            logger.debug("GetTakeAPeekRelation(.) - after unlock");
-        }
-
-        return takeAPeekRelation;
-    }
-
-    public List<TakeAPeekRelation> GetTakeAPeekRelationFollowing(String profileId)
+    public List<TakeAPeekRelation> GetTakeAPeekRelationAllFollowing(String sourceProfileId)
     {
         logger.debug("GetTakeAPeekRelationFollowing(.) Invoked - before lock");
 
@@ -874,7 +840,7 @@ public class DatabaseManager
             try
             {
                 takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryBuilder().
-                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("sourceId", profileId).query();
+                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("sourceId", sourceProfileId).query();
             }
             catch (SQLException e)
             {
@@ -894,7 +860,7 @@ public class DatabaseManager
         return takeAPeekRelationList;
     }
 
-    public List<TakeAPeekRelation> GetTakeAPeekRelationFollowers(String profileId)
+    public List<TakeAPeekRelation> GetTakeAPeekRelationAllFollowers(String targetProfileId)
     {
         logger.debug("GetTakeAPeekRelationFollowers(.) Invoked - before lock");
 
@@ -908,7 +874,7 @@ public class DatabaseManager
             try
             {
                 takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryBuilder().
-                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("targetId", profileId).query();
+                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("targetId", targetProfileId).query();
             }
             catch (SQLException e)
             {
@@ -928,7 +894,7 @@ public class DatabaseManager
         return takeAPeekRelationList;
     }
 
-    public List<TakeAPeekRelation> GetTakeAPeekRelationBlocked(String profileId)
+    public List<TakeAPeekRelation> GetTakeAPeekRelationAllBlocked(String sourceProfileId)
     {
         logger.debug("GetTakeAPeekRelationBlocked(.) Invoked - before lock");
 
@@ -942,7 +908,7 @@ public class DatabaseManager
             try
             {
                 takeAPeekRelationList = getHelper().GetTakeAPeekRelationDao().queryBuilder().
-                        where().eq("type", Constants.RelationTypeEnum.Block.name()).and().eq("targetId", profileId).query();
+                        where().eq("type", Constants.RelationTypeEnum.Block.name()).and().eq("sourceId", sourceProfileId).query();
             }
             catch (SQLException e)
             {
@@ -960,6 +926,143 @@ public class DatabaseManager
         }
 
         return takeAPeekRelationList;
+    }
+
+    public TakeAPeekRelation GetTakeAPeekRelation(String relationId)
+    {
+        logger.debug("GetTakeAPeekRelation(.) Invoked - before lock");
+
+        TakeAPeekRelation takeAPeekRelation = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelation(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelation = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("relationId", relationId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekRelation with relationID=%s", relationId), e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelation(.) - after unlock");
+        }
+
+        return takeAPeekRelation;
+    }
+
+    public TakeAPeekRelation GetTakeAPeekRelationFollow(String targetProfileId)
+    {
+        logger.debug("GetTakeAPeekRelationFollow(.) Invoked - before lock");
+
+        TakeAPeekRelation takeAPeekRelationFollowingTarget = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelationFollow(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelationFollowingTarget = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("targetId", targetProfileId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to query for Following", e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelationFollow(.) - after unlock");
+        }
+
+        return takeAPeekRelationFollowingTarget;
+    }
+
+    public TakeAPeekRelation GetTakeAPeekRelationFollower(String sourceProfileId)
+    {
+        logger.debug("GetTakeAPeekRelationFollower(.) Invoked - before lock");
+
+        TakeAPeekRelation takeAPeekRelationFollowerSource = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelationFollower(.) - inside lock");
+
+            try
+            {
+                takeAPeekRelationFollowerSource = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("type", Constants.RelationTypeEnum.Follow.name()).and().eq("sourceId", sourceProfileId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to query for Follower", e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelationFollower(.) - after unlock");
+        }
+
+        return takeAPeekRelationFollowerSource;
+    }
+
+    public TakeAPeekRelation GetTakeAPeekRelationBlocked(String profileId)
+    {
+        logger.debug("GetTakeAPeekRelationBlocked(.) Invoked - before lock");
+
+        TakeAPeekRelation takeAPeekRelationBlocked = null;
+
+        lockTakeAPeekRelation.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekRelationBlocked(.) - inside lock");
+
+            try
+            {
+                //There should only be one
+                takeAPeekRelationBlocked = getHelper().GetTakeAPeekRelationDao().queryBuilder().
+                        where().eq("type", Constants.RelationTypeEnum.Block.name()).and().eq("targetId", profileId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to query for Followers", e);
+        }
+        finally
+        {
+            lockTakeAPeekRelation.unlock();
+            logger.debug("GetTakeAPeekRelationBlocked(.) - after unlock");
+        }
+
+        return takeAPeekRelationBlocked;
     }
 
     public void ClearAllTakeAPeekRelations()

@@ -40,7 +40,7 @@
         again while you are here).
     </string>
     <string name="zoom">Zoom</string>
-    <string name="clip_will_be_sent">Your Peek will be sent as soon as possible.</string>
+    <string name="clip_will_be_sent">Your Peek is being sent</string>
     <string name="enter_peek_title_here">Add a title to your Peek</string>
 
     <!-- Strings related to login -->
@@ -213,14 +213,14 @@
 
     <!-- Profile -->
     <string name="following">Following</string>
-    <string name="textview_following_empty">You are not following anybody yet...</string>
+    <string name="textview_following_empty">You are not following anybody...</string>
     <string name="following_unfollow">Unfollow</string>
     <string name="followers">Followers</string>
-    <string name="textview_followers_empty">Nobody is following you yet...</string>
+    <string name="textview_followers_empty">Nobody is following you...</string>
     <string name="followers_follow">Follow</string>
     <string name="followers_block">Block</string>
     <string name="blocked">Blocked</string>
-    <string name="textview_blocked_empty">You are not blocking anybody yet...</string>
+    <string name="textview_blocked_empty">You are not blocking anybody...</string>
     <string name="blocked_unblock">Unblock</string>
     <string name="invite_friends">Invite Friends</string>
     <string name="invite_friends_using">Invite Friends using:</string>

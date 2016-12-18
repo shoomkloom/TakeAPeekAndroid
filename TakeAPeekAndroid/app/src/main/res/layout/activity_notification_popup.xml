@@ -24,8 +24,8 @@
         android:layout_marginTop="80dp"
         android:orientation="vertical"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
         android:gravity="center_vertical"
         android:padding="5dp"
         android:background="@drawable/rounded_corners_top" >
@@ -71,8 +71,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="130dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
 
@@ -84,8 +84,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="130dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:layout_centerHorizontal="true"
         android:background="@color/tap_white"
         android:visibility="gone" >
@@ -120,8 +120,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="130dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/rounded_corner_overlay_gray6"
         android:visibility="visible" />
@@ -132,8 +132,8 @@
         android:layout_height="100dp"
         android:layout_marginTop="330dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
         android:translationZ="4dp"
         android:background="@drawable/rounded_corner_bottom" >
 
@@ -168,9 +168,10 @@
             android:id = "@+id/request_location_on_map"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:textSize="13sp"
             android:textColor="@color/pt_gray"
             android:background="@drawable/rounded_corner_bottom"

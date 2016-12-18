@@ -71,40 +71,7 @@ public class BlockedActivity extends AppCompatActivity
 
         RefreshAdapterData();
 
-        //Get the updated relation list and update the list
-        new AsyncTask<BlockedActivity, Void, Boolean>()
-        {
-            BlockedActivity mBlockedActivity = null;
-
-            @Override
-            protected Boolean doInBackground(BlockedActivity... params)
-            {
-                mBlockedActivity = params[0];
-
-                try
-                {
-                    Helper.UpdateRelations(mBlockedActivity, mSharedPreferences);
-                    return true;
-                }
-                catch(Exception e)
-                {
-                    Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
-                }
-
-                return false;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result)
-            {
-                logger.debug("onPostExecute(.) Invoked");
-
-                if(result == true)
-                {
-                    RefreshAdapterData();
-                }
-            }
-        }.execute(BlockedActivity.this);
+        UpdateRelations();
     }
 
     public void RefreshAdapterData()
@@ -141,6 +108,47 @@ public class BlockedActivity extends AppCompatActivity
         }
     }
 
+    public void UpdateRelations()
+    {
+        logger.debug("UpdateRelations() Invoked");
+
+        //Get the updated relation list and update the list
+        new AsyncTask<BlockedActivity, Void, Boolean>()
+        {
+            BlockedActivity mBlockedActivity = null;
+
+            @Override
+            protected Boolean doInBackground(BlockedActivity... params)
+            {
+                mBlockedActivity = params[0];
+
+                try
+                {
+                    Helper.UpdateRelations(mBlockedActivity, mSharedPreferences);
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                if(result == true)
+                {
+                    RefreshAdapterData();
+                }
+            }
+        }.execute(BlockedActivity.this);
+
+    }
+
     private List<TakeAPeekRelation> GetTakeAPeekBlockedList()
     {
         logger.debug("GetTakeAPeekBlockedArray() Invoked");
@@ -151,7 +159,7 @@ public class BlockedActivity extends AppCompatActivity
 
         if(profileId != null)
         {
-            takeAPeekBlockedArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(profileId);
+            takeAPeekBlockedArrayList = DatabaseManager.getInstance().GetTakeAPeekRelationAllBlocked(profileId);
         }
 
         return takeAPeekBlockedArrayList;

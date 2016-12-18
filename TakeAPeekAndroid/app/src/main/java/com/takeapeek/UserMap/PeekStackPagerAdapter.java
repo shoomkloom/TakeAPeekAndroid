@@ -21,7 +21,9 @@ import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
+import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
@@ -50,6 +52,8 @@ public class PeekStackPagerAdapter extends PagerAdapter
         mUserMapActivity = userMapActivity;
         mHashMapIndexToProfileObject = hashMapIndexToProfileObject;
         mSharedPreferences = mUserMapActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        DatabaseManager.init(mUserMapActivity);
     }
 
     @Override
@@ -221,6 +225,9 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                         else
                                         {
                                             String message = mTargetProfileObject.displayName;
+                                            String profileId = Helper.GetProfileId(mSharedPreferences);
+                                            TakeAPeekRelation takeAPeekRelationBlocked = null;
+                                            TakeAPeekRelation takeAPeekRelationFollow = null;
                                             switch(mRelationTypeEnum)
                                             {
                                                 case Follow:
@@ -228,6 +235,15 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                     mTextViewFollowButton.setText(R.string.unfollow);
                                                     mTextViewFollowButton.setBackgroundResource(R.drawable.button_gray);
                                                     mTextViewFollowButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
+
+                                                    //Delete Blocked Relation if exists
+                                                    takeAPeekRelationBlocked = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(mTargetProfileObject.profileId);
+                                                    DatabaseManager.getInstance().DeleteTakeAPeekRelation(takeAPeekRelationBlocked);
+
+                                                    //Add Follow Relation
+                                                    takeAPeekRelationFollow = new TakeAPeekRelation(mRelationTypeEnum.name(), profileId, null, mTargetProfileObject.profileId, mTargetProfileObject.displayName);
+                                                    DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelationFollow);
+
                                                     break;
 
                                                 default:
@@ -235,6 +251,14 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                     mTextViewFollowButton.setText(R.string.follow);
                                                     mTextViewFollowButton.setBackgroundResource(R.drawable.button_green);
                                                     mTextViewFollowButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
+
+                                                    //Delete Blocked Relation if exists
+                                                    takeAPeekRelationBlocked = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(mTargetProfileObject.profileId);
+                                                    DatabaseManager.getInstance().DeleteTakeAPeekRelation(takeAPeekRelationBlocked);
+
+                                                    //Add Follow Relation
+                                                    takeAPeekRelationFollow = DatabaseManager.getInstance().GetTakeAPeekRelationFollow(mTargetProfileObject.profileId);
+                                                    DatabaseManager.getInstance().DeleteTakeAPeekRelation(takeAPeekRelationFollow);
                                                     break;
                                             }
 

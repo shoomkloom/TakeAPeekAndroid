@@ -36,6 +36,7 @@ import com.takeapeek.notifications.NotificationsActivity;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,10 +97,11 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                     takeAPeekNotification.relatedPeekId = remoteMessageData.get("relatedPeekId");
                     takeAPeekNotification.notificationIntId = notificationIntId;
 
+                    Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(takeAPeekNotification.type);
+
                     try
                     {
                         //Clear the request sent if received answer
-                        Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(takeAPeekNotification.type);
                         if (pushNotificationTypeEnum == Constants.PushNotificationTypeEnum.peek || pushNotificationTypeEnum == Constants.PushNotificationTypeEnum.response)
                         {
                             if (DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(takeAPeekNotification.srcProfileId) > 0)
@@ -125,6 +127,27 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                     {
                         takeAPeekNotification.srcProfileJson = responseObject.pushNotificationData.srcProfileJson;
                         takeAPeekNotification.relatedPeekJson = responseObject.pushNotificationData.relatedPeekJson;
+
+                        TakeAPeekObject takeAPeekObject = new Gson().fromJson(takeAPeekNotification.srcProfileJson, TakeAPeekObject.class);
+
+                        try
+                        {
+                            //Update Follow Relation
+                            if (pushNotificationTypeEnum == Constants.PushNotificationTypeEnum.follow)
+                            {
+                                TakeAPeekRelation takeAPeekRelation = new TakeAPeekRelation(
+                                        Constants.RelationTypeEnum.Follow.name(),
+                                        takeAPeekObject.ProfileID,
+                                        takeAPeekObject.ProfileDisplayName,
+                                        Helper.GetProfileId(sharedPreferences),
+                                        null);
+                                DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: When trying to clear TakeAPeekRequest", e);
+                        }
 
                         DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
 

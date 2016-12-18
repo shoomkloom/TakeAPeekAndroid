@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -162,6 +165,9 @@ public class NotificationPopupActivity extends FragmentActivity implements
             TextView textViewDisplayName = (TextView)findViewById(R.id.request_displayname_on_map);
             Helper.setTypeface(this, textViewDisplayName, Helper.FontTypeEnum.normalFont);
 
+            TextView textViewPeekTitle = (TextView)findViewById(R.id.peek_notification_title);
+            Helper.setTypeface(this, textViewPeekTitle, Helper.FontTypeEnum.normalFont);
+
             switch(mPushNotificationTypeEnum)
             {
                 case request:
@@ -203,9 +209,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 case response:
                     findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
 
-                    TextView textViewPeekTitle = (TextView)findViewById(R.id.peek_notification_title);
                     textViewPeekTitle.setText(mTakeAPeekObject.Title);
-                    Helper.setTypeface(this, textViewPeekTitle, Helper.FontTypeEnum.normalFont);
 
                     mThumbnailLoader = new ThumbnailLoader();
                     mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
@@ -237,6 +241,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                 case peek:
                     findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
+
+                    textViewPeekTitle.setText(mTakeAPeekObject.Title);
 
                     mThumbnailLoader = new ThumbnailLoader();
                     mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
@@ -390,8 +396,29 @@ public class NotificationPopupActivity extends FragmentActivity implements
             {
                 LatLng lastLocationLatLng = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
 
-                Marker marker = mGoogleMap.addMarker(
-                        new MarkerOptions().position(lastLocationLatLng).title(mProfileObject.displayName));
+                BitmapDescriptor bitmapDescriptor = null;
+
+                try
+                {
+                    String itemSizedBitmapPath = String.format("%sItemSizedNotificationBitmap.png", Helper.GetTakeAPeekPath(this));
+                    Bitmap itemSizedBitmap = Helper.GetSizedBitmapFromResource(this, mSharedPreferences, R.drawable.marker_notification, itemSizedBitmapPath, 40, 40);
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(itemSizedBitmap);
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When trying to get marker icon", e);
+                }
+
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(lastLocationLatLng)
+                        .title(mProfileObject.displayName);
+
+                if(bitmapDescriptor != null)
+                {
+                    markerOptions.icon(bitmapDescriptor);
+                }
+
+                Marker marker = mGoogleMap.addMarker(markerOptions);
 
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 12);
                 mGoogleMap.moveCamera(cameraUpdate);

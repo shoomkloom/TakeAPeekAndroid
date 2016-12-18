@@ -188,7 +188,7 @@ public class SettingsActivity extends AppCompatActivity
         {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 
-            String versionString = String.format("TakeAPeek %s", packageInfo.versionName);
+            String versionString = String.format("Peek.To %s", packageInfo.versionName);
             TextView textviewVersion = (TextView) findViewById(R.id.textview_version);
             Helper.setTypeface(this, textviewVersion, Helper.FontTypeEnum.normalFont);
             textviewVersion.setText(versionString);

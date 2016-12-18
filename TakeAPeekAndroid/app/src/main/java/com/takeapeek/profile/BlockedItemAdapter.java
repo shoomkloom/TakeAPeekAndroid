@@ -16,7 +16,6 @@ import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
-import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 
 import org.slf4j.Logger;
@@ -153,8 +152,6 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                         Constants.RelationTypeEnum.Unfollow.name(),
                                         mSharedPreferences);
 
-                                DatabaseManager.getInstance().DeleteTakeAPeekRelation(mViewHolder.mTakeAPeekBlocked);
-
                                 return true;
                             }
                             catch(Exception e)
@@ -173,7 +170,7 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mBlockedActivity.RefreshAdapterData();
+                                mBlockedActivity.UpdateRelations();
 
                                 String message = String.format(mBlockedActivity.getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
                                 Toast.makeText(mBlockedActivity, message, Toast.LENGTH_LONG).show();

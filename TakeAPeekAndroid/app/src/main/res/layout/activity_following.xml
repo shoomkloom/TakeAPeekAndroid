@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.takeapeek.profile.FollowingActivity"
-    android:background="@drawable/gradient_gray_fade" >
+    android:background="@color/pt_gray_2" >
 
     <RelativeLayout
         android:id="@+id/top_bar"

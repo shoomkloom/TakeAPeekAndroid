@@ -825,9 +825,12 @@ public class Helper
 
         DatabaseManager.getInstance().ClearAllTakeAPeekRelations();
 
-        for(TakeAPeekRelation takeAPeekRelation : takeAPeekRelationList)
+        if(takeAPeekRelationList != null)
         {
-            DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
+            for (TakeAPeekRelation takeAPeekRelation : takeAPeekRelationList)
+            {
+                DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
+            }
         }
     }
 	

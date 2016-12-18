@@ -30,4 +30,15 @@ public class TakeAPeekRelation
 
     @DatabaseField(columnName = "type")
     public String type = null;
+
+    public TakeAPeekRelation() {}
+
+    public TakeAPeekRelation(String type, String sourceId, String sourceDisplayName, String targetId, String targetDisplayName)
+    {
+        this.type = type;
+        this.sourceId = sourceId;
+        this.sourceDisplayName = sourceDisplayName;
+        this.targetId = targetId;
+        this.targetDisplayName = targetDisplayName;
+    }
 }

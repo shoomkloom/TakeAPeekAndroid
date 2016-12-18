@@ -177,7 +177,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mFollowersActivity.RefreshAdapterData();
+                                mFollowersActivity.UpdateRelations();
 
                                 String message = String.format(mFollowersActivity.getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
                                 Toast.makeText(mFollowersActivity, message, Toast.LENGTH_LONG).show();
@@ -235,7 +235,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mFollowersActivity.RefreshAdapterData();
+                                mFollowersActivity.UpdateRelations();
 
                                 String message = String.format(mFollowersActivity.getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
                                 Toast.makeText(mFollowersActivity, message, Toast.LENGTH_LONG).show();
