@@ -216,6 +216,7 @@ public class Constants
     //@@public static final String CUSTOM_SCHEMA_PREFIX_REPLACEMENT = "SM";
     public static final String UNSENT_LIKE_HASH = "UnsentLikeHash";
     public static final String FIRST_CAPTURE = "FirstCapture";
+    public static final String FIRST_TRENDING_SWIPE = "FirstTrendingSwipe";
     public static final String FIRST_RUN = "FirstRun";
     public static final String LAST_CAPTURE = "LastCapture";
     public static final String FIRST_WHOELSE = "FirstWhoElse";

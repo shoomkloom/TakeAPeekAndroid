@@ -172,7 +172,7 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 //Refresh the adapter data
                                 mBlockedActivity.UpdateRelations();
 
-                                String message = String.format(mBlockedActivity.getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
+                                String message = String.format(mBlockedActivity.getString(R.string.set_relation_unblock), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
                                 Toast.makeText(mBlockedActivity, message, Toast.LENGTH_LONG).show();
                             }
                             else

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,13 +23,17 @@ import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.gson.Gson;
 import com.takeapeek.R;
+import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.ProfileObject;
+import com.takeapeek.common.RequestObject;
+import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
@@ -43,8 +48,12 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.takeapeek.R.id.textview_preview_button_report;
+import static com.takeapeek.R.id.top_bar;
 
 public class UserFeedActivity extends AppCompatActivity
 {
@@ -57,6 +66,7 @@ public class UserFeedActivity extends AppCompatActivity
     PeekItemAdapter mPeekItemAdapter = null;
 
     RelativeLayout mTopBar = null;
+    RelativeLayout mPostPreviewPane = null;
     ImageView mImageViewProgressAnimation = null;
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
     ImageView mImageViewPeekThumbnail = null;
@@ -66,9 +76,10 @@ public class UserFeedActivity extends AppCompatActivity
     TextView mTextViewPeekVideoProgress = null;
     AnimationDrawable mAnimationDrawableVideoProgressAnimation = null;
     ImageView mImageViewPeekThumbnailPlay = null;
-    ImageView mImageViewPeekClose = null;
     TextView mTextViewEmptyList = null;
     ThumbnailLoader mThumbnailLoader = null;
+
+    private AsyncTask<Void, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     TakeAPeekObject mCurrentTakeAPeekObject = null;
 
@@ -183,7 +194,7 @@ public class UserFeedActivity extends AppCompatActivity
 
         //Initate members for UI elements
 
-        mTopBar = (RelativeLayout)findViewById(R.id.top_bar);
+        mTopBar = (RelativeLayout)findViewById(top_bar);
 
         //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.user_feed_progress);
@@ -203,14 +214,31 @@ public class UserFeedActivity extends AppCompatActivity
 
         mImageViewPeekThumbnailPlay = (ImageView)findViewById(R.id.user_peek_feed_thumbnail_play);
         mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
-        mImageViewPeekClose = (ImageView)findViewById(R.id.user_peek_stack_close);
-        mImageViewPeekClose.setOnClickListener(ClickListener);
 
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_user_feed_empty);
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_up).setOnClickListener(ClickListener);
         findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
+
+        mPostPreviewPane =  (RelativeLayout)findViewById(R.id.user_feed_post_preview);
+
+        findViewById(R.id.imageview_intro_close).setOnClickListener(ClickListener);
+        findViewById(R.id.textview_preview_button_block).setOnClickListener(ClickListener);
+        findViewById(R.id.textview_preview_button_report).setOnClickListener(ClickListener);
+
+        findViewById(R.id.button_control).setOnClickListener(ClickListener);
+        findViewById(R.id.button_control_close).setOnClickListener(ClickListener);
+
+        LinearLayout linearLayoutButtonSend = (LinearLayout)findViewById(R.id.button_send_peek);
+        TextView textviewButtonSendPeek = (TextView)findViewById(R.id.textview_button_send_peek);
+        Helper.setTypeface(this, textviewButtonSendPeek, Helper.FontTypeEnum.boldFont);
+        linearLayoutButtonSend.setOnClickListener(ClickListener);
+
+        LinearLayout linearLayoutButtonRequest = (LinearLayout)findViewById(R.id.button_request_peek);
+        TextView textviewButtonRequestPeek = (TextView)findViewById(R.id.textview_button_request_peek);
+        Helper.setTypeface(this, textviewButtonRequestPeek, Helper.FontTypeEnum.boldFont);
+        linearLayoutButtonRequest.setOnClickListener(ClickListener);
 
         mThumbnailLoader = new ThumbnailLoader();
 
@@ -391,7 +419,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
 
-                    mEnumActivityState = EnumActivityState.list;
+                    mEnumActivityState = EnumActivityState.previewStopped;
                     UpdateUI();
                 }
             });
@@ -407,7 +435,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
 
-                    mEnumActivityState = EnumActivityState.list;
+                    mEnumActivityState = EnumActivityState.previewStopped;
                     UpdateUI();
 
                     Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
@@ -440,6 +468,7 @@ public class UserFeedActivity extends AppCompatActivity
             mVideoViewPeekItem.setVideoPath(peekFilePath);
             mVideoViewPeekItem.requestFocus();
 
+
             Helper.SetFullscreen(mVideoViewPeekItem);
 
             mVideoViewPeekItem.start();
@@ -448,8 +477,15 @@ public class UserFeedActivity extends AppCompatActivity
         {
             Helper.ClearFullscreen(mVideoViewPeekItem);
 
+            mEnumActivityState = EnumActivityState.list;
+            UpdateUI();
+
             Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
             Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+        }
+        finally
+        {
+
         }
     }
 
@@ -486,7 +522,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
 
-                    mEnumActivityState = EnumActivityState.list;
+                    mEnumActivityState = EnumActivityState.previewStopped;
                     UpdateUI();
                 }
             });
@@ -502,7 +538,7 @@ public class UserFeedActivity extends AppCompatActivity
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
 
-                    mEnumActivityState = EnumActivityState.list;
+                    mEnumActivityState = EnumActivityState.previewStopped;
                     UpdateUI();
 
                     Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
@@ -526,8 +562,15 @@ public class UserFeedActivity extends AppCompatActivity
         {
             Helper.ClearFullscreen(mVideoViewPeekItem);
 
+            mEnumActivityState = EnumActivityState.list;
+            UpdateUI();
+
             Helper.Error(logger, "EXCEPTION: When trying to play this peek", e);
             Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_playing_peek));
+        }
+        finally
+        {
+
         }
     }
 
@@ -572,16 +615,6 @@ public class UserFeedActivity extends AppCompatActivity
 
             switch (v.getId())
             {
-                case R.id.user_peek_stack_close:
-                    logger.info("onClick: user_peek_stack_close");
-
-                    mCurrentTakeAPeekObject = null;
-
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
-
-                    break;
-
                 case R.id.user_peek_feed_thumbnail_play:
                     logger.info("onClick: user_peek_feed_thumbnail_play");
 
@@ -600,19 +633,182 @@ public class UserFeedActivity extends AppCompatActivity
 
                     OpenMapActivity();
                     break;
-/*@@
 
+                case R.id.textview_preview_button_block:
+                    logger.info("onClick: textview_preview_button_block clicked");
 
-                case R.id.user_peek_stack_thumbnail_time:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
+                    new AsyncTask<Void, Void, Boolean>()
+                    {
+                        @Override
+                        protected Boolean doInBackground(Void... params)
+                        {
+                            try
+                            {
+                                String username = Helper.GetTakeAPeekAccountUsername(UserFeedActivity.this);
+                                String password = Helper.GetTakeAPeekAccountPassword(UserFeedActivity.this);
+
+                                new Transport().SetRelation(
+                                        UserFeedActivity.this, username, password,
+                                        mCurrentTakeAPeekObject.ProfileID,
+                                        Constants.RelationTypeEnum.Block.name(),
+                                        mSharedPreferences);
+
+                                return true;
+                            }
+                            catch(Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
+                            }
+
+                            return false;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Boolean result)
+                        {
+                            logger.debug("onPostExecute(.) Invoked");
+
+                            if(result == true)
+                            {
+                                String message = String.format(UserFeedActivity.this.getString(R.string.set_relation_block), mCurrentTakeAPeekObject.ProfileDisplayName);
+                                Toast.makeText(UserFeedActivity.this, message, Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                String error = String.format(UserFeedActivity.this.getString(R.string.error_set_relation_block), mCurrentTakeAPeekObject.ProfileDisplayName);
+                                Toast.makeText(UserFeedActivity.this, error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }.execute();
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+
                     break;
 
-                case R.id.user_peek_stack_thumbnail_play:
-                    GotoUserPeekListActivity("user_peek_stack_thumbnail_play");
+                case textview_preview_button_report:
+                    logger.info("onClick: textview_preview_button_report clicked");
+
+                    //@@ Do something!!!
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+
                     break;
 
+                case R.id.imageview_intro_close:
+                    logger.info("onClick: button_close clicked");
 
-@@*/
+                    mCurrentTakeAPeekObject = null;
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+
+                    //@@Also remove this peek from the visible list and refresh the adapter
+
+                    break;
+
+                case R.id.button_control:
+                    logger.info("onClick: button_control clicked");
+
+                    findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(UserFeedActivity.this, R.color.pt_white_faded)));
+                    findViewById(R.id.button_control).setVisibility(View.GONE);
+                    findViewById(R.id.button_control_background_close).setVisibility(View.VISIBLE);
+                    break;
+
+                case R.id.button_control_close:
+                    logger.info("onClick: button_control clicked");
+
+                    findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(UserFeedActivity.this, R.color.pt_tra‌​nsparent)));
+                    findViewById(R.id.button_control).setVisibility(View.VISIBLE);
+                    findViewById(R.id.button_control_background_close).setVisibility(View.GONE);
+                    break;
+
+                case R.id.button_send_peek:
+                    logger.info("onClick: button_send_peek clicked");
+
+                    final Intent captureClipActivityIntent = new Intent(UserFeedActivity.this, CaptureClipActivity.class);
+                    captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mCurrentTakeAPeekObject.ProfileID);
+                    startActivity(captureClipActivityIntent);
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+
+                    break;
+
+                case R.id.button_request_peek:
+                    logger.info("onClick: button_request_peek clicked");
+
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
+
+                    if(mAsyncTaskRequestPeek == null)
+                    {
+                        try
+                        {
+                            //Start asynchronous request to server
+                            mAsyncTaskRequestPeek = new AsyncTask<Void, Void, ResponseObject>()
+                            {
+                                @Override
+                                protected ResponseObject doInBackground(Void... params)
+                                {
+                                    try
+                                    {
+                                        logger.info("Sending peek request to single profile");
+
+                                        RequestObject requestObject = new RequestObject();
+                                        requestObject.targetProfileList = new ArrayList<String>();
+
+                                        requestObject.targetProfileList.add(mCurrentTakeAPeekObject.ProfileID);
+
+                                        String metaDataJson = new Gson().toJson(requestObject);
+
+                                        String userName = Helper.GetTakeAPeekAccountUsername(UserFeedActivity.this);
+                                        String password = Helper.GetTakeAPeekAccountPassword(UserFeedActivity.this);
+
+                                        return new Transport().RequestPeek(UserFeedActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                    }
+
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(ResponseObject responseObject)
+                                {
+                                    try
+                                    {
+                                        if (responseObject == null)
+                                        {
+                                            Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_request_peek));
+                                        }
+                                        else
+                                        {
+                                            String message = String.format(getString(R.string.notification_popup_requested_peeks_to), mCurrentTakeAPeekObject.ProfileDisplayName);
+                                            Toast.makeText(UserFeedActivity.this, message, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    catch(Exception e)
+                                    {
+                                        Helper.Error(logger, "EXCEPTION: When getting response to Request Peek", e);
+                                    }
+
+                                    mEnumActivityState = EnumActivityState.list;
+                                    UpdateUI();
+                                }
+                            }.execute();
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+                        }
+                    }
+
+                    break;
 
                 default:
                     break;
@@ -710,9 +906,10 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoCountDown.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
+
+                mPostPreviewPane.setVisibility(View.GONE);
 
                 break;
 
@@ -732,9 +929,11 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoCountDown.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
+
+                mPostPreviewPane.setVisibility(View.GONE);
+
                 break;
 
             case emptyList:
@@ -753,13 +952,15 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoCountDown.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
+
+                mPostPreviewPane.setVisibility(View.GONE);
+
                 break;
 
             case previewLoading:
-                mTopBar.setVisibility(View.VISIBLE);
+                mTopBar.setVisibility(View.GONE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 
@@ -784,9 +985,11 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
                 mVideoCountDown.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
+
+                mPostPreviewPane.setVisibility(View.GONE);
+
                 break;
 
             case previewPlayingStream:
@@ -805,9 +1008,11 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
+
+                mPostPreviewPane.setVisibility(View.GONE);
+
                 break;
 
             case previewPlayingFile:
@@ -826,13 +1031,15 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
-                mImageViewPeekClose.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
+
+                mPostPreviewPane.setVisibility(View.GONE);
+
                 break;
 
             case previewStopped:
-                mTopBar.setVisibility(View.VISIBLE);
+                mTopBar.setVisibility(View.GONE);
                 mImageViewProgressAnimation.setVisibility(View.GONE);
                 mAnimationDrawableProgressAnimation.stop();
 
@@ -840,17 +1047,18 @@ public class UserFeedActivity extends AppCompatActivity
                 mTextViewEmptyList.setVisibility(View.GONE);
 
                 mImageViewPeekThumbnail.setVisibility(View.VISIBLE);
-                mImageViewPeekThumbnailPlay.setVisibility(View.VISIBLE);
+                mImageViewPeekThumbnailPlay.setVisibility(View.GONE);
                 mImageViewPeekVideoProgress.setVisibility(View.GONE);
                 mTextViewPeekVideoProgress.setVisibility(View.GONE);
                 mTextViewPeekVideoProgress.setText("");
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
-                mVideoCountDown.setVisibility(View.GONE);
-                mImageViewPeekClose.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
+
+                mPostPreviewPane.setVisibility(View.VISIBLE);
+
                 break;
 
             default: break;

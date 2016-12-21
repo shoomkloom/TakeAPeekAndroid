@@ -2550,6 +2550,21 @@ public class Helper
         sharedPreferencesEditor.commit();
     }
 
+    public static Boolean GetFirstTrendingSwipe(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetFirstTrendingSwipe(.) Invoked");
+
+        return sharedPreferences.getBoolean(Constants.FIRST_TRENDING_SWIPE, false);
+    }
+
+    public static void SetFirstTrendingSwipe(Editor sharedPreferencesEditor, Boolean firstTrendingSwipe)
+    {
+        logger.debug(String.format("SetFirstTrendingSwipe(Editor, firstTrendingSwipe=%b) Invoked", firstTrendingSwipe));
+
+        sharedPreferencesEditor.putBoolean(Constants.FIRST_TRENDING_SWIPE, firstTrendingSwipe);
+        sharedPreferencesEditor.commit();
+    }
+
     public static Boolean GetFirstRun(SharedPreferences sharedPreferences)
     {
         logger.debug("GetFirstRun(.) Invoked");

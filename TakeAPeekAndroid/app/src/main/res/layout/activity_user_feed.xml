@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:translationZ="4dp"
-        android:background="@color/pt_gray_1">
+        android:background="@color/pt_gray_1"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/imageview_up"
@@ -96,16 +97,6 @@
         android:src="@drawable/ic_video_play"
         android:visibility="gone" />
 
-    <ImageView
-        android:id = "@+id/user_peek_stack_close"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/close"
-        android:visibility="gone" />
-
     <ListView
         android:id="@+id/listview_user_feed_list"
         android:layout_width="match_parent"
@@ -157,5 +148,165 @@
         android:textColor="@color/tap_white"
         android:textSize="20sp"
         android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/user_feed_post_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/pt_gray_faded">
+
+        <TextView
+            android:id = "@+id/textview_preview_button_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/pt_white"
+            android:text="@string/feed_block"
+            android:background="@drawable/button_gray" />
+
+        <TextView
+            android:id = "@+id/textview_preview_button_report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="10dp"
+            android:textSize="15sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@color/pt_white"
+            android:layout_toRightOf="@+id/textview_preview_button_block"
+            android:text="@string/feed_report"
+            android:background="@drawable/button_green" />
+
+        <ImageView
+            android:id="@+id/imageview_intro_close"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="20dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/button_close" />
+
+        <!-- Buttons -->
+        <RelativeLayout
+            android:id="@+id/button_control_background"
+            android:layout_width="match_parent"
+            android:layout_height="115dp"
+            android:layout_alignParentBottom="true" >
+
+            <LinearLayout
+                android:id="@+id/button_control"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/button_map_control" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/button_control_background_close"
+                android:layout_width="match_parent"
+                android:layout_height="115dp"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone" >
+
+                <LinearLayout
+                    android:id="@+id/button_control_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="10dp" >
+
+                    <ImageView
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/button_map_control_close" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/button_send_peek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="30dp" >
+
+                    <TextView
+                        android:id="@+id/textview_button_send_peek"
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:background="@color/pt_gray"
+                        android:textSize="12sp"
+                        android:padding="3dp"
+                        android:textColor="@color/pt_white"
+                        android:text="@string/textview_send_peek"/>
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:src="@drawable/button_peek_send" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/button_request_peek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="30dp">
+
+                    <TextView
+                        android:id="@+id/textview_button_request_peek"
+                        android:layout_width="85dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:background="@color/pt_gray"
+                        android:textSize="12sp"
+                        android:padding="3dp"
+                        android:textColor="@color/pt_white"
+                        android:text="@string/textview_request_peek"/>
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:src="@drawable/button_peek_request" />
+
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 </RelativeLayout>

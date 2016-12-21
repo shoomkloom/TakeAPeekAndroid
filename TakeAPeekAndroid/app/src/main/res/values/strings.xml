@@ -147,6 +147,7 @@
     <string name="report">Report</string>
     <string name="set_relation_follow">You are now following %1$s.</string>
     <string name="set_relation_unfollow">You are now not following %1$s.</string>
+    <string name="set_relation_unblock">You are now not blocking %1$s.</string>
     <string name="set_relation_block">You are now blocking %1$s.</string>
     <string name="set_relation_report">You have reported %1$s.</string>
     <string name="error_set_relation_follow">There was an error following %1$s. Please try again later.</string>
@@ -230,6 +231,10 @@
     <string name="licenses">Licenses</string>
     <string name="share_text">Check out Peek.To!</string>
     <string name="error_no_share_apps">Could not find an app to share with.</string>
+
+    <!-- User Feed -->
+    <string name="feed_report">Report</string>
+    <string name="feed_block">Block</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

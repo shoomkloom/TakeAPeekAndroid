@@ -18,7 +18,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -92,7 +94,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
-import static com.takeapeek.common.Helper.GetFormattedNumberStr;
 import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -149,6 +150,8 @@ public class UserMapActivity extends FragmentActivity implements
     ViewPager mViewPager = null;
     PeekStackPagerAdapter mPeekStackPagerAdapter = null;
     private CutOutView mCutOutView = null;
+    TextView mTextviewTrendingLocations = null;
+    RelativeSliderLayout mRelativeSliderLayout = null;
 
     int mUserStackItemPosition = -1;
     boolean mOpenStack = false;
@@ -274,15 +277,17 @@ public class UserMapActivity extends FragmentActivity implements
         TextView textviewButtonSendPeek = (TextView)findViewById(R.id.textview_button_send_peek);
         Helper.setTypeface(this, textviewButtonSendPeek, Helper.FontTypeEnum.boldFont);
 
-        TextView textviewTrendingLocations = (TextView)findViewById(R.id.textview_trending_locations);
-        Helper.setTypeface(this, textviewTrendingLocations, Helper.FontTypeEnum.boldFont);
+        mTextviewTrendingLocations = (TextView)findViewById(R.id.textview_trending_locations);
+        Helper.setTypeface(this, mTextviewTrendingLocations, Helper.FontTypeEnum.boldFont);
 
-        RelativeSliderLayout relativeSliderLayout = (RelativeSliderLayout) findViewById(R.id.dragger_trending_locations);
-        relativeSliderLayout.initSliding(new RelativeSliderLayout.OnSlidedListener() {
+        mRelativeSliderLayout = (RelativeSliderLayout) findViewById(R.id.dragger_trending_locations);
+        mRelativeSliderLayout.initSliding(new RelativeSliderLayout.OnSlidedListener() {
             @Override
             public void onSlided()
             {
                 logger.info("RelativeSliderLayout:onSlided: dragger_trending_locations slided");
+
+                Helper.SetFirstTrendingSwipe(mSharedPreferences.edit(), true);
 
                 //Show the trending locations activity
                 final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
@@ -299,6 +304,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         mLayoutPeekStack =  (RelativeLayout) findViewById(R.id.user_peek_stack);
         mPagerContainer = (PagerContainer) findViewById(R.id.user_peek_pager_container);
+        //@@mPagerContainer.setOnTouchListener(StackTouchListener);
         mViewPager = mPagerContainer.getViewPager();
         mViewPager.setClipChildren(false);
         mViewPager.setOffscreenPageLimit(15);
@@ -537,6 +543,51 @@ public class UserMapActivity extends FragmentActivity implements
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
+
+        AnimateTrendingPlacesButton();
+    }
+
+    private void AnimateTrendingPlacesButton()
+    {
+        logger.debug("AnimateTrendingPlacesButton() Invoked");
+
+        if(Helper.GetFirstTrendingSwipe(mSharedPreferences) == false)
+        {
+            //Fade in and out the left arrow
+            View imageViewSearchbarLeftArrow = findViewById(R.id.imageview_searchbar_leftarrow);
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeinsearchbararrow);
+            fadeInAnimation.setAnimationListener(new Animation.AnimationListener()
+            {
+                @Override
+                public void onAnimationStart(Animation animation)
+                {
+                    findViewById(R.id.imageview_searchbar_leftarrow).setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation)
+                {
+                    View imageViewSearchbarLeftArrow = findViewById(R.id.imageview_searchbar_leftarrow);
+                    Animation fadeOutAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeout);
+                    imageViewSearchbarLeftArrow.setAnimation(fadeOutAnimation);
+                    fadeOutAnimation.start();
+                    imageViewSearchbarLeftArrow.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation)
+                {
+
+                }
+            });
+            imageViewSearchbarLeftArrow.setAnimation(fadeInAnimation);
+            fadeInAnimation.start();
+
+            //Slide the button
+            Animation slideTrendingPlacesAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidetrendingplaces);
+            mRelativeSliderLayout.setAnimation(slideTrendingPlacesAnimation);
+            slideTrendingPlacesAnimation.start();
+        }
     }
 
     @Override
@@ -1087,6 +1138,55 @@ public class UserMapActivity extends FragmentActivity implements
         ShowProfilesInBounds(true);
     }
 
+    public View.OnTouchListener StackTouchListener = new View.OnTouchListener()
+    {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent)
+        {
+            logger.debug("StackTouchListener:onTouch(..) Invoked");
+
+            if(mLayoutPeekStack.getVisibility() == View.VISIBLE)
+            {
+
+                int action = MotionEventCompat.getActionMasked(motionEvent);
+
+                switch (action)
+                {
+                    case (MotionEvent.ACTION_DOWN):
+                        logger.info("Touch event on mLayoutPeekStack was MotionEvent.ACTION_DOWN");
+
+                        return true;
+
+                    case (MotionEvent.ACTION_MOVE):
+                        logger.info("Touch event on mLayoutPeekStack was MotionEvent.ACTION_MOVE");
+
+                        return true;
+
+                    case (MotionEvent.ACTION_UP):
+                        logger.info("Touch event on mLayoutPeekStack was MotionEvent.ACTION_UP");
+
+                        CloseUserPeekStack();
+                        return true;
+
+                    case (MotionEvent.ACTION_CANCEL):
+                        logger.info("Touch event on mLayoutPeekStack was MotionEvent.ACTION_CANCEL");
+
+                        return true;
+
+                    case (MotionEvent.ACTION_OUTSIDE):
+                        logger.info("Touch event on mLayoutPeekStack was MotionEvent.ACTION_OUTSIDE");
+
+                        return true;
+
+                    default:
+                        break;
+                }
+            }
+
+            return false;
+        }
+    };
+
     public View.OnClickListener ClickListener = new View.OnClickListener()
     {
         @Override
@@ -1265,6 +1365,7 @@ public class UserMapActivity extends FragmentActivity implements
                     }
                     break;
 
+                case R.id.textview_new_notifications:
                 case R.id.notifications_image:
                     logger.info("OnClickListener:onClick: notifications_image clicked");
 
