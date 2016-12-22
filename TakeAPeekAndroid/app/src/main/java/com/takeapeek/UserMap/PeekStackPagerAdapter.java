@@ -94,7 +94,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
         if(profileObject.peeks != null && profileObject.peeks.size() > 0)
         {
-            final TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
+            final TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestPeek(profileObject); //Get the latest peek
 
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
@@ -303,7 +303,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
             ProfileObject profileObject = (ProfileObject)view.getTag();
             String profileObjectJSON = new Gson().toJson(profileObject);
 
-            TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0);
+            TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestPeek(profileObject); //Get the latest peek
             String takeAPeekObjectJSON = new Gson().toJson(takeAPeekObject);
 
             final Intent intent = new Intent(mUserMapActivity, UserFeedActivity.class);

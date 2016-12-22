@@ -764,6 +764,38 @@ public class Transport
         return responseObject;
     }
 
+    public ResponseObject ReportPeek(Context context, String userName, String password, String peekId, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("ReportPeek(.....) Invoked");
+
+        ResponseObject responseObject = null;
+
+        //@@lock.lock();
+
+        try
+        {
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "report_peek"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peekid", peekId));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside ReportPeek(.....)", e);
+            throw e;
+        }
+        finally
+        {
+            //@@lock.unlock();
+        }
+
+        return responseObject;
+    }
+
 	public ResponseObject VerifySMSCode(Context context, String username, String smsCode, SharedPreferences sharedPreferences) throws Exception
     {
 		logger.debug("VerifySMSCode(...) Invoked - before lock");

@@ -1076,7 +1076,7 @@ public class UserMapActivity extends FragmentActivity implements
 @@*/
 
                     ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
-                    TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
+                    TakeAPeekObject takeAPeekObject = GetProfileLatestPeek(profileObject);
 
                     mTextViewStackUserName.setText(profileObject.displayName);
                     mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
@@ -1113,9 +1113,28 @@ public class UserMapActivity extends FragmentActivity implements
         }
     }
 
+    public TakeAPeekObject GetProfileLatestPeek(ProfileObject profileObject)
+    {
+        logger.debug("GetProfileLatestPeek(..) Invoked");
+
+        TakeAPeekObject takeAPeekObject = null;
+
+        for(int i=0; i<profileObject.peeks.size();i++)
+        {
+            //Get the latest peek that belongs to this profile
+            takeAPeekObject = profileObject.peeks.get(i);
+            if(takeAPeekObject.ProfileID.compareTo(profileObject.profileId) == 0)
+            {
+                break;
+            }
+        }
+
+        return takeAPeekObject;
+    }
+
     public void CloseUserPeekStack()
     {
-        logger.debug("OnClickListener:onClick(.) Invoked");
+        logger.debug("CloseUserPeekStack() Invoked");
 
         mUserStackItemPosition = -1;
 
@@ -1435,7 +1454,7 @@ public class UserMapActivity extends FragmentActivity implements
             mUserStackItemPosition = index;
 
             ProfileObject profileObject = GetProfileObjectByPosition(index);
-            TakeAPeekObject takeAPeekObject = profileObject.peeks.get(0); //Get the latest peek
+            TakeAPeekObject takeAPeekObject = GetProfileLatestPeek(profileObject); //Get the latest peek
 
             ClusterManagerSingleItem(index);
 

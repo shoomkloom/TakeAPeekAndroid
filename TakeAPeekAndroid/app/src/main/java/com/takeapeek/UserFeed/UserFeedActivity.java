@@ -689,7 +689,48 @@ public class UserFeedActivity extends AppCompatActivity
                 case textview_preview_button_report:
                     logger.info("onClick: textview_preview_button_report clicked");
 
-                    //@@ Do something!!!
+                    new AsyncTask<Void, Void, Boolean>()
+                    {
+                        @Override
+                        protected Boolean doInBackground(Void... params)
+                        {
+                            try
+                            {
+                                String username = Helper.GetTakeAPeekAccountUsername(UserFeedActivity.this);
+                                String password = Helper.GetTakeAPeekAccountPassword(UserFeedActivity.this);
+
+                                new Transport().ReportPeek(
+                                        UserFeedActivity.this, username, password,
+                                        mCurrentTakeAPeekObject.TakeAPeekID,
+                                        mSharedPreferences);
+
+                                return true;
+                            }
+                            catch(Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
+                            }
+
+                            return false;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Boolean result)
+                        {
+                            logger.debug("onPostExecute(.) Invoked");
+
+                            if(result == true)
+                            {
+                                String message = UserFeedActivity.this.getString(R.string.report_peek_success);
+                                Toast.makeText(UserFeedActivity.this, message, Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                String error = UserFeedActivity.this.getString(R.string.error_report_peek);
+                                Toast.makeText(UserFeedActivity.this, error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }.execute();
 
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
