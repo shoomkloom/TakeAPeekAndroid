@@ -200,6 +200,7 @@
             android:id="@+id/button_control_background"
             android:layout_width="match_parent"
             android:layout_height="115dp"
+            android:paddingTop="5dp"
             android:layout_alignParentBottom="true" >
 
             <LinearLayout
@@ -208,9 +209,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
-                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="10dp">
+                android:layout_marginTop="20dp">
 
                 <ImageView
                     android:layout_width="70dp"
@@ -223,7 +224,7 @@
                 android:id="@+id/button_control_background_close"
                 android:layout_width="match_parent"
                 android:layout_height="115dp"
-                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"
                 android:visibility="gone" >
 
                 <LinearLayout
@@ -232,9 +233,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center_horizontal"
-                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="10dp" >
+                    android:layout_marginTop="20dp" >
 
                     <ImageView
                         android:layout_width="70dp"
@@ -249,7 +250,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center_horizontal"
-                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_marginBottom="20dp"
                     android:layout_marginLeft="30dp" >
@@ -280,7 +281,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center_horizontal"
-                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
                     android:layout_marginBottom="20dp"
                     android:layout_marginRight="30dp">

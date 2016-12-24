@@ -1398,18 +1398,47 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("onBackPressed() Invoked.");
 
-        if(mPreview != null && mPreview.isVideoRecording())
+        switch(mVideoCaptureStateEnum)
         {
-            takePicture();
+            case Details:
+                mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+                UpdateUI();
+                break;
 
-            mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
-            UpdateUI();
-            return;
+            case Capture:
+                if(mPreview != null && mPreview.isVideoRecording())
+                {
+                    takePicture();
+                }
+
+                mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+                UpdateUI();
+                break;
+
+            case Preview:
+
+                if(mCapturePreviewVideo != null && mCapturePreviewVideo.isPlaying() == true)
+                {
+                    //Exit full screen
+                    Helper.ClearFullscreen(mCapturePreviewVideo);
+
+                    mCapturePreviewVideo.stopPlayback();
+                }
+
+                mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+                UpdateUI();
+                break;
+
+            case Finish:
+                mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+                UpdateUI();
+                break;
+
+            default:
+                setResult(RESULT_CANCELED);
+                super.onBackPressed();
+                break;
         }
-
-        setResult(RESULT_CANCELED);
-
-        super.onBackPressed();
     }
     
     public boolean usingKitKatImmersiveMode()

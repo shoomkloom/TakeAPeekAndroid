@@ -555,38 +555,41 @@ public class UserMapActivity extends FragmentActivity implements
         {
             //Fade in and out the left arrow
             View imageViewSearchbarLeftArrow = findViewById(R.id.imageview_searchbar_leftarrow);
-            Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeinsearchbararrow);
-            fadeInAnimation.setAnimationListener(new Animation.AnimationListener()
+            if(imageViewSearchbarLeftArrow != null)
             {
-                @Override
-                public void onAnimationStart(Animation animation)
+                Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeinsearchbararrow);
+                fadeInAnimation.setAnimationListener(new Animation.AnimationListener()
                 {
-                    findViewById(R.id.imageview_searchbar_leftarrow).setVisibility(View.VISIBLE);
-                }
+                    @Override
+                    public void onAnimationStart(Animation animation)
+                    {
+                        findViewById(R.id.imageview_searchbar_leftarrow).setVisibility(View.VISIBLE);
+                    }
 
-                @Override
-                public void onAnimationEnd(Animation animation)
-                {
-                    View imageViewSearchbarLeftArrow = findViewById(R.id.imageview_searchbar_leftarrow);
-                    Animation fadeOutAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeout);
-                    imageViewSearchbarLeftArrow.setAnimation(fadeOutAnimation);
-                    fadeOutAnimation.start();
-                    imageViewSearchbarLeftArrow.setVisibility(View.INVISIBLE);
-                }
+                    @Override
+                    public void onAnimationEnd(Animation animation)
+                    {
+                        View imageViewSearchbarLeftArrow = findViewById(R.id.imageview_searchbar_leftarrow);
+                        Animation fadeOutAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeout);
+                        imageViewSearchbarLeftArrow.setAnimation(fadeOutAnimation);
+                        fadeOutAnimation.start();
+                        imageViewSearchbarLeftArrow.setVisibility(View.INVISIBLE);
+                    }
 
-                @Override
-                public void onAnimationRepeat(Animation animation)
-                {
+                    @Override
+                    public void onAnimationRepeat(Animation animation)
+                    {
 
-                }
-            });
-            imageViewSearchbarLeftArrow.setAnimation(fadeInAnimation);
-            fadeInAnimation.start();
+                    }
+                });
+                imageViewSearchbarLeftArrow.setAnimation(fadeInAnimation);
+                fadeInAnimation.start();
 
-            //Slide the button
-            Animation slideTrendingPlacesAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidetrendingplaces);
-            mRelativeSliderLayout.setAnimation(slideTrendingPlacesAnimation);
-            slideTrendingPlacesAnimation.start();
+                //Slide the button
+                Animation slideTrendingPlacesAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidetrendingplaces);
+                mRelativeSliderLayout.setAnimation(slideTrendingPlacesAnimation);
+                slideTrendingPlacesAnimation.start();
+            }
         }
     }
 

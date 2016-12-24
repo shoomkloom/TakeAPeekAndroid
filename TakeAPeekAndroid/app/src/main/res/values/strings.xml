@@ -157,7 +157,7 @@
     <string name="view_peek">View Peek</string>
     <string name="unknown_location">Unknown Location</string>
     <string name="earth">Earth</string>
-    <string name="report_peek_success">This Peek was reported!</string>
+    <string name="report_peek_success">This Peek is reported!</string>
     <string name="error_report_peek">There was an error reporting this peek, sorry...</string>
 
     <!-- Notifications -->

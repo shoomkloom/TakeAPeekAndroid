@@ -297,20 +297,31 @@ public class UserFeedActivity extends AppCompatActivity
     {
         logger.debug("onBackPressed() Invoked");
 
-        if(mVideoViewPeekItem != null && mVideoViewPeekItem.isPlaying() == true)
+        switch(mEnumActivityState)
         {
-            mVideoViewPeekItem.stopPlayback();
+            case previewPlayingFile:
+            case previewPlayingStream:
+                if(mVideoViewPeekItem != null && mVideoViewPeekItem.isPlaying() == true)
+                {
+                    mVideoViewPeekItem.stopPlayback();
+                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+                }
 
-            mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+                Helper.ClearFullscreen(mVideoViewPeekItem);
 
-            Helper.ClearFullscreen(mVideoViewPeekItem);
+                mEnumActivityState = EnumActivityState.list;
+                UpdateUI();
 
-            mEnumActivityState = EnumActivityState.list;
-            UpdateUI();
-        }
-        else
-        {
-            super.onBackPressed();
+                break;
+
+            case previewStopped:
+                mEnumActivityState = EnumActivityState.list;
+                UpdateUI();
+                break;
+
+            default:
+                super.onBackPressed();
+                break;
         }
     }
 
@@ -681,8 +692,15 @@ public class UserFeedActivity extends AppCompatActivity
                         }
                     }.execute();
 
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
+                    //We don't want the rest of the blocked profile peeks to be visible
+                    //and also not the peek stack, so re-open the UserMapActivity
+                    Intent userMapActivityIntent = new Intent(UserFeedActivity.this, UserMapActivity.class);
+                    userMapActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(userMapActivityIntent);
+
+                    //Finish this activity so that the user can't do 'Back' and get back to
+                    //the blocked profile feed
+                    finish();
 
                     break;
 
