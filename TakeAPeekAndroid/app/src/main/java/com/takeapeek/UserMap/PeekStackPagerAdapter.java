@@ -65,12 +65,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
         final ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
 
         ImageView imageViewPeekThumbnail = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail);
-        imageViewPeekThumbnail.setOnClickListener(ClickListener);
-        imageViewPeekThumbnail.setTag(profileObject);
-
         ImageView textViewPeekThumbnailPlay = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
-        textViewPeekThumbnailPlay.setOnClickListener(ClickListener);
-        textViewPeekThumbnailPlay.setTag(profileObject);
 
         TextView textViewUserStackFollow = (TextView)viewGroup.findViewById(R.id.user_peek_stack_follow);
         Helper.setTypeface(mUserMapActivity, textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
@@ -92,9 +87,15 @@ public class PeekStackPagerAdapter extends PagerAdapter
                 break;
         }
 
-        if(profileObject.peeks != null && profileObject.peeks.size() > 0)
+        final TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
+
+        if(takeAPeekObject != null)
         {
-            final TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestPeek(profileObject); //Get the latest peek
+            imageViewPeekThumbnail.setOnClickListener(ClickListener);
+            imageViewPeekThumbnail.setTag(profileObject);
+
+            textViewPeekThumbnailPlay.setOnClickListener(ClickListener);
+            textViewPeekThumbnailPlay.setTag(profileObject);
 
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
@@ -303,13 +304,21 @@ public class PeekStackPagerAdapter extends PagerAdapter
             ProfileObject profileObject = (ProfileObject)view.getTag();
             String profileObjectJSON = new Gson().toJson(profileObject);
 
-            TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestPeek(profileObject); //Get the latest peek
+            TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
             String takeAPeekObjectJSON = new Gson().toJson(takeAPeekObject);
 
             final Intent intent = new Intent(mUserMapActivity, UserFeedActivity.class);
             intent.putExtra(Constants.PARAM_PROFILEOBJECT, profileObjectJSON);
             intent.putExtra(Constants.PARAM_PEEKOBJECT, takeAPeekObjectJSON);
             mUserMapActivity.startActivity(intent);
+
+            mHandler.postDelayed(new Runnable()
+            {
+                public void run()
+                {
+                    mUserMapActivity.QuickCloseUserPeekStack();
+                }
+            }, 1000);
         }
         catch (Exception e)
         {

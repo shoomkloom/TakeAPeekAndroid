@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -94,6 +95,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
+import static com.takeapeek.common.Helper.GetProfileUnViewedPeeks;
 import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -145,6 +147,7 @@ public class UserMapActivity extends FragmentActivity implements
     TextView mTextViewStackPeekTitle = null;
     TextView mTextViewStackPeekTime = null;
     TextView mTextViewStackPeekAddress = null;
+    TextView mTextViewStackPeekNoPeeks = null;
     RelativeLayout mLayoutPeekStack = null;
     PagerContainer mPagerContainer = null;
     ViewPager mViewPager = null;
@@ -301,6 +304,8 @@ public class UserMapActivity extends FragmentActivity implements
         mTextViewStackPeekTitle = (TextView)findViewById(R.id.peek_stack_title);
         mTextViewStackPeekTime = (TextView)findViewById(R.id.user_peek_stack_time);
         mTextViewStackPeekAddress = (TextView)findViewById(R.id.peek_stack_address);
+        mTextViewStackPeekNoPeeks = (TextView)findViewById(R.id.user_peek_stack_button_request_peeks);
+        mTextViewStackPeekNoPeeks.setOnClickListener(ClickListener);
 
         mLayoutPeekStack =  (RelativeLayout) findViewById(R.id.user_peek_stack);
         mPagerContainer = (PagerContainer) findViewById(R.id.user_peek_pager_container);
@@ -537,6 +542,12 @@ public class UserMapActivity extends FragmentActivity implements
         if (mGoogleApiClient != null)
         {
             mGoogleApiClient.connect();
+        }
+
+        if (mGoogleMap != null)
+        {
+            ClusterManagerClear();
+            ShowProfilesInBounds(true);
         }
 
         UpdateNumberOfNewNotifications();
@@ -1057,48 +1068,14 @@ public class UserMapActivity extends FragmentActivity implements
 
                 mViewPager.setCurrentItem(mUserStackItemPosition);
 
-                ProfileObject currentProfileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
-                LatLng markerLatLng = new LatLng(
-                        currentProfileObject.latitude,
-                        currentProfileObject.longitude);
-
-                ClusterManagerSingleItem(mUserStackItemPosition);
-
-                UpdateBelowProjection(markerLatLng);
-
                 if (mLayoutPeekStack.getVisibility() == View.GONE)
                 {
                     mCutOutView.setVisibility(View.GONE);
 
                     mRelativeLayoutSearchBar.setVisibility(View.GONE);
                     mLayoutPeekStack.setVisibility(View.VISIBLE);
-/*@@
-                    Animation slideDownAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slidedown);
-                    mLayoutPeekStack.setAnimation(slideDownAnimation);
-                    slideDownAnimation.start();
-@@*/
 
-                    ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
-                    TakeAPeekObject takeAPeekObject = GetProfileLatestPeek(profileObject);
-
-                    mTextViewStackUserName.setText(profileObject.displayName);
-                    mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
-                    mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
-
-                    if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
-                    {
-                        mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
-                        findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
-                        AddressLoader addressLoader = new AddressLoader();
-
-                        LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                        addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
-                    }
-                    else
-                    {
-                        mTextViewStackPeekAddress.setVisibility(View.GONE);
-                        findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
-                    }
+                    FillPeekInfo();
                 }
             }
             catch (Exception e)
@@ -1116,23 +1093,95 @@ public class UserMapActivity extends FragmentActivity implements
         }
     }
 
-    public TakeAPeekObject GetProfileLatestPeek(ProfileObject profileObject)
+    private void FillPeekInfo()
     {
-        logger.debug("GetProfileLatestPeek(..) Invoked");
+        logger.debug("FillPeekInfo() Invoked");
 
-        TakeAPeekObject takeAPeekObject = null;
+        ClusterManagerSingleItem(mUserStackItemPosition);
 
-        for(int i=0; i<profileObject.peeks.size();i++)
+        ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
+        TakeAPeekObject takeAPeekObject = GetProfileLatestUnViewedPeek(profileObject);
+
+        LatLng markerLatLng = new LatLng(
+                profileObject.latitude,
+                profileObject.longitude);
+
+        UpdateBelowProjection(markerLatLng);
+
+        mTextViewStackUserName.setText(profileObject.displayName);
+
+        if(takeAPeekObject != null)
+        {
+            mTextViewStackPeekNoPeeks.setVisibility(View.GONE);
+
+            mTextViewStackPeekTitle.setVisibility(View.VISIBLE);
+            mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
+
+            mTextViewStackPeekTime.setVisibility(View.VISIBLE);
+            mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
+
+            if (takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
+            {
+                mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
+                findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
+                AddressLoader addressLoader = new AddressLoader();
+
+                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
+            }
+            else
+            {
+                mTextViewStackPeekAddress.setVisibility(View.GONE);
+                findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
+            }
+        }
+        else
+        {
+            if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(profileObject.profileId) == 0)
+            {
+                mTextViewStackPeekNoPeeks.setVisibility(View.VISIBLE);
+            }
+
+            mTextViewStackPeekTitle.setText(R.string.profile_has_no_peeks);
+            mTextViewStackPeekTime.setVisibility(View.INVISIBLE);
+            mTextViewStackPeekAddress.setVisibility(View.GONE);
+            findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
+        }
+    }
+
+    public TakeAPeekObject GetProfileLatestUnViewedPeek(ProfileObject profileObject)
+    {
+        logger.debug("GetProfileLatestUnViewedPeek(..) Invoked");
+
+        ArrayList<TakeAPeekObject> takeAPeekObjectList = Helper.GetProfileUnViewedPeeks(this, profileObject);
+
+        for(int i=0; i<takeAPeekObjectList.size(); i++)
         {
             //Get the latest peek that belongs to this profile
-            takeAPeekObject = profileObject.peeks.get(i);
-            if(takeAPeekObject.ProfileID.compareTo(profileObject.profileId) == 0)
+            TakeAPeekObject takeAPeekObject = takeAPeekObjectList.get(i);
+            if(takeAPeekObject.ProfileID.compareTo(profileObject.profileId) == 0 &&
+               takeAPeekObject.Viewed == 0)
             {
-                break;
+                return takeAPeekObject;
             }
         }
 
-        return takeAPeekObject;
+        return null;
+    }
+
+    public void QuickCloseUserPeekStack()
+    {
+        logger.debug("QuickCloseUserPeekStack() Invoked");
+
+        mUserStackItemPosition = -1;
+
+        mTextViewStackUserName.setText("");
+
+        //Hide the user peek stack
+        mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
+        mLayoutPeekStack.setVisibility(View.GONE);
+
+        mCutOutView.setVisibility(View.VISIBLE);
     }
 
     public void CloseUserPeekStack()
@@ -1146,11 +1195,6 @@ public class UserMapActivity extends FragmentActivity implements
         //Hide the user peek stack
         mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
         mLayoutPeekStack.setVisibility(View.GONE);
-/*@@
-        Animation slideUpAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.slideup);
-        mLayoutPeekStack.setAnimation(slideUpAnimation);
-        slideUpAnimation.start();
-@@*/
 
         mCutOutView.setVisibility(View.VISIBLE);
         Animation fadeInAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadein);
@@ -1250,141 +1294,16 @@ public class UserMapActivity extends FragmentActivity implements
                     startActivity(captureClipActivityIntent);
                     break;
 
+                case R.id.user_peek_stack_button_request_peeks:
+                    logger.info("OnClickListener:onClick: user_peek_stack_button_request_peeks clicked");
+
+                    SendRequest();
+                    break;
+
                 case R.id.button_request_peek:
                     logger.info("OnClickListener:onClick: button_request_peek clicked");
 
-                    logger.info("Delete old requests from ormLite");
-                    DatabaseManager.getInstance().ClearOldTakeAPeekRequests();
-
-                    try
-                    {
-                        if(mClusterManagerAlgorithm.getItems().size() > 0)
-                        {
-                            try
-                            {
-                                requestPeekLock.lock();
-
-                                if (mAsyncTaskRequestPeek == null)
-                                {
-                                    Hashtable<Integer, Boolean> isInCutOutHash = new Hashtable<Integer, Boolean>();
-
-                                    Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
-                                    for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
-                                    {
-                                        Point markerPosition = mGoogleMap.getProjection().toScreenLocation(tapClusterItem.getPosition());
-                                        boolean inCutOut = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) < mCutOutView.mRadius;
-                                        isInCutOutHash.put(tapClusterItem.mIndex, inCutOut);
-                                    }
-
-                                    //Start asynchronous request to server
-                                    mAsyncTaskRequestPeek = new AsyncTask<Hashtable<Integer, Boolean>, Void, ResponseObject>()
-                                    {
-                                        int mNumberOfRequests = 0;
-
-                                        @Override
-                                        protected ResponseObject doInBackground(Hashtable<Integer, Boolean>... params)
-                                        {
-                                            Hashtable<Integer, Boolean> isInCutOutHash = (Hashtable<Integer, Boolean>)params[0];
-
-                                            try
-                                            {
-                                                logger.info("Getting profile list from server");
-
-                                                Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
-
-                                                RequestObject requestObject = new RequestObject();
-                                                requestObject.targetProfileList = new ArrayList<String>();
-
-                                                long currentTimeMillis = Helper.GetCurrentTimeMillis();
-
-                                                for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
-                                                {
-                                                    if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) == 0)
-                                                    {
-                                                        if(isInCutOutHash.get(tapClusterItem.mIndex) == true)
-                                                        {
-                                                            mNumberOfRequests++;
-
-                                                            requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
-
-                                                            TakeAPeekRequest takeAPeekRequest = new TakeAPeekRequest(tapClusterItem.mProfileObject.profileId, currentTimeMillis);
-                                                            DatabaseManager.getInstance().AddTakeAPeekRequest(takeAPeekRequest);
-                                                        }
-                                                    }
-                                                }
-
-                                                if(mNumberOfRequests > 0)
-                                                {
-                                                    String metaDataJson = new Gson().toJson(requestObject);
-
-                                                    String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
-                                                    String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
-
-                                                    return new Transport().RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
-                                                }
-
-                                                return new ResponseObject();
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
-                                            }
-
-                                            return null;
-                                        }
-
-                                        @Override
-                                        protected void onPostExecute(ResponseObject responseObject)
-                                        {
-                                            try
-                                            {
-                                                if (responseObject == null)
-                                                {
-                                                    Helper.ErrorMessage(UserMapActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_request_peek));
-                                                }
-                                                else
-                                                {
-                                                    if(mUserStackItemPosition >= 0)
-                                                    {
-                                                        ShowUserPeekStack();
-                                                    }
-                                                    else
-                                                    {
-                                                        ShowProfilesInBounds(true);
-                                                    }
-
-                                                    String message = String.format(getString(R.string.user_map_requested_peeks_to), mNumberOfRequests);
-
-                                                    if(mNumberOfRequests == 1)
-                                                    {
-                                                        message = getString(R.string.user_map_requested_peeks_to_one);
-                                                    }
-
-                                                    Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                            finally
-                                            {
-                                                mAsyncTaskRequestPeek = null;
-                                            }
-                                        }
-                                    }.execute(isInCutOutHash);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
-                            }
-                            finally
-                            {
-                                requestPeekLock.unlock();
-                            }
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Helper.Error(logger, "EXCEPTION: Exception when requesting peek", e);
-                    }
+                    SendRequest();
                     break;
 
                 case R.id.textview_new_notifications:
@@ -1422,6 +1341,150 @@ public class UserMapActivity extends FragmentActivity implements
         }
     };
 
+    private void SendRequest()
+    {
+        logger.debug("SendRequest() Invoked");
+
+        logger.info("Delete old requests from ormLite");
+        DatabaseManager.getInstance().ClearOldTakeAPeekRequests();
+
+        try
+        {
+            if(mClusterManagerAlgorithm.getItems().size() > 0)
+            {
+                try
+                {
+                    requestPeekLock.lock();
+
+                    if (mAsyncTaskRequestPeek == null)
+                    {
+                        Hashtable<Integer, Boolean> isInCutOutHash = new Hashtable<Integer, Boolean>();
+
+                        Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
+                        for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
+                        {
+                            Point markerPosition = mGoogleMap.getProjection().toScreenLocation(tapClusterItem.getPosition());
+                            boolean inCutOut = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) < mCutOutView.mRadius;
+                            isInCutOutHash.put(tapClusterItem.mIndex, inCutOut);
+                        }
+
+                        //Start asynchronous request to server
+                        mAsyncTaskRequestPeek = new AsyncTask<Hashtable<Integer, Boolean>, Void, ResponseObject>()
+                        {
+                            int mNumberOfRequests = 0;
+
+                            @Override
+                            protected ResponseObject doInBackground(Hashtable<Integer, Boolean>... params)
+                            {
+                                Hashtable<Integer, Boolean> isInCutOutHash = (Hashtable<Integer, Boolean>)params[0];
+
+                                try
+                                {
+                                    logger.info("Getting profile list from server");
+
+                                    Collection<TAPClusterItem> tapClusterItemCollection = mClusterManagerAlgorithm.getItems();
+
+                                    RequestObject requestObject = new RequestObject();
+                                    requestObject.targetProfileList = new ArrayList<String>();
+
+                                    long currentTimeMillis = Helper.GetCurrentTimeMillis();
+
+                                    for(TAPClusterItem tapClusterItem : tapClusterItemCollection)
+                                    {
+                                        if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) == 0)
+                                        {
+                                            if(isInCutOutHash.get(tapClusterItem.mIndex) == true)
+                                            {
+                                                mNumberOfRequests++;
+
+                                                requestObject.targetProfileList.add(tapClusterItem.mProfileObject.profileId);
+
+                                                TakeAPeekRequest takeAPeekRequest = new TakeAPeekRequest(tapClusterItem.mProfileObject.profileId, currentTimeMillis);
+                                                DatabaseManager.getInstance().AddTakeAPeekRequest(takeAPeekRequest);
+                                            }
+                                        }
+                                    }
+
+                                    if(mNumberOfRequests > 0)
+                                    {
+                                        String metaDataJson = new Gson().toJson(requestObject);
+
+                                        String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                        String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
+
+                                        return new Transport().RequestPeek(UserMapActivity.this, userName, password, metaDataJson, mSharedPreferences);
+                                    }
+
+                                    return new ResponseObject();
+                                }
+                                catch (Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(ResponseObject responseObject)
+                            {
+                                try
+                                {
+                                    if (responseObject == null)
+                                    {
+                                        Helper.ErrorMessage(UserMapActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_request_peek));
+                                    }
+                                    else
+                                    {
+                                        mTextViewStackPeekNoPeeks.setVisibility(View.GONE);
+                                        Animation fadeOutAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeout);
+                                        mTextViewStackPeekNoPeeks.setAnimation(fadeOutAnimation);
+                                        fadeOutAnimation.start();
+
+                                        if(mUserStackItemPosition >= 0)
+                                        {
+                                            ShowUserPeekStack();
+                                        }
+                                        else
+                                        {
+                                            ShowProfilesInBounds(true);
+                                        }
+
+                                        String message = String.format(getString(R.string.user_map_requested_peeks_to), mNumberOfRequests);
+
+                                        if(mNumberOfRequests == 1)
+                                        {
+                                            message = getString(R.string.user_map_requested_peeks_to_one);
+                                        }
+
+                                        Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                finally
+                                {
+                                    mAsyncTaskRequestPeek = null;
+                                }
+                            }
+                        }.execute(isInCutOutHash);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+                }
+                finally
+                {
+                    requestPeekLock.unlock();
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: Exception when requesting peek", e);
+        }
+
+    }
+
     ViewPager.OnPageChangeListener PageChangeListener = new ViewPager.OnPageChangeListener()
     {
         @Override
@@ -1456,32 +1519,7 @@ public class UserMapActivity extends FragmentActivity implements
         {
             mUserStackItemPosition = index;
 
-            ProfileObject profileObject = GetProfileObjectByPosition(index);
-            TakeAPeekObject takeAPeekObject = GetProfileLatestPeek(profileObject); //Get the latest peek
-
-            ClusterManagerSingleItem(index);
-
-            LatLng profileObjectLocation = new LatLng(profileObject.latitude, profileObject.longitude);
-            UpdateBelowProjection(profileObjectLocation);
-
-            mTextViewStackUserName.setText(profileObject.displayName);
-            mTextViewStackPeekTitle.setText(takeAPeekObject.Title);
-            mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
-
-            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
-            {
-                mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
-                findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
-                AddressLoader addressLoader = new AddressLoader();
-
-                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
-            }
-            else
-            {
-                mTextViewStackPeekAddress.setVisibility(View.GONE);
-                findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
-            }
+            FillPeekInfo();
         }
     };
 
@@ -1542,6 +1580,14 @@ public class UserMapActivity extends FragmentActivity implements
                             notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, notificationID);
                             startActivity(notificationPopupActivityIntent);
                             overridePendingTransition(R.anim.zoominbounce, R.anim.donothing);
+
+                            mHandler.postDelayed(new Runnable()
+                            {
+                                public void run()
+                                {
+                                    QuickCloseUserPeekStack();
+                                }
+                            }, 1000);
                         }
                     };
 

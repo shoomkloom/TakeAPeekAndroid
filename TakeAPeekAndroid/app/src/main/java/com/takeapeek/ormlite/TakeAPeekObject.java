@@ -50,4 +50,10 @@ public class TakeAPeekObject
 
     @DatabaseField(columnName = "PeekMP4StreamingURL")
     public String PeekMP4StreamingURL;
+
+    @DatabaseField(dataType= DataType.INTEGER, columnName = "Viewed")
+    public int Viewed;
+
+    @DatabaseField(dataType= DataType.INTEGER, columnName = "Upload")
+    public int Upload;
 }

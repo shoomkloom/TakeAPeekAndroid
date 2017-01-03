@@ -436,6 +436,48 @@ public class DatabaseManager
 		return takeAPeekObjectList;
 	}
 
+    public List<TakeAPeekObject> GetTakeAPeekObjectViewedList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekObjectViewedList() Invoked");
+
+        List<TakeAPeekObject> takeAPeekObjectList = null;
+
+        try
+        {
+            takeAPeekObjectList = getHelper().GetTakeAPeekObjectDao().queryBuilder().
+                    where().eq("Viewed", 1).query();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekObjectList;
+    }
+
+    public List<TakeAPeekObject> GetTakeAPeekObjectUploadList()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekObjectUploadList() Invoked");
+
+        List<TakeAPeekObject> takeAPeekObjectList = null;
+
+        try
+        {
+            takeAPeekObjectList = getHelper().GetTakeAPeekObjectDao().queryBuilder().
+                    where().eq("Upload", 1).query();
+        }
+        catch (SQLException e)
+        {
+            Helper.Error(logger, "SQLException", e);
+        }
+
+        return takeAPeekObjectList;
+    }
+
 	public HashMap<String, TakeAPeekObject> GetTakeAPeekObjectHash()
 	{
 		//Do not lock this function
@@ -456,6 +498,27 @@ public class DatabaseManager
 
 		return hashMap;
 	}
+
+    public HashMap<String, TakeAPeekObject> GetTakeAPeekObjectViewedHash()
+    {
+        //Do not lock this function
+
+        logger.debug("GetTakeAPeekObjectViewedHash()");
+
+        HashMap<String, TakeAPeekObject> hashMap = new HashMap<String, TakeAPeekObject>();
+
+        List<TakeAPeekObject> takeAPeekObjectList  = GetTakeAPeekObjectViewedList();
+
+        if(takeAPeekObjectList != null)
+        {
+            for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
+            {
+                hashMap.put(takeAPeekObject.TakeAPeekID, takeAPeekObject);
+            }
+        }
+
+        return hashMap;
+    }
 
 	public TakeAPeekObject GetTakeAPeekObject(String takeAPeekID)
 	{

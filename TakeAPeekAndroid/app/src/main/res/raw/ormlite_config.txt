@@ -1,5 +1,5 @@
 #
-# generated on 2016/11/08 09:20:38
+# generated on 2017/01/02 10:57:36
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -111,6 +111,16 @@ columnName=Title
 # --field-start--
 fieldName=PeekMP4StreamingURL
 columnName=PeekMP4StreamingURL
+# --field-end--
+# --field-start--
+fieldName=Viewed
+columnName=Viewed
+dataPersister=INTEGER
+# --field-end--
+# --field-start--
+fieldName=Upload
+columnName=Upload
+dataPersister=INTEGER
 # --field-end--
 # --table-fields-end--
 # --table-end--

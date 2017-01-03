@@ -147,7 +147,7 @@ public class SyncAdapterHelper implements Runnable,
 		List<TakeAPeekObject> takeAPeekObjectList = null;
 
         logger.info("Getting list of pending takeAPeekObjects from takeAPeekObjectList");
-        takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectList();
+        takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectUploadList();
 
         if(takeAPeekObjectList != null)
         {
@@ -162,7 +162,8 @@ public class SyncAdapterHelper implements Runnable,
                     if (fileToUpload.exists() == false)
                     {
                         Helper.Error(logger, String.format("ERROR: file %s does not exist", takeAPeekObject.FilePath));
-                        DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
+                        takeAPeekObject.Upload = 0;
+                        DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                         continue;
                     }
 
@@ -196,7 +197,8 @@ public class SyncAdapterHelper implements Runnable,
             logger.info(String.format("Deleting %d takeAPeekObjects from takeAPeekObjectList", takeAPeekObjectList.size()));
             for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
             {
-                DatabaseManager.getInstance().DeleteTakeAPeekObject(takeAPeekObject);
+                takeAPeekObject.Upload = 0;
+                DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
             }
         }
 

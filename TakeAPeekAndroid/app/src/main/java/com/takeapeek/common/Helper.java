@@ -64,6 +64,7 @@ import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.common.Constants.UpdateTypeEnum;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekContactUpdateTimes;
+import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.syncadapter.ActiveSyncService;
 
@@ -823,6 +824,7 @@ public class Helper
 
         ArrayList<TakeAPeekRelation> takeAPeekRelationList = new Transport().GetAllRelations(context, username, password, sharedPreferences);
 
+        DatabaseManager.init(context);
         DatabaseManager.getInstance().ClearAllTakeAPeekRelations();
 
         if(takeAPeekRelationList != null)
@@ -2783,7 +2785,31 @@ public class Helper
     		Helper.Error(logger, "EXCEPTION: When starting ActiveSyncService", e);
     	}
     }
-    
+
+    public static ArrayList<TakeAPeekObject> GetProfileUnViewedPeeks(Context context, ProfileObject profileObject)
+    {
+        logger.debug("GetUnViewedPeeks() Invoked");
+
+        ArrayList<TakeAPeekObject> takeAPeekObjectArray = new ArrayList<TakeAPeekObject>();
+
+        if(profileObject.peeks != null)
+        {
+            DatabaseManager.init(context);
+            HashMap<String, TakeAPeekObject> takeAPeekObjectViewedHash = DatabaseManager.getInstance().GetTakeAPeekObjectViewedHash();
+
+            for (TakeAPeekObject takeAPeekObject : profileObject.peeks)
+            {
+                if(takeAPeekObjectViewedHash.containsKey(takeAPeekObject.TakeAPeekID) == false ||
+                        takeAPeekObjectViewedHash.get(takeAPeekObject.TakeAPeekID).Viewed != 1)
+                {
+                    takeAPeekObjectArray.add(takeAPeekObject);
+                }
+            }
+        }
+
+        return takeAPeekObjectArray;
+    }
+
     public static long GetCurrentTimeMillis()
     {
     	logger.debug("GetCurrentTimeMillis() Invoked");

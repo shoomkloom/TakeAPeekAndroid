@@ -38,6 +38,7 @@ import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
+import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.usermap.UserMapActivity;
 
@@ -62,6 +63,7 @@ public class UserFeedActivity extends AppCompatActivity
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
 
+    ProfileObject mProfileObject = null;
     ListView mListViewFeedList = null;
     PeekItemAdapter mPeekItemAdapter = null;
 
@@ -192,6 +194,8 @@ public class UserFeedActivity extends AppCompatActivity
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
+        DatabaseManager.init(this);
+
         //Initate members for UI elements
 
         mTopBar = (RelativeLayout)findViewById(top_bar);
@@ -249,21 +253,22 @@ public class UserFeedActivity extends AppCompatActivity
         if(intent != null)
         {
             String profileObjectJSON = intent.getStringExtra(Constants.PARAM_PROFILEOBJECT);
-            ProfileObject profileObject = new Gson().fromJson(profileObjectJSON, ProfileObject.class);
+            mProfileObject = new Gson().fromJson(profileObjectJSON, ProfileObject.class);
 
-            if(profileObject != null)
+            if(mProfileObject != null)
             {
                 //Set the name in the top bar
                 //@@getSupportActionBar().setTitle(profileObject.displayName);
                 TextView title = (TextView)findViewById(R.id.textview_user_feed_title);
                 Helper.setTypeface(this, title, Helper.FontTypeEnum.boldFont);
-                title.setText(profileObject.displayName);
+                title.setText(mProfileObject.displayName);
 
                 // Setting adapter
-                mPeekItemAdapter = new PeekItemAdapter(this, R.layout.item_peek_feed, profileObject.peeks);
+                ArrayList<TakeAPeekObject> takeAPeekObjectUnViewed = Helper.GetProfileUnViewedPeeks(this, mProfileObject);
+                mPeekItemAdapter = new PeekItemAdapter(this, R.layout.item_peek_feed, takeAPeekObjectUnViewed);
                 mListViewFeedList.setAdapter(mPeekItemAdapter);
 
-                if (profileObject.peeks != null && profileObject.peeks.size() > 0)
+                if (takeAPeekObjectUnViewed != null && takeAPeekObjectUnViewed.size() > 0)
                 {
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
@@ -426,6 +431,8 @@ public class UserFeedActivity extends AppCompatActivity
                 {
                     logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
 
+                    ClearPeekFromList(takeAPeekObject);
+
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
@@ -529,6 +536,8 @@ public class UserFeedActivity extends AppCompatActivity
                 {
                     logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
 
+                    ClearPeekFromList(takeAPeekObject);
+
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
@@ -582,6 +591,40 @@ public class UserFeedActivity extends AppCompatActivity
         finally
         {
 
+        }
+    }
+
+    private void ClearPeekFromList(TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("ClearPeekFromList(.) Invoked");
+
+        // Set this Peek as Viewed = 1
+        TakeAPeekObject takeAPeekObjectDB = DatabaseManager.getInstance().GetTakeAPeekObject(takeAPeekObject.TakeAPeekID);
+        if(takeAPeekObjectDB != null)
+        {
+            takeAPeekObjectDB.Viewed = 1;
+            DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObjectDB);
+        }
+        else
+        {
+            takeAPeekObject.Viewed = 1;
+            DatabaseManager.getInstance().AddTakeAPeekObject(takeAPeekObject);
+        }
+
+        // Refresh adapter
+        ArrayList<TakeAPeekObject> takeAPeekObjectUnViewed = Helper.GetProfileUnViewedPeeks(this, mProfileObject);
+        mPeekItemAdapter = new PeekItemAdapter(this, R.layout.item_peek_feed, takeAPeekObjectUnViewed);
+        mListViewFeedList.setAdapter(mPeekItemAdapter);
+
+        if (takeAPeekObjectUnViewed != null && takeAPeekObjectUnViewed.size() > 0)
+        {
+            mEnumActivityState = EnumActivityState.list;
+            UpdateUI();
+        }
+        else
+        {
+            mEnumActivityState = EnumActivityState.emptyList;
+            UpdateUI();
         }
     }
 
@@ -762,9 +805,6 @@ public class UserFeedActivity extends AppCompatActivity
 
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
-
-                    //@@Also remove this peek from the visible list and refresh the adapter
-
                     break;
 
                 case R.id.button_control:

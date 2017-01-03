@@ -3278,6 +3278,7 @@ public class CaptureClipActivity extends Activity implements
         mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
         mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
         mCompletedTakeAPeekObject.RelatedProfileID = mRelateProfileID;
+        mCompletedTakeAPeekObject.Upload = 1;
 
         try
         {
