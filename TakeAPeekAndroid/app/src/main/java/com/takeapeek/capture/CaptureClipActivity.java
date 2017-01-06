@@ -3399,15 +3399,17 @@ public class CaptureClipActivity extends Activity implements
                 mImageviewCaptureCountdown.setVisibility(View.GONE);
                 mImageviewSwitchCamera.setVisibility(View.VISIBLE);
                 mRelativelayoutIntro.setVisibility(View.VISIBLE);
-                mLinearLayoutIntro.setVisibility(View.VISIBLE);
-                mImageviewIntroArrow.setVisibility(View.VISIBLE);
 
-/*@@
-                if(Helper.GetFirstCapture(mSharedPreferences) == true)
+                if(Helper.GetFirstRun(mSharedPreferences) == true)
                 {
-                    Helper.SetFirstCapture(mSharedPreferences.edit(), false);
+                    mLinearLayoutIntro.setVisibility(View.VISIBLE);
                 }
-@@*/
+                else
+                {
+                    mLinearLayoutIntro.setVisibility(View.INVISIBLE);
+                }
+
+                mImageviewIntroArrow.setVisibility(View.VISIBLE);
 
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
