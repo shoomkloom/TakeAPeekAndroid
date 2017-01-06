@@ -77,7 +77,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int REQUEST_SMS_PERMISSION_CODE = 10001;
-    private static final int REQUEST_PERMISSION_CODE = 10002;
 
 	enum HandlerState
 	{
@@ -757,122 +756,7 @@ public class AuthenticatorActivity extends AppCompatActivity
                 }, REQUEST_SMS_PERMISSION_CODE);
     }
 
-    private boolean CheckPermissions()
-    {
-        logger.debug("CheckPermissions() Invoked");
 
-        int numberOfPermissions = 6;
-        int permissionTypeArray[] = new int[numberOfPermissions];
-
-        permissionTypeArray[0] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
-        permissionTypeArray[1] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
-        permissionTypeArray[2] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-        permissionTypeArray[3] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        permissionTypeArray[4] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
-        permissionTypeArray[5] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        for(int i=0; i<numberOfPermissions; i++)
-        {
-            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private void RequestPermissions()
-    {
-        logger.debug("RequestPermissions() Invoked");
-
-        ActivityCompat.requestPermissions(AuthenticatorActivity.this, new String[]
-                {
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-
-                }, REQUEST_PERMISSION_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
-        logger.debug("onRequestPermissionsResult(...) Invoked");
-
-        switch (requestCode)
-        {
-            case REQUEST_SMS_PERMISSION_CODE:
-
-                boolean smsPermissionGranted = true;
-                if (grantResults.length > 0)
-                {
-                    for (int grantResult : grantResults)
-                    {
-                        if (grantResult != PackageManager.PERMISSION_GRANTED)
-                        {
-                            smsPermissionGranted = false;
-                            break;
-                        }
-                    }
-                }
-
-                if(smsPermissionGranted == true)
-                {
-                    //Scan SMS messages for verification code in an AsyncTask
-                    mScanSMSAsyncTask = new ScanSMSAsyncTask(this);
-                    mScanSMSAsyncTask.execute();
-                }
-
-                break;
-
-            case REQUEST_PERMISSION_CODE:
-
-                boolean allPermissionsGranted = true;
-                if (grantResults.length > 0)
-                {
-                    for (int grantResult : grantResults)
-                    {
-                        if (grantResult != PackageManager.PERMISSION_GRANTED)
-                        {
-                            allPermissionsGranted = false;
-                            break;
-                        }
-                    }
-                }
-
-                if(allPermissionsGranted == true)
-                {
-                    FinishCreateAccount();
-                }
-                else
-                {
-                    //Some permissions were denied, ask again
-                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthenticatorActivity.this, R.style.AppThemeAlertDialog);
-
-                    alert.setTitle(R.string.permissions_title);
-                    alert.setMessage(R.string.error_permissions);
-                    alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            dialogInterface.dismiss();
-                            RequestPermissions();
-                        }
-                    });
-                    alert.show();
-                }
-
-                break;
-
-            default:
-                break;
-        }
-    }
     
     public void ScanSMSAsyncTaskPostExecute(String takeAPeekVerificationCode)
     {
@@ -917,17 +801,44 @@ public class AuthenticatorActivity extends AppCompatActivity
     	else
     	{
     		mPassword = result;
-
-
-                if (CheckPermissions() == true)
-                {
-                    FinishCreateAccount();
-                }
-                else
-                {
-                    RequestPermissions();
-                }
+            FinishCreateAccount();
     	}
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        logger.debug("onRequestPermissionsResult(...) Invoked");
+
+        switch (requestCode)
+        {
+            case REQUEST_SMS_PERMISSION_CODE:
+
+                boolean smsPermissionGranted = true;
+                if (grantResults.length > 0)
+                {
+                    for (int grantResult : grantResults)
+                    {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED)
+                        {
+                            smsPermissionGranted = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(smsPermissionGranted == true)
+                {
+                    //Scan SMS messages for verification code in an AsyncTask
+                    mScanSMSAsyncTask = new ScanSMSAsyncTask(this);
+                    mScanSMSAsyncTask.execute();
+                }
+
+                break;
+
+            default:
+                break;
+        }
     }
     
     /**

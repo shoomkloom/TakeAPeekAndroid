@@ -1,7 +1,13 @@
 package com.takeapeek.walkthrough;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener
 {
     static private final Logger logger = LoggerFactory.getLogger(WalkthroughActivity.class);
+
+    private static final int REQUEST_PERMISSION_CODE = 10001;
 
     protected View view;
     private TextView mTextViewButtonSkip = null;
@@ -88,8 +96,6 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(this);
         setUiPageViewController();
-
-        Helper.SetWalkthroughFinished(mSharedPreferences);
     }
 
     @Override
@@ -116,6 +122,104 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
         setResult(RESULT_CANCELED);
 
         super.onBackPressed();
+    }
+
+    private boolean CheckPermissions()
+    {
+        logger.debug("CheckPermissions() Invoked");
+
+        int numberOfPermissions = 6;
+        int permissionTypeArray[] = new int[numberOfPermissions];
+
+        permissionTypeArray[0] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
+        permissionTypeArray[1] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissionTypeArray[2] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionTypeArray[3] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
+        permissionTypeArray[4] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        permissionTypeArray[5] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        for(int i=0; i<numberOfPermissions; i++)
+        {
+            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void RequestPermissions()
+    {
+        logger.debug("RequestPermissions() Invoked");
+
+        ActivityCompat.requestPermissions(WalkthroughActivity.this, new String[]
+                {
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+
+                }, REQUEST_PERMISSION_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        logger.debug("onRequestPermissionsResult(...) Invoked");
+
+        switch (requestCode)
+        {
+            case REQUEST_PERMISSION_CODE:
+
+                boolean allPermissionsGranted = true;
+                if (grantResults.length > 0)
+                {
+                    for (int grantResult : grantResults)
+                    {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED)
+                        {
+                            allPermissionsGranted = false;
+                            break;
+                        }
+                    }
+                }
+
+                if(allPermissionsGranted == true)
+                {
+                    logger.info("All permissions were granted, finish the activity.");
+
+                    Helper.SetWalkthroughFinished(mSharedPreferences);
+
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                else
+                {
+                    //Some permissions were denied, ask again
+                    AlertDialog.Builder alert = new AlertDialog.Builder(WalkthroughActivity.this, R.style.AppThemeAlertDialog);
+
+                    alert.setTitle(R.string.permissions_title);
+                    alert.setMessage(R.string.error_permissions);
+                    alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            dialogInterface.dismiss();
+                            RequestPermissions();
+                        }
+                    });
+                    alert.show();
+                }
+
+                break;
+
+            default:
+                break;
+        }
     }
 
     private void setUiPageViewController()
@@ -154,15 +258,35 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
             case R.id.textview_button_skip:
                 logger.info("onClick(.) Invoked with R.id.textview_button_skip");
 
-                setResult(RESULT_OK);
-                finish();
+                if(CheckPermissions() == true)
+                {
+                    Helper.SetWalkthroughFinished(mSharedPreferences);
+
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                else
+                {
+                    RequestPermissions();
+                }
+
                 break;
 
             case R.id.textview_button_letsgo:
                 logger.info("onClick(.) Invoked with R.id.textview_button_letsgo");
 
-                setResult(RESULT_OK);
-                finish();
+                if(CheckPermissions() == true)
+                {
+                    Helper.SetWalkthroughFinished(mSharedPreferences);
+
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                else
+                {
+                    RequestPermissions();
+                }
+
                 break;
         }
     }
