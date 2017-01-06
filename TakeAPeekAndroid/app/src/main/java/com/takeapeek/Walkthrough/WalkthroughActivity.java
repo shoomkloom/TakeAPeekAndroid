@@ -88,6 +88,8 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(this);
         setUiPageViewController();
+
+        Helper.SetWalkthroughFinished(mSharedPreferences);
     }
 
     @Override

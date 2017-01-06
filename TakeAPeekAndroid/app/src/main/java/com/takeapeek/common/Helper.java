@@ -2536,21 +2536,6 @@ public class Helper
         sharedPreferencesEditor.putInt(Constants.NUMBER_OF_APPEARANCES, numberOfAppearances);
         sharedPreferencesEditor.commit();
     }
-    
-    public static Boolean GetFirstCapture(SharedPreferences sharedPreferences)
-    {
-    	logger.debug("GetFirstCapture(.) Invoked");
-    	
-    	return sharedPreferences.getBoolean(Constants.FIRST_CAPTURE, true);
-    }
-    
-    public static void SetFirstCapture(Editor sharedPreferencesEditor, Boolean firstCapture)
-    {
-    	logger.debug(String.format("SetFirstCapture(Editor, firstCapture=%b) Invoked", firstCapture));
-    	
-        sharedPreferencesEditor.putBoolean(Constants.FIRST_CAPTURE, firstCapture);
-        sharedPreferencesEditor.commit();
-    }
 
     public static Boolean GetFirstTrendingSwipe(SharedPreferences sharedPreferences)
     {
@@ -2696,6 +2681,25 @@ public class Helper
         sharedPreferencesEditor.commit();
     }
     //DOB Success Success
+
+    //WalkThrough finished
+    public static Boolean GetWalkthroughFinished(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetWalkthroughFinished(.) Invoked");
+
+        boolean walkthroughFinished = sharedPreferences.getBoolean(Constants.WALKTHROUGH_FINISHED, false);
+        return walkthroughFinished;
+    }
+
+    public static void SetWalkthroughFinished(SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetWalkthroughFinished(.) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(Constants.WALKTHROUGH_FINISHED, true);
+        sharedPreferencesEditor.commit();
+    }
+    //WalkThrough finished
     
     public static ProfileStateEnum GetProfileState(SharedPreferences sharedPreferences)
     {

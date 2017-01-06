@@ -230,6 +230,7 @@ public class Constants
     public static final String USER_NUMBER = "UserNumber";
     public static final String DISPLAY_NAME_SUCCESS = "DisplayNameSuccess";
     public static final String DOB_SUCCESS = "DOBSuccess";
+    public static final String WALKTHROUGH_FINISHED = "WalkthroughFinished";
     public static final String PROFILE_ID = "ProfileId";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String SHOW_NOTIFICATIONS = "ShowNotifications";

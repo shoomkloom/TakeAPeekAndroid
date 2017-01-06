@@ -210,18 +210,25 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("AppLoadLogic() Invoked");
 
-        if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
-                Helper.GetDisplayNameSuccess(mSharedPreferences) == true &&
-                Helper.GetDOBSuccess(mSharedPreferences) == true)
+        if(Helper.GetWalkthroughFinished(mSharedPreferences) == true)
         {
-            if(ShowCaptureOnLoad() == false)
+            if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
+                    Helper.GetDisplayNameSuccess(mSharedPreferences) == true &&
+                    Helper.GetDOBSuccess(mSharedPreferences) == true)
             {
-                ShowUserMap();
+                if(ShowCaptureOnLoad() == false)
+                {
+                    ShowUserMap();
+                }
+            }
+            else
+            {
+                ShowAuthenticator();
             }
         }
         else
         {
-            ShowAuthenticator();
+            ShowWalkthrough();
         }
     }
 
@@ -366,17 +373,17 @@ public class UserMapActivity extends FragmentActivity implements
             case RESULT_AUTHENTICATE:
                 logger.info("onActivityResult: requestCode = 'RESULT_AUTHENTICATE'");
 
-                ShowWalkthrough();
+                if(ShowCaptureOnLoad() == false)
+                {
+                    ShowUserMap();
+                }
 
                 break;
 
             case RESULT_WALKTHROUGH:
                 logger.info("onActivityResult: requestCode = 'RESULT_WALKTHROUGH'");
 
-                if(ShowCaptureOnLoad() == false)
-                {
-                    ShowUserMap();
-                }
+                ShowAuthenticator();
 
                 break;
 
