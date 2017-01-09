@@ -80,6 +80,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 
 	enum HandlerState
 	{
+        start,
 		numberEdit,
 		firstVerification,
 		receiveSMSTimeout,
@@ -113,7 +114,7 @@ public class AuthenticatorActivity extends AppCompatActivity
         }
     };
 	
-	HandlerState mHandlerState = HandlerState.numberEdit;
+	HandlerState mHandlerState = HandlerState.start;
 	
 	/** for receiving events from FMPhoneNumberFormattingTextWatcher back to UI thread */
 	private final NumberFormattingTextHandler mNumberFormattingTextHandler = new NumberFormattingTextHandler(this);
@@ -185,6 +186,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     
     ImageView mDisplayNameValidationProgess = null;
     TextView mButtonCreateDisplayName = null;
+    String mDisplayName = null;
 
     private String mVerificationCode = null;
 
@@ -194,6 +196,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     private Bundle mResultBundle = null;
 
     Calendar mCalendar = Calendar.getInstance();
+    long mDateOfBirthMillis = -1;
 
     /**
      * Set the result that is to be sent as the result of the request that caused this
@@ -268,8 +271,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 	        mAccountManager = AccountManager.get(this);
 	        
 	        Account takeAPeekAccount = null;
-            Boolean displayNameSuccess = Helper.GetDisplayNameSuccess(mSharedPreferences);
-            Boolean dobSuccess = Helper.GetDOBSuccess(mSharedPreferences);
 
 			try 
 			{
@@ -281,7 +282,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 				Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_more_than_one_account));
 			}
 			
-	    	if(takeAPeekAccount != null && displayNameSuccess == true && dobSuccess == true)
+	    	if(takeAPeekAccount != null/*@@ && displayNameSuccess == true && dobSuccess == true*/)
 	    	{
 	    		logger.info("onCreate: A TakeAPeek account already exists");
 	    		
@@ -319,22 +320,6 @@ public class AuthenticatorActivity extends AppCompatActivity
                         mButtonCreateDisplayName = (TextView)findViewById(R.id.button_create_display_name);
                         Helper.setTypeface(this, mButtonCreateDisplayName, FontTypeEnum.boldFont);
                         mButtonCreateDisplayName.setOnClickListener(ClickListener);
-
-                        if(takeAPeekAccount != null && displayNameSuccess == false)
-                        {
-                            logger.info("Account exists but display name failed.");
-
-                            mHandlerState = HandlerState.verificationSuccess;
-                            UpdateUI();
-                        }
-
-                        if(takeAPeekAccount != null && dobSuccess == false)
-                        {
-                            logger.info("Account exists but DOB failed.");
-
-                            mHandlerState = HandlerState.dateOfBirth;
-                            UpdateUI();
-                        }
 
 			        	List<String> countryISOCodes = Arrays.asList(new String[]{"hint", "AF","AL","DZ","AD","AO","AI","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","MM","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CO","KM","CG","CD","CR","HR","CU","CY","CZ","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GD","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JO","KZ","KE","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MR","MU","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NP","NL","AN","NZ","NI","NE","NG","KP","NO","OM","PK","PW","PA","PG","PY","PE","PH","PL","PT","PR","QA","RO","RU","RW","WS","SM","ST","SA","SN","RS","SC","SL","SG","SK","SI","SB","SO","ZA","KR","ES","LK","SH","KN","LC","VC","SD","SR","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TO","TT","TN","TR","TM","TC","AE","UG","GB","UA","UY","US","UZ","VU","VE","VN","YE","ZM","ZW"});
 			        	String[] countryNames = new String[]{"hint", "Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burma (Myanmar)","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Colombia","Comoros","Republic of the Congo","Dem. Rep. of the Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Timor-Leste","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nepal","Netherlands","Netherlands Antilles","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Romania","Russia","Rwanda","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","Spain","Sri Lanka","Saint Helena","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","United Arab Emirates","Uganda","United Kingdom","Ukraine","Uruguay","United States","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"};
@@ -1018,9 +1003,9 @@ public class AuthenticatorActivity extends AppCompatActivity
     			
     		case verificationSuccess:
     			logger.info("HandleMessage::verificationSuccess");
-    			
-    			mHandlerState = HandlerState.verificationSuccess;
-    			UpdateUI();
+
+                setResult(RESULT_OK);
+                finish();
 
                 break;
     	        
@@ -1147,6 +1132,8 @@ public class AuthenticatorActivity extends AppCompatActivity
         }
         else
         {
+            mDisplayName = validatedDisplayName;
+
             mDisplayNameValidationProgess.setImageResource(R.drawable.ic_displayname_verify_success);
             Animation zoomInAnimation = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
             mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
@@ -1173,6 +1160,21 @@ public class AuthenticatorActivity extends AppCompatActivity
     	
     	switch (mHandlerState)
     	{
+            case start:
+                //Hide enter number UI
+                findViewById(R.id.login_textview_big_title).setVisibility(View.GONE);
+                findViewById(R.id.login_textview_small_title).setVisibility(View.GONE);
+                findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
+
+                //Hide resend UI
+                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
+
+                //Show Display Name UI
+                mLoginImageviewScreenLogo.setImageResource(R.drawable.login_center_image_name);
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.VISIBLE);
+
+                break;
+
 	    	case numberEdit:
 	    		UpdateButtonCreateAccountUI();
 	    		
@@ -1249,17 +1251,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		break;
 	    		
 	    	case verificationSuccess:
-	    		//Hide enter number UI
-                findViewById(R.id.login_textview_big_title).setVisibility(View.GONE);
-                findViewById(R.id.login_textview_small_title).setVisibility(View.GONE);
-                findViewById(R.id.login_linearlayout_fill_number).setVisibility(View.GONE);
-
-                //Hide resend UI
-                findViewById(R.id.login_linearlayout_resend_options).setVisibility(View.GONE);
-
-            	//Show Display Name UI
-                mLoginImageviewScreenLogo.setImageResource(R.drawable.login_center_image_name);
-                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.VISIBLE);
 
 	    		break;
 	    		
@@ -1275,8 +1266,6 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		break;
 
             case displayNameVerify:
-
-
                 mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
                 mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
                 Animation zoomInAnimationDisplayNameVerify = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
@@ -1470,8 +1459,8 @@ public class AuthenticatorActivity extends AppCompatActivity
 
                     Helper.SetDOBSuccess(mSharedPreferences.edit(), true);
 
-                    setResult(RESULT_OK);
-                    finish();
+                    mHandlerState =  HandlerState.numberEdit;
+                    UpdateUI();
 
                     break;
 
@@ -1513,43 +1502,9 @@ public class AuthenticatorActivity extends AppCompatActivity
             return false;
         }
 
-        new AsyncTask<Void, Void, ResponseObject>()
-        {
-            @Override
-            protected ResponseObject doInBackground(Void... params)
-            {
-                try
-                {
-                    logger.info("Setting Date Of Birth");
+        mDateOfBirthMillis = mCalendar.getTimeInMillis();
 
-                    long dateOfBirthMillis = mCalendar.getTimeInMillis();
-
-                    String userName = Helper.GetTakeAPeekAccountUsername(AuthenticatorActivity.this);
-                    String password = Helper.GetTakeAPeekAccountPassword(AuthenticatorActivity.this);
-
-                    return new Transport().SetDateOfBirth(AuthenticatorActivity.this, userName, password, dateOfBirthMillis, mSharedPreferences);
-                }
-                catch (Exception e)
-                {
-                    Helper.Error(logger, "EXCEPTION: doInBackground: setting date of birth", e);
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(ResponseObject responseObject)
-            {
-                logger.debug("onPostExecute(.) Invoked");
-
-                if(responseObject == null)
-                {
-                    Helper.Error(logger, "responseObject = null when trying set date of birth");
-                }
-
-                UpdateDOBTextView();
-            }
-        }.execute();
+        UpdateDOBTextView();
 
         return true;
     }
@@ -1611,10 +1566,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 
         try
         {
-            String userName = Helper.GetTakeAPeekAccountUsername(mAuthenticatorActivity);
-            String password = Helper.GetTakeAPeekAccountPassword(mAuthenticatorActivity);
-
-            return new Transport().GetDisplayName(mAuthenticatorActivity, userName, password, mProposedDisplayName, mSharedPreferences);
+            return new Transport().CheckDisplayName(mAuthenticatorActivity, mProposedDisplayName, mSharedPreferences);
         }
         catch(Exception e)
         {
@@ -1708,7 +1660,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
     	try
 		{
     		//Create the profile and ask for SMS with verification code
-    		new Transport().CreateProfile(mAuthenticatorActivity, mUserName, mSharedPreferences);
+    		new Transport().CreateProfile(mAuthenticatorActivity, mUserName, mAuthenticatorActivity.mDisplayName, mAuthenticatorActivity.mDateOfBirthMillis, mSharedPreferences);
 		}
 		catch(Exception e)
     	{

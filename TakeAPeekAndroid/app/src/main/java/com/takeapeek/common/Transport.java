@@ -66,9 +66,9 @@ public class Transport
 		return false;
 	}
 	
-	public ResponseObject CreateProfile(Context context, String username, SharedPreferences sharedPreferences) throws Exception
+	public ResponseObject CreateProfile(Context context, String username, String displayName, long dateOfBirth, SharedPreferences sharedPreferences) throws Exception
     {
-		logger.debug("CreateProfile(..) Invoked - before lock");
+		logger.debug("CreateProfile(.....) Invoked - before lock");
 		
 		ResponseObject responseObject = null;
 		
@@ -76,7 +76,7 @@ public class Transport
 		
 		try
 		{
-			logger.debug("CreateProfile(..) - inside lock");
+			logger.debug("CreateProfile(.....) - inside lock");
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
@@ -84,6 +84,8 @@ public class Transport
 			//@@nameValuePairs.add(new NameValuePair("action_type", "create_profile_nosms"));
 			nameValuePairs.add(new NameValuePair("user_name", username));
 			nameValuePairs.add(new NameValuePair("platform", "Android"));
+            nameValuePairs.add(new NameValuePair("display_name", displayName));
+            nameValuePairs.add(new NameValuePair("dob", String.format("%d", dateOfBirth)));
 			
 			//Returns the password
 			responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
@@ -96,7 +98,7 @@ public class Transport
 		finally
 		{
 			//@@lock.unlock();
-			logger.debug("CreateProfile(..) - after unlock");
+			logger.debug("CreateProfile(.....) - after unlock");
 		}
 		
 		return responseObject;
@@ -138,7 +140,7 @@ public class Transport
 
     public String GetDisplayName(Context context, String userName, String password, String proposedDisplayName, SharedPreferences sharedPreferences) throws Exception
     {
-        logger.debug("GetDisplayName(....) Invoked - before lock");
+        logger.debug("GetDisplayName(.....) Invoked - before lock");
 
         String displayName = null;
 
@@ -146,7 +148,7 @@ public class Transport
 
         try
         {
-            logger.debug("GetDisplayName(....) - inside lock");
+            logger.debug("GetDisplayName(.....) - inside lock");
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
@@ -166,7 +168,41 @@ public class Transport
         finally
         {
             //@@lock.unlock();
-            logger.debug("GetDisplayName(....) - after unlock");
+            logger.debug("GetDisplayName(.....) - after unlock");
+        }
+
+        return displayName;
+    }
+
+    public String CheckDisplayName(Context context, String proposedDisplayName, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("CheckDisplayName(...) Invoked - before lock");
+
+        String displayName = null;
+
+        //@@lock.lock();
+
+        try
+        {
+            logger.debug("CheckDisplayName(...) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "check_display_name"));
+            nameValuePairs.add(new NameValuePair("proposed_display_name", proposedDisplayName));
+
+            ResponseObject responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+            displayName = responseObject.validDisplayName;
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetDisplayName(....)", e);
+            throw e;
+        }
+        finally
+        {
+            //@@lock.unlock();
+            logger.debug("CheckDisplayName(...) - after unlock");
         }
 
         return displayName;
