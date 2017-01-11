@@ -1161,6 +1161,9 @@ public class AuthenticatorActivity extends AppCompatActivity
     	switch (mHandlerState)
     	{
             case start:
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.VISIBLE);
+                findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.GONE);
+
                 //Hide enter number UI
                 findViewById(R.id.login_textview_big_title).setVisibility(View.GONE);
                 findViewById(R.id.login_textview_small_title).setVisibility(View.GONE);
@@ -1176,6 +1179,9 @@ public class AuthenticatorActivity extends AppCompatActivity
                 break;
 
 	    	case numberEdit:
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.GONE);
+                findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.GONE);
+
 	    		UpdateButtonCreateAccountUI();
 	    		
 	    		//Show enter number UI
@@ -1189,6 +1195,9 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		break;
 	    		
 	    	case firstVerification:
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.GONE);
+                findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.GONE);
+
 	    		UpdateButtonVerifyAccountUI();
 
                 //Set big title
@@ -1231,6 +1240,9 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		break;
 			
 	    	case receiveSMSTimeout:
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.GONE);
+                findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.GONE);
+
                 //Enable number
                 mMobileNumber.setEnabled(true);
                 mCountrySpinner.setEnabled(true);
@@ -1266,6 +1278,9 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    		break;
 
             case displayNameVerify:
+                findViewById(R.id.login_relativelayout_display_name).setVisibility(View.VISIBLE);
+                findViewById(R.id.login_linearlayout_date_of_birth).setVisibility(View.GONE);
+
                 mDisplayNameValidationProgess.setVisibility(View.VISIBLE);
                 mDisplayNameValidationProgess.setImageResource(R.drawable.progress);
                 Animation zoomInAnimationDisplayNameVerify = AnimationUtils.loadAnimation(AuthenticatorActivity.this, R.anim.zoomin);
