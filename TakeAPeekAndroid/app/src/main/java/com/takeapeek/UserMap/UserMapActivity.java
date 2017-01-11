@@ -95,7 +95,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
-import static com.takeapeek.common.Helper.GetProfileUnViewedPeeks;
 import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -128,6 +127,7 @@ public class UserMapActivity extends FragmentActivity implements
     private boolean mFirstLoad = false;
     HashMap<String, Integer> mHashMapProfileObjectToIndex = new HashMap<String, Integer>();
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
+    HashMap<Integer, ProfileObject> mHashMapIndexToProfileStackObject = new HashMap<Integer, ProfileObject>();
 
     private LatLngBounds mLatLngBounds = null;
     private LatLngBounds mLatLngBoundsIntent = null;
@@ -677,7 +677,15 @@ public class UserMapActivity extends FragmentActivity implements
 
         //Show peek for first profile
         mUserStackItemPosition = cluster.getItems().iterator().next().mIndex;
-        ShowUserPeekStack();
+
+        if(mHashMapIndexToProfileStackObject.size() > 0)
+        {
+            if(mUserStackItemPosition < 0)
+            {
+                mUserStackItemPosition = mHashMapIndexToProfileStackObject.keySet().iterator().next().intValue();
+            }
+            ShowUserPeekStack();
+        }
 
         return true;
     }
@@ -692,7 +700,15 @@ public class UserMapActivity extends FragmentActivity implements
     public boolean onClusterItemClick(TAPClusterItem item)
     {
         mUserStackItemPosition = item.mIndex;
-        ShowUserPeekStack();
+
+        if(mHashMapIndexToProfileStackObject.size() > 0)
+        {
+            if(mUserStackItemPosition < 0)
+            {
+                mUserStackItemPosition = mHashMapIndexToProfileStackObject.keySet().iterator().next().intValue();
+            }
+            ShowUserPeekStack();
+        }
 
         return true;
     }
@@ -851,7 +867,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                                     mClusterManager.cluster();
 
-                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileObject);
+                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileStackObject);
                                     mViewPager.setAdapter(mPeekStackPagerAdapter);
 
                                     if(mOpenStack == true)
@@ -988,7 +1004,31 @@ public class UserMapActivity extends FragmentActivity implements
 
         mHashMapIndexToProfileObject.put(i, profileObject);
         mHashMapProfileObjectToIndex.put(profileObject.profileId, i);
-        mClusterManager.addItem(new TAPClusterItem(i, profileObject));
+
+        ArrayList<TakeAPeekObject> profileUnViewedPeeks = Helper.GetProfileUnViewedPeeks(UserMapActivity.this, profileObject);
+
+        boolean hasPeeks = false;
+        for(int j=0; j<profileUnViewedPeeks.size(); j++)
+        {
+            //Get the latest peek that belongs to this profile
+            TakeAPeekObject takeAPeekObject = profileUnViewedPeeks.get(j);
+            if(takeAPeekObject.ProfileID.compareTo(profileObject.profileId) == 0 &&
+                    takeAPeekObject.Viewed == 0)
+            {
+                hasPeeks = true;
+                break;
+            }
+        }
+
+        if(hasPeeks == true)
+        {
+            mHashMapIndexToProfileStackObject.put(i, profileObject);
+            mClusterManager.addItem(new TAPClusterItem(i, profileObject));
+        }
+        else
+        {
+            mClusterManager.addItem(new TAPClusterItem(-1, profileObject));
+        }
     }
 
     private void ClusterManagerClear()
@@ -997,6 +1037,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         mHashMapIndexToProfileObject.clear();
         mHashMapProfileObjectToIndex.clear();
+        mHashMapIndexToProfileStackObject.clear();
         mClusterManager.clearItems();
     }
 
