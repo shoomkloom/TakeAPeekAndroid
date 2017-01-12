@@ -301,7 +301,10 @@ public class SyncAdapterHelper implements Runnable,
 //@@        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         //Create a location request as long as this service is up
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+        {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
     }
 
     private void HandleNewLocation() throws Exception

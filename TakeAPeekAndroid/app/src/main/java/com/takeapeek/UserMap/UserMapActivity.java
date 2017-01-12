@@ -641,7 +641,13 @@ public class UserMapActivity extends FragmentActivity implements
         if(mFirstLoad == true)
         {
             mFirstLoad = false;
-            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Location location = null;
+
+            if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+            {
+                location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            }
+
             InitMap(location);
         }
     }

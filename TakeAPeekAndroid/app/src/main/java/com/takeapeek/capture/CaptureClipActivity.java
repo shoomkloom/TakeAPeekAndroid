@@ -3310,12 +3310,18 @@ public class CaptureClipActivity extends Activity implements
         logger.debug("onConnected(.) Invoked");
         logger.info("Location services connected.");
 
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+        {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        }
 
         if (mLastLocation == null)
         {
             logger.warn("mLastLocation == null, creating a location update request.");
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+            {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            }
         }
         else
         {
