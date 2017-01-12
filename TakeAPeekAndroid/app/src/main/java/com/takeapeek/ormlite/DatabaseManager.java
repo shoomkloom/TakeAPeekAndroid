@@ -771,6 +771,40 @@ public class DatabaseManager
         return takeAPeekNotification;
     }
 
+    public TakeAPeekNotification GetTakeAPeekNotificationByPeek(String relatedPeekId)
+    {
+        logger.debug("GetTakeAPeekNotificationByPeek(.) Invoked - before lock");
+
+        TakeAPeekNotification takeAPeekNotification = null;
+
+        lockTakeAPeekNotification.lock();
+        try
+        {
+            logger.debug("GetTakeAPeekNotificationByPeek(.) - inside lock");
+
+            try
+            {
+                takeAPeekNotification = getHelper().GetTakeAPeekNotificationDao().queryBuilder().
+                        where().eq("relatedPeekId", relatedPeekId).queryForFirst();
+            }
+            catch (SQLException e)
+            {
+                Helper.Error(logger, "SQLException", e);
+            }
+        }
+        catch (Exception e)
+        {
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekNotification with relatedPeekId=%s", relatedPeekId), e);
+        }
+        finally
+        {
+            lockTakeAPeekNotification.unlock();
+            logger.debug("GetTakeAPeekNotificationByPeek(.) - after unlock");
+        }
+
+        return takeAPeekNotification;
+    }
+
     public void ClearAllTakeAPeekNotifications()
     {
         logger.debug("ClearAllTakeAPeekNotifications() - before lock");

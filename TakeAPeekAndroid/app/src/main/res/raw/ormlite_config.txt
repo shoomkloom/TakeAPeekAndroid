@@ -1,5 +1,5 @@
 #
-# generated on 2017/01/02 10:57:36
+# generated on 2017/01/12 10:20:05
 #
 # --table-start--
 dataClass=com.takeapeek.ormlite.TakeAPeekContact
@@ -163,6 +163,10 @@ columnName=notificationIntId
 fieldName=notified
 columnName=notified
 dataPersister=BOOLEAN
+# --field-end--
+# --field-start--
+fieldName=relatedPeekId
+columnName=relatedPeekId
 # --field-end--
 # --table-fields-end--
 # --table-end--

@@ -39,6 +39,7 @@ import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.usermap.UserMapActivity;
 
@@ -382,6 +383,13 @@ public class UserFeedActivity extends AppCompatActivity
         else
         {
             ShowPeekStream(fromHandler, takeAPeekObject);
+        }
+
+        //Remove related notification
+        TakeAPeekNotification takeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotificationByPeek(takeAPeekObject.TakeAPeekID);
+        if(takeAPeekNotification != null)
+        {
+            DatabaseManager.getInstance().DeleteTakeAPeekNotification(takeAPeekNotification);
         }
     }
 
