@@ -1185,7 +1185,11 @@ public class UserFeedActivity extends AppCompatActivity
 
             try
             {
-                if (intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
+                //Show the popup notification screen if not currently playing preview
+                if (mEnumActivityState != EnumActivityState.previewLoading &&
+                        mEnumActivityState != EnumActivityState.previewPlayingFile &&
+                        mEnumActivityState != EnumActivityState.previewPlayingStream &&
+                        intent.getAction().compareTo(Constants.PUSH_BROADCAST_ACTION) == 0)
                 {
                     String notificationID = intent.getStringExtra(Constants.PUSH_BROADCAST_EXTRA_ID);
 
