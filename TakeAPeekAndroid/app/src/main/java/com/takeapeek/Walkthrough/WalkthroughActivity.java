@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,15 +43,7 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
     private ViewPagerAdapter  mAdapter;
     SharedPreferences mSharedPreferences = null;
 
-    private int[] mImageResources =
-    {
-            R.drawable.walkthrough01,
-            R.drawable.walkthrough02,
-            R.drawable.walkthrough03,
-            R.drawable.walkthrough04,
-            R.drawable.walkthrough05,
-            R.drawable.walkthrough06
-    };
+    private Bitmap[] mImages = new Bitmap[6];
 
     private int[] mStringResources =
     {
@@ -75,11 +69,14 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
         mViewPager = (ViewPager) findViewById(R.id.pager_introduction);
         mViewPager.setClipToPadding(false);
 
-/*@@
-        int pixels = Helper.dipToPx(50);
-        mViewPager.setPadding(pixels, 0, pixels, 0);
-        //@@mViewPager.setPageMargin(-100);
-@@*/
+        BitmapFactory.Options bitmapFactoryOptions = new BitmapFactory.Options();
+        bitmapFactoryOptions.inScaled = false;
+        mImages[0] = BitmapFactory.decodeResource(getResources(), R.drawable.walkthrough01, bitmapFactoryOptions);
+        mImages[1] = BitmapFactory.decodeResource(getResources(), R.drawable.walkthrough02, bitmapFactoryOptions);
+        mImages[2] = BitmapFactory.decodeResource(getResources(), R.drawable.walkthrough03, bitmapFactoryOptions);
+        mImages[3] = BitmapFactory.decodeResource(getResources(), R.drawable.walkthrough04, bitmapFactoryOptions);
+        mImages[4] = BitmapFactory.decodeResource(getResources(), R.drawable.walkthrough05, bitmapFactoryOptions);
+        mImages[5] = BitmapFactory.decodeResource(getResources(), R.drawable.walkthrough06, bitmapFactoryOptions);
 
         mTextViewButtonSkip = (TextView) findViewById(R.id.textview_button_skip);
         Helper.setTypeface(this, mTextViewButtonSkip, Helper.FontTypeEnum.boldFont);
@@ -91,7 +88,7 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
 
         mLinearLayoutIndicator = (LinearLayout) findViewById(R.id.viewPagerCountDots);
 
-        mAdapter = new ViewPagerAdapter(WalkthroughActivity.this, mImageResources, mStringResources);
+        mAdapter = new ViewPagerAdapter(WalkthroughActivity.this, mImages, mStringResources);
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(this);

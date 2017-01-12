@@ -1,6 +1,7 @@
 package com.takeapeek.walkthrough;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,20 +20,20 @@ import com.takeapeek.common.Helper;
 public class ViewPagerAdapter extends PagerAdapter
 {
     private Context mContext;
-    private int[] mImageResources;
+    private Bitmap[] mImages;
     private int[] mStringResources;
 
-    public ViewPagerAdapter(Context context, int[] imageResources, int[] stringResources)
+    public ViewPagerAdapter(Context context, Bitmap[] images, int[] stringResources)
     {
         mContext = context;
-        mImageResources = imageResources;
+        mImages = images;
         mStringResources = stringResources;
     }
 
     @Override
     public int getCount()
     {
-        return mImageResources.length;
+        return mImages.length;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class ViewPagerAdapter extends PagerAdapter
         try
         {
             ImageView imageView = (ImageView) itemView.findViewById(R.id.img_pager_item);
-            imageView.setImageResource(mImageResources[position]);
+            imageView.setImageBitmap(mImages[position]);
 
             TextView textView = (TextView) itemView.findViewById(R.id.text_pager_item);
             Helper.setTypeface(mContext, textView, Helper.FontTypeEnum.normalFont);
