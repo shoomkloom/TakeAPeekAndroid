@@ -692,6 +692,10 @@ public class UserMapActivity extends FragmentActivity implements
             }
             ShowUserPeekStack();
         }
+        else
+        {
+            Toast.makeText(this, R.string.no_available_peeks, Toast.LENGTH_LONG).show();
+        }
 
         return true;
     }
@@ -714,6 +718,11 @@ public class UserMapActivity extends FragmentActivity implements
                 mUserStackItemPosition = mHashMapIndexToProfileStackObject.keySet().iterator().next().intValue();
             }
             ShowUserPeekStack();
+        }
+        else
+        {
+            String message = String.format(getString(R.string.profile_has_no_peeks_for), item.mProfileObject.displayName);
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         }
 
         return true;
@@ -1375,15 +1384,21 @@ public class UserMapActivity extends FragmentActivity implements
 
                     if(mClusterManagerAlgorithm.getItems().size() > 0)
                     {
-                        if(mUserStackItemPosition == -1)
+                        boolean hasValidPeeks = (mHashMapIndexToProfileStackObject.size() > 0);
+
+                        if(hasValidPeeks && mUserStackItemPosition == -1)
                         {
                             //Show the peek stack
                             mUserStackItemPosition = mClusterManagerAlgorithm.getItems().iterator().next().mIndex;
                             ShowUserPeekStack();
                         }
-                        else
+                        else if(mUserStackItemPosition != -1)
                         {
                             CloseUserPeekStack();
+                        }
+                        else
+                        {
+                            Toast.makeText(UserMapActivity.this, R.string.no_available_peeks, Toast.LENGTH_LONG).show();
                         }
                     }
 

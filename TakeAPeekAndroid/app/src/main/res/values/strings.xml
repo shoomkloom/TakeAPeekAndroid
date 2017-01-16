@@ -161,6 +161,8 @@
     <string name="error_report_peek">There was an error reporting this peek, sorry...</string>
     <string name="profile_has_no_peeks">No Peeks available.</string>
     <string name="click_here_to_request_peek">Click here to request a Peek!</string>
+    <string name="no_available_peeks">No available Peeks. Send a request to get new Peeks.</string>
+    <string name="profile_has_no_peeks_for">No Peeks available for %1$s. Send a request to get new Peeks.</string>
 
     <!-- Notifications -->
     <string name="title_activity_notifications">Notifications</string>
