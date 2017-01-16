@@ -244,7 +244,7 @@ public class AuthenticatorActivity extends AppCompatActivity
         {
         	logger.info("onCreate: No connection");
     		
-        	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog);
    	     
     		// set title
     		alertDialogBuilder.setTitle(R.string.no_connection);
@@ -845,7 +845,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    	{
 	    		logger.info("AuthenticatorAsyncTaskPostExecute: Non valid number");
 	    		
-	        	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+	        	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog);
 	   	     
 	    		// set title
 	    		alertDialogBuilder.setTitle(R.string.Error);
@@ -897,7 +897,7 @@ public class AuthenticatorActivity extends AppCompatActivity
     	
     	DismissProgressDialog();
     	
-    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.AppThemeAlertDialog);
   	     
 		// set title
 		alertDialogBuilder.setTitle(R.string.Error);

@@ -1614,7 +1614,7 @@ public class Helper
             @Override
             public void run()
             {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AppThemeAlertDialog);
 
                 alert.setTitle(title);
                 alert.setMessage(message);
@@ -1640,7 +1640,7 @@ public class Helper
             @Override
             public void run()
             {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AppThemeAlertDialog);
 
                 alert.setTitle(title);
                 alert.setMessage(message);
