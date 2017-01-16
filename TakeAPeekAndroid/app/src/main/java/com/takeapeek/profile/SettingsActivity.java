@@ -17,8 +17,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -57,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity
 
     EditText mEditTextDisplayName = null;
     ImageView mDisplayNameValidationProgess = null;
-    Switch mSwitchShowNotifications = null;
+    ToggleButton mToggleButtonShowNotifications = null;
 
     /** for posting authentication attempts back to UI thread */
     private final IncomingHandler mHandler = new IncomingHandler(this);
@@ -173,9 +173,9 @@ public class SettingsActivity extends AppCompatActivity
         Helper.setTypeface(this, textviewShowNotifications, Helper.FontTypeEnum.normalFont);
 
         boolean showNotifications = Helper.GetShowNotifications(mSharedPreferences);
-        mSwitchShowNotifications = (Switch)findViewById(R.id.switch_show_notifications);
-        mSwitchShowNotifications.setChecked(showNotifications);
-        mSwitchShowNotifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        mToggleButtonShowNotifications = (ToggleButton)findViewById(R.id.switch_show_notifications);
+        mToggleButtonShowNotifications.setChecked(showNotifications);
+        mToggleButtonShowNotifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b)

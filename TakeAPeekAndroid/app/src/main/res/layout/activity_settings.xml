@@ -165,14 +165,26 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/pt_darkgray"/>
 
-                <Switch
+                <ToggleButton
+                    android:id="@+id/switch_show_notifications"
+                    android:layout_width="31dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:text=""
+                    android:textOff=""
+                    android:textOn="" />
+
+                <!--Switch
                     android:id="@+id/switch_show_notifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:showText="true"
                     android:checked="true"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_centerVertical="true" /-->
 
             </RelativeLayout>
 
