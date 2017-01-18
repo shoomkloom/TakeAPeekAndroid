@@ -255,17 +255,8 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
             case R.id.textview_button_skip:
                 logger.info("onClick(.) Invoked with R.id.textview_button_skip");
 
-                if(CheckPermissions() == true)
-                {
-                    Helper.SetWalkthroughFinished(mSharedPreferences);
-
-                    setResult(RESULT_OK);
-                    finish();
-                }
-                else
-                {
-                    RequestPermissions();
-                }
+                //Set the pager to the last screen
+                mViewPager.setCurrentItem(mImages.length - 1, true);
 
                 break;
 
