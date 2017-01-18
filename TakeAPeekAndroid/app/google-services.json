@@ -15,11 +15,23 @@
       },
       "oauth_client": [
         {
+          "client_id": "472227973071-805po050kc329ttp1jj18h1k1lditip7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.takeapeek",
+            "certificate_hash": "41667347704AA2B49BE0433EB9AFB488FE9ED1CA"
+          }
+        },
+        {
           "client_id": "472227973071-eg34585habqrasg3399t8702v8f8u5qk.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      "api_key": [{ "current_key": "AIzaSyDN-rC2dCkmhNFWIbu7VcM9lkSQ6waVj_U" }],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHHyII_qZ7Pfqq8k_IBeffdxqrRDhkK8w"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 2,
