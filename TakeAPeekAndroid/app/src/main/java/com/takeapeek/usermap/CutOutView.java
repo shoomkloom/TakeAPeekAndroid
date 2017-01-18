@@ -128,14 +128,14 @@ public class CutOutView extends View
         //Paint the dot background
         mPaint = new Paint();
         mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_white));
-        mPaint.setAlpha(230);
+        mPaint.setAlpha(150);
         mPaint.setAntiAlias(true);
         canvas.drawCircle(mCenter.x, mCenter.y, mDotBackRadius, mPaint);
 
         //Paint the central dot
         mPaint = new Paint();
         mPaint.setColor(ContextCompat.getColor(mContext, R.color.pt_green_2));
-        mPaint.setAlpha(230);
+        mPaint.setAlpha(150);
         mPaint.setAntiAlias(true);
         canvas.drawCircle(mCenter.x, mCenter.y, mDotRadius, mPaint);
     }
