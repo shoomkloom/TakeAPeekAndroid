@@ -232,7 +232,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-        notificationBuilder.setSmallIcon(R.mipmap.ic_notification);
+        notificationBuilder.setSmallIcon(R.drawable.ic_notification);
 
         if(thumbnailBitmap != null)
         {
