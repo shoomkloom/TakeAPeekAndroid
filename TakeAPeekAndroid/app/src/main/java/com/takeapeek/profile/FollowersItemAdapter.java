@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -180,12 +179,12 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 mFollowersActivity.UpdateRelations();
 
                                 String message = String.format(mFollowersActivity.getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
-                                Toast.makeText(mFollowersActivity, message, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mFollowersActivity, message);
                             }
                             else
                             {
                                 String error = String.format(mFollowersActivity.getString(R.string.error_set_relation_follow), mViewHolder.mTakeAPeekFollowers.targetDisplayName);
-                                Toast.makeText(mFollowersActivity, error, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mFollowersActivity, error);
                             }
                         }
                     }.execute(viewHolder);
@@ -238,12 +237,12 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 mFollowersActivity.UpdateRelations();
 
                                 String message = String.format(mFollowersActivity.getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
-                                Toast.makeText(mFollowersActivity, message, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mFollowersActivity, message);
                             }
                             else
                             {
                                 String error = String.format(mFollowersActivity.getString(R.string.error_set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
-                                Toast.makeText(mFollowersActivity, error, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mFollowersActivity, error);
                             }
                         }
                     }.execute(viewHolder);

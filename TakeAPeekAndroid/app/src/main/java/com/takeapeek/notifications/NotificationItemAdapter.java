@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
@@ -290,7 +289,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                                                     else
                                                     {
                                                         String message = String.format(mNotificationsActivity.getString(R.string.notifications_requested_peek_to), mProfileObject.displayName);
-                                                        Toast.makeText(mNotificationsActivity, message, Toast.LENGTH_SHORT).show();
+                                                        Helper.ShowCenteredToast(mNotificationsActivity, message);
                                                     }
                                                 }
                                                 finally

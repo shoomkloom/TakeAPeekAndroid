@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -173,12 +172,12 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 mBlockedActivity.UpdateRelations();
 
                                 String message = String.format(mBlockedActivity.getString(R.string.set_relation_unblock), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
-                                Toast.makeText(mBlockedActivity, message, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mBlockedActivity, message);
                             }
                             else
                             {
                                 String error = String.format(mBlockedActivity.getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
-                                Toast.makeText(mBlockedActivity, error, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mBlockedActivity, error);
                             }
                         }
                     }.execute(viewHolder);

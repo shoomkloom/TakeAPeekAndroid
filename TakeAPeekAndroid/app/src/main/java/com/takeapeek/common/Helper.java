@@ -45,11 +45,16 @@ import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.AlignmentSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
@@ -2812,6 +2817,25 @@ public class Helper
         }
 
         return takeAPeekObjectArray;
+    }
+
+    public static void ShowCenteredToast(Context context, int resId)
+    {
+        logger.debug("ShowCenteredToast(Context, int) Invoked");
+
+        ShowCenteredToast(context, context.getString(resId));
+    }
+
+    public static void ShowCenteredToast(Context context, String text)
+    {
+        logger.debug("ShowCenteredToast(Context, String) Invoked");
+
+        Spannable centeredText = new SpannableString(text);
+        centeredText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                0, text.length() - 1,
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+        Toast.makeText(context, centeredText, Toast.LENGTH_LONG).show();
     }
 
     public static long GetCurrentTimeMillis()

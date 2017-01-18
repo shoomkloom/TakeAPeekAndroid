@@ -379,7 +379,7 @@ public class CameraPreviewBGActivity extends AppCompatActivity
                 @Override
                 public void onConfigureFailed(CameraCaptureSession cameraCaptureSession)
                 {
-                    Toast.makeText(CameraPreviewBGActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                    Helper.ShowCenteredToast(CameraPreviewBGActivity.this, R.string.error_configure_failed);
                 }
             }, mBackgroundHandler);
         }

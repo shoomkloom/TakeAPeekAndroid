@@ -53,7 +53,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -3249,7 +3248,7 @@ public class CaptureClipActivity extends Activity implements
 
         UploadRecordedVideo(mCompletedTakeAPeekObject);
 
-        Toast.makeText(this, R.string.clip_will_be_sent, Toast.LENGTH_LONG).show();
+        Helper.ShowCenteredToast(this, R.string.clip_will_be_sent);
 
         //Save time for last capture
         long currentTimeMillis = Helper.GetCurrentTimeMillis();

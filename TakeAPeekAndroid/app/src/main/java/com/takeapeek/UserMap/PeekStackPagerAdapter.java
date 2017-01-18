@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.takeapeek.R;
@@ -266,7 +265,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                             mTargetProfileObject.relationTypeEnum = mRelationTypeEnum;
                                             mHashMapIndexToProfileObject.put(mPosition, mTargetProfileObject);
 
-                                            Toast.makeText(mUserMapActivity, message, Toast.LENGTH_SHORT).show();
+                                            Helper.ShowCenteredToast(mUserMapActivity, message);
                                         }
                                     }
                                     finally

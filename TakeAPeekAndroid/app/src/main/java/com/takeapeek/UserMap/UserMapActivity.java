@@ -95,6 +95,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
+import static android.R.id.message;
 import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -694,7 +695,7 @@ public class UserMapActivity extends FragmentActivity implements
         }
         else
         {
-            Toast.makeText(this, R.string.no_available_peeks, Toast.LENGTH_LONG).show();
+            Helper.ShowCenteredToast(this, R.string.no_available_peeks);
         }
 
         return true;
@@ -722,7 +723,7 @@ public class UserMapActivity extends FragmentActivity implements
         else
         {
             String message = String.format(getString(R.string.profile_has_no_peeks_for), item.mProfileObject.displayName);
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            Helper.ShowCenteredToast(this, message);
         }
 
         return true;
@@ -1328,7 +1329,6 @@ public class UserMapActivity extends FragmentActivity implements
                 case R.id.button_map_control:
                     logger.info("onClick: button_map_control clicked");
 
-                    //@@Some animations would be nice
                     findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_transparent_faded)));
                     findViewById(R.id.button_map_control).setVisibility(View.GONE);
                     findViewById(R.id.button_map_control_close).setVisibility(View.VISIBLE);
@@ -1340,7 +1340,6 @@ public class UserMapActivity extends FragmentActivity implements
                 case R.id.button_map_control_close:
                     logger.info("onClick: button_map_control clicked");
 
-                    //@@Some animations would be nice
                     findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_tra‌​nsparent)));
                     findViewById(R.id.button_map_control).setVisibility(View.VISIBLE);
                     findViewById(R.id.button_map_control_close).setVisibility(View.GONE);
@@ -1398,7 +1397,7 @@ public class UserMapActivity extends FragmentActivity implements
                         }
                         else
                         {
-                            Toast.makeText(UserMapActivity.this, R.string.no_available_peeks, Toast.LENGTH_LONG).show();
+                            Helper.ShowCenteredToast(UserMapActivity.this, R.string.no_available_peeks);
                         }
                     }
 
@@ -1526,7 +1525,7 @@ public class UserMapActivity extends FragmentActivity implements
                                             message = getString(R.string.user_map_requested_peeks_to_one);
                                         }
 
-                                        Toast.makeText(UserMapActivity.this, message, Toast.LENGTH_SHORT).show();
+                                        Helper.ShowCenteredToast(UserMapActivity.this, message);
                                     }
                                 }
                                 finally

@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -548,7 +547,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                                         else
                                         {
                                             String message = String.format(getString(R.string.notification_popup_requested_peeks_to), mProfileObject.displayName);
-                                            Toast.makeText(NotificationPopupActivity.this, message, Toast.LENGTH_SHORT).show();
+                                            Helper.ShowCenteredToast(NotificationPopupActivity.this, message);
                                         }
                                     }
                                     finally

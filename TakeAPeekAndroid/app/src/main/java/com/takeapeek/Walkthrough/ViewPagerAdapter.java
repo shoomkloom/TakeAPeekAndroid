@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Helper;
@@ -58,7 +57,7 @@ public class ViewPagerAdapter extends PagerAdapter
         }
         catch(Exception e)
         {
-            Toast.makeText(mContext, e.toString(), Toast.LENGTH_LONG).show();
+            Helper.ShowCenteredToast(mContext, e.toString());
         }
 
         container.addView(itemView);

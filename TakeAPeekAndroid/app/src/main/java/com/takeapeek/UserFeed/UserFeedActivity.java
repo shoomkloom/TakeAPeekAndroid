@@ -23,7 +23,6 @@ import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.gson.Gson;
@@ -733,12 +732,12 @@ public class UserFeedActivity extends AppCompatActivity
                             if(result == true)
                             {
                                 String message = String.format(UserFeedActivity.this.getString(R.string.set_relation_block), mCurrentTakeAPeekObject.ProfileDisplayName);
-                                Toast.makeText(UserFeedActivity.this, message, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(UserFeedActivity.this, message);
                             }
                             else
                             {
                                 String error = String.format(UserFeedActivity.this.getString(R.string.error_set_relation_block), mCurrentTakeAPeekObject.ProfileDisplayName);
-                                Toast.makeText(UserFeedActivity.this, error, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(UserFeedActivity.this, error);
                             }
                         }
                     }.execute();
@@ -791,12 +790,12 @@ public class UserFeedActivity extends AppCompatActivity
                             if(result == true)
                             {
                                 String message = UserFeedActivity.this.getString(R.string.report_peek_success);
-                                Toast.makeText(UserFeedActivity.this, message, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(UserFeedActivity.this, message);
                             }
                             else
                             {
                                 String error = UserFeedActivity.this.getString(R.string.error_report_peek);
-                                Toast.makeText(UserFeedActivity.this, error, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(UserFeedActivity.this, error);
                             }
                         }
                     }.execute();
@@ -896,7 +895,7 @@ public class UserFeedActivity extends AppCompatActivity
                                         else
                                         {
                                             String message = String.format(getString(R.string.notification_popup_requested_peeks_to), mCurrentTakeAPeekObject.ProfileDisplayName);
-                                            Toast.makeText(UserFeedActivity.this, message, Toast.LENGTH_SHORT).show();
+                                            Helper.ShowCenteredToast(UserFeedActivity.this, message);
                                         }
                                     }
                                     catch(Exception e)

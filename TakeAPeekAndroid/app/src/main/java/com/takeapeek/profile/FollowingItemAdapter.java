@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
@@ -176,12 +175,12 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 mFollowingActivity.UpdateRelations();
 
                                 String message = String.format(mFollowingActivity.getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
-                                Toast.makeText(mFollowingActivity, message, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mFollowingActivity, message);
                             }
                             else
                             {
                                 String error = String.format(mFollowingActivity.getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
-                                Toast.makeText(mFollowingActivity, error, Toast.LENGTH_LONG).show();
+                                Helper.ShowCenteredToast(mFollowingActivity, error);
                             }
                         }
                     }.execute(viewHolder);

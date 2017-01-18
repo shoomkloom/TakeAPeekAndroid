@@ -37,7 +37,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -286,7 +285,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    	{
 	    		logger.info("onCreate: A TakeAPeek account already exists");
 	    		
-	    		Toast.makeText(this, R.string.account_already_exists, Toast.LENGTH_LONG).show();
+                Helper.ShowCenteredToast(this, R.string.account_already_exists);
 	    		
 	    		setResult(RESULT_OK);
 	    		finish();
@@ -435,7 +434,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 			        {
 			        	logger.info("onCreate: Trying to create account not through the app");
 			    		
-			    		Toast.makeText(this, R.string.create_account_only_in_app, Toast.LENGTH_LONG).show();
+                        Helper.ShowCenteredToast(this, R.string.create_account_only_in_app);
 			    		
 			    		finish();
 			        }
@@ -581,7 +580,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 		
 		if(mVerificationCode == null || (mVerificationCode.length() != 4 && mVerificationCode.length() != 6))
 		{
-			Toast.makeText(AuthenticatorActivity.this, R.string.create_account_verify_sms_error, Toast.LENGTH_LONG).show();
+            Helper.ShowCenteredToast(this, R.string.create_account_verify_sms_error);
 		}
 		else
 		{
@@ -839,7 +838,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 	    	{
 	    		DismissProgressDialog();
 	        	
-	        	Toast.makeText(this, R.string.create_account_empty_number, Toast.LENGTH_LONG).show();
+                Helper.ShowCenteredToast(this, R.string.create_account_empty_number);
 	    	}
 	    	else if(result.compareTo(Constants.AUTHENTICATION_NUMBER_NONVALID) == 0)
 	    	{
