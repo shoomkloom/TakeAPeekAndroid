@@ -42,6 +42,7 @@
     <string name="zoom">Zoom</string>
     <string name="clip_will_be_sent">Your Peek is being sent</string>
     <string name="enter_peek_title_here">Add a title to your Peek</string>
+    <string name="error_configure_failed">Failed to configure camera</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -161,8 +162,8 @@
     <string name="error_report_peek">There was an error reporting this peek, sorry...</string>
     <string name="profile_has_no_peeks">No Peeks available.</string>
     <string name="click_here_to_request_peek">Click here to request a Peek!</string>
-    <string name="no_available_peeks">No available Peeks. Send a request to get new Peeks.</string>
-    <string name="profile_has_no_peeks_for">No Peeks available for %1$s. Send a request to get new Peeks.</string>
+    <string name="no_available_peeks">No available Peeks.\nSend a request to get new Peeks.</string>
+    <string name="profile_has_no_peeks_for">No Peeks available for %1$s.\nSend a request to get new Peeks.</string>
 
     <!-- Notifications -->
     <string name="title_activity_notifications">Notifications</string>
