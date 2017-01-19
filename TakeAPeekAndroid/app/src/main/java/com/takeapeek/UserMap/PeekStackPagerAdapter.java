@@ -28,6 +28,7 @@ import com.takeapeek.userfeed.UserFeedActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -39,6 +40,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
     private UserMapActivity mUserMapActivity = null;
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = null;
+    ArrayList mProfileObjectList = null;
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
     private final AddressLoader mAddressLoader = new AddressLoader();
     SharedPreferences mSharedPreferences = null;
@@ -50,6 +52,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
     {
         mUserMapActivity = userMapActivity;
         mHashMapIndexToProfileObject = hashMapIndexToProfileObject;
+        mProfileObjectList = new ArrayList(mHashMapIndexToProfileObject.values());
         mSharedPreferences = mUserMapActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         DatabaseManager.init(mUserMapActivity);
@@ -58,12 +61,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
     @Override
     public Object instantiateItem(ViewGroup collection, int position)
     {
-        ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
-
-        if(profileObject == null)
-        {
-            return collection;
-        }
+        ProfileObject profileObject = (ProfileObject)mProfileObjectList.get(position);
 
         LayoutInflater inflater = LayoutInflater.from(mUserMapActivity);
         final ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
@@ -122,7 +120,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
     @Override
     public int getCount()
     {
-        return mHashMapIndexToProfileObject.values().size();
+        return mProfileObjectList.size();
     }
 
     @Override
@@ -134,7 +132,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
     @Override
     public CharSequence getPageTitle(int position)
     {
-        ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
+        ProfileObject profileObject = (ProfileObject)mProfileObjectList.get(position);
         return profileObject.displayName;
     }
 
@@ -178,7 +176,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
                                         mPosition = (int)params[0];
                                         mTextViewFollowButton = (TextView)params[1];
-                                        mTargetProfileObject = mHashMapIndexToProfileObject.get(mPosition);
+                                        mTargetProfileObject = (ProfileObject)mProfileObjectList.get(mPosition);
 
                                         String userName = Helper.GetTakeAPeekAccountUsername(mUserMapActivity);
                                         String password = Helper.GetTakeAPeekAccountPassword(mUserMapActivity);
@@ -200,7 +198,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                     }
                                     catch (Exception e)
                                     {
-                                        Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                        Helper.Error(logger, "EXCEPTION: doInBackground: Exception when setting relation", e);
                                     }
 
                                     return null;
@@ -268,7 +266,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                             }
 
                                             mTargetProfileObject.relationTypeEnum = mRelationTypeEnum;
-                                            mHashMapIndexToProfileObject.put(mPosition, mTargetProfileObject);
+                                            mProfileObjectList.set(mPosition, mTargetProfileObject);
 
                                             Helper.ShowCenteredToast(mUserMapActivity, message);
                                         }
