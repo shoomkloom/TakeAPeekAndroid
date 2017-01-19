@@ -1073,12 +1073,22 @@ public class AuthenticatorActivity extends AppCompatActivity
     void DismissProgressDialog()
     {
     	logger.debug("DismissProgressDialog() Invoked");
-    	
-    	if(mProgressDialog != null)
-    	{
-    		mProgressDialog.dismiss();
-    		mProgressDialog = null;
-    	}
+
+        try
+        {
+           if (mProgressDialog != null)
+            {
+                mProgressDialog.dismiss();
+            }
+        }
+        catch(Exception e)
+        {
+            logger.error("EXCEPTION: when trying to dismiss mProgressDialog", e);
+        }
+        finally
+        {
+            mProgressDialog = null;
+        }
     }
     
     private void UpdateButtonCreateAccountUI()

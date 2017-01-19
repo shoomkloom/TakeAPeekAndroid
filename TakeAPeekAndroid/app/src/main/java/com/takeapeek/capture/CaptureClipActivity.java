@@ -3244,21 +3244,28 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("clickedDone(.) Invoked.");
 
-        mCompletedTakeAPeekObject.Title = mCapturePreviewTitle.getText().toString();
+        if(mCompletedTakeAPeekObject != null)
+        {
+            mCompletedTakeAPeekObject.Title = mCapturePreviewTitle.getText().toString();
 
-        UploadRecordedVideo(mCompletedTakeAPeekObject);
+            UploadRecordedVideo(mCompletedTakeAPeekObject);
 
-        Helper.ShowCenteredToast(this, R.string.clip_will_be_sent);
+            Helper.ShowCenteredToast(this, R.string.clip_will_be_sent);
 
-        //Save time for last capture
-        long currentTimeMillis = Helper.GetCurrentTimeMillis();
-        Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
+            //Save time for last capture
+            long currentTimeMillis = Helper.GetCurrentTimeMillis();
+            Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
-        //First run ends only with first capture
-        Helper.SetFirstRun(mSharedPreferences.edit(), false);
+            //First run ends only with first capture
+            Helper.SetFirstRun(mSharedPreferences.edit(), false);
 
-        setResult(RESULT_OK);
-        finish();
+            setResult(RESULT_OK);
+            finish();
+        }
+        else
+        {
+            logger.error("ERROR: mCompletedTakeAPeekObject = null, perhaps RecordingTimeDone was not called yet?");
+        }
     }
 
     public void RecordingTimeDone(String videoFilePath)

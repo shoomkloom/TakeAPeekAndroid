@@ -60,6 +60,11 @@ public class PeekStackPagerAdapter extends PagerAdapter
     {
         ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
 
+        if(profileObject == null)
+        {
+            return collection;
+        }
+
         LayoutInflater inflater = LayoutInflater.from(mUserMapActivity);
         final ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
 
