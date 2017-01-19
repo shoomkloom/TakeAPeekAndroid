@@ -40,6 +40,7 @@ import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
@@ -80,6 +81,8 @@ public class UserFeedActivity extends AppCompatActivity
     ImageView mImageViewPeekThumbnailPlay = null;
     TextView mTextViewEmptyList = null;
     ThumbnailLoader mThumbnailLoader = null;
+
+    private AsyncTask<Void, Void, ResponseObject> mAsyncTaskFollowAction = null;
 
     private AsyncTask<Void, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
@@ -384,6 +387,8 @@ public class UserFeedActivity extends AppCompatActivity
             ShowPeekStream(fromHandler, takeAPeekObject);
         }
 
+        FollowProfile(takeAPeekObject.ProfileID, takeAPeekObject.ProfileDisplayName);
+
         //Remove related notification
         TakeAPeekNotification takeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotificationByPeek(takeAPeekObject.TakeAPeekID);
         if(takeAPeekNotification != null)
@@ -428,24 +433,6 @@ public class UserFeedActivity extends AppCompatActivity
                     //Start the video play time display
                     mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
                     mVideoCountDown.setVisibility(View.VISIBLE);
-                }
-            });
-
-            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mp)
-                {
-                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
-
-                    ClearPeekFromList(takeAPeekObject);
-
-                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
-
-                    Helper.ClearFullscreen(mVideoViewPeekItem);
-
-                    mEnumActivityState = EnumActivityState.previewStopped;
-                    UpdateUI();
                 }
             });
 
@@ -497,6 +484,17 @@ public class UserFeedActivity extends AppCompatActivity
             Helper.SetFullscreen(mVideoViewPeekItem);
 
             mVideoViewPeekItem.start();
+
+            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+            {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
+
+                    CompletePlayBack(takeAPeekObject);
+                }
+            });
         }
         catch (Exception e)
         {
@@ -536,24 +534,6 @@ public class UserFeedActivity extends AppCompatActivity
                 }
             });
 
-            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mp)
-                {
-                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
-
-                    ClearPeekFromList(takeAPeekObject);
-
-                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
-
-                    Helper.ClearFullscreen(mVideoViewPeekItem);
-
-                    mEnumActivityState = EnumActivityState.previewStopped;
-                    UpdateUI();
-                }
-            });
-
             mVideoViewPeekItem.setOnErrorListener(new MediaPlayer.OnErrorListener()
             {
                 @Override
@@ -584,6 +564,17 @@ public class UserFeedActivity extends AppCompatActivity
             mVideoViewPeekItem.requestFocus();
 
             mVideoViewPeekItem.start();
+
+            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+            {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
+
+                    CompletePlayBack(takeAPeekObject);
+                }
+            });
         }
         catch (Exception e)
         {
@@ -599,6 +590,20 @@ public class UserFeedActivity extends AppCompatActivity
         {
 
         }
+    }
+
+    private void CompletePlayBack(TakeAPeekObject takeAPeekObject)
+    {
+        logger.debug("CompletePlayBack(.) Invoked");
+
+        ClearPeekFromList(takeAPeekObject);
+
+        mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
+        Helper.ClearFullscreen(mVideoViewPeekItem);
+
+        mEnumActivityState = EnumActivityState.previewStopped;
+        UpdateUI();
     }
 
     private void ClearPeekFromList(TakeAPeekObject takeAPeekObject)
@@ -978,6 +983,81 @@ public class UserFeedActivity extends AppCompatActivity
             case 0:
                 mVideoCountDown.setImageResource(R.drawable.take_video_0);
                 break;
+        }
+    }
+
+    private void FollowProfile(final String targetProfileId, final String targetDisplayName)
+    {
+        logger.debug("FollowProfile(.) Invoked");
+
+        TakeAPeekRelation takeAPeekRelationFollow = DatabaseManager.getInstance().GetTakeAPeekRelationFollow(targetProfileId);
+
+        if(takeAPeekRelationFollow == null && mAsyncTaskFollowAction == null)
+        {
+            try
+            {
+                //Start asynchronous request to server
+                mAsyncTaskFollowAction = new AsyncTask<Void, Void, ResponseObject>()
+                {
+                    @Override
+                    protected ResponseObject doInBackground(Void... params)
+                    {
+                        try
+                        {
+                            logger.info("Sending request to apply follow status");
+
+                            String userName = Helper.GetTakeAPeekAccountUsername(UserFeedActivity.this);
+                            String password = Helper.GetTakeAPeekAccountPassword(UserFeedActivity.this);
+
+                            return new Transport().SetRelation(UserFeedActivity.this, userName, password, targetProfileId, Constants.RelationTypeEnum.Follow.name(), mSharedPreferences);
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: doInBackground: Exception when setting relation", e);
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(ResponseObject responseObject)
+                    {
+                        try
+                        {
+                            if (responseObject == null)
+                            {
+                                String errorMessage = String.format(UserFeedActivity.this.getString(R.string.error_set_relation_follow), targetDisplayName);
+                                Helper.ErrorMessage(UserFeedActivity.this, mHandler, UserFeedActivity.this.getString(R.string.Error), UserFeedActivity.this.getString(R.string.ok), errorMessage);
+                            }
+                            else
+                            {
+                                String profileId = Helper.GetProfileId(mSharedPreferences);
+                                TakeAPeekRelation takeAPeekRelationBlocked = null;
+                                TakeAPeekRelation takeAPeekRelationFollow = null;
+                                String message = String.format(UserFeedActivity.this.getString(R.string.set_relation_follow), targetDisplayName);
+
+                                //Delete Blocked Relation if exists
+                                takeAPeekRelationBlocked = DatabaseManager.getInstance().GetTakeAPeekRelationBlocked(targetProfileId);
+                                DatabaseManager.getInstance().DeleteTakeAPeekRelation(takeAPeekRelationBlocked);
+
+                                //Add Follow Relation
+                                takeAPeekRelationFollow = new TakeAPeekRelation(Constants.RelationTypeEnum.Follow.name(), profileId, null, targetProfileId, targetDisplayName);
+                                DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelationFollow);
+
+                                Helper.ShowCenteredToast(UserFeedActivity.this, message);
+                            }
+                        }
+                        finally
+                        {
+                            mAsyncTaskFollowAction = null;
+                        }
+                    }
+                }.execute();
+            }
+            catch (Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+            }
         }
     }
 
