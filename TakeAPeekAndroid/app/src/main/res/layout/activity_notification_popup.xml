@@ -32,22 +32,24 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id = "@+id/request_displayname_on_map"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:textSize="18sp"
-                android:textColor="@color/pt_red"
-                android:gravity="center_horizontal"
-                android:visibility="visible"/>
+                android:textColor="@color/textcolorred"
+                android:gravity="center"
+                android:layout_centerVertical="true"/>
 
             <TextView
                 android:id="@+id/big_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:layout_centerVertical="true"
                 android:textColor="@color/pt_darkgray"
                 android:textSize="18sp"
                 android:layout_toRightOf="@+id/request_displayname_on_map" />

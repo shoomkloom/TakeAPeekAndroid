@@ -163,6 +163,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
             TextView textViewDisplayName = (TextView)findViewById(R.id.request_displayname_on_map);
             Helper.setTypeface(this, textViewDisplayName, Helper.FontTypeEnum.normalFont);
+            textViewDisplayName.setOnClickListener(ClickListener);
 
             TextView textViewPeekTitle = (TextView)findViewById(R.id.peek_notification_title);
             Helper.setTypeface(this, textViewPeekTitle, Helper.FontTypeEnum.normalFont);
@@ -201,7 +202,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     //Control buttons
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
-                    linearLayoutButtonRequest.setVisibility(View.GONE);
+                    linearLayoutButtonRequest.setVisibility(View.VISIBLE);
 
                     break;
 
@@ -234,7 +235,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     //Control buttons
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
-                    linearLayoutButtonRequest.setVisibility(View.GONE);
+                    linearLayoutButtonRequest.setVisibility(View.VISIBLE);
 
                     break;
 
@@ -267,7 +268,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     //Control buttons
                     linearLayoutButtonSend.setVisibility(View.VISIBLE);
-                    linearLayoutButtonRequest.setVisibility(View.GONE);
+                    linearLayoutButtonRequest.setVisibility(View.VISIBLE);
 
                     break;
 
@@ -310,7 +311,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     linearLayoutButtonSend.setOnClickListener(ClickListener);
 
                     //Control buttons
-                    linearLayoutButtonSend.setVisibility(View.GONE);
+                    linearLayoutButtonSend.setVisibility(View.VISIBLE);
                     linearLayoutButtonRequest.setVisibility(View.VISIBLE);
 
                     break;
@@ -576,6 +577,18 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     startActivity(userFeedActivityIntent);
                     finish();
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
+                    break;
+
+                case R.id.request_displayname_on_map:
+                    logger.info("onClick: request_displayname_on_map clicked");
+
+                    final Intent userFeedActivityNoPlayIntent = new Intent(NotificationPopupActivity.this, UserFeedActivity.class);
+                    userFeedActivityNoPlayIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    userFeedActivityNoPlayIntent.putExtra(Constants.PARAM_PROFILEOBJECT, mTakeAPeekNotification.srcProfileJson);
+                    startActivity(userFeedActivityNoPlayIntent);
+                    finish();
+                    overridePendingTransition(R.anim.donothing, R.anim.zoomout);
+
                     break;
 
                 default: break;

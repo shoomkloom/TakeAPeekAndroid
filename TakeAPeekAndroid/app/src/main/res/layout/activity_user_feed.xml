@@ -107,6 +107,7 @@
         android:orientation="vertical"
         android:listSelector="@android:color/transparent"
         android:drawSelectorOnTop="true"
+        android:background="@color/pt_gray_2"
         android:visibility="gone" />
 
     <TextView

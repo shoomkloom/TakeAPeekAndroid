@@ -34,6 +34,8 @@
     <color name="tap_tra‌​nsparent">#00000000</color>
 
     <color name="pt_red">#ec407a</color>
+    <color name="pt_orange">#ff7341</color>
+    <color name="pt_yellow">#ffeb5f</color>
     <color name="pt_green_faded">#cc66bb6a</color>
     <color name="pt_green">#55af2d</color>
     <color name="pt_green_1">#81c784</color>

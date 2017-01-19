@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -13,7 +14,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -30,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -81,6 +80,7 @@ import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.ormlite.TakeAPeekRequest;
 import com.takeapeek.trendingplaces.TrendingPlacesActivity;
+import com.takeapeek.userfeed.UserFeedActivity;
 import com.takeapeek.walkthrough.WalkthroughActivity;
 
 import org.slf4j.Logger;
@@ -95,7 +95,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
-import static android.R.id.message;
 import static com.takeapeek.common.Helper.dipToPx;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -308,6 +307,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
         Helper.setTypeface(this, mTextViewStackUserName, Helper.FontTypeEnum.boldFont);
+        mTextViewStackUserName.setOnClickListener(ClickListener);
 
         mTextViewStackPeekTitle = (TextView)findViewById(R.id.peek_stack_title);
         mTextViewStackPeekTime = (TextView)findViewById(R.id.user_peek_stack_time);
@@ -1174,6 +1174,13 @@ public class UserMapActivity extends FragmentActivity implements
 
         mTextViewStackUserName.setText(profileObject.displayName);
 
+        //Set material click background ripple
+        int[] attrs = new int[]{R.attr.selectableItemBackgroundBorderless};
+        TypedArray typedArray = UserMapActivity.this.obtainStyledAttributes(attrs);
+        int backgroundResource = typedArray.getResourceId(0, 0);
+        mTextViewStackUserName.setBackgroundResource(backgroundResource);
+        typedArray.recycle();
+
         if(takeAPeekObject != null)
         {
             mTextViewStackPeekNoPeeks.setVisibility(View.GONE);
@@ -1240,6 +1247,7 @@ public class UserMapActivity extends FragmentActivity implements
         mUserStackItemPosition = -1;
 
         mTextViewStackUserName.setText("");
+        mTextViewStackUserName.setBackgroundColor((ContextCompat.getColor(this, R.color.pt_tra‌​nsparent)));
 
         //Hide the user peek stack
         mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
@@ -1255,6 +1263,7 @@ public class UserMapActivity extends FragmentActivity implements
         mUserStackItemPosition = -1;
 
         mTextViewStackUserName.setText("");
+        mTextViewStackUserName.setBackgroundColor((ContextCompat.getColor(this, R.color.pt_tra‌​nsparent)));
 
         //Hide the user peek stack
         mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
@@ -1376,6 +1385,14 @@ public class UserMapActivity extends FragmentActivity implements
                     final Intent notificationsIntent = new Intent(UserMapActivity.this, NotificationsActivity.class);
                     startActivity(notificationsIntent);
 
+                    mHandler.postDelayed(new Runnable()
+                    {
+                        public void run()
+                        {
+                            QuickCloseUserPeekStack();
+                        }
+                    }, 1000);
+
                     break;
 
                 case R.id.stack_image:
@@ -1399,6 +1416,32 @@ public class UserMapActivity extends FragmentActivity implements
                         {
                             Helper.ShowCenteredToast(UserMapActivity.this, R.string.no_available_peeks);
                         }
+                    }
+
+                    break;
+
+                case R.id.stack_name:
+                    logger.info("OnClickListener:onClick: stack_name clicked");
+
+                    if (mLayoutPeekStack.getVisibility() == View.VISIBLE)
+                    {
+                        logger.info("Stack is visible, go to the user feed");
+
+                        //Show the user feed activity
+                        ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
+                        String profileObjectJSON = new Gson().toJson(profileObject);
+
+                        final Intent intent = new Intent(UserMapActivity.this, UserFeedActivity.class);
+                        intent.putExtra(Constants.PARAM_PROFILEOBJECT, profileObjectJSON);
+                        startActivity(intent);
+
+                        mHandler.postDelayed(new Runnable()
+                        {
+                            public void run()
+                            {
+                                QuickCloseUserPeekStack();
+                            }
+                        }, 1000);
                     }
 
                     break;

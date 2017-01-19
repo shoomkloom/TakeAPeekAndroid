@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:textSize="18sp"
-        android:textColor="@color/pt_red"
+        android:textColor="@color/textcolorred"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
 

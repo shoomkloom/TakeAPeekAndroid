@@ -123,6 +123,8 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_notification_src_name);
             Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.boldFont);
+            viewHolder.mTextViewSrcProfileName.setOnClickListener(ClickListener);
+            viewHolder.mTextViewSrcProfileName.setTag(viewHolder);
 
             viewHolder.mTextViewNotificationTime = (TextView)view.findViewById(R.id.textview_notification_time);
             Helper.setTypeface(mNotificationsActivity, viewHolder.mTextViewNotificationTime, Helper.FontTypeEnum.boldFont);
@@ -202,12 +204,12 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
         {
             logger.debug("OnClickListener:onClick(.) Invoked");
 
+            ViewHolder viewHolder = (ViewHolder)v.getTag();
+
             switch (v.getId())
             {
                 case R.id.textview_notification_action:
                     logger.info("onClick: textview_notification_action");
-
-                    ViewHolder viewHolder = (ViewHolder)v.getTag();
 
                     Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(viewHolder.mTakeAPeekNotification.type);
 
@@ -232,8 +234,6 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                             userFeedActivityIntent.putExtra(Constants.PARAM_PEEKOBJECT, viewHolder.mTakeAPeekNotification.relatedPeekJson);
                             mNotificationsActivity.startActivity(userFeedActivityIntent);
                             break;
-
-                        default: break;
 
                         case follow:
                             try
@@ -316,6 +316,18 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
                             break;
                     }
+
+                    break;
+
+                case R.id.textview_notification_src_name:
+                    logger.info("onClick: textview_notification_src_name");
+
+                    String profileJson = new Gson().toJson(viewHolder.mSrcProfileObject);
+
+                    final Intent userFeedActivityIntent = new Intent(mNotificationsActivity, UserFeedActivity.class);
+                    userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    userFeedActivityIntent.putExtra(Constants.PARAM_PROFILEOBJECT, profileJson);
+                    mNotificationsActivity.startActivity(userFeedActivityIntent);
 
                     break;
 
