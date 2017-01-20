@@ -65,7 +65,7 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
     {
         logger.debug("ZoomedAddressCreator::onPostExecute(.) Invoked");
 
-        if(text.isEmpty() == true)
+        if(text == null || text.isEmpty() == true)
         {
             text = mContext.getString(R.string.earth);
         }
