@@ -163,6 +163,20 @@ public class UserMapActivity extends FragmentActivity implements
 
     static public ReentrantLock lockBroadcastReceiver = new ReentrantLock();
 
+    Handler mTimerHandler = new Handler();
+    Runnable mTimerRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            logger.debug("mTimerRunnable.run() Invoked");
+
+            UpdateNumberOfNewNotifications();
+
+            mTimerHandler.postDelayed(this, Constants.INTERVAL_FIVESECONDS);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -558,6 +572,7 @@ public class UserMapActivity extends FragmentActivity implements
             ShowProfilesInBounds(true);
         }
 
+        mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_FIVESECONDS);
         UpdateNumberOfNewNotifications();
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
@@ -616,6 +631,8 @@ public class UserMapActivity extends FragmentActivity implements
     public void onPause()
     {
         logger.debug("onPause() Invoked");
+
+        mTimerHandler.removeCallbacks(mTimerRunnable);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
