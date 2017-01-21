@@ -251,4 +251,7 @@
     <string name="advanced_title">Advanced</string>
     <string name="show_notifications">Show Notifications</string>
 
+    <!-- facebook -->
+    <string name="facebook_app_id">1765959877057432</string>
+
 </resources>
