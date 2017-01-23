@@ -361,6 +361,8 @@ public class UserMapActivity extends FragmentActivity implements
                 }
             }
         }
+
+        setIntent(null);
     }
 
     @Override

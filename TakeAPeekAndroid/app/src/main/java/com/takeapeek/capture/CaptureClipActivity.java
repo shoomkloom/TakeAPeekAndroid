@@ -238,6 +238,7 @@ public class CaptureClipActivity extends Activity implements
         if(intent != null)
         {
             mRelateProfileID = intent.getStringExtra(Constants.RELATEDPROFILEIDEXTRA_KEY);
+            setIntent(null);
         }
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);

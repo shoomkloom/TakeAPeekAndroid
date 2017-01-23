@@ -444,7 +444,11 @@ public class AuthenticatorActivity extends AppCompatActivity
 		    		Helper.Error(logger, "EXCEPTION: Problem loading Authentication Activity - exiting application.", e);
 					Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_loading_authentication));
 		    	}
-		    }
+                finally
+                {
+                    setIntent(null);
+                }
+            }
         }
     }
 

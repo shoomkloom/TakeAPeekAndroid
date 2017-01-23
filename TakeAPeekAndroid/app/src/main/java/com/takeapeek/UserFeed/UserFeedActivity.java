@@ -298,6 +298,8 @@ public class UserFeedActivity extends AppCompatActivity
         {
             Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_profile));
         }
+
+        setIntent(null);
     }
 
     @Override
