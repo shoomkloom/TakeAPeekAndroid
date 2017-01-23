@@ -9,11 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
-import com.takeapeek.common.ProfileObject;
-import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
@@ -21,6 +20,7 @@ import com.takeapeek.ormlite.TakeAPeekRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -29,15 +29,14 @@ import java.util.List;
 public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 {
     static private final Logger logger = LoggerFactory.getLogger(FollowersItemAdapter.class);
+    AppEventsLogger mAppEventsLogger = null;
 
-    FollowersActivity mFollowersActivity = null;
+    WeakReference<FollowersActivity> mFollowersActivity = null;
     List<TakeAPeekRelation> mTakeAPeekFollowersList = null;
 
     private static LayoutInflater mLayoutInflater = null;
 
     SharedPreferences mSharedPreferences = null;
-
-    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     private class ViewHolder
     {
@@ -56,12 +55,14 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
         logger.debug("FollowersItemAdapter(...) Invoked");
 
-        mFollowersActivity = followersActivity;
+        mFollowersActivity = new WeakReference<FollowersActivity>(followersActivity);
         mTakeAPeekFollowersList = takeAPeekFollowersList;
 
-        mLayoutInflater = (LayoutInflater)mFollowersActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater)mFollowersActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mSharedPreferences = mFollowersActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mFollowersActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        mAppEventsLogger = AppEventsLogger.newLogger(mFollowersActivity.get());
     }
 
     @Override
@@ -94,15 +95,15 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             viewHolder.mTakeAPeekFollowers = mTakeAPeekFollowersList.get(position);
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_followers_src_name);
-            Helper.setTypeface(mFollowersActivity, viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewFollowButton = (TextView)view.findViewById(R.id.textview_followers_follow_action);
-            Helper.setTypeface(mFollowersActivity, viewHolder.mTextViewFollowButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewFollowButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewFollowButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewFollowButton.setTag(viewHolder);
 
             viewHolder.mTextViewBlockButton = (TextView)view.findViewById(R.id.textview_followers_block_action);
-            Helper.setTypeface(mFollowersActivity, viewHolder.mTextViewBlockButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewBlockButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewBlockButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewBlockButton.setTag(viewHolder);
 
@@ -149,11 +150,11 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                             try
                             {
-                                String username = Helper.GetTakeAPeekAccountUsername(mFollowersActivity);
-                                String password = Helper.GetTakeAPeekAccountPassword(mFollowersActivity);
+                                String username = Helper.GetTakeAPeekAccountUsername(mFollowersActivity.get());
+                                String password = Helper.GetTakeAPeekAccountPassword(mFollowersActivity.get());
 
                                 new Transport().SetRelation(
-                                        mFollowersActivity, username, password,
+                                        mFollowersActivity.get(), username, password,
                                         mViewHolder.mTakeAPeekFollowers.sourceId,
                                         Constants.RelationTypeEnum.Follow.name(),
                                         mSharedPreferences);
@@ -176,15 +177,18 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mFollowersActivity.UpdateRelations();
+                                mFollowersActivity.get().UpdateRelations();
 
-                                String message = String.format(mFollowersActivity.getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
-                                Helper.ShowCenteredToast(mFollowersActivity, message);
+                                String message = String.format(mFollowersActivity.get().getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
+                                Helper.ShowCenteredToast(mFollowersActivity.get(), message);
+
+                                //Log event to FaceBook
+                                mAppEventsLogger.logEvent("EVENT_NAME_FOLLOW");
                             }
                             else
                             {
-                                String error = String.format(mFollowersActivity.getString(R.string.error_set_relation_follow), mViewHolder.mTakeAPeekFollowers.targetDisplayName);
-                                Helper.ShowCenteredToast(mFollowersActivity, error);
+                                String error = String.format(mFollowersActivity.get().getString(R.string.error_set_relation_follow), mViewHolder.mTakeAPeekFollowers.targetDisplayName);
+                                Helper.ShowCenteredToast(mFollowersActivity.get(), error);
                             }
                         }
                     }.execute(viewHolder);
@@ -205,11 +209,11 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                             try
                             {
-                                String username = Helper.GetTakeAPeekAccountUsername(mFollowersActivity);
-                                String password = Helper.GetTakeAPeekAccountPassword(mFollowersActivity);
+                                String username = Helper.GetTakeAPeekAccountUsername(mFollowersActivity.get());
+                                String password = Helper.GetTakeAPeekAccountPassword(mFollowersActivity.get());
 
                                 new Transport().SetRelation(
-                                        mFollowersActivity, username, password,
+                                        mFollowersActivity.get(), username, password,
                                         mViewHolder.mTakeAPeekFollowers.sourceId,
                                         Constants.RelationTypeEnum.Block.name(),
                                         mSharedPreferences);
@@ -234,15 +238,15 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mFollowersActivity.UpdateRelations();
+                                mFollowersActivity.get().UpdateRelations();
 
-                                String message = String.format(mFollowersActivity.getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
-                                Helper.ShowCenteredToast(mFollowersActivity, message);
+                                String message = String.format(mFollowersActivity.get().getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
+                                Helper.ShowCenteredToast(mFollowersActivity.get(), message);
                             }
                             else
                             {
-                                String error = String.format(mFollowersActivity.getString(R.string.error_set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
-                                Helper.ShowCenteredToast(mFollowersActivity, error);
+                                String error = String.format(mFollowersActivity.get().getString(R.string.error_set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
+                                Helper.ShowCenteredToast(mFollowersActivity.get(), error);
                             }
                         }
                     }.execute(viewHolder);

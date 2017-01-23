@@ -12,8 +12,6 @@ import android.widget.TextView;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
-import com.takeapeek.common.ProfileObject;
-import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
@@ -21,6 +19,7 @@ import com.takeapeek.ormlite.TakeAPeekRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -30,14 +29,12 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 {
     static private final Logger logger = LoggerFactory.getLogger(FollowingItemAdapter.class);
 
-    FollowingActivity mFollowingActivity = null;
+    WeakReference<FollowingActivity> mFollowingActivity = null;
     List<TakeAPeekRelation> mTakeAPeekFollowingList = null;
 
     private static LayoutInflater mLayoutInflater = null;
 
     SharedPreferences mSharedPreferences = null;
-
-    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     private class ViewHolder
     {
@@ -55,12 +52,12 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
         logger.debug("FollowingItemAdapter(...) Invoked");
 
-        mFollowingActivity = followingActivity;
+        mFollowingActivity = new WeakReference<FollowingActivity>(followingActivity);
         mTakeAPeekFollowingList = takeAPeekFollowingList;
 
-        mLayoutInflater = (LayoutInflater)mFollowingActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater)mFollowingActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mSharedPreferences = mFollowingActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mFollowingActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
     }
 
     @Override
@@ -93,10 +90,10 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             viewHolder.mTakeAPeekFollowing = mTakeAPeekFollowingList.get(position);
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_following_src_name);
-            Helper.setTypeface(mFollowingActivity, viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_following_action);
-            Helper.setTypeface(mFollowingActivity, viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 
@@ -143,11 +140,11 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                             try
                             {
-                                String username = Helper.GetTakeAPeekAccountUsername(mFollowingActivity);
-                                String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity);
+                                String username = Helper.GetTakeAPeekAccountUsername(mFollowingActivity.get());
+                                String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity.get());
 
                                 new Transport().SetRelation(
-                                        mFollowingActivity, username, password,
+                                        mFollowingActivity.get(), username, password,
                                         mViewHolder.mTakeAPeekFollowing.targetId,
                                         Constants.RelationTypeEnum.Unfollow.name(),
                                         mSharedPreferences);
@@ -172,15 +169,15 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mFollowingActivity.UpdateRelations();
+                                mFollowingActivity.get().UpdateRelations();
 
-                                String message = String.format(mFollowingActivity.getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
-                                Helper.ShowCenteredToast(mFollowingActivity, message);
+                                String message = String.format(mFollowingActivity.get().getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                                Helper.ShowCenteredToast(mFollowingActivity.get(), message);
                             }
                             else
                             {
-                                String error = String.format(mFollowingActivity.getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
-                                Helper.ShowCenteredToast(mFollowingActivity, error);
+                                String error = String.format(mFollowingActivity.get().getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                                Helper.ShowCenteredToast(mFollowingActivity.get(), error);
                             }
                         }
                     }.execute(viewHolder);

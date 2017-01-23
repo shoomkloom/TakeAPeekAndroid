@@ -16,12 +16,13 @@ import com.takeapeek.ormlite.TakeAPeekSendObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 public class ShareListAdapter extends ArrayAdapter<TakeAPeekSendObject>
 {
 	static private final Logger logger = LoggerFactory.getLogger(ShareListAdapter.class);
 	
-	Activity mActivity = null;
+	WeakReference<Activity> mActivity = null;
 	ArrayList<TakeAPeekSendObject> mResolveInfoObjects;
 	PackageManager mPackageManager = null;
 	
@@ -29,9 +30,9 @@ public class ShareListAdapter extends ArrayAdapter<TakeAPeekSendObject>
 	{            
 		super(activity, itemResourceId, allSendables);   
 		
-		mActivity = activity;
+		mActivity = new WeakReference<Activity>(activity);
 		mResolveInfoObjects = allSendables;
-		mPackageManager = mActivity.getPackageManager();
+		mPackageManager = mActivity.get().getPackageManager();
 	}         
 	
 	/*private view holder class*/
@@ -46,7 +47,7 @@ public class ShareListAdapter extends ArrayAdapter<TakeAPeekSendObject>
 		ViewHolder holder = null;
         TakeAPeekSendObject itemTakeAPeekSendObject = getItem(position);
 		
-		LayoutInflater mInflater = (LayoutInflater) mActivity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater mInflater = (LayoutInflater) mActivity.get().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 		
 		if (convertView == null) 
 		{
@@ -55,7 +56,7 @@ public class ShareListAdapter extends ArrayAdapter<TakeAPeekSendObject>
 			holder.mImageViewIcon = (ImageView) convertView.findViewById(R.id.share_list_item_image);
 
             holder.mTextViewLabel = (TextView) convertView.findViewById(R.id.share_list_item_label);
-			Helper.setTypeface(mActivity, holder.mTextViewLabel, Helper.FontTypeEnum.normalFont);
+			Helper.setTypeface(mActivity.get(), holder.mTextViewLabel, Helper.FontTypeEnum.normalFont);
 
             convertView.setTag(holder);
 		} 

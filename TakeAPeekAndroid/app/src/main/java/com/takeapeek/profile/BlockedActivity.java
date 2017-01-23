@@ -19,6 +19,7 @@ import com.takeapeek.ormlite.TakeAPeekRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -115,16 +116,16 @@ public class BlockedActivity extends AppCompatActivity
         //Get the updated relation list and update the list
         new AsyncTask<BlockedActivity, Void, Boolean>()
         {
-            BlockedActivity mBlockedActivity = null;
+            WeakReference<BlockedActivity> mBlockedActivity = null;
 
             @Override
             protected Boolean doInBackground(BlockedActivity... params)
             {
-                mBlockedActivity = params[0];
+                mBlockedActivity = new WeakReference<BlockedActivity>(params[0]);
 
                 try
                 {
-                    Helper.UpdateRelations(mBlockedActivity, mSharedPreferences);
+                    Helper.UpdateRelations(mBlockedActivity.get(), mSharedPreferences);
                     return true;
                 }
                 catch(Exception e)

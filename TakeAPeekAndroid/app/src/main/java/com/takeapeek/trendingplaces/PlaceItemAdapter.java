@@ -24,6 +24,7 @@ import com.takeapeek.usermap.UserMapActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -33,7 +34,7 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 {
     static private final Logger logger = LoggerFactory.getLogger(PlaceItemAdapter.class);
 
-    TrendingPlacesActivity mTrendingPlacesActivity = null;
+    WeakReference<TrendingPlacesActivity> mTrendingPlacesActivity = null;
     ArrayList<TrendingPlaceObject> mTrendingPlaceObjectList = null;
     BitmapFactory.Options mBitmapFactoryOptions = null;
 
@@ -62,15 +63,15 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 
         logger.debug("PlaceItemAdapter(...) Invoked");
 
-        mTrendingPlacesActivity = trendingPlacesActivity;
+        mTrendingPlacesActivity = new WeakReference<TrendingPlacesActivity>(trendingPlacesActivity);
         mTrendingPlaceObjectList = trendingPlaceObjectList;
 
         mBitmapFactoryOptions = new BitmapFactory.Options();
         mBitmapFactoryOptions.inScaled = false;
 
-        mLayoutInflater = (LayoutInflater)mTrendingPlacesActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater)mTrendingPlacesActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mSharedPreferences = mTrendingPlacesActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mTrendingPlacesActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
     }
 
     @Override
@@ -104,10 +105,10 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
             viewHolder.mImagePlaceThumbnail.setOnClickListener(ClickListener);
 
             viewHolder.mTextViewPlaceAddress = (TextView)view.findViewById(R.id.place_address);
-            Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewPlaceAddress, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mTrendingPlacesActivity.get(), viewHolder.mTextViewPlaceAddress, Helper.FontTypeEnum.boldFont);
 
             viewHolder.mTextViewNumberOfPeeks = (TextView)view.findViewById(R.id.place_number_of_peeks);
-            Helper.setTypeface(mTrendingPlacesActivity, viewHolder.mTextViewNumberOfPeeks, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mTrendingPlacesActivity.get(), viewHolder.mTextViewNumberOfPeeks, Helper.FontTypeEnum.normalFont);
 
             view.setTag(viewHolder);
         }
@@ -130,7 +131,7 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 
             //Load the thumbnail asynchronously
             viewHolder.mImagePlaceThumbnail.setTag("Thumbnail_" + viewHolder.Position);
-            mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity, position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
+            mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity.get(), position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
 
             if(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude > 0 &&
                     viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude > 0)
@@ -138,10 +139,10 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
                 LatLng location = new LatLng(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude,
                         viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude);
 
-                mAddressLoader.SetAddress(mTrendingPlacesActivity, location, viewHolder.mTextViewPlaceAddress, mSharedPreferences);
+                mAddressLoader.SetAddress(mTrendingPlacesActivity.get(), location, viewHolder.mTextViewPlaceAddress, mSharedPreferences);
             }
 
-            String numberOfPeeks = String.format(mTrendingPlacesActivity.getString(R.string.place_number_of_peeks), viewHolder.mTrendingPlaceObject.Peeks.size());
+            String numberOfPeeks = String.format(mTrendingPlacesActivity.get().getString(R.string.place_number_of_peeks), viewHolder.mTrendingPlaceObject.Peeks.size());
             viewHolder.mTextViewNumberOfPeeks.setText(numberOfPeeks);
         }
 
@@ -179,10 +180,10 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 
                     LatLngBounds latLngBounds = latLngBoundsBuilder.build();
 
-                    Intent intent = new Intent(mTrendingPlacesActivity, UserMapActivity.class);
+                    Intent intent = new Intent(mTrendingPlacesActivity.get(), UserMapActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.putExtra("com.google.android.gms.maps.model.LatLngBounds", latLngBounds);
-                    mTrendingPlacesActivity.startActivity(intent);
+                    mTrendingPlacesActivity.get().startActivity(intent);
 
                     break;
 

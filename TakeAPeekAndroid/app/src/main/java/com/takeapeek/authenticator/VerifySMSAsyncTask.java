@@ -10,11 +10,13 @@ import com.takeapeek.common.Transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
+
 public class VerifySMSAsyncTask extends AsyncTask<String, Integer, String>
 {
 	static private final Logger logger = LoggerFactory.getLogger(VerifySMSAsyncTask.class);
 	
-	private AuthenticatorActivity mAuthenticatorActivity = null;
+	private WeakReference<AuthenticatorActivity> mAuthenticatorActivity = null;
 	private SharedPreferences mSharedPreferences = null;
 	
 	private String mSelfMeSMSCode = "";
@@ -23,7 +25,7 @@ public class VerifySMSAsyncTask extends AsyncTask<String, Integer, String>
 	{    
 		logger.debug("VerifySMSAsyncTask(.) Invoked");
 		
-		mAuthenticatorActivity = authenticatorActivity;
+		mAuthenticatorActivity = new WeakReference<AuthenticatorActivity>(authenticatorActivity);
 		mSelfMeSMSCode = selfMeSMSCode;
 		mSharedPreferences = sharedPreferences;
 	}  
@@ -35,7 +37,7 @@ public class VerifySMSAsyncTask extends AsyncTask<String, Integer, String>
 		
 		try 
 		{
-			ResponseObject responseObject = new Transport().VerifySMSCode(mAuthenticatorActivity, mAuthenticatorActivity.mUsername, mSelfMeSMSCode, mSharedPreferences);
+			ResponseObject responseObject = new Transport().VerifySMSCode(mAuthenticatorActivity.get(), mAuthenticatorActivity.get().mUsername, mSelfMeSMSCode, mSharedPreferences);
 			
 			if(responseObject.password != null)
 			{
@@ -66,7 +68,7 @@ public class VerifySMSAsyncTask extends AsyncTask<String, Integer, String>
 	{
 		logger.debug(String.format("onPostExecute(%s) Invoked", result));
 		
-		mAuthenticatorActivity.VerifySMSAsyncTaskPostExecute(result);
+		mAuthenticatorActivity.get().VerifySMSAsyncTaskPostExecute(result);
 		
 		super.onPostExecute(result);
 	}

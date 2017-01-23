@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsConstants;
+import com.facebook.appevents.AppEventsLogger;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener
 {
     static private final Logger logger = LoggerFactory.getLogger(WalkthroughActivity.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     private static final int REQUEST_PERMISSION_CODE = 10001;
 
@@ -61,6 +64,7 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
         super.onCreate(savedInstanceState);
 
         logger.debug("onCreate(.) Invoked");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
 
         setContentView(R.layout.activity_walkthrough);
 
@@ -266,6 +270,9 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
                 if(CheckPermissions() == true)
                 {
                     Helper.SetWalkthroughFinished(mSharedPreferences);
+
+                    //Log event to FaceBook
+                    mAppEventsLogger.logEvent(AppEventsConstants.EVENT_NAME_COMPLETED_TUTORIAL);
 
                     setResult(RESULT_OK);
                     finish();

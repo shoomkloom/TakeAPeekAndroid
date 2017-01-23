@@ -25,6 +25,7 @@ import com.takeapeek.usermap.UserMapActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -86,16 +87,16 @@ public class ProfileActivity extends AppCompatActivity
         //Get the updated relation list and update the list
         new AsyncTask<ProfileActivity, Void, Boolean>()
         {
-            ProfileActivity mProfileActivity = null;
+            WeakReference<ProfileActivity> mProfileActivity = null;
 
             @Override
             protected Boolean doInBackground(ProfileActivity... params)
             {
-                mProfileActivity = params[0];
+                mProfileActivity = new WeakReference<ProfileActivity>(params[0]);
 
                 try
                 {
-                    Helper.UpdateRelations(mProfileActivity, mSharedPreferences);
+                    Helper.UpdateRelations(mProfileActivity.get(), mSharedPreferences);
                     return true;
                 }
                 catch(Exception e)

@@ -21,6 +21,7 @@ import com.takeapeek.ormlite.TakeAPeekObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -30,7 +31,7 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
 {
     static private final Logger logger = LoggerFactory.getLogger(PeekItemAdapter.class);
 
-    UserFeedActivity mUserFeedActivity = null;
+    WeakReference<UserFeedActivity> mUserFeedActivity = null;
     ArrayList<TakeAPeekObject> mTakeAPeekObjectList = null;
     BitmapFactory.Options mBitmapFactoryOptions = null;
 
@@ -61,15 +62,15 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
 
         logger.debug("PeekItemAdapter(...) Invoked");
 
-        mUserFeedActivity = userFeedActivity;
+        mUserFeedActivity = new WeakReference<UserFeedActivity>(userFeedActivity);
         mTakeAPeekObjectList = takeAPeekObjectList;
 
         mBitmapFactoryOptions = new BitmapFactory.Options();
         mBitmapFactoryOptions.inScaled = false;
 
-        mLayoutInflater = (LayoutInflater)mUserFeedActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater)mUserFeedActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mSharedPreferences = mUserFeedActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mUserFeedActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
     }
 
     @Override
@@ -103,16 +104,16 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mImageViewPeekThumbnailPlay = (ImageView)view.findViewById(R.id.user_peek_feed_thumbnail_play);
             viewHolder.mImageViewPeekThumbnailPlay.setOnClickListener(ClickListener);
             viewHolder.mTextViewUserFeedDisplayname = (TextView)view.findViewById(R.id.user_peek_feed_displayname);
-            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedDisplayname, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mUserFeedActivity.get(), viewHolder.mTextViewUserFeedDisplayname, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewUserFeedTitle = (TextView)view.findViewById(R.id.user_peek_feed_title);
-            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedTitle, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mUserFeedActivity.get(), viewHolder.mTextViewUserFeedTitle, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewUserFeedTime = (TextView)view.findViewById(R.id.user_peek_feed_time);
-            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedTime, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mUserFeedActivity.get(), viewHolder.mTextViewUserFeedTime, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewUserFeedAddress = (TextView)view.findViewById(R.id.user_peek_feed_address);
-            Helper.setTypeface(mUserFeedActivity, viewHolder.mTextViewUserFeedAddress, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mUserFeedActivity.get(), viewHolder.mTextViewUserFeedAddress, Helper.FontTypeEnum.normalFont);
 
             view.setTag(viewHolder);
         }
@@ -127,17 +128,17 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mTakeAPeekObject = mTakeAPeekObjectList.get(position);
 
             //Load the thumbnail asynchronously
-            mThumbnailLoader.SetThumbnail(mUserFeedActivity, position, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
+            mThumbnailLoader.SetThumbnail(mUserFeedActivity.get(), position, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
 
             viewHolder.mTextViewUserFeedDisplayname.setText(viewHolder.mTakeAPeekObject.ProfileDisplayName);
 
             viewHolder.mTextViewUserFeedTitle.setText(viewHolder.mTakeAPeekObject.Title);
 
-            viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity, viewHolder.mTakeAPeekObject.CreationTime));
+            viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity.get(), viewHolder.mTakeAPeekObject.CreationTime));
             if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
             {
                 LatLng location = new LatLng(viewHolder.mTakeAPeekObject.Latitude, viewHolder.mTakeAPeekObject.Longitude);
-                mAddressLoader.SetAddress(mUserFeedActivity, location, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
+                mAddressLoader.SetAddress(mUserFeedActivity.get(), location, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
             }
         }
 
@@ -164,7 +165,7 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
                 case R.id.user_peek_feed_thumbnail_play:
                     logger.info("onClick: user_peek_feed_thumbnail_play clicked");
 
-                    mUserFeedActivity.ShowPeek(finalViewHolder.mTakeAPeekObject);
+                    mUserFeedActivity.get().ShowPeek(finalViewHolder.mTakeAPeekObject);
 
                     break;
 

@@ -17,6 +17,7 @@ public class TAPApplication extends Application
     public void onCreate()
     {
         super.onCreate();
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
     }

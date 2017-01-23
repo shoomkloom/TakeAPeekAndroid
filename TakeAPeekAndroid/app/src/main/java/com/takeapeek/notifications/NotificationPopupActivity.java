@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -62,6 +63,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
         LocationListener
 {
     static private final Logger logger = LoggerFactory.getLogger(NotificationPopupActivity.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     SharedPreferences mSharedPreferences = null;
 
@@ -88,6 +90,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
 
         logger.debug("onCreate(.) Invoked");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
 
         setContentView(R.layout.activity_notification_popup);
 
@@ -549,6 +552,9 @@ public class NotificationPopupActivity extends FragmentActivity implements
                                         {
                                             String message = String.format(getString(R.string.notification_popup_requested_peeks_to), mProfileObject.displayName);
                                             Helper.ShowCenteredToast(NotificationPopupActivity.this, message);
+
+                                            //Log event to FaceBook
+                                            mAppEventsLogger.logEvent("EVENT_NAME_REQUEST_PEEK");
                                         }
                                     }
                                     finally

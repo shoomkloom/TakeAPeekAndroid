@@ -19,7 +19,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Pair;
@@ -267,6 +266,7 @@ public class MyApplicationInterface implements ApplicationInterface
     {
         logger.debug("isVideoPref() Invoked.");
 
+/*@@
         String action = main_activity.getIntent().getAction();
         if( MediaStore.INTENT_ACTION_VIDEO_CAMERA.equals(action) || MediaStore.ACTION_VIDEO_CAPTURE.equals(action) )
         {
@@ -278,7 +278,10 @@ public class MyApplicationInterface implements ApplicationInterface
    			logger.info("launching from photo intent");
     		return false;
 		}
+
 		SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+@@*/
 		return true;//@@mSharedPreferences.getBoolean(PreferenceKeys.getIsVideoPreferenceKey(), false);
     }
 

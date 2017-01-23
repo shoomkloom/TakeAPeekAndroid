@@ -18,6 +18,7 @@ import com.takeapeek.ormlite.DatabaseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
 {
     static private final Logger logger = LoggerFactory.getLogger(ProfileItemAdapter.class);
 
-    ProfileActivity mProfileActivity = null;
+    WeakReference<ProfileActivity> mProfileActivity = null;
     List<Integer> mProfileTitlesList = null;
 
     private static LayoutInflater mLayoutInflater = null;
@@ -48,14 +49,14 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
 
         logger.debug("ProfileItemAdapter(...) Invoked");
 
-        mProfileActivity = profileActivity;
+        mProfileActivity = new WeakReference<ProfileActivity>(profileActivity);
         mProfileTitlesList = profileTitlesList;
 
-        mLayoutInflater = (LayoutInflater)mProfileActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater)mProfileActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mSharedPreferences = mProfileActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mProfileActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
-        DatabaseManager.init(mProfileActivity);
+        DatabaseManager.init(mProfileActivity.get());
     }
 
     @Override
@@ -88,7 +89,7 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
             viewHolder = new ViewHolder();
 
             viewHolder.mTextViewTitle = (TextView)view.findViewById(R.id.textview_profile_item_name);
-            Helper.setTypeface(mProfileActivity, viewHolder.mTextViewTitle, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mProfileActivity.get(), viewHolder.mTextViewTitle, Helper.FontTypeEnum.normalFont);
 
             view.setTag(viewHolder);
         }
@@ -119,28 +120,28 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
             switch(v.getId())
             {
                 case R.id.textview_profile_invite_friends:
-                    final Intent inviteFriendsIntent1 = new Intent(mProfileActivity, ShareActivity.class);
+                    final Intent inviteFriendsIntent1 = new Intent(mProfileActivity.get(), ShareActivity.class);
                     inviteFriendsIntent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    mProfileActivity.startActivity(inviteFriendsIntent1);
+                    mProfileActivity.get().startActivity(inviteFriendsIntent1);
                     break;
 
                 default:
                     switch (mProfileTitlesList.get(viewHolder.Position))
                     {
                         case R.string.support:
-                            Toast.makeText(mProfileActivity, "Support", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mProfileActivity.get(), "Support", Toast.LENGTH_SHORT).show();
                             break;
 
                         case R.string.privacy_policy:
-                            Toast.makeText(mProfileActivity, "Privacy Policy", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mProfileActivity.get(), "Privacy Policy", Toast.LENGTH_SHORT).show();
                             break;
 
                         case R.string.terms_of_service:
-                            Toast.makeText(mProfileActivity, "Terms of Service", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mProfileActivity.get(), "Terms of Service", Toast.LENGTH_SHORT).show();
                             break;
 
                         case R.string.licenses:
-                            Toast.makeText(mProfileActivity, "Licenses", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mProfileActivity.get(), "Licenses", Toast.LENGTH_SHORT).show();
                             break;
 
                         default:

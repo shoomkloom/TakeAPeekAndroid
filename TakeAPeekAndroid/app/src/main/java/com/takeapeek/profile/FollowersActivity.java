@@ -19,6 +19,7 @@ import com.takeapeek.ormlite.TakeAPeekRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -115,16 +116,16 @@ public class FollowersActivity extends AppCompatActivity
         //Get the updated relation list and update the list
         new AsyncTask<FollowersActivity, Void, Boolean>()
         {
-            FollowersActivity mFollowersActivity = null;
+            WeakReference<FollowersActivity> mFollowersActivity = null;
 
             @Override
             protected Boolean doInBackground(FollowersActivity... params)
             {
-                mFollowersActivity = params[0];
+                mFollowersActivity = new WeakReference<FollowersActivity>(params[0]);
 
                 try
                 {
-                    Helper.UpdateRelations(mFollowersActivity, mSharedPreferences);
+                    Helper.UpdateRelations(mFollowersActivity.get(), mSharedPreferences);
                     return true;
                 }
                 catch(Exception e)

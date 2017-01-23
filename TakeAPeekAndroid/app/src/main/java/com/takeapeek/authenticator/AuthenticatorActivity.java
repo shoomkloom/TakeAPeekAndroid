@@ -38,6 +38,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsConstants;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -73,6 +75,7 @@ import static com.takeapeek.R.id.login_textview_small_title;
 public class AuthenticatorActivity extends AppCompatActivity
 {
 	static private final Logger logger = LoggerFactory.getLogger(AuthenticatorActivity.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int REQUEST_SMS_PERMISSION_CODE = 10001;
@@ -214,6 +217,7 @@ public class AuthenticatorActivity extends AppCompatActivity
         super.onCreate(icicle);
         
         logger.debug("onCreate(.) Invoked");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
 
         if(CheckPlayServices() == false)
         {
@@ -645,6 +649,9 @@ public class AuthenticatorActivity extends AppCompatActivity
 
         //Set Profile state as 'Active'
 		Helper.SetProfileState(mSharedPreferences.edit(), ProfileStateEnum.Active);
+
+        //Log event to FaceBook
+        mAppEventsLogger.logEvent(AppEventsConstants.EVENT_NAME_COMPLETED_TUTORIAL);
 
         new AsyncTask<Void, Void, ResponseObject>()
         {
@@ -1574,7 +1581,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 {
     static private final Logger logger = LoggerFactory.getLogger(ValidateDisplayNameAsyncTask.class);
 
-    AuthenticatorActivity mAuthenticatorActivity = null;
+    WeakReference<AuthenticatorActivity> mAuthenticatorActivity = null;
     String mProposedDisplayName = null;
     SharedPreferences mSharedPreferences = null;
 
@@ -1582,7 +1589,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
     {
         logger.debug("ValidateDisplayNameAsyncTask(..) Invoked");
 
-        mAuthenticatorActivity = authenticatorActivity;
+        mAuthenticatorActivity = new WeakReference<AuthenticatorActivity>(authenticatorActivity);
         mProposedDisplayName = proposedDisplayName;
         mSharedPreferences = sharedPreferences;
     }
@@ -1594,7 +1601,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 
         try
         {
-            return new Transport().CheckDisplayName(mAuthenticatorActivity, mProposedDisplayName, mSharedPreferences);
+            return new Transport().CheckDisplayName(mAuthenticatorActivity.get(), mProposedDisplayName, mSharedPreferences);
         }
         catch(Exception e)
         {
@@ -1610,13 +1617,13 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 
         try
         {
-            mAuthenticatorActivity.DoValidatedDisplayName(validatedDisplayName);
+            mAuthenticatorActivity.get().DoValidatedDisplayName(validatedDisplayName);
 
             super.onPostExecute(validatedDisplayName);
         }
         finally
         {
-            mAuthenticatorActivity.mValidateDisplayNameAsyncTask = null;
+            mAuthenticatorActivity.get().mValidateDisplayNameAsyncTask = null;
         }
     }
 }
@@ -1625,7 +1632,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
 {
 	static private final Logger logger = LoggerFactory.getLogger(AuthenticatorAsyncTask.class);
 	
-	AuthenticatorActivity mAuthenticatorActivity = null;
+	WeakReference<AuthenticatorActivity> mAuthenticatorActivity = null;
 	PhoneNumberUtil mPhoneNumberUtil = null;
 	String mMobile = "";
 	String mNDCMobile = "";
@@ -1636,7 +1643,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
 
 	public AuthenticatorAsyncTask(AuthenticatorActivity authenticatorActivity, PhoneNumberUtil phoneNumberUtil, String mobile, String prefix, SharedPreferences sharedPreferences)
 	{
-		mAuthenticatorActivity = authenticatorActivity;
+		mAuthenticatorActivity = new WeakReference<AuthenticatorActivity>(authenticatorActivity);
 		mPhoneNumberUtil = phoneNumberUtil;
 		mMobile = mobile;
 		mPrefix = prefix;
@@ -1688,7 +1695,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
     	try
 		{
     		//Create the profile and ask for SMS with verification code
-    		new Transport().CreateProfile(mAuthenticatorActivity, mUserName, mAuthenticatorActivity.mDisplayName, mAuthenticatorActivity.mDateOfBirthMillis, mSharedPreferences);
+    		new Transport().CreateProfile(mAuthenticatorActivity.get(), mUserName, mAuthenticatorActivity.get().mDisplayName, mAuthenticatorActivity.get().mDateOfBirthMillis, mSharedPreferences);
 		}
 		catch(Exception e)
     	{
@@ -1709,7 +1716,7 @@ class AuthenticatorAsyncTask extends AsyncTask<String, Integer, String>
 		{
 			result = Constants.AUTHENTICATION_FAIL;
 		}
-		mAuthenticatorActivity.AuthenticatorAsyncTaskPostExecute(result, mMobile, mNDCMobile, mPrefix, mUserName, mPassword); 
+		mAuthenticatorActivity.get().AuthenticatorAsyncTaskPostExecute(result, mMobile, mNDCMobile, mPrefix, mUserName, mPassword);
 		
 		super.onPostExecute(result);
 	}
@@ -1751,14 +1758,14 @@ class PhoneNumberUtilInitAsyncTask extends AsyncTask<Void, Integer, Boolean>
 class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception> 
 {   
 	static private final Logger logger = LoggerFactory.getLogger(RequestCallAsyncTask.class);
-	
-	AuthenticatorActivity mAuthenticatorActivity = null;
+
+    WeakReference<AuthenticatorActivity> mAuthenticatorActivity = null;
 	String mUserName = "";
 	SharedPreferences mSharedPreferences = null;
 
 	public RequestCallAsyncTask(AuthenticatorActivity authenticatorActivity, String userName, SharedPreferences sharedPreferences)
 	{
-		mAuthenticatorActivity = authenticatorActivity;
+		mAuthenticatorActivity = new WeakReference<AuthenticatorActivity>(authenticatorActivity);
 		mUserName = userName;
 		mSharedPreferences = sharedPreferences;
 	}
@@ -1771,7 +1778,7 @@ class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception>
 		try
     	{
 			//Ask for voice verification
-			new Transport().StartVoiceVerification(mAuthenticatorActivity, mUserName, mSharedPreferences);
+			new Transport().StartVoiceVerification(mAuthenticatorActivity.get(), mUserName, mSharedPreferences);
     	}
     	catch(Exception e)
     	{
@@ -1789,7 +1796,7 @@ class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception>
 		{
 			if(result != null)
 			{
-				mAuthenticatorActivity.ShowCreateAccountErrorDialog(R.string.error_verify_account);
+				mAuthenticatorActivity.get().ShowCreateAccountErrorDialog(R.string.error_verify_account);
 				
 				Helper.Error(logger, "EXCEPTION: Problem verifying account", result);
 			}
@@ -1802,7 +1809,7 @@ class RequestCallAsyncTask extends AsyncTask<Void, Integer, Exception>
 		{
 			logger.info("onPostExecute: Dismissing RequestCallAsyncTask progress dialog");
 			
-			mAuthenticatorActivity.DismissProgressDialog();
+			mAuthenticatorActivity.get().DismissProgressDialog();
 		}
 		
 		super.onPostExecute(result);

@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
@@ -48,6 +49,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TAPFcmListenerService extends FirebaseMessagingService
 {
     static private final Logger logger = LoggerFactory.getLogger(TAPFcmListenerService.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     static public ReentrantLock lockMessageReceived = new ReentrantLock();
 
@@ -59,6 +61,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
     public void onMessageReceived(RemoteMessage remoteMessage)
     {
         logger.debug("onMessageReceived(.) Invoked - before lock");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
 
         lockMessageReceived.lock();
 
@@ -142,6 +145,9 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                                         Helper.GetProfileId(sharedPreferences),
                                         null);
                                 DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
+
+                                //Log event to FaceBook
+                                mAppEventsLogger.logEvent("EVENT_NAME_FOLLOW");
                             }
                         }
                         catch(Exception e)

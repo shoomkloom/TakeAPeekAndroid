@@ -311,7 +311,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 {
     static private final Logger logger = LoggerFactory.getLogger(ValidateDisplayNameAsyncTask.class);
 
-    SettingsActivity mSettingsActivity = null;
+    WeakReference<SettingsActivity> mSettingsActivity = null;
     String mProposedDisplayName = null;
     SharedPreferences mSharedPreferences = null;
 
@@ -319,7 +319,7 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
     {
         logger.debug("ValidateDisplayNameAsyncTask(..) Invoked");
 
-        mSettingsActivity = settingsActivity;
+        mSettingsActivity = new WeakReference<SettingsActivity>(settingsActivity);
         mProposedDisplayName = proposedDisplayName;
         mSharedPreferences = sharedPreferences;
     }
@@ -331,10 +331,10 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 
         try
         {
-            String userName = Helper.GetTakeAPeekAccountUsername(mSettingsActivity);
-            String password = Helper.GetTakeAPeekAccountPassword(mSettingsActivity);
+            String userName = Helper.GetTakeAPeekAccountUsername(mSettingsActivity.get());
+            String password = Helper.GetTakeAPeekAccountPassword(mSettingsActivity.get());
 
-            return new Transport().GetDisplayName(mSettingsActivity, userName, password, mProposedDisplayName, mSharedPreferences);
+            return new Transport().GetDisplayName(mSettingsActivity.get(), userName, password, mProposedDisplayName, mSharedPreferences);
         }
         catch(Exception e)
         {
@@ -350,13 +350,13 @@ class ValidateDisplayNameAsyncTask extends AsyncTask<String, Integer, String>
 
         try
         {
-            mSettingsActivity.DoValidatedDisplayName(validatedDisplayName);
+            mSettingsActivity.get().DoValidatedDisplayName(validatedDisplayName);
 
             super.onPostExecute(validatedDisplayName);
         }
         finally
         {
-            mSettingsActivity.mValidateDisplayNameAsyncTask = null;
+            mSettingsActivity.get().mValidateDisplayNameAsyncTask = null;
         }
     }
 }

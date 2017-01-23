@@ -12,14 +12,13 @@ import android.widget.TextView;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
-import com.takeapeek.common.ProfileObject;
-import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -29,14 +28,12 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 {
     static private final Logger logger = LoggerFactory.getLogger(BlockedItemAdapter.class);
 
-    BlockedActivity mBlockedActivity = null;
+    WeakReference<BlockedActivity> mBlockedActivity = null;
     List<TakeAPeekRelation> mTakeAPeekBlockedList = null;
 
     private static LayoutInflater mLayoutInflater = null;
 
     SharedPreferences mSharedPreferences = null;
-
-    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     private class ViewHolder
     {
@@ -54,12 +51,12 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
         logger.debug("BlockedItemAdapter(...) Invoked");
 
-        mBlockedActivity = blockedActivity;
+        mBlockedActivity = new WeakReference<BlockedActivity>(blockedActivity);
         mTakeAPeekBlockedList = takeAPeekBlockedList;
 
-        mLayoutInflater = (LayoutInflater)mBlockedActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater)mBlockedActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mSharedPreferences = mBlockedActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mBlockedActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
     }
 
     @Override
@@ -92,10 +89,10 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             viewHolder.mTakeAPeekBlocked = mTakeAPeekBlockedList.get(position);
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_blocked_src_name);
-            Helper.setTypeface(mBlockedActivity, viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
+            Helper.setTypeface(mBlockedActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_blocked_action);
-            Helper.setTypeface(mBlockedActivity, viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mBlockedActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 
@@ -142,11 +139,11 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                             try
                             {
-                                String username = Helper.GetTakeAPeekAccountUsername(mBlockedActivity);
-                                String password = Helper.GetTakeAPeekAccountPassword(mBlockedActivity);
+                                String username = Helper.GetTakeAPeekAccountUsername(mBlockedActivity.get());
+                                String password = Helper.GetTakeAPeekAccountPassword(mBlockedActivity.get());
 
                                 new Transport().SetRelation(
-                                        mBlockedActivity, username, password,
+                                        mBlockedActivity.get(), username, password,
                                         mViewHolder.mTakeAPeekBlocked.targetId,
                                         Constants.RelationTypeEnum.Unfollow.name(),
                                         mSharedPreferences);
@@ -169,15 +166,15 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             if(result == true)
                             {
                                 //Refresh the adapter data
-                                mBlockedActivity.UpdateRelations();
+                                mBlockedActivity.get().UpdateRelations();
 
-                                String message = String.format(mBlockedActivity.getString(R.string.set_relation_unblock), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
-                                Helper.ShowCenteredToast(mBlockedActivity, message);
+                                String message = String.format(mBlockedActivity.get().getString(R.string.set_relation_unblock), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
+                                Helper.ShowCenteredToast(mBlockedActivity.get(), message);
                             }
                             else
                             {
-                                String error = String.format(mBlockedActivity.getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
-                                Helper.ShowCenteredToast(mBlockedActivity, error);
+                                String error = String.format(mBlockedActivity.get().getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
+                                Helper.ShowCenteredToast(mBlockedActivity.get(), error);
                             }
                         }
                     }.execute(viewHolder);

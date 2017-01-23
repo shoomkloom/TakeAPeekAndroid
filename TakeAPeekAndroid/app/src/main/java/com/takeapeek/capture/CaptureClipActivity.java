@@ -55,6 +55,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -89,6 +90,7 @@ public class CaptureClipActivity extends Activity implements
         Animation.AnimationListener
 {
     static private final Logger logger = LoggerFactory.getLogger(CaptureClipActivity.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
@@ -229,6 +231,7 @@ public class CaptureClipActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 
         logger.debug("onCreate(..) Invoked");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
 
         setContentView(R.layout.activity_capture_clip);
 
@@ -238,7 +241,6 @@ public class CaptureClipActivity extends Activity implements
         if(intent != null)
         {
             mRelateProfileID = intent.getStringExtra(Constants.RELATEDPROFILEIDEXTRA_KEY);
-            setIntent(null);
         }
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
@@ -1025,14 +1027,29 @@ public class CaptureClipActivity extends Activity implements
                     return true;
 
                 case MotionEvent.ACTION_UP:
-                    if(mVideoCaptureStateEnum == VideoCaptureStateEnum.Capture)
+
+                    //NOTE: StopVideoCapture usually causes a call to RecordingTimeDone
+                    //unless it is a very short down and up touch
+                    StopVideoCapture();
+
+                    long video_time = mPreview.getVideoTime();
+                    int secs = (int)((video_time / 1000) % 60);
+                    if(secs < 1)
                     {
-                        mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+                        mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+                        UpdateUI();
+                        Helper.ShowCenteredToast(CaptureClipActivity.this, R.string.error_peek_too_short);
+
+                        //Force stopVideo so that the timer task does not continue
+                        mPreview.stopVideo(false);
                     }
 
-                    UpdateUI();
-
-                    StopVideoCapture();
+/*@@
+                    if(tooShort)
+                    {
+                        Helper.ShowCenteredToast(CaptureClipActivity.this, R.string.error_peek_too_short);
+                    }
+@@*/
                     return true;
             }
 
@@ -3260,6 +3277,9 @@ public class CaptureClipActivity extends Activity implements
             //First run ends only with first capture
             Helper.SetFirstRun(mSharedPreferences.edit(), false);
 
+            //Log event to FaceBook
+            mAppEventsLogger.logEvent("EVENT_NAME_SEND_PEEK");
+
             setResult(RESULT_OK);
             finish();
         }
@@ -3273,32 +3293,58 @@ public class CaptureClipActivity extends Activity implements
     {
         logger.debug("RecordingTimeDone() Invoked.");
 
-        mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+        if(mVideoCaptureStateEnum != VideoCaptureStateEnum.Capture)
+        {
+            logger.info("mVideoCaptureStateEnum != VideoCaptureStateEnum.Capture, Doing quick return.");
+            return;
+        }
+
+        boolean tooShort = false;
+
+        long video_time = mPreview.getVideoTime();
+        int secs = (int)((video_time / 1000) % 60);
+        if(secs < 4)
+        {
+            tooShort = true;
+            mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+        }
+        else
+        {
+            mVideoCaptureStateEnum = VideoCaptureStateEnum.Finish;
+        }
+
         UpdateUI();
 
         StopVideoCapture();
 
-        mCompletedTakeAPeekObject = new TakeAPeekObject();
-        mCompletedTakeAPeekObject.FilePath = videoFilePath;
-        mCompletedTakeAPeekObject.CreationTime = System.currentTimeMillis();
-        mCompletedTakeAPeekObject.ContentType = Constants.ContentTypeEnum.mp4.toString();
-        mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
-        mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
-        mCompletedTakeAPeekObject.RelatedProfileID = mRelateProfileID;
-        mCompletedTakeAPeekObject.Upload = 1;
-
-        try
+        if(tooShort)
         {
-            //Create the thumbnail
-            String thumbnailFullPath = Helper.CreatePeekThumbnail(mCompletedTakeAPeekObject.FilePath);
-            Bitmap thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath);
-
-            //Set the thumbnail bitmap
-            mCapturePreviewThumbnail.setImageBitmap(thumbnailBitmap);
+            Helper.ShowCenteredToast(CaptureClipActivity.this, R.string.error_peek_too_short);
         }
-        catch(Exception e)
+        else
         {
-            Helper.Error(logger, "EXCEPTION: when creating the thumbnail", e);
+            mCompletedTakeAPeekObject = new TakeAPeekObject();
+            mCompletedTakeAPeekObject.FilePath = videoFilePath;
+            mCompletedTakeAPeekObject.CreationTime = System.currentTimeMillis();
+            mCompletedTakeAPeekObject.ContentType = Constants.ContentTypeEnum.mp4.toString();
+            mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
+            mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
+            mCompletedTakeAPeekObject.RelatedProfileID = mRelateProfileID;
+            mCompletedTakeAPeekObject.Upload = 1;
+
+            try
+            {
+                //Create the thumbnail
+                String thumbnailFullPath = Helper.CreatePeekThumbnail(mCompletedTakeAPeekObject.FilePath);
+                Bitmap thumbnailBitmap = BitmapFactory.decodeFile(thumbnailFullPath);
+
+                //Set the thumbnail bitmap
+                mCapturePreviewThumbnail.setImageBitmap(thumbnailBitmap);
+            }
+            catch (Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION: when creating the thumbnail", e);
+            }
         }
     }
 

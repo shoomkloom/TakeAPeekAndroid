@@ -25,6 +25,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
@@ -60,6 +61,7 @@ import static com.takeapeek.R.id.top_bar;
 public class UserFeedActivity extends AppCompatActivity
 {
     static private final Logger logger = LoggerFactory.getLogger(UserFeedActivity.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
@@ -193,6 +195,10 @@ public class UserFeedActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        logger.debug("onCreate(.) Invoked");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
+
         setContentView(R.layout.activity_user_feed);
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
@@ -903,6 +909,9 @@ public class UserFeedActivity extends AppCompatActivity
                                         {
                                             String message = String.format(getString(R.string.notification_popup_requested_peeks_to), mCurrentTakeAPeekObject.ProfileDisplayName);
                                             Helper.ShowCenteredToast(UserFeedActivity.this, message);
+
+                                            //Log event to FaceBook
+                                            mAppEventsLogger.logEvent("EVENT_NAME_REQUEST_PEEK");
                                         }
                                     }
                                     catch(Exception e)

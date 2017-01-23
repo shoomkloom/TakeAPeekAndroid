@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 public class ShareActivity extends ActionBarActivity
 {
 	static private final Logger logger = LoggerFactory.getLogger(ShareActivity.class);
+    AppEventsLogger mAppEventsLogger = null;
 	
 	public SharedPreferences mSharedPreferences = null;
 	public Handler mHandler = new Handler();
@@ -52,6 +54,7 @@ public class ShareActivity extends ActionBarActivity
 		super.onCreate(savedInstanceState);
 		
 		logger.debug("onCreate(.) Invoked");
+        mAppEventsLogger = AppEventsLogger.newLogger(this);
 		
 		setContentView(R.layout.activity_share);
 		
@@ -174,6 +177,9 @@ public class ShareActivity extends ActionBarActivity
     	shareIntent.setComponent(new ComponentName(sharePackageName, shareActivityName));
     	shareIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
     	startActivity(shareIntent);
+
+        //Log event to FaceBook
+        mAppEventsLogger.logEvent("EVENT_NAME_SHARE_APP");
     }
 	
 	private void LoadSendFilterActivitiesAsync(boolean forceUpdate)

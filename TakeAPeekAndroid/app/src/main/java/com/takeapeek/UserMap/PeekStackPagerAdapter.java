@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.common.AddressLoader;
@@ -28,6 +29,7 @@ import com.takeapeek.userfeed.UserFeedActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,8 +39,9 @@ import java.util.HashMap;
 public class PeekStackPagerAdapter extends PagerAdapter
 {
     static private final Logger logger = LoggerFactory.getLogger(PeekStackPagerAdapter.class);
+    AppEventsLogger mAppEventsLogger = null;
 
-    private UserMapActivity mUserMapActivity = null;
+    private WeakReference<UserMapActivity> mUserMapActivityWeakReference = null;
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = null;
     ArrayList mProfileObjectList = null;
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
@@ -50,12 +53,14 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
     public PeekStackPagerAdapter(UserMapActivity userMapActivity, HashMap<Integer, ProfileObject> hashMapIndexToProfileObject)
     {
-        mUserMapActivity = userMapActivity;
+        mUserMapActivityWeakReference = new WeakReference<UserMapActivity> (userMapActivity);
         mHashMapIndexToProfileObject = hashMapIndexToProfileObject;
         mProfileObjectList = new ArrayList(mHashMapIndexToProfileObject.values());
-        mSharedPreferences = mUserMapActivity.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+        mSharedPreferences = mUserMapActivityWeakReference.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
-        DatabaseManager.init(mUserMapActivity);
+        DatabaseManager.init(mUserMapActivityWeakReference.get());
+
+        mAppEventsLogger = AppEventsLogger.newLogger(mUserMapActivityWeakReference.get());
     }
 
     @Override
@@ -63,14 +68,14 @@ public class PeekStackPagerAdapter extends PagerAdapter
     {
         ProfileObject profileObject = (ProfileObject)mProfileObjectList.get(position);
 
-        LayoutInflater inflater = LayoutInflater.from(mUserMapActivity);
+        LayoutInflater inflater = LayoutInflater.from(mUserMapActivityWeakReference.get());
         final ViewGroup viewGroup = (ViewGroup) inflater.inflate(R.layout.item_peek_stack, collection, false);
 
         ImageView imageViewPeekThumbnail = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail);
         ImageView textViewPeekThumbnailPlay = (ImageView)viewGroup.findViewById(R.id.user_peek_stack_thumbnail_play);
 
         TextView textViewUserStackFollow = (TextView)viewGroup.findViewById(R.id.user_peek_stack_follow);
-        Helper.setTypeface(mUserMapActivity, textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(mUserMapActivityWeakReference.get(), textViewUserStackFollow, Helper.FontTypeEnum.boldFont);
         textViewUserStackFollow.setOnClickListener(ClickListener);
         textViewUserStackFollow.setTag(position);
 
@@ -89,7 +94,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                 break;
         }
 
-        final TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
+        final TakeAPeekObject takeAPeekObject = mUserMapActivityWeakReference.get().GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
 
         if(takeAPeekObject != null)
         {
@@ -100,7 +105,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
             textViewPeekThumbnailPlay.setTag(profileObject);
 
             //Load the thumbnail asynchronously
-            mThumbnailLoader.SetThumbnail(mUserMapActivity, position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
+            mThumbnailLoader.SetThumbnail(mUserMapActivityWeakReference.get(), position, takeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
         }
         else
         {
@@ -178,8 +183,8 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                         mTextViewFollowButton = (TextView)params[1];
                                         mTargetProfileObject = (ProfileObject)mProfileObjectList.get(mPosition);
 
-                                        String userName = Helper.GetTakeAPeekAccountUsername(mUserMapActivity);
-                                        String password = Helper.GetTakeAPeekAccountPassword(mUserMapActivity);
+                                        String userName = Helper.GetTakeAPeekAccountUsername(mUserMapActivityWeakReference.get());
+                                        String password = Helper.GetTakeAPeekAccountPassword(mUserMapActivityWeakReference.get());
 
                                         switch(mTargetProfileObject.relationTypeEnum)
                                         {
@@ -194,7 +199,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                 break;
                                         }
 
-                                        return new Transport().SetRelation(mUserMapActivity, userName, password, mTargetProfileObject.profileId, mRelationTypeEnum.name(), mSharedPreferences);
+                                        return new Transport().SetRelation(mUserMapActivityWeakReference.get(), userName, password, mTargetProfileObject.profileId, mRelationTypeEnum.name(), mSharedPreferences);
                                     }
                                     catch (Exception e)
                                     {
@@ -211,19 +216,19 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                     {
                                         if (responseObject == null)
                                         {
-                                            String errorMessage = mUserMapActivity.getString(R.string.Error);
+                                            String errorMessage = mUserMapActivityWeakReference.get().getString(R.string.Error);
                                             switch(mRelationTypeEnum)
                                             {
                                                 case Follow:
-                                                    errorMessage = String.format(mUserMapActivity.getString(R.string.error_set_relation_follow), mTargetProfileObject.displayName);
+                                                    errorMessage = String.format(mUserMapActivityWeakReference.get().getString(R.string.error_set_relation_follow), mTargetProfileObject.displayName);
                                                     break;
 
                                                 default:
-                                                    errorMessage = String.format(mUserMapActivity.getString(R.string.error_set_relation_unfollow), mTargetProfileObject.displayName);
+                                                    errorMessage = String.format(mUserMapActivityWeakReference.get().getString(R.string.error_set_relation_unfollow), mTargetProfileObject.displayName);
                                                     break;
                                             }
 
-                                            Helper.ErrorMessage(mUserMapActivity, mHandler, mUserMapActivity.getString(R.string.Error), mUserMapActivity.getString(R.string.ok), errorMessage);
+                                            Helper.ErrorMessage(mUserMapActivityWeakReference.get(), mHandler, mUserMapActivityWeakReference.get().getString(R.string.Error), mUserMapActivityWeakReference.get().getString(R.string.ok), errorMessage);
                                         }
                                         else
                                         {
@@ -234,7 +239,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                             switch(mRelationTypeEnum)
                                             {
                                                 case Follow:
-                                                    message = String.format(mUserMapActivity.getString(R.string.set_relation_follow), mTargetProfileObject.displayName);
+                                                    message = String.format(mUserMapActivityWeakReference.get().getString(R.string.set_relation_follow), mTargetProfileObject.displayName);
                                                     mTextViewFollowButton.setText(R.string.unfollow);
                                                     mTextViewFollowButton.setBackgroundResource(R.drawable.button_gray);
                                                     mTextViewFollowButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
@@ -247,10 +252,13 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                     takeAPeekRelationFollow = new TakeAPeekRelation(mRelationTypeEnum.name(), profileId, null, mTargetProfileObject.profileId, mTargetProfileObject.displayName);
                                                     DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelationFollow);
 
+                                                    //Log event to FaceBook
+                                                    mAppEventsLogger.logEvent("EVENT_NAME_FOLLOW");
+
                                                     break;
 
                                                 default:
-                                                    message = String.format(mUserMapActivity.getString(R.string.set_relation_unfollow), mTargetProfileObject.displayName);
+                                                    message = String.format(mUserMapActivityWeakReference.get().getString(R.string.set_relation_unfollow), mTargetProfileObject.displayName);
                                                     mTextViewFollowButton.setText(R.string.follow);
                                                     mTextViewFollowButton.setBackgroundResource(R.drawable.button_green);
                                                     mTextViewFollowButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
@@ -268,7 +276,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                             mTargetProfileObject.relationTypeEnum = mRelationTypeEnum;
                                             mProfileObjectList.set(mPosition, mTargetProfileObject);
 
-                                            Helper.ShowCenteredToast(mUserMapActivity, message);
+                                            Helper.ShowCenteredToast(mUserMapActivityWeakReference.get(), message);
                                         }
                                     }
                                     finally
@@ -306,19 +314,19 @@ public class PeekStackPagerAdapter extends PagerAdapter
             ProfileObject profileObject = (ProfileObject)view.getTag();
             String profileObjectJSON = new Gson().toJson(profileObject);
 
-            TakeAPeekObject takeAPeekObject = mUserMapActivity.GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
+            TakeAPeekObject takeAPeekObject = mUserMapActivityWeakReference.get().GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
             String takeAPeekObjectJSON = new Gson().toJson(takeAPeekObject);
 
-            final Intent intent = new Intent(mUserMapActivity, UserFeedActivity.class);
+            final Intent intent = new Intent(mUserMapActivityWeakReference.get(), UserFeedActivity.class);
             intent.putExtra(Constants.PARAM_PROFILEOBJECT, profileObjectJSON);
             intent.putExtra(Constants.PARAM_PEEKOBJECT, takeAPeekObjectJSON);
-            mUserMapActivity.startActivity(intent);
+            mUserMapActivityWeakReference.get().startActivity(intent);
 
             mHandler.postDelayed(new Runnable()
             {
                 public void run()
                 {
-                    mUserMapActivity.QuickCloseUserPeekStack();
+                    mUserMapActivityWeakReference.get().QuickCloseUserPeekStack();
                 }
             }, 1000);
         }

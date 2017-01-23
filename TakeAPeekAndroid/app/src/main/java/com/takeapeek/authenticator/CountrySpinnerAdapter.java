@@ -19,6 +19,7 @@ import com.takeapeek.common.Helper.FontTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -28,8 +29,8 @@ import java.util.List;
 public class CountrySpinnerAdapter extends ArrayAdapter<String> 
 {
 	static private final Logger logger = LoggerFactory.getLogger(CountrySpinnerAdapter.class);
-	
-	Activity mActivity = null;
+
+    WeakReference<Activity> mActivity = null;
 	String[] mCountryNames;
 	int[] mCountryPrefixCodes;
 	List<String> mCountryISOCodes;
@@ -39,7 +40,7 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 	{            
 		super(activity, textViewResourceId, countryNames);   
 		
-		mActivity = activity;
+		mActivity = new WeakReference<Activity>(activity);
 		mCountryNames = countryNames;
 		mCountryPrefixCodes = countryPrefixCodes;
 		mCountryISOCodes = countryISOCodes;
@@ -62,7 +63,7 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 	{  
 		logger.debug("getCollapsedDropDownItemView(...)");
 		
-		LayoutInflater inflater = mActivity.getLayoutInflater();            
+		LayoutInflater inflater = mActivity.get().getLayoutInflater();
 		View row = inflater.inflate(R.layout.country_spinner_item_collapsed, parent, false);
 
         ImageView flag = (ImageView)row.findViewById(R.id.itemImageCountryFlag);
@@ -72,20 +73,20 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
         }
 
 		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
-        Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
+        Helper.setTypeface(mActivity.get(), label, Helper.FontTypeEnum.normalFont);
 
 		String labelText = "";
 		int countryPrefix = mCountryPrefixCodes[position];
 		if(countryPrefix == -1)
 		{
-			labelText = mActivity.getString(R.string.create_account_country_spinner_prompt);
+			labelText = mActivity.get().getString(R.string.create_account_country_spinner_prompt);
 		}
 		else
 		{
 			labelText = String.format("+%d %s", countryPrefix, mCountryISOCodes.get(position));
 		}
 		label.setText(labelText);  
-		Helper.setTypeface(mActivity, label, FontTypeEnum.lightFont);
+		Helper.setTypeface(mActivity.get(), label, FontTypeEnum.lightFont);
 		
 		return row;            
 	} 
@@ -94,7 +95,7 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 	{             
 		logger.debug("getExpandedDropDownItemView(...)");
 		
-		LayoutInflater inflater = mActivity.getLayoutInflater();            
+		LayoutInflater inflater = mActivity.get().getLayoutInflater();
 		View row = inflater.inflate(R.layout.country_spinner_item, parent, false);
 
         ImageView flag = (ImageView)row.findViewById(R.id.itemImageCountryFlag);
@@ -104,15 +105,15 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
         }
 
 		TextView label = (TextView)row.findViewById(R.id.itemTextCountryName);
-        Helper.setTypeface(mActivity, label, Helper.FontTypeEnum.normalFont);
+        Helper.setTypeface(mActivity.get(), label, Helper.FontTypeEnum.normalFont);
 
         TextView prefix = (TextView)row.findViewById(R.id.itemTextCountryPrefix);
-        Helper.setTypeface(mActivity, prefix, Helper.FontTypeEnum.normalFont);
+        Helper.setTypeface(mActivity.get(), prefix, Helper.FontTypeEnum.normalFont);
 		
 		int countryPrefix = mCountryPrefixCodes[position];
 		if(countryPrefix == -1)
 		{
-			String labelText = String.format("%s", mActivity.getString(R.string.create_account_country_spinner_long_prompt));
+			String labelText = String.format("%s", mActivity.get().getString(R.string.create_account_country_spinner_long_prompt));
 			label.setText(labelText);
             label.setTextColor(Color.parseColor("#283238"));
 
@@ -126,10 +127,10 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String>
 			String prefixText = "+" + String.valueOf(mCountryPrefixCodes[position]);
 			prefix.setText(prefixText); 
 			
-			Helper.setTypeface(mActivity, prefix, FontTypeEnum.lightFont);
+			Helper.setTypeface(mActivity.get(), prefix, FontTypeEnum.lightFont);
 		} 
 		
-		Helper.setTypeface(mActivity, label, FontTypeEnum.lightFont);
+		Helper.setTypeface(mActivity.get(), label, FontTypeEnum.lightFont);
 		
 		return row;            
 	}

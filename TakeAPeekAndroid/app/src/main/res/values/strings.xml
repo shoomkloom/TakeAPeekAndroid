@@ -43,6 +43,7 @@
     <string name="clip_will_be_sent">Your Peek is being sent</string>
     <string name="enter_peek_title_here">Add a title to your Peek</string>
     <string name="error_configure_failed">Failed to configure camera</string>
+    <string name="error_peek_too_short">Peek has to be longer than 3 seconds</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
