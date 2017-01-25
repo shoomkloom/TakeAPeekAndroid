@@ -143,7 +143,7 @@ public class NotificationsActivity extends AppCompatActivity
             {
                 if (oldNotification == false)
                 {
-                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_DAY)
+                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR)
                     {
                         takeAPeekNotificationArrayList.add(takeAPeekNotification);
                     }
