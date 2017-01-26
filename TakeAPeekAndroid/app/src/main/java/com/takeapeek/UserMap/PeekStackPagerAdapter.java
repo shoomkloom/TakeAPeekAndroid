@@ -253,7 +253,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
                                                     DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelationFollow);
 
                                                     //Log event to FaceBook
-                                                    mAppEventsLogger.logEvent("EVENT_NAME_FOLLOW");
+                                                    mAppEventsLogger.logEvent("Followed_User");
 
                                                     break;
 

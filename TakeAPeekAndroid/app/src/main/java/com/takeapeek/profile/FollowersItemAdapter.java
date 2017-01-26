@@ -183,7 +183,7 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                                 Helper.ShowCenteredToast(mFollowersActivity.get(), message);
 
                                 //Log event to FaceBook
-                                mAppEventsLogger.logEvent("EVENT_NAME_FOLLOW");
+                                mAppEventsLogger.logEvent("Followed_User");
                             }
                             else
                             {

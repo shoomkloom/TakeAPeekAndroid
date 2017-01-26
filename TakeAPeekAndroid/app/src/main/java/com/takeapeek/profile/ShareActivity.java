@@ -179,7 +179,7 @@ public class ShareActivity extends ActionBarActivity
     	startActivity(shareIntent);
 
         //Log event to FaceBook
-        mAppEventsLogger.logEvent("EVENT_NAME_SHARE_APP");
+        mAppEventsLogger.logEvent("Shared_App");
     }
 	
 	private void LoadSendFilterActivitiesAsync(boolean forceUpdate)

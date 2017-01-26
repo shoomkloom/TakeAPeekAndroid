@@ -911,7 +911,7 @@ public class UserFeedActivity extends AppCompatActivity
                                             Helper.ShowCenteredToast(UserFeedActivity.this, message);
 
                                             //Log event to FaceBook
-                                            mAppEventsLogger.logEvent("EVENT_NAME_REQUEST_PEEK");
+                                            mAppEventsLogger.logEvent("Peek_Request");
                                         }
                                     }
                                     catch(Exception e)

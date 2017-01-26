@@ -1,6 +1,7 @@
 package com.takeapeek.common;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.animation.Animation;
@@ -26,6 +27,7 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
     private Context mContext = null;
     private LatLng mLatlngToTheLeft = null;
     private LatLng mLatlngToTheRight = null;
+    private SharedPreferences mSharedPreferences = null;
 
     public ZoomedAddressCreator(Context context, LatLng latlngToTheLeft, LatLng latlngToTheRight, TextView textView)
     {
@@ -35,6 +37,8 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
         mContext = context;
         mLatlngToTheLeft = latlngToTheLeft;
         mLatlngToTheRight = latlngToTheRight;
+
+        mSharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
     }
 
     /**
@@ -94,8 +98,8 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
 
         String foundAddress = "";
 
-        String addressLeft = LocationHelper.FormattedAddressFromLocation(mContext, mLatlngToTheLeft);
-        String addressRight = LocationHelper.FormattedAddressFromLocation(mContext, mLatlngToTheRight);
+        String addressLeft = LocationHelper.FormattedAddressFromLocation(mContext, mLatlngToTheLeft, mSharedPreferences);
+        String addressRight = LocationHelper.FormattedAddressFromLocation(mContext, mLatlngToTheRight, mSharedPreferences);
 
         if(addressLeft == null || addressRight == null)
         {

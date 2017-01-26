@@ -297,7 +297,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                                                         Helper.ShowCenteredToast(mNotificationsActivity.get(), message);
 
                                                         //Log event to FaceBook
-                                                        mAppEventsLogger.logEvent("EVENT_NAME_REQUEST_PEEK");
+                                                        mAppEventsLogger.logEvent("Peek_Request");
                                                     }
                                                 }
                                                 finally

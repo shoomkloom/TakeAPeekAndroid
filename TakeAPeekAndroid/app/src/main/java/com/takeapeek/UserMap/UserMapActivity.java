@@ -273,7 +273,7 @@ public class UserMapActivity extends FragmentActivity implements
                 .build();
 
         //Retrieve the PlaceAutocompleteFragment.
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        CustomPlaceAutoCompleteFragment autocompleteFragment = (CustomPlaceAutoCompleteFragment)getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(PlaceSelectionListen);
 
         mImageViewNotifications = (ImageView)findViewById(R.id.notifications_image);
@@ -1598,7 +1598,7 @@ public class UserMapActivity extends FragmentActivity implements
                                         Helper.ShowCenteredToast(UserMapActivity.this, message);
 
                                         //Log event to FaceBook
-                                        mAppEventsLogger.logEvent("EVENT_NAME_REQUEST_PEEK");
+                                        mAppEventsLogger.logEvent("Peek_Request");
                                     }
                                 }
                                 finally

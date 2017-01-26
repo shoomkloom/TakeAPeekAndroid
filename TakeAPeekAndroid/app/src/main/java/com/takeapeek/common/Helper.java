@@ -35,6 +35,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.icu.util.GregorianCalendar;
 import android.media.AudioManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -77,12 +78,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -90,6 +94,7 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -264,7 +269,14 @@ public class Helper
 		return takeapeekDirectoryPath;
 	}
 @@*/
-	
+
+    static public String GetMixPanelParamsFilePath(Context context) throws IOException
+    {
+        logger.debug("GetMixPanelParamsFilePath(.) Invoked");
+
+        return GetTakeAPeekPath(context) + Constants.MIXPANELPARAMS_FILE_NAME;
+    }
+
 	static public String GetLogsZipFilePath(Context context) throws IOException
 	{
 		logger.debug("GetLogsZipFilePath(.) Invoked");
@@ -941,18 +953,46 @@ public class Helper
 		List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);    
 		return list.size() > 0;
 	}
+
+    static public <T> void SaveJsonObject(String filePath, T jsonObject)
+    {
+        logger.debug("SaveJsonObject(..) Invoked");
+
+        try
+        {
+            String jsonString = new Gson().toJson(jsonObject);
+
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
+            bufferedWriter.write(jsonString);
+            bufferedWriter.close();
+        }
+        catch(Exception e)
+        {
+            logger.error("EXCEPTION: When trying to save json object to file", e);
+        }
+    }
 	
-	static public <T> T getJsonFileContents(String filePath, Class<T> clazz) throws Exception
+	static public <T> T LoadJsonObject(String filePath, Class<T> clazz)
 	{
-		logger.debug("getJsonFileContents(..) Invoked");
+		logger.debug("LoadJsonObject(..) Invoked");
 		
-		String UTF8 = "utf8"; 
-		int BUFFER_SIZE = 8192;  
-		File f = new File(filePath);
-		
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), UTF8), BUFFER_SIZE);
-		T jsonObject = new Gson().fromJson(br, clazz); 
-		br.close();
+		File file = new File(filePath);
+
+        T jsonObject = null;
+
+        try
+        {
+            if (file.exists() == true)
+            {
+                BufferedReader br = new BufferedReader(new FileReader(filePath));
+                jsonObject = new Gson().fromJson(br, clazz);
+                br.close();
+            }
+        }
+        catch(Exception e)
+        {
+            logger.error("EXCEPTION: When trying to load json file to object", e);
+        }
 		
 		return jsonObject;
 	}
@@ -2705,7 +2745,25 @@ public class Helper
         sharedPreferencesEditor.commit();
     }
     //WalkThrough finished
-    
+
+    //City Name
+    public static String GetCityName(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetCityName(.) Invoked");
+
+        return sharedPreferences.getString(Constants.CITY_NAME, "");
+    }
+
+    public static void SetCityName(SharedPreferences sharedPreferences, String cityName)
+    {
+        logger.debug("SetCityName(..) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putString(Constants.CITY_NAME, cityName);
+        sharedPreferencesEditor.commit();
+    }
+    //City Name
+
     public static ProfileStateEnum GetProfileState(SharedPreferences sharedPreferences)
     {
     	logger.debug("GetProfileState(.) Invoked");
@@ -3302,6 +3360,30 @@ public class Helper
         //@@Collections.sort(allSendables, new ResolveInfo.DisplayNameComparator(packageManager));
         
         return allSendables;
+    }
+
+    public static int GetAgeFromMillis(long birthdayMillis)
+    {
+        logger.debug("GetAgeFromMillis(.) Invoked");
+
+        Date birthday = new Date(birthdayMillis);
+
+        GregorianCalendar today = new GregorianCalendar();
+        GregorianCalendar bday = new GregorianCalendar();
+        GregorianCalendar bdayThisYear = new GregorianCalendar();
+
+        bday.setTime(birthday);
+        bdayThisYear.setTime(birthday);
+        bdayThisYear.set(Calendar.YEAR, today.get(Calendar.YEAR));
+
+        int age = today.get(Calendar.YEAR) - bday.get(Calendar.YEAR);
+
+        if(today.getTimeInMillis() < bdayThisYear.getTimeInMillis())
+        {
+            age--;
+        }
+
+        return age;
     }
 
     // -- Fonts -- //

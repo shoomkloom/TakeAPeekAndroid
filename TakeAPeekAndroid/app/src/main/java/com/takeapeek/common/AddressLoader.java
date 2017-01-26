@@ -90,6 +90,7 @@ public class AddressLoader
         private LatLng mLatLng = null;
         private WeakReference<TextView> mTextViewReference;
         private Context mContext = null;
+        private SharedPreferences mSharedPreferences = null;
 
         public AddressCreatorTask(Context context, TextView textView)
         {
@@ -97,6 +98,8 @@ public class AddressLoader
         	
         	mTextViewReference = new WeakReference<TextView>(textView);
         	mContext = context;
+
+            mSharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
         }
         
         /**
@@ -111,7 +114,7 @@ public class AddressLoader
 
         	try
         	{
-                return LocationHelper.FormattedAddressFromLocation(mContext, mLatLng);
+                return LocationHelper.FormattedAddressFromLocation(mContext, mLatLng, mSharedPreferences);
         	}
         	catch(Exception e)
         	{

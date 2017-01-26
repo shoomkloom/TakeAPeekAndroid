@@ -178,6 +178,9 @@ public class Constants
     //Widget image content uri string
     public static final String WIDGET_IMAGE_URI = "WidgetImageURI";
 
+    //MixPanel Params file
+    public static final String MIXPANELPARAMS_FILE_NAME = "mixpanelparams.json";
+
     //IncomingHandler message types
     public static final int HANDLER_MESSAGE_PEEK_DOWNLOADED = 10001;
     public static final int HANDLER_MESSAGE_PEEK_PROGRESS = 10002;
@@ -234,6 +237,7 @@ public class Constants
     public static final String PROFILE_ID = "ProfileId";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String SHOW_NOTIFICATIONS = "ShowNotifications";
+    public static final String CITY_NAME = "CityName";
     
     public static final int OLDCURSOR_CONTACT_QUATA = 100;
     public static final int UPDATECURSOR_CONTACT_QUATA = 100;

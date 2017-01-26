@@ -147,7 +147,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                                 DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
 
                                 //Log event to FaceBook
-                                mAppEventsLogger.logEvent("EVENT_NAME_FOLLOW");
+                                mAppEventsLogger.logEvent("Followed_User");
                             }
                         }
                         catch(Exception e)

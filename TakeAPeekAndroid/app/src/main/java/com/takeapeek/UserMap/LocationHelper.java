@@ -1,6 +1,7 @@
 package com.takeapeek.usermap;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 
@@ -25,8 +26,10 @@ public class LocationHelper
 {
     static private final Logger logger = LoggerFactory.getLogger(LocationHelper.class);
 
-    static public String FormattedAddressFromLocation(Context context, LatLng location) throws Exception
+    static public String FormattedAddressFromLocation(Context context, LatLng location, SharedPreferences sharedPreferences) throws Exception
     {
+        logger.debug("FormattedAddressFromLocation(...) Invoked");
+
         String formattedAddress = null;
 
         String googleMapsKey = context.getString(R.string.google_maps_key);
@@ -41,8 +44,9 @@ public class LocationHelper
         {
             String postCode = null;
             String streetNumber = null;
+            String locality = null;
 
-            //Find the post code
+            //Find the post code, streetNumber and city
             for(AddressComponent addressComponent : formattedAddressContainer.results.get(0).address_components)
             {
                 for(String type : addressComponent.types)
@@ -55,6 +59,10 @@ public class LocationHelper
                     {
                         streetNumber = addressComponent.long_name;
                     }
+                    else if(type.compareTo("locality") == 0)
+                    {
+                        locality = addressComponent.long_name;
+                    }
                 }
 
                 if(postCode != null)
@@ -62,6 +70,8 @@ public class LocationHelper
                     break;
                 }
             }
+
+            Helper.SetCityName(sharedPreferences, locality);
 
             formattedAddress = formattedAddressContainer.results.get(0).formatted_address;
 

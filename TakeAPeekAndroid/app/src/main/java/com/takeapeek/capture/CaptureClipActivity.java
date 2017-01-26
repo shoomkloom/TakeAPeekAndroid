@@ -3278,7 +3278,7 @@ public class CaptureClipActivity extends Activity implements
             Helper.SetFirstRun(mSharedPreferences.edit(), false);
 
             //Log event to FaceBook
-            mAppEventsLogger.logEvent("EVENT_NAME_SEND_PEEK");
+            mAppEventsLogger.logEvent("Peek_Sent");
 
             setResult(RESULT_OK);
             finish();

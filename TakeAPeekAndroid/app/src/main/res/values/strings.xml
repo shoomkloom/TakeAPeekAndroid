@@ -255,4 +255,7 @@
     <!-- facebook -->
     <string name="facebook_app_id">1765959877057432</string>
 
+    <!-- MixPanel -->
+    <string name="mixpanel_id">a13426908acdc514a1db984d9db013eb</string>
+
 </resources>

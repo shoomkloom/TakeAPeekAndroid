@@ -9,8 +9,33 @@ public class NameValuePair
     {
         Name = name;
         Value = value;
+        ValueType = PairType.StringVal;
+    }
+
+    public NameValuePair(String name, long value)
+    {
+        Name = name;
+        ValueLong = value;
+        ValueType = PairType.LongVal;
+    }
+
+    public NameValuePair(String name, boolean value)
+    {
+        Name = name;
+        ValueBoolean = value;
+        ValueType = PairType.BooleanVal;
     }
 
     public String Name;
     public String Value;
+    public long ValueLong;
+    public boolean ValueBoolean;
+    public PairType ValueType;
+
+    public enum PairType
+    {
+        StringVal,
+        LongVal,
+        BooleanVal
+    }
 }

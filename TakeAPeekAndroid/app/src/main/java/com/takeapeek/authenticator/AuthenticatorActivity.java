@@ -38,7 +38,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.facebook.appevents.AppEventsConstants;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -285,7 +284,7 @@ public class AuthenticatorActivity extends AppCompatActivity
 				Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.Exit), getString(R.string.error_more_than_one_account));
 			}
 			
-	    	if(takeAPeekAccount != null/*@@ && displayNameSuccess == true && dobSuccess == true*/)
+	    	if(takeAPeekAccount != null)
 	    	{
 	    		logger.info("onCreate: A TakeAPeek account already exists");
 	    		
@@ -651,8 +650,25 @@ public class AuthenticatorActivity extends AppCompatActivity
 		Helper.SetProfileState(mSharedPreferences.edit(), ProfileStateEnum.Active);
 
         //Log event to FaceBook
-        mAppEventsLogger.logEvent(AppEventsConstants.EVENT_NAME_COMPLETED_TUTORIAL);
+        mAppEventsLogger.logEvent("Completed_Registration");
 
+        //Log event to MixPanel
+/*@@MP
+        try
+        {
+            JSONObject props = new JSONObject();
+            props.put("Mobile Number", mUsername);
+            mMixpanel.track("Mobile Number Verified", props);
+
+            JSONObject superProps = new JSONObject();
+            superProps.put("Mobile Number", mUsername);
+            mMixpanel.registerSuperProperties(superProps);
+        }
+        catch (JSONException e)
+        {
+            logger.error("MixPanel EXCEPTION: Unable to add properties to JSONObject", e);
+        }
+@@*/
         new AsyncTask<Void, Void, ResponseObject>()
         {
             @Override
@@ -1159,6 +1175,24 @@ public class AuthenticatorActivity extends AppCompatActivity
             mDisplayNameValidationProgess.setAnimation(zoomInAnimation);
             zoomInAnimation.start();
             mButtonCreateDisplayName.setEnabled(true);
+
+            //Log event to MixPanel
+/*@@MP
+            try
+            {
+                JSONObject props = new JSONObject();
+                props.put("User Name", mDisplayName);
+                mMixpanel.track("User Name Approved", props);
+
+                JSONObject superProps = new JSONObject();
+                superProps.put("User Name", mDisplayName);
+                mMixpanel.registerSuperProperties(superProps);
+            }
+            catch (JSONException e)
+            {
+                logger.error("MixPanel EXCEPTION: Unable to add properties to JSONObject", e);
+            }
+@@*/
         }
     }
 
@@ -1541,6 +1575,25 @@ public class AuthenticatorActivity extends AppCompatActivity
 
         UpdateDOBTextView();
 
+        //Log event to MixPanel
+/*@@MP
+        try
+        {
+            int age = Helper.GetAgeFromMillis(mDateOfBirthMillis);
+
+            JSONObject props = new JSONObject();
+            props.put("Age", age);
+            mMixpanel.track("Age Approved", props);
+
+            JSONObject superProps = new JSONObject();
+            superProps.put("Age", age);
+            mMixpanel.registerSuperProperties(superProps);
+        }
+        catch (JSONException e)
+        {
+            logger.error("MixPanel EXCEPTION: Unable to add properties to JSONObject", e);
+        }
+@@*/
         return true;
     }
 
