@@ -41,6 +41,7 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
@@ -55,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+
+import static com.takeapeek.common.MixPanel.SCREEN_NOTIFICATION_POPUP;
 
 public class NotificationPopupActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -481,6 +484,9 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(NotificationPopupActivity.this, R.color.pt_white_faded)));
                     findViewById(R.id.button_control).setVisibility(View.GONE);
                     findViewById(R.id.button_control_background_close).setVisibility(View.VISIBLE);
+
+                    MixPanel.PeekButtonEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP);
+
                     break;
 
                 case R.id.button_control_close:
@@ -493,6 +499,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                 case R.id.button_send_peek:
                     logger.info("onClick: button_send_peek clicked");
+
+                    MixPanel.SendButtonEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP, mSharedPreferences);
 
                     final Intent captureClipActivityIntent = new Intent(NotificationPopupActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -555,6 +563,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                                             //Log event to FaceBook
                                             mAppEventsLogger.logEvent("Peek_Request");
+
+                                            MixPanel.RequestButtonEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP, 1, mSharedPreferences);
                                         }
                                     }
                                     finally
@@ -575,6 +585,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                 case R.id.user_peek_notification_thumbnail_play:
                     logger.info("onClick: user_peek_notification_thumbnail_play clicked");
+
+                    MixPanel.ViewPeekClickEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP, mSharedPreferences);
 
                     final Intent userFeedActivityIntent = new Intent(NotificationPopupActivity.this, UserFeedActivity.class);
                     userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

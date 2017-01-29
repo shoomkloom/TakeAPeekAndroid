@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 
@@ -20,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.takeapeek.common.MixPanel.SCREEN_BLOCKED;
 
 /**
  * Created by orenslev on 12/05/2016.
@@ -170,6 +173,8 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                                 String message = String.format(mBlockedActivity.get().getString(R.string.set_relation_unblock), mViewHolder.mTakeAPeekBlocked.targetDisplayName);
                                 Helper.ShowCenteredToast(mBlockedActivity.get(), message);
+
+                                MixPanel.BlockUserEventAndProps(mBlockedActivity.get(), SCREEN_BLOCKED, mSharedPreferences);
                             }
                             else
                             {

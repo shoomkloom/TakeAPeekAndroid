@@ -88,6 +88,13 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
 
                 mTextView.setSelected(true);
                 mTextView.requestFocus();
+
+                if(Helper.GetFirstRun(mSharedPreferences) == false)
+                {
+                    //Set MixPanel event and props
+                    //but only after first capture is done
+                    MixPanel.AppOpenEventAndProps(mContext, mSharedPreferences);
+                }
             }
         }
     }

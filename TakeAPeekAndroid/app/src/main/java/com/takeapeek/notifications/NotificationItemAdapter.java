@@ -19,6 +19,7 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
@@ -33,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.takeapeek.common.MixPanel.SCREEN_NOTIFICATION;
 
 /**
  * Created by orenslev on 12/05/2016.
@@ -223,6 +226,8 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                         case request:
                             logger.info(String.format("Starting CaptureClipActivity with RELATEDPROFILEIDEXTRA_KEY = %s", viewHolder.mSrcProfileObject.profileId));
 
+                            MixPanel.SendButtonEventAndProps(mNotificationsActivity.get(), SCREEN_NOTIFICATION, mSharedPreferences);
+
                             final Intent captureClipActivityIntent = new Intent(mNotificationsActivity.get(), CaptureClipActivity.class);
                             captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mSrcProfileObject.profileId);
@@ -232,6 +237,8 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                         case response:
                         case peek:
                             logger.info("Starting UserFeedActivity with PARAM_PEEKOBJECT");
+
+                            MixPanel.ViewPeekClickEventAndProps(mNotificationsActivity.get(), SCREEN_NOTIFICATION, mSharedPreferences);
 
                             final Intent userFeedActivityIntent = new Intent(mNotificationsActivity.get(), UserFeedActivity.class);
                             userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -2747,19 +2747,19 @@ public class Helper
     //WalkThrough finished
 
     //City Name
-    public static String GetCityName(SharedPreferences sharedPreferences)
+    public static String GetLocality(SharedPreferences sharedPreferences)
     {
-        logger.debug("GetCityName(.) Invoked");
+        logger.debug("GetLocality(.) Invoked");
 
-        return sharedPreferences.getString(Constants.CITY_NAME, "");
+        return sharedPreferences.getString(Constants.LOCALITY, "");
     }
 
-    public static void SetCityName(SharedPreferences sharedPreferences, String cityName)
+    public static void SetLocality(SharedPreferences sharedPreferences, String locality)
     {
-        logger.debug("SetCityName(..) Invoked");
+        logger.debug("SetLocality(..) Invoked");
 
         Editor sharedPreferencesEditor = sharedPreferences.edit();
-        sharedPreferencesEditor.putString(Constants.CITY_NAME, cityName);
+        sharedPreferencesEditor.putString(Constants.LOCALITY, locality);
         sharedPreferencesEditor.commit();
     }
     //City Name

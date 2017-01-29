@@ -237,7 +237,7 @@ public class Constants
     public static final String PROFILE_ID = "ProfileId";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String SHOW_NOTIFICATIONS = "ShowNotifications";
-    public static final String CITY_NAME = "CityName";
+    public static final String LOCALITY = "Locality";
     
     public static final int OLDCURSOR_CONTACT_QUATA = 100;
     public static final int UPDATECURSOR_CONTACT_QUATA = 100;

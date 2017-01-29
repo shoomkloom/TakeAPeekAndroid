@@ -68,6 +68,8 @@ import com.takeapeek.capture.Preview.Preview;
 import com.takeapeek.capture.UI.MainUI;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
+import com.takeapeek.common.NameValuePair;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
@@ -79,6 +81,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import static com.takeapeek.common.MixPanel.Instance;
 
 /** The main Activity for Open Camera.
  */
@@ -3279,6 +3283,40 @@ public class CaptureClipActivity extends Activity implements
 
             //Log event to FaceBook
             mAppEventsLogger.logEvent("Peek_Sent");
+
+            //Get mixpanel properties
+            long currentDate = Helper.GetCurrentTimeMillis();
+
+            Object firstCaptureDateObj = Instance(this).GetSuperProperty("Date of first time peek created");
+            long firstCaptureDate = firstCaptureDateObj == null ? 0 : (long)firstCaptureDateObj;
+
+            Boolean firstTime = firstCaptureDate == currentDate;
+
+            //Set MixPanel event
+            List<NameValuePair> props = new ArrayList<NameValuePair>();
+            props.add(new NameValuePair("Date", currentDate));
+            props.add(new NameValuePair("Text", mCompletedTakeAPeekObject.Title));
+            props.add(new NameValuePair("First Time ?", firstTime));
+            Instance(this).SendEvent("Peek Created", props);
+
+            //Save once locality date for comparison later
+            List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
+            superOnceProps.add(new NameValuePair("Date of first time peek created", currentDate));
+            Instance(this).SetSuperPropertiesOnce(superOnceProps);
+
+            Object totalPeekCreatedObj = Instance(this).GetSuperProperty("Total number of peeks created");
+            long totalPeekCreated = totalPeekCreatedObj == null ? 1 : (long)totalPeekCreatedObj + 1;
+
+            long firstPeekCreatedDate = (long)MixPanel.Instance(this).GetSuperProperty("Date of first time peek created");
+
+            //Save super props
+            List<NameValuePair> superProps = new ArrayList<NameValuePair>();
+            superProps.add(new NameValuePair("Date of first time peek created", firstPeekCreatedDate));
+            superProps.add(new NameValuePair("Total number of peeks created", totalPeekCreated));
+            MixPanel.Instance(this).SetSuperProperties(superProps);
+
+            //Save people properties
+            MixPanel.Instance(this).SetPeopleProperties(superProps);
 
             setResult(RESULT_OK);
             finish();

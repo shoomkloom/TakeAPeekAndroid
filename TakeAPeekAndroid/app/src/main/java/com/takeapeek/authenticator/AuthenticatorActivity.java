@@ -49,6 +49,8 @@ import com.takeapeek.common.Constants;
 import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.Helper.FontTypeEnum;
+import com.takeapeek.common.MixPanel;
+import com.takeapeek.common.NameValuePair;
 import com.takeapeek.common.PhoneNumberFormattingTextWatcher;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.TAPDatePicker;
@@ -59,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -653,22 +656,12 @@ public class AuthenticatorActivity extends AppCompatActivity
         mAppEventsLogger.logEvent("Completed_Registration");
 
         //Log event to MixPanel
-/*@@MP
-        try
-        {
-            JSONObject props = new JSONObject();
-            props.put("Mobile Number", mUsername);
-            mMixpanel.track("Mobile Number Verified", props);
+        List<NameValuePair> props = new ArrayList<NameValuePair>();
+        props.add(new NameValuePair("Mobile Number", mUsername));
+        MixPanel.Instance(this).SendEvent("Mobile Number Verified", props);
+        MixPanel.Instance(this).SetSuperProperties(props);
+        MixPanel.Instance(this).SetPeopleProperties(props);
 
-            JSONObject superProps = new JSONObject();
-            superProps.put("Mobile Number", mUsername);
-            mMixpanel.registerSuperProperties(superProps);
-        }
-        catch (JSONException e)
-        {
-            logger.error("MixPanel EXCEPTION: Unable to add properties to JSONObject", e);
-        }
-@@*/
         new AsyncTask<Void, Void, ResponseObject>()
         {
             @Override
@@ -1177,22 +1170,11 @@ public class AuthenticatorActivity extends AppCompatActivity
             mButtonCreateDisplayName.setEnabled(true);
 
             //Log event to MixPanel
-/*@@MP
-            try
-            {
-                JSONObject props = new JSONObject();
-                props.put("User Name", mDisplayName);
-                mMixpanel.track("User Name Approved", props);
-
-                JSONObject superProps = new JSONObject();
-                superProps.put("User Name", mDisplayName);
-                mMixpanel.registerSuperProperties(superProps);
-            }
-            catch (JSONException e)
-            {
-                logger.error("MixPanel EXCEPTION: Unable to add properties to JSONObject", e);
-            }
-@@*/
+            List<NameValuePair> props = new ArrayList<NameValuePair>();
+            props.add(new NameValuePair("User Name", mDisplayName));
+            MixPanel.Instance(this).SendEvent("User Name Approved", props);
+            MixPanel.Instance(this).SetSuperProperties(props);
+            MixPanel.Instance(this).SetPeopleProperties(props);
         }
     }
 
@@ -1576,24 +1558,14 @@ public class AuthenticatorActivity extends AppCompatActivity
         UpdateDOBTextView();
 
         //Log event to MixPanel
-/*@@MP
-        try
-        {
-            int age = Helper.GetAgeFromMillis(mDateOfBirthMillis);
+        int age = Helper.GetAgeFromMillis(mDateOfBirthMillis);
 
-            JSONObject props = new JSONObject();
-            props.put("Age", age);
-            mMixpanel.track("Age Approved", props);
+        List<NameValuePair> props = new ArrayList<NameValuePair>();
+        props.add(new NameValuePair("Age", age));
+        MixPanel.Instance(this).SendEvent("Age Approved", props);
+        MixPanel.Instance(this).SetSuperProperties(props);
+        MixPanel.Instance(this).SetPeopleProperties(props);
 
-            JSONObject superProps = new JSONObject();
-            superProps.put("Age", age);
-            mMixpanel.registerSuperProperties(superProps);
-        }
-        catch (JSONException e)
-        {
-            logger.error("MixPanel EXCEPTION: Unable to add properties to JSONObject", e);
-        }
-@@*/
         return true;
     }
 

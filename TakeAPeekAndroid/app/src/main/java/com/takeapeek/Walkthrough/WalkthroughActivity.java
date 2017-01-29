@@ -20,14 +20,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.facebook.appevents.AppEventsConstants;
 import com.facebook.appevents.AppEventsLogger;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
+import com.takeapeek.common.NameValuePair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WalkthroughActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener
 {
@@ -171,6 +175,9 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
     {
         logger.debug("onRequestPermissionsResult(...) Invoked");
 
+        List<NameValuePair> mixPanelProps = new ArrayList<NameValuePair>();
+        mixPanelProps.add(new NameValuePair("Date", Helper.GetCurrentTimeMillis() / 1000L));
+
         switch (requestCode)
         {
             case REQUEST_PERMISSION_CODE:
@@ -178,21 +185,37 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
                 boolean allPermissionsGranted = true;
                 if (grantResults.length > 0)
                 {
-                    for (int grantResult : grantResults)
+                    for(int i=0; i<grantResults.length; i++)
                     {
+                        String permission = permissions[i];
+                        int grantResult = grantResults[i];
+
                         if (grantResult != PackageManager.PERMISSION_GRANTED)
                         {
                             allPermissionsGranted = false;
-                            break;
+
+                            mixPanelProps.add(new NameValuePair(permission, false));
+                        }
+                        else
+                        {
+                            mixPanelProps.add(new NameValuePair(permission, true));
                         }
                     }
                 }
+
+                MixPanel.Instance(this).SendEvent("Main Permissions Enabled", mixPanelProps);
 
                 if(allPermissionsGranted == true)
                 {
                     logger.info("All permissions were granted, finish the activity.");
 
                     Helper.SetWalkthroughFinished(mSharedPreferences);
+
+                    //Log event to FaceBook
+                    mAppEventsLogger.logEvent("Completed_Tutorial");
+
+                    //Set Mixpanel event
+                    MixPanel.WalkthroughCompletedEventAndProps(this);
 
                     setResult(RESULT_OK);
                     finish();
@@ -272,7 +295,10 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
                     Helper.SetWalkthroughFinished(mSharedPreferences);
 
                     //Log event to FaceBook
-                    mAppEventsLogger.logEvent(AppEventsConstants.EVENT_NAME_COMPLETED_TUTORIAL);
+                    mAppEventsLogger.logEvent("Completed_Tutorial");
+
+                    //Set Mixpanel event
+                    MixPanel.WalkthroughCompletedEventAndProps(this);
 
                     setResult(RESULT_OK);
                     finish();

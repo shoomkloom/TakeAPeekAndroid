@@ -31,6 +31,7 @@ import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
@@ -57,6 +58,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.takeapeek.R.id.textview_preview_button_report;
 import static com.takeapeek.R.id.top_bar;
+import static com.takeapeek.common.MixPanel.SCREEN_USER_FEED;
 
 public class UserFeedActivity extends AppCompatActivity
 {
@@ -612,6 +614,8 @@ public class UserFeedActivity extends AppCompatActivity
 
         mEnumActivityState = EnumActivityState.previewStopped;
         UpdateUI();
+
+        MixPanel.PeekViewedEventAndProps(this, mSharedPreferences);
     }
 
     private void ClearPeekFromList(TakeAPeekObject takeAPeekObject)
@@ -746,6 +750,8 @@ public class UserFeedActivity extends AppCompatActivity
                             {
                                 String message = String.format(UserFeedActivity.this.getString(R.string.set_relation_block), mCurrentTakeAPeekObject.ProfileDisplayName);
                                 Helper.ShowCenteredToast(UserFeedActivity.this, message);
+
+                                MixPanel.BlockUserEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED, mSharedPreferences);
                             }
                             else
                             {
@@ -804,6 +810,9 @@ public class UserFeedActivity extends AppCompatActivity
                             {
                                 String message = UserFeedActivity.this.getString(R.string.report_peek_success);
                                 Helper.ShowCenteredToast(UserFeedActivity.this, message);
+
+                                String userReported = String.format("%s (%s)", mCurrentTakeAPeekObject.ProfileDisplayName, mCurrentTakeAPeekObject.ProfileID);
+                                MixPanel.ReportUserEventAndProps(UserFeedActivity.this, userReported, mSharedPreferences);
                             }
                             else
                             {
@@ -833,6 +842,9 @@ public class UserFeedActivity extends AppCompatActivity
                     findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(UserFeedActivity.this, R.color.pt_white_faded)));
                     findViewById(R.id.button_control).setVisibility(View.GONE);
                     findViewById(R.id.button_control_background_close).setVisibility(View.VISIBLE);
+
+                    MixPanel.PeekButtonEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED);
+
                     break;
 
                 case R.id.button_control_close:
@@ -845,6 +857,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 case R.id.button_send_peek:
                     logger.info("onClick: button_send_peek clicked");
+
+                    MixPanel.SendButtonEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED, mSharedPreferences);
 
                     final Intent captureClipActivityIntent = new Intent(UserFeedActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -912,6 +926,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                                             //Log event to FaceBook
                                             mAppEventsLogger.logEvent("Peek_Request");
+
+                                            MixPanel.RequestButtonEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED, 1, mSharedPreferences);
                                         }
                                     }
                                     catch(Exception e)
@@ -1056,6 +1072,8 @@ public class UserFeedActivity extends AppCompatActivity
                                 DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelationFollow);
 
                                 Helper.ShowCenteredToast(UserFeedActivity.this, message);
+
+                                MixPanel.FollowUserEventAndProps(UserFeedActivity.this, mSharedPreferences);
                             }
                         }
                         finally

@@ -66,6 +66,8 @@ import com.takeapeek.capture.CaptureClipActivity;
 import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
+import com.takeapeek.common.NameValuePair;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RelativeSliderLayout;
 import com.takeapeek.common.RequestObject;
@@ -92,12 +94,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
 import static com.takeapeek.common.Helper.dipToPx;
+import static com.takeapeek.common.MixPanel.SCREEN_USER_FEED;
+import static com.takeapeek.common.MixPanel.SCREEN_USER_MAP;
 
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -317,8 +322,6 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 logger.info("RelativeSliderLayout:onSlided: dragger_trending_locations slided");
 
-                Helper.SetFirstTrendingSwipe(mSharedPreferences.edit(), true);
-
                 //Show the trending locations activity
                 final Intent trendingIntent = new Intent(UserMapActivity.this, TrendingPlacesActivity.class);
                 startActivity(trendingIntent);
@@ -465,6 +468,8 @@ public class UserMapActivity extends FragmentActivity implements
             if (currentTimeMillis - lastCaptureMillis > Constants.INTERVAL_TENMINUTES)
             {
                 showCaptureOnLoad = true;
+
+                MixPanel.SendButtonEventAndProps(this, SCREEN_USER_MAP, mSharedPreferences);
 
                 Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);
                 captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -830,16 +835,6 @@ public class UserMapActivity extends FragmentActivity implements
                     mZoomedAddressCreator = new ZoomedAddressCreator(this, latlngToTheLeft, latlngToTheRight, mTextViewStackUserName);
                     mZoomedAddressCreator.execute();
 
-/*@@
-                    try
-                    {
-                        mTextViewStackUserName.setText(GetZoomedAddress());
-                    }
-                    catch(Exception e)
-                    {
-                        Helper.Error(logger, "EXCEPTION: When calling GetZoomedAddress", e);
-                    }
-@@*/
                     //Start asynchronous request to server
                     mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
                     {
@@ -1371,6 +1366,8 @@ public class UserMapActivity extends FragmentActivity implements
                     findViewById(R.id.button_send_peek).setVisibility(View.VISIBLE);
                     findViewById(R.id.button_request_peek).setVisibility(View.VISIBLE);
 
+                    MixPanel.PeekButtonEventAndProps(UserMapActivity.this, SCREEN_USER_MAP);
+
                     break;
 
                 case R.id.button_map_control_close:
@@ -1386,6 +1383,8 @@ public class UserMapActivity extends FragmentActivity implements
 
                 case R.id.button_send_peek:
                     logger.info("OnClickListener:onClick: button_send_peek clicked");
+
+                    MixPanel.SendButtonEventAndProps(UserMapActivity.this, SCREEN_USER_MAP, mSharedPreferences);
 
                     final Intent captureClipActivityIntent = new Intent(UserMapActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1599,6 +1598,8 @@ public class UserMapActivity extends FragmentActivity implements
 
                                         //Log event to FaceBook
                                         mAppEventsLogger.logEvent("Peek_Request");
+
+                                        MixPanel.RequestButtonEventAndProps(UserMapActivity.this, SCREEN_USER_MAP, mNumberOfRequests, mSharedPreferences);
                                     }
                                 }
                                 finally

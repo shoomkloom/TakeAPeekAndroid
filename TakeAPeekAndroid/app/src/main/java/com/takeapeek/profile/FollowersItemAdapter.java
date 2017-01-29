@@ -13,6 +13,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
@@ -22,6 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.takeapeek.common.MixPanel.SCREEN_FOLLOWERS;
 
 /**
  * Created by orenslev on 12/05/2016.
@@ -184,6 +187,8 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                                 //Log event to FaceBook
                                 mAppEventsLogger.logEvent("Followed_User");
+
+                                MixPanel.FollowUserEventAndProps(mFollowersActivity.get(), mSharedPreferences);
                             }
                             else
                             {
@@ -242,6 +247,8 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
                                 String message = String.format(mFollowersActivity.get().getString(R.string.set_relation_block), mViewHolder.mTakeAPeekFollowers.sourceDisplayName);
                                 Helper.ShowCenteredToast(mFollowersActivity.get(), message);
+
+                                MixPanel.BlockUserEventAndProps(mFollowersActivity.get(), SCREEN_FOLLOWERS, mSharedPreferences);
                             }
                             else
                             {

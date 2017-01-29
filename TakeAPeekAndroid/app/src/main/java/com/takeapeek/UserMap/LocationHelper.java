@@ -71,7 +71,7 @@ public class LocationHelper
                 }
             }
 
-            Helper.SetCityName(sharedPreferences, locality);
+            Helper.SetLocality(sharedPreferences, locality);
 
             formattedAddress = formattedAddressContainer.results.get(0).formatted_address;
 

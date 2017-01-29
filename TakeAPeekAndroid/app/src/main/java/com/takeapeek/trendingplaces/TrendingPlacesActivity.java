@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
+import com.takeapeek.common.NameValuePair;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.common.Transport;
 import com.takeapeek.common.TrendingPlaceObject;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TrendingPlacesActivity extends AppCompatActivity
@@ -144,6 +147,39 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
         mEnumActivityState = EnumActivityState.loading;
         UpdateUI();
+
+        boolean doneFirstTrendingSwipe = Helper.GetFirstTrendingSwipe(mSharedPreferences);
+        if(doneFirstTrendingSwipe == false)
+        {
+            Helper.SetFirstTrendingSwipe(mSharedPreferences.edit(), true);
+        }
+
+        //Send MixPanel event
+        long currentDate = Helper.GetCurrentTimeMillis();
+        List<NameValuePair> props = new ArrayList<NameValuePair>();
+        props.add(new NameValuePair("Date", currentDate));
+        props.add(new NameValuePair("First time ?", !doneFirstTrendingSwipe));
+        MixPanel.Instance(this).SendEvent("Trending Location Slide", props);
+
+        //Set once super properties
+        List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
+        superOnceProps.add(new NameValuePair("Date of first trending location slide", currentDate));
+        MixPanel.Instance(this).SetSuperPropertiesOnce(superOnceProps);
+
+        long dateOfFirstSwipe = (long)MixPanel.Instance(this).GetSuperProperty("Date of first trending location slide");
+
+        //Set super properties
+        Object totalTrendingLocationSwipeObj = MixPanel.Instance(this).GetSuperProperty("Total number of trending loation slide");
+        long totalTrendingLocationSwipe = totalTrendingLocationSwipeObj == null ? 1 : (long)totalTrendingLocationSwipeObj + 1;
+
+        List<NameValuePair> superProps = new ArrayList<NameValuePair>();
+        superProps.add(new NameValuePair("Date of first trending location slide", dateOfFirstSwipe));
+        superProps.add(new NameValuePair("Total number of trending loation slide", totalTrendingLocationSwipe));
+        MixPanel.Instance(this).SetSuperProperties(superProps);
+
+        //Set people properties
+        MixPanel.Instance(this).SetPeopleProperties(superProps);
+        //End Send MixPanel event
 
         new AsyncTask<Void, Void, ArrayList<TrendingPlaceObject>>()
         {
