@@ -1557,14 +1557,21 @@ public class AuthenticatorActivity extends AppCompatActivity
 
         UpdateDOBTextView();
 
-        //Log event to MixPanel
-        int age = Helper.GetAgeFromMillis(mDateOfBirthMillis);
+        try
+        {
+            //Log event to MixPanel
+            int age = Helper.GetAgeFromMillis(mDateOfBirthMillis);
 
-        List<NameValuePair> props = new ArrayList<NameValuePair>();
-        props.add(new NameValuePair("Age", age));
-        MixPanel.Instance(this).SendEvent("Age Approved", props);
-        MixPanel.Instance(this).SetSuperProperties(props);
-        MixPanel.Instance(this).SetPeopleProperties(props);
+            List<NameValuePair> props = new ArrayList<NameValuePair>();
+            props.add(new NameValuePair("Age", age));
+            MixPanel.Instance(this).SendEvent("Age Approved", props);
+            MixPanel.Instance(this).SetSuperProperties(props);
+            MixPanel.Instance(this).SetPeopleProperties(props);
+        }
+        catch(Exception e)
+        {
+            logger.error("EXCEPTION: When trying to send 'age' to MixPanel", e);
+        }
 
         return true;
     }

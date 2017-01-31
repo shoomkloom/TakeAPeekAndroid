@@ -3284,39 +3284,47 @@ public class CaptureClipActivity extends Activity implements
             //Log event to FaceBook
             mAppEventsLogger.logEvent("Peek_Sent");
 
-            //Get mixpanel properties
-            long currentDate = Helper.GetCurrentTimeMillis();
+            try
+            {
+                //Get mixpanel properties
+                long currentDate = Helper.GetCurrentTimeMillis();
 
-            Object firstCaptureDateObj = Instance(this).GetSuperProperty("Date of first time peek created");
-            long firstCaptureDate = firstCaptureDateObj == null ? 0 : (long)firstCaptureDateObj;
+                Object firstCaptureDateObj = Instance(this).GetSuperProperty("Date of first time peek created");
+                long firstCaptureDate = firstCaptureDateObj == null ? 0 : (long) firstCaptureDateObj;
 
-            Boolean firstTime = firstCaptureDate == currentDate;
+                Boolean firstTime = firstCaptureDate == 0 || firstCaptureDate == currentDate;
 
-            //Set MixPanel event
-            List<NameValuePair> props = new ArrayList<NameValuePair>();
-            props.add(new NameValuePair("Date", currentDate));
-            props.add(new NameValuePair("Text", mCompletedTakeAPeekObject.Title));
-            props.add(new NameValuePair("First Time ?", firstTime));
-            Instance(this).SendEvent("Peek Created", props);
+                //Set MixPanel event
+                List<NameValuePair> props = new ArrayList<NameValuePair>();
+                props.add(new NameValuePair("Date", currentDate));
+                props.add(new NameValuePair("Text", mCompletedTakeAPeekObject.Title));
+                props.add(new NameValuePair("First Time ?", firstTime));
+                Instance(this).SendEvent("Peek Created", props);
 
-            //Save once locality date for comparison later
-            List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
-            superOnceProps.add(new NameValuePair("Date of first time peek created", currentDate));
-            Instance(this).SetSuperPropertiesOnce(superOnceProps);
+                //Save once locality date for comparison later
+                List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
+                superOnceProps.add(new NameValuePair("Date of first time peek created", currentDate));
+                Instance(this).SetSuperPropertiesOnce(superOnceProps);
 
-            Object totalPeekCreatedObj = Instance(this).GetSuperProperty("Total number of peeks created");
-            long totalPeekCreated = totalPeekCreatedObj == null ? 1 : (long)totalPeekCreatedObj + 1;
+                Object totalPeekCreatedObj = Instance(this).GetSuperProperty("Total number of peeks created");
+                long totalPeekCreated = totalPeekCreatedObj == null ? 1 : (long) totalPeekCreatedObj + 1;
 
-            long firstPeekCreatedDate = (long)MixPanel.Instance(this).GetSuperProperty("Date of first time peek created");
+                Object firstPeekCreatedDateObj = MixPanel.Instance(this).GetSuperProperty("Date of first time peek created");
+                long firstPeekCreatedDate = firstPeekCreatedDateObj == null ? 0 : (long) firstPeekCreatedDateObj;
 
-            //Save super props
-            List<NameValuePair> superProps = new ArrayList<NameValuePair>();
-            superProps.add(new NameValuePair("Date of first time peek created", firstPeekCreatedDate));
-            superProps.add(new NameValuePair("Total number of peeks created", totalPeekCreated));
-            MixPanel.Instance(this).SetSuperProperties(superProps);
+                //Save super props
+                List<NameValuePair> superProps = new ArrayList<NameValuePair>();
+                superProps.add(new NameValuePair("Date of first time peek created", firstPeekCreatedDate));
+                superProps.add(new NameValuePair("Total number of peeks created", totalPeekCreated));
+                MixPanel.Instance(this).SetSuperProperties(superProps);
 
-            //Save people properties
-            MixPanel.Instance(this).SetPeopleProperties(superProps);
+                //Save people properties
+                MixPanel.Instance(this).SetPeopleProperties(superProps);
+            }
+            catch(Exception e)
+            {
+                logger.error("EXCEPTION: When calling MixPanel inside CaptureClipActivity", e);
+            }
 
             setResult(RESULT_OK);
             finish();

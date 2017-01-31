@@ -35,7 +35,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.icu.util.GregorianCalendar;
 import android.media.AudioManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -3366,21 +3365,30 @@ public class Helper
     {
         logger.debug("GetAgeFromMillis(.) Invoked");
 
-        Date birthday = new Date(birthdayMillis);
+        int age = -1;
 
-        GregorianCalendar today = new GregorianCalendar();
-        GregorianCalendar bday = new GregorianCalendar();
-        GregorianCalendar bdayThisYear = new GregorianCalendar();
-
-        bday.setTime(birthday);
-        bdayThisYear.setTime(birthday);
-        bdayThisYear.set(Calendar.YEAR, today.get(Calendar.YEAR));
-
-        int age = today.get(Calendar.YEAR) - bday.get(Calendar.YEAR);
-
-        if(today.getTimeInMillis() < bdayThisYear.getTimeInMillis())
+        try
         {
-            age--;
+            Date birthday = new Date(birthdayMillis);
+
+            Calendar today = Calendar.getInstance();
+            Calendar bday = Calendar.getInstance();
+            Calendar bdayThisYear = Calendar.getInstance();
+
+            bday.setTime(birthday);
+            bdayThisYear.setTime(birthday);
+            bdayThisYear.set(Calendar.YEAR, today.get(Calendar.YEAR));
+
+            age = today.get(Calendar.YEAR) - bday.get(Calendar.YEAR);
+
+            if (today.getTimeInMillis() < bdayThisYear.getTimeInMillis())
+            {
+                age--;
+            }
+        }
+        catch(Exception e)
+        {
+            logger.error("EXCEPTION: When in GetAgeFromMillis", e);
         }
 
         return age;
