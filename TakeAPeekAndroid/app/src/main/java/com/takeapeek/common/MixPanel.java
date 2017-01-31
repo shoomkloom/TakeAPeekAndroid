@@ -355,7 +355,7 @@ public class MixPanel
             Object firstLocalityDateObj = MixPanel.Instance(context).GetSuperProperty("Date of First App open");
             long firstLocalityDate = firstLocalityDateObj == null ? 0 : (long) firstLocalityDateObj;
 
-            Boolean firstTime = firstLocalityDate == currentDate;
+            Boolean firstTime = firstLocalityDate == 0 || firstLocalityDate == currentDate;
 
             List<NameValuePair> props = new ArrayList<NameValuePair>();
             props.add(new NameValuePair("Date", currentDate));
@@ -529,7 +529,7 @@ public class MixPanel
             Object firstPeekViewedDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek viewed");
             long firstPeekViewedDate = firstPeekViewedDateObj == null ? 0 : (long) firstPeekViewedDateObj;
 
-            Boolean firstTime = firstPeekViewedDate == currentDate;
+            Boolean firstTime = firstPeekViewedDate == 0 || firstPeekViewedDate == currentDate;
 
             //Set MixPanel event
             List<NameValuePair> props = new ArrayList<NameValuePair>();
@@ -574,7 +574,7 @@ public class MixPanel
             Object firstFollowDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time followed");
             long firstFollowDate = firstFollowDateObj == null ? 0 : (long) firstFollowDateObj;
 
-            Boolean firstTime = firstFollowDate == currentDate;
+            Boolean firstTime = firstFollowDate == 0 || firstFollowDate == currentDate;
 
             //Set MixPanel event
             List<NameValuePair> props = new ArrayList<NameValuePair>();
@@ -619,7 +619,7 @@ public class MixPanel
             Object firstFollowDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time blocked");
             long firstFollowDate = firstFollowDateObj == null ? 0 : (long) firstFollowDateObj;
 
-            Boolean firstTime = firstFollowDate == currentDate;
+            Boolean firstTime = firstFollowDate == 0 || firstFollowDate == currentDate;
 
             //Set MixPanel event
             List<NameValuePair> props = new ArrayList<NameValuePair>();
@@ -665,7 +665,7 @@ public class MixPanel
             Object firstReportDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time report");
             long firstReportDate = firstReportDateObj == null ? 0 : (long) firstReportDateObj;
 
-            Boolean firstTime = firstReportDate == currentDate;
+            Boolean firstTime = firstReportDate == 0 || firstReportDate == currentDate;
 
             //Set MixPanel event
             List<NameValuePair> props = new ArrayList<NameValuePair>();
