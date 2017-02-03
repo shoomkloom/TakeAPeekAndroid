@@ -141,17 +141,21 @@ public class SyncAdapterHelper implements Runnable,
 	{
 		logger.debug("UploadPendingPeeks() Invoked");
 
-		String username = Helper.GetTakeAPeekAccountUsername(mContext);
-		String password = Helper.GetTakeAPeekAccountPassword(mContext);
-
-		List<TakeAPeekObject> takeAPeekObjectList = null;
+        if(new Transport().IsConnected(mContext) == false)
+        {
+            logger.warn("Quick return in case of no network connection");
+            return;
+        }
 
         logger.info("Getting list of pending takeAPeekObjects from takeAPeekObjectList");
-        takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectUploadList();
+		List<TakeAPeekObject> takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectUploadList();
 
         if(takeAPeekObjectList != null)
         {
             logger.info(String.format("Found %d takeAPeekObjects pending upload", takeAPeekObjectList.size()));
+
+            String username = Helper.GetTakeAPeekAccountUsername(mContext);
+            String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
             for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
             {
@@ -162,6 +166,13 @@ public class SyncAdapterHelper implements Runnable,
                     if (fileToUpload.exists() == false)
                     {
                         Helper.Error(logger, String.format("ERROR: file %s does not exist", takeAPeekObject.FilePath));
+                        takeAPeekObject.Upload = 0;
+                        DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
+                        continue;
+                    }
+                    else if(Helper.GetCurrentTimeMillis() - takeAPeekObject.CreationTime > Constants.INTERVAL_HOUR)
+                    {
+                        logger.warn("Peek older than 1 hour, skipping upload and setting Upload = 0");
                         takeAPeekObject.Upload = 0;
                         DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                         continue;
@@ -186,19 +197,15 @@ public class SyncAdapterHelper implements Runnable,
                             fileToUpload, thumbnailToUpload,
                             Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
                             mSharedPreferences);
+
+                    logger.info("Peek uploaded successfully, setting Upload = 0");
+                    takeAPeekObject.Upload = 0;
+                    DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                 }
                 catch(Exception ex)
                 {
                     Helper.Error(logger, String.format("EXCEPTION: When trying to upload %s", takeAPeekObject.FilePath), ex);
-                    throw ex;
                 }
-            }
-
-            logger.info(String.format("Deleting %d takeAPeekObjects from takeAPeekObjectList", takeAPeekObjectList.size()));
-            for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
-            {
-                takeAPeekObject.Upload = 0;
-                DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
             }
         }
 
