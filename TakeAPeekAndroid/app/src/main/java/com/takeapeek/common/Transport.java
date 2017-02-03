@@ -45,11 +45,11 @@ public class Transport
 	
 	private ReentrantLock lock = new ReentrantLock();
 
-    /*/@@*/String mServerRootURL = "https://rest.peek.to";
-	//@@*/String mServerRootURL = "http://takeapeek.cloudapp.net";
-	//@@*/String mServerRootURL = "http://10.0.0.18:8888"; //Nexus 5 test device ip to PC localhost
-    //@@*/String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-	//@@*/String mServerRootURL = ""; //Staging address
+    /*@@*/String mServerRootURL = "https://rest.peek.to";
+	//*@@*/String mServerRootURL = "http://takeapeek.cloudapp.net";
+	//*@@*/String mServerRootURL = "https://127.0.0.1:3858"; //Nexus 5 test device ip to PC localhost
+    //*@@*/String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
+	//*@@*/String mServerRootURL = ""; //Staging address
 	
 	public boolean IsConnected(Context context)
 	{
