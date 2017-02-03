@@ -23,6 +23,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.takeapeek.R;
 import com.takeapeek.common.Helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -33,6 +36,8 @@ import com.takeapeek.common.Helper;
  */
 public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
 {
+    static private final Logger logger = LoggerFactory.getLogger(CustomPlaceAutoCompleteFragment.class);
+
     private EditText mEditTextSearch;
 
     private View mZzaRh;
@@ -52,6 +57,8 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        logger.debug("onCreateView(...) Invoked");
+
         View var4 = inflater.inflate(R.layout.fragment_custom_place_auto_complete, container, false);
 
         mEditTextSearch = (EditText) var4.findViewById(R.id.editWorkLocation);
@@ -70,6 +77,8 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
 
     public void onDestroyView()
     {
+        logger.debug("onDestroyView() Invoked");
+
         this.mZzaRh = null;
         this.mZzaRi = null;
         this.mEditTextSearch = null;
@@ -78,39 +87,53 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
 
     public void setBoundsBias(@Nullable LatLngBounds bounds)
     {
+        logger.debug("setBoundsBias(.) Invoked");
+
         this.mZzaRk = bounds;
     }
 
     public void setFilter(@Nullable AutocompleteFilter filter)
     {
+        logger.debug("setFilter(.) Invoked");
+
         this.mZzaRl = filter;
     }
 
     public void setText(CharSequence text)
     {
+        logger.debug("setText(.) Invoked");
+
         this.mEditTextSearch.setText(text);
         //this.zzzF();
     }
 
     public void setHint(CharSequence hint)
     {
+        logger.debug("setHint(.) Invoked");
+
         this.mEditTextSearch.setHint(hint);
         this.mZzaRh.setContentDescription(hint);
     }
 
     public void setOnPlaceSelectedListener(PlaceSelectionListener listener)
     {
+        logger.debug("setOnPlaceSelectedListener(.) Invoked");
+
         this.mZzaRm = listener;
     }
 
     private void zzzF()
     {
+        logger.debug("zzzF() Invoked");
+
         boolean var1 = !this.mEditTextSearch.getText().toString().isEmpty();
         //this.zzaRi.setVisibility(var1?0:8);
     }
 
     private void zzzG()
     {
+        logger.debug("zzzG() Invoked");
+
         int var1 = -1;
 
         try
@@ -140,6 +163,8 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        logger.debug("onActivityResult(...) Invoked");
+
         if (requestCode == 1)
         {
             if (resultCode == -1)

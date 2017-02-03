@@ -3290,7 +3290,7 @@ public class CaptureClipActivity extends Activity implements
                 long currentDate = Helper.GetCurrentTimeMillis();
 
                 Object firstCaptureDateObj = Instance(this).GetSuperProperty("Date of first time peek created");
-                long firstCaptureDate = firstCaptureDateObj == null ? 0 : (long) firstCaptureDateObj;
+                long firstCaptureDate = firstCaptureDateObj == null ? 0L : (long) firstCaptureDateObj;
 
                 Boolean firstTime = firstCaptureDate == 0 || firstCaptureDate == currentDate;
 
@@ -3307,10 +3307,10 @@ public class CaptureClipActivity extends Activity implements
                 Instance(this).SetSuperPropertiesOnce(superOnceProps);
 
                 Object totalPeekCreatedObj = Instance(this).GetSuperProperty("Total number of peeks created");
-                long totalPeekCreated = totalPeekCreatedObj == null ? 1 : (long) totalPeekCreatedObj + 1;
+                long totalPeekCreated = totalPeekCreatedObj == null ? 1L : (long) totalPeekCreatedObj + 1L;
 
                 Object firstPeekCreatedDateObj = MixPanel.Instance(this).GetSuperProperty("Date of first time peek created");
-                long firstPeekCreatedDate = firstPeekCreatedDateObj == null ? 0 : (long) firstPeekCreatedDateObj;
+                long firstPeekCreatedDate = firstPeekCreatedDateObj == null ? 0L : (long) firstPeekCreatedDateObj;
 
                 //Save super props
                 List<NameValuePair> superProps = new ArrayList<NameValuePair>();

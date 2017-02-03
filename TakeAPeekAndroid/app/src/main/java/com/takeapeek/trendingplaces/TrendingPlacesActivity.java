@@ -170,11 +170,11 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
 
             Object dateOfFirstSwipeObj = MixPanel.Instance(this).GetSuperProperty("Date of first trending location slide");
-            long dateOfFirstSwipe = dateOfFirstSwipeObj == null ? 0 : (long) dateOfFirstSwipeObj;
+            long dateOfFirstSwipe = dateOfFirstSwipeObj == null ? 0L : (long) dateOfFirstSwipeObj;
 
             //Set super properties
             Object totalTrendingLocationSwipeObj = MixPanel.Instance(this).GetSuperProperty("Total number of trending loation slide");
-            long totalTrendingLocationSwipe = totalTrendingLocationSwipeObj == null ? 1 : (long) totalTrendingLocationSwipeObj + 1;
+            long totalTrendingLocationSwipe = totalTrendingLocationSwipeObj == null ? 1L : (long) totalTrendingLocationSwipeObj + 1L;
 
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
             superProps.add(new NameValuePair("Date of first trending location slide", dateOfFirstSwipe));

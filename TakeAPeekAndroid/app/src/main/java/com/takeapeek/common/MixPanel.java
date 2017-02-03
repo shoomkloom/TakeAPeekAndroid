@@ -293,10 +293,10 @@ public class MixPanel
 
             //Set super properties
             Object totalPeekButtonClickObj = MixPanel.Instance(context).GetSuperProperty("Total Peek Button Clicks");
-            long totalPeekButtonClick = totalPeekButtonClickObj == null ? 1 : (long) totalPeekButtonClickObj + 1;
+            long totalPeekButtonClick = totalPeekButtonClickObj == null ? 1L : (long) totalPeekButtonClickObj + 1L;
 
             Object dateOfFirstPeekClickObj = MixPanel.Instance(context).GetSuperProperty("Date of First Peek click");
-            long dateOfFirstPeekClick = dateOfFirstPeekClickObj == null ? 0 : (long)dateOfFirstPeekClickObj;
+            long dateOfFirstPeekClick = dateOfFirstPeekClickObj == null ? 0L : (long)dateOfFirstPeekClickObj;
 
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
             superProps.add(new NameValuePair("Date of First Peek click", dateOfFirstPeekClick));
@@ -330,7 +330,7 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superNameValuePairs);
 
             Object firstTimeCompleteWalkthroughDateObj = MixPanel.Instance(context).GetSuperProperty("First time completed Walkthrough");
-            long firstTimeCompleteWalkthroughDate = firstTimeCompleteWalkthroughDateObj == null ? 0 : (long) firstTimeCompleteWalkthroughDateObj;
+            long firstTimeCompleteWalkthroughDate = firstTimeCompleteWalkthroughDateObj == null ? 0L : (long) firstTimeCompleteWalkthroughDateObj;
 
             List<NameValuePair> peopleNameValuePairs = new ArrayList<NameValuePair>();
             peopleNameValuePairs.add(new NameValuePair("First time completed Walkthrough", firstTimeCompleteWalkthroughDate));
@@ -353,7 +353,7 @@ public class MixPanel
             String currentLocality = Helper.GetLocality(sharedPreferences);
 
             Object firstLocalityDateObj = MixPanel.Instance(context).GetSuperProperty("Date of First App open");
-            long firstLocalityDate = firstLocalityDateObj == null ? 0 : (long) firstLocalityDateObj;
+            long firstLocalityDate = firstLocalityDateObj == null ? 0L : (long) firstLocalityDateObj;
 
             Boolean firstTime = firstLocalityDate == 0 || firstLocalityDate == currentDate;
 
@@ -409,10 +409,10 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             Object dateOfFirstPeekClickObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek request");
-            long dateOfFirstPeekClick = dateOfFirstPeekClickObj == null ? 0 : (long) dateOfFirstPeekClickObj;
+            long dateOfFirstPeekClick = dateOfFirstPeekClickObj == null ? 0L : (long) dateOfFirstPeekClickObj;
 
             Object totalPeekRequestClickObj = MixPanel.Instance(context).GetSuperProperty("Total Number of Peek Request clicks");
-            long totalPeekRequestClick = totalPeekRequestClickObj == null ? 1 : (long) totalPeekRequestClickObj + 1;
+            long totalPeekRequestClick = totalPeekRequestClickObj == null ? 1L : (long) totalPeekRequestClickObj + 1L;
 
             Object totalPeekRequestSentObj = MixPanel.Instance(context).GetSuperProperty("Total Number of request sent");
             long totalPeekRequestSent = totalPeekRequestSentObj == null ? numberOfRequestSent : (long) totalPeekRequestSentObj + numberOfRequestSent;
@@ -455,10 +455,10 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             Object dateOfFirstPeekSentObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek Sent");
-            long dateOfFirstPeekSent = dateOfFirstPeekSentObj == null ? 0 : (long) dateOfFirstPeekSentObj;
+            long dateOfFirstPeekSent = dateOfFirstPeekSentObj == null ? 0L : (long) dateOfFirstPeekSentObj;
 
             Object totalSendPeekClickObj = MixPanel.Instance(context).GetSuperProperty("Total Number of Peek Send clicks");
-            long totalSendPeekClick = totalSendPeekClickObj == null ? 1 : (long) totalSendPeekClickObj + 1;
+            long totalSendPeekClick = totalSendPeekClickObj == null ? 1L : (long) totalSendPeekClickObj + 1L;
 
             //Set super properties
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
@@ -497,10 +497,10 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             Object dateOfFirstPeekViewedObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek view click");
-            long dateOfFirstPeekViewed = dateOfFirstPeekViewedObj == null ? 0 : (long) dateOfFirstPeekViewedObj;
+            long dateOfFirstPeekViewed = dateOfFirstPeekViewedObj == null ? 0L : (long) dateOfFirstPeekViewedObj;
 
             Object totalViewPeekClickObj = MixPanel.Instance(context).GetSuperProperty("Total Number of Peeks Viewed");
-            long totalViewPeekClick = totalViewPeekClickObj == null ? 1 : (long) totalViewPeekClickObj + 1;
+            long totalViewPeekClick = totalViewPeekClickObj == null ? 1L : (long) totalViewPeekClickObj + 1L;
 
             //Set super properties
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
@@ -527,7 +527,7 @@ public class MixPanel
             long currentDate = Helper.GetCurrentTimeMillis();
 
             Object firstPeekViewedDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek viewed");
-            long firstPeekViewedDate = firstPeekViewedDateObj == null ? 0 : (long) firstPeekViewedDateObj;
+            long firstPeekViewedDate = firstPeekViewedDateObj == null ? 0L : (long) firstPeekViewedDateObj;
 
             Boolean firstTime = firstPeekViewedDate == 0 || firstPeekViewedDate == currentDate;
 
@@ -538,7 +538,7 @@ public class MixPanel
             MixPanel.Instance(context).SendEvent("Peek Viewed", props);
 
             Object totalPeekViewedObj = MixPanel.Instance(context).GetSuperProperty("Total number of peeks viewed");
-            long totalPeekViewed = totalPeekViewedObj == null ? 1 : (long) totalPeekViewedObj + 1;
+            long totalPeekViewed = totalPeekViewedObj == null ? 1L : (long) totalPeekViewedObj + 1L;
 
             //Save once date for comparison later
             List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
@@ -546,7 +546,7 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             firstPeekViewedDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek viewed");
-            firstPeekViewedDate = firstPeekViewedDateObj == null ? 0 : (long) firstPeekViewedDateObj;
+            firstPeekViewedDate = firstPeekViewedDateObj == null ? 0L : (long) firstPeekViewedDateObj;
 
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
             superProps.add(new NameValuePair("Date of first peek viewed", firstPeekViewedDate));
@@ -572,7 +572,7 @@ public class MixPanel
             long currentDate = Helper.GetCurrentTimeMillis();
 
             Object firstFollowDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time followed");
-            long firstFollowDate = firstFollowDateObj == null ? 0 : (long) firstFollowDateObj;
+            long firstFollowDate = firstFollowDateObj == null ? 0L : (long) firstFollowDateObj;
 
             Boolean firstTime = firstFollowDate == 0 || firstFollowDate == currentDate;
 
@@ -583,7 +583,7 @@ public class MixPanel
             MixPanel.Instance(context).SendEvent("Follow User", props);
 
             Object totalFollowedObj = MixPanel.Instance(context).GetSuperProperty("Total number of user following");
-            long totalFollowed = totalFollowedObj == null ? 1 : (long) totalFollowedObj + 1;
+            long totalFollowed = totalFollowedObj == null ? 1L : (long) totalFollowedObj + 1L;
 
             //Save once date for comparison later
             List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
@@ -591,7 +591,7 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             firstFollowDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time followed");
-            firstFollowDate = firstFollowDateObj == null ? 0 : (long) firstFollowDateObj;
+            firstFollowDate = firstFollowDateObj == null ? 0L : (long) firstFollowDateObj;
 
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
             superProps.add(new NameValuePair("Date of first time followed", firstFollowDate));
@@ -617,7 +617,7 @@ public class MixPanel
             long currentDate = Helper.GetCurrentTimeMillis();
 
             Object firstFollowDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time blocked");
-            long firstFollowDate = firstFollowDateObj == null ? 0 : (long) firstFollowDateObj;
+            long firstFollowDate = firstFollowDateObj == null ? 0L : (long) firstFollowDateObj;
 
             Boolean firstTime = firstFollowDate == 0 || firstFollowDate == currentDate;
 
@@ -629,7 +629,7 @@ public class MixPanel
             MixPanel.Instance(context).SendEvent("Block User", props);
 
             Object totalFollowedObj = MixPanel.Instance(context).GetSuperProperty("Total number of user blocked");
-            long totalFollowed = totalFollowedObj == null ? 1 : (long) totalFollowedObj + 1;
+            long totalFollowed = totalFollowedObj == null ? 1L : (long) totalFollowedObj + 1L;
 
             //Save once date for comparison later
             List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
@@ -637,7 +637,7 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             firstFollowDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time blocked");
-            firstFollowDate = firstFollowDateObj == null ? 0 : (long) firstFollowDateObj;
+            firstFollowDate = firstFollowDateObj == null ? 0L : (long) firstFollowDateObj;
 
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
             superProps.add(new NameValuePair("Date of first time blocked", firstFollowDate));
@@ -663,7 +663,7 @@ public class MixPanel
             long currentDate = Helper.GetCurrentTimeMillis();
 
             Object firstReportDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time report");
-            long firstReportDate = firstReportDateObj == null ? 0 : (long) firstReportDateObj;
+            long firstReportDate = firstReportDateObj == null ? 0L : (long) firstReportDateObj;
 
             Boolean firstTime = firstReportDate == 0 || firstReportDate == currentDate;
 
@@ -672,10 +672,10 @@ public class MixPanel
             props.add(new NameValuePair("Date", currentDate));
             props.add(new NameValuePair("User (blocked)", userReported));
             props.add(new NameValuePair("First Time ?", firstTime));
-            MixPanel.Instance(context).SendEvent("Block User", props);
+            MixPanel.Instance(context).SendEvent("Report User", props);
 
             Object totalReportedObj = MixPanel.Instance(context).GetSuperProperty("Total number of reported users");
-            long totalReported = totalReportedObj == null ? 1 : (long) totalReportedObj + 1;
+            long totalReported = totalReportedObj == null ? 1L : (long) totalReportedObj + 1L;
 
             //Save once date for comparison later
             List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
@@ -683,7 +683,7 @@ public class MixPanel
             MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
 
             firstReportDateObj = MixPanel.Instance(context).GetSuperProperty("Date of first time report");
-            firstReportDate = firstReportDateObj == null ? 0 : (long) firstReportDateObj;
+            firstReportDate = firstReportDateObj == null ? 0L : (long) firstReportDateObj;
 
             List<NameValuePair> superProps = new ArrayList<NameValuePair>();
             superProps.add(new NameValuePair("Date of first time report", firstReportDate));
