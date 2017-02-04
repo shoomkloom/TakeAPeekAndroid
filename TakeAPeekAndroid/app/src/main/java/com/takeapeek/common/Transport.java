@@ -32,6 +32,8 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1349,8 +1351,15 @@ public class Transport
                     if(metaDataJson != null && metaDataJson != "")
                     {
                         byte[] metaDataJsonBytes = metaDataJson.getBytes("UTF-8");
+                        int metaDataJsonBytesLength = metaDataJsonBytes.length;
+
+                        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+                        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+                        byteBuffer.putInt(metaDataJsonBytesLength);
+                        byte[] metaDataJsonLengthBytes = byteBuffer.array();
+
+                        outputStream.write(metaDataJsonLengthBytes);
                         outputStream.write(metaDataJsonBytes);
-                        outputStream.write('\n');
                     }
 
 					if(thumbnailToUpload != null)
