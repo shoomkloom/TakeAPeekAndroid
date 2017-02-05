@@ -79,6 +79,7 @@ import com.takeapeek.common.ZoomedAddressCreator;
 import com.takeapeek.notifications.NotificationPopupActivity;
 import com.takeapeek.notifications.NotificationsActivity;
 import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.ormlite.TakeAPeekRequest;
@@ -542,7 +543,16 @@ public class UserMapActivity extends FragmentActivity implements
 
         try
         {
-            int numberOfNewNotifications = DatabaseManager.getInstance().GetTakeAPeekNotificationUnnotifiedList().size();
+            int numberOfNewNotifications = 0;
+            List<TakeAPeekNotification> takeAPeekNotificationList = DatabaseManager.getInstance().GetTakeAPeekNotificationUnnotifiedList();
+            for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+            {
+                if(Helper.GetCurrentTimeMillis() - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR)
+                {
+                    numberOfNewNotifications++;
+                }
+            }
+
             if(numberOfNewNotifications > 0)
             {
                 mTextViewNumNewNotifications.setText(String.format("%d", numberOfNewNotifications));
