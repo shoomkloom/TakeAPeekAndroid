@@ -702,7 +702,7 @@ public class Transport
                     error = "Unavailable";
                 }
 
-                Helper.Error(logger, String.format("EXCEPTION: When trying to upload a file. Response error: %s", error), e);
+                Helper.Error(logger, String.format("EXCEPTION: When trying to request a peek. Response error: %s", error), e);
                 throw e;
             }
         }
@@ -1447,7 +1447,7 @@ public class Transport
                 }
                 catch (Exception e)
                 {
-                    Helper.Error(logger, "EXCEPTION: When trying to upload a file", e);
+                    Helper.Error(logger, "EXCEPTION: Inside DoHttpPost", e);
 					throw e;
                 }
                 finally

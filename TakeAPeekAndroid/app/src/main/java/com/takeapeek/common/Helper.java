@@ -1652,6 +1652,7 @@ public class Helper
     public static void ErrorMessageWithExit(final Context context, Handler handler, final String title, final String buttonText, final String message)
 	{
     	logger.debug("ErrorMessageWithExit(.....) Invoked");
+        logger.warn(String.format("ErrorMessageWithExit shown: '%s'", message));
 
     	handler.post(new Runnable()
         {
@@ -1678,6 +1679,7 @@ public class Helper
     public static void ErrorMessage(final Context context, Handler handler, final String title, final String buttonText, final String message)
 	{
     	logger.debug("ErrorMessage(.....) Invoked");
+        logger.warn(String.format("ErrorMessage shown: '%s'", message));
 
     	handler.post(new Runnable()
         {
