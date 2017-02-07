@@ -26,9 +26,11 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.facebook.appevents.AppEventsLogger;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.capture.CaptureClipActivity;
+import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.MixPanel;
@@ -78,6 +80,8 @@ public class UserFeedActivity extends AppCompatActivity
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
     ImageView mImageViewPeekThumbnail = null;
     VideoView mVideoViewPeekItem = null;
+    TextView mTextViewVideoTitle = null;
+    TextView mTextViewVideoAddress = null;
     ImageView mVideoCountDown = null;
     ImageView mImageViewPeekVideoProgress = null;
     TextView mTextViewPeekVideoProgress = null;
@@ -223,6 +227,10 @@ public class UserFeedActivity extends AppCompatActivity
         mTextViewPeekVideoProgress = (TextView)findViewById(R.id.textview_video_progress);
         Helper.setTypeface(this, mTextViewPeekVideoProgress, Helper.FontTypeEnum.boldFont);
         mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
+        mTextViewVideoTitle = (TextView)findViewById(R.id.user_peek_video_title);
+        Helper.setTypeface(this, mTextViewVideoTitle, Helper.FontTypeEnum.normalFont);
+        mTextViewVideoAddress = (TextView)findViewById(R.id.user_peek_video_address);
+        Helper.setTypeface(this, mTextViewVideoAddress, Helper.FontTypeEnum.normalFont);
 
         mVideoCountDown = (ImageView)findViewById(R.id.imageview_video_countdown);
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.boldFont);
@@ -326,6 +334,8 @@ public class UserFeedActivity extends AppCompatActivity
                 }
 
                 Helper.ClearFullscreen(mVideoViewPeekItem);
+                mTextViewVideoTitle.setText("");
+                mTextViewVideoAddress.setText("");
 
                 mEnumActivityState = EnumActivityState.list;
                 UpdateUI();
@@ -422,6 +432,8 @@ public class UserFeedActivity extends AppCompatActivity
                     Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_download_peek));
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
+                    mTextViewVideoTitle.setText("");
+                    mTextViewVideoAddress.setText("");
 
                     mEnumActivityState = EnumActivityState.list;
                     UpdateUI();
@@ -456,6 +468,8 @@ public class UserFeedActivity extends AppCompatActivity
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
+                    mTextViewVideoTitle.setText("");
+                    mTextViewVideoAddress.setText("");
 
                     mEnumActivityState = EnumActivityState.previewStopped;
                     UpdateUI();
@@ -490,10 +504,16 @@ public class UserFeedActivity extends AppCompatActivity
             mVideoViewPeekItem.setVideoPath(peekFilePath);
             mVideoViewPeekItem.requestFocus();
 
-
             Helper.SetFullscreen(mVideoViewPeekItem);
 
             mVideoViewPeekItem.start();
+            mTextViewVideoTitle.setText(takeAPeekObject.Title);
+            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
+            {
+                AddressLoader addressLoader = new AddressLoader();
+                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
+            }
 
             mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
             {
@@ -509,6 +529,9 @@ public class UserFeedActivity extends AppCompatActivity
         catch (Exception e)
         {
             Helper.ClearFullscreen(mVideoViewPeekItem);
+
+            mTextViewVideoTitle.setText("");
+            mTextViewVideoAddress.setText("");
 
             mEnumActivityState = EnumActivityState.list;
             UpdateUI();
@@ -554,6 +577,8 @@ public class UserFeedActivity extends AppCompatActivity
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
 
                     Helper.ClearFullscreen(mVideoViewPeekItem);
+                    mTextViewVideoTitle.setText("");
+                    mTextViewVideoAddress.setText("");
 
                     mEnumActivityState = EnumActivityState.previewStopped;
                     UpdateUI();
@@ -573,6 +598,14 @@ public class UserFeedActivity extends AppCompatActivity
             mVideoViewPeekItem.setVideoURI(url);
             mVideoViewPeekItem.requestFocus();
 
+            mTextViewVideoTitle.setText(takeAPeekObject.Title);
+            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
+            {
+                AddressLoader addressLoader = new AddressLoader();
+                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+                addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
+            }
+
             mVideoViewPeekItem.start();
 
             mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
@@ -582,6 +615,9 @@ public class UserFeedActivity extends AppCompatActivity
                 {
                     logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
 
+                    mTextViewVideoTitle.setText("");
+                    mTextViewVideoAddress.setText("");
+
                     CompletePlayBack(takeAPeekObject);
                 }
             });
@@ -589,6 +625,9 @@ public class UserFeedActivity extends AppCompatActivity
         catch (Exception e)
         {
             Helper.ClearFullscreen(mVideoViewPeekItem);
+
+            mTextViewVideoTitle.setText("");
+            mTextViewVideoAddress.setText("");
 
             mEnumActivityState = EnumActivityState.list;
             UpdateUI();
@@ -1121,6 +1160,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoCountDown.setVisibility(View.GONE);
+                mTextViewVideoTitle.setVisibility(View.GONE);
+                mTextViewVideoAddress.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
 
@@ -1144,6 +1185,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoCountDown.setVisibility(View.GONE);
+                mTextViewVideoTitle.setVisibility(View.GONE);
+                mTextViewVideoAddress.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
 
@@ -1167,6 +1210,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
                 mVideoCountDown.setVisibility(View.GONE);
+                mTextViewVideoTitle.setVisibility(View.GONE);
+                mTextViewVideoAddress.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_white)));
 
@@ -1200,6 +1245,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
                 mVideoCountDown.setVisibility(View.GONE);
+                mTextViewVideoTitle.setVisibility(View.VISIBLE);
+                mTextViewVideoAddress.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
 
@@ -1223,6 +1270,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
+                mTextViewVideoTitle.setVisibility(View.VISIBLE);
+                mTextViewVideoAddress.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
 
@@ -1246,6 +1295,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.VISIBLE);
+                mTextViewVideoTitle.setVisibility(View.VISIBLE);
+                mTextViewVideoAddress.setVisibility(View.VISIBLE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
 
@@ -1269,6 +1320,8 @@ public class UserFeedActivity extends AppCompatActivity
                 mAnimationDrawableVideoProgressAnimation.stop();
 
                 mVideoViewPeekItem.setVisibility(View.GONE);
+                mTextViewVideoTitle.setVisibility(View.GONE);
+                mTextViewVideoAddress.setVisibility(View.GONE);
 
                 findViewById(R.id.user_peek_feed_background).setBackgroundColor((ContextCompat.getColor(this, R.color.tap_black)));
 

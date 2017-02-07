@@ -65,7 +65,32 @@
         android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="5dp"
+        android:layout_marginTop="35dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id = "@+id/user_peek_video_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_below="@+id/imageview_video_countdown"
+        android:textSize="18sp"
+        android:textColor="@color/pt_white"
+        android:gravity="left"
+        android:padding="5dp"
+        android:background="@color/pt_gray_faded"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id = "@+id/user_peek_video_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textSize="18sp"
+        android:textColor="@color/pt_white"
+        android:gravity="left"
+        android:padding="5dp"
+        android:background="@color/pt_gray_faded"
         android:visibility="gone"/>
 
     <TextView
