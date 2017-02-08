@@ -507,7 +507,14 @@ public class UserFeedActivity extends AppCompatActivity
             Helper.SetFullscreen(mVideoViewPeekItem);
 
             mVideoViewPeekItem.start();
-            mTextViewVideoTitle.setText(takeAPeekObject.Title);
+            if(takeAPeekObject.Title == null || takeAPeekObject.Title == "")
+            {
+                mTextViewVideoTitle.setVisibility(View.GONE);
+            }
+            else
+            {
+                mTextViewVideoTitle.setText(takeAPeekObject.Title);
+            }
             if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
             {
                 AddressLoader addressLoader = new AddressLoader();
@@ -598,7 +605,14 @@ public class UserFeedActivity extends AppCompatActivity
             mVideoViewPeekItem.setVideoURI(url);
             mVideoViewPeekItem.requestFocus();
 
-            mTextViewVideoTitle.setText(takeAPeekObject.Title);
+            if(takeAPeekObject.Title == null || takeAPeekObject.Title == "")
+            {
+                mTextViewVideoTitle.setVisibility(View.GONE);
+            }
+            else
+            {
+                mTextViewVideoTitle.setText(takeAPeekObject.Title);
+            }
             if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
             {
                 AddressLoader addressLoader = new AddressLoader();
