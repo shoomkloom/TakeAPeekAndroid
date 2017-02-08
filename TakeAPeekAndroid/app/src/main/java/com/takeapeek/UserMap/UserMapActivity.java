@@ -591,7 +591,14 @@ public class UserMapActivity extends FragmentActivity implements
 
         if (mGoogleMap != null)
         {
+            //Clear the cluster manager
             ClusterManagerClear();
+
+            //Clear the adapter
+            mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileStackObject);
+            mViewPager.setAdapter(mPeekStackPagerAdapter);
+
+            //Refresh data from the server
             ShowProfilesInBounds(true);
         }
 
@@ -926,7 +933,16 @@ public class UserMapActivity extends FragmentActivity implements
                                         {
                                             //Show the peek stack
                                             mUserStackItemPosition = mClusterManagerAlgorithm.getItems().iterator().next().mIndex;
-                                            ShowUserPeekStack();
+
+                                            ProfileObject profileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
+                                            if(profileObject != null)
+                                            {
+                                                ShowUserPeekStack();
+                                            }
+                                            else
+                                            {
+                                                logger.error(String.format("ERROR: When trying to open stack with hasValidPeeks = true, mUserStackItemPosition = '%d' and ProfileObject = null", mUserStackItemPosition));
+                                            }
                                         }
                                     }
                                 }
@@ -1034,7 +1050,12 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("ClusterManagerSingleItem(int) Invoked");
 
-        ClusterManagerSingleItem(new TAPClusterItem(position, mHashMapIndexToProfileObject.get(position)));
+        ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
+
+        if(profileObject != null)
+        {
+            ClusterManagerSingleItem(new TAPClusterItem(position, profileObject));
+        }
     }
 
     private void ClusterManagerSingleItem(TAPClusterItem tapClusterItem)
@@ -1087,13 +1108,6 @@ public class UserMapActivity extends FragmentActivity implements
         mHashMapProfileObjectToIndex.clear();
         mHashMapIndexToProfileStackObject.clear();
         mClusterManager.clearItems();
-    }
-
-    ProfileObject GetProfileObjectByPosition(int position)
-    {
-        logger.debug("GetProfileObjectByPosition(.) Invoked");
-
-        return mHashMapIndexToProfileObject.get(position);
     }
 
     @Override
@@ -1195,7 +1209,7 @@ public class UserMapActivity extends FragmentActivity implements
 
         ClusterManagerSingleItem(mUserStackItemPosition);
 
-        ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
+        ProfileObject profileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
         TakeAPeekObject takeAPeekObject = GetProfileLatestUnViewedPeek(profileObject);
 
         LatLng markerLatLng = new LatLng(
@@ -1464,7 +1478,7 @@ public class UserMapActivity extends FragmentActivity implements
                         logger.info("Stack is visible, go to the user feed");
 
                         //Show the user feed activity
-                        ProfileObject profileObject = GetProfileObjectByPosition(mUserStackItemPosition);
+                        ProfileObject profileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
                         String profileObjectJSON = new Gson().toJson(profileObject);
 
                         final Intent intent = new Intent(UserMapActivity.this, UserFeedActivity.class);
