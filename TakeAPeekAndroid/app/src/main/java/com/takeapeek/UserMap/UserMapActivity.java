@@ -470,8 +470,6 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 showCaptureOnLoad = true;
 
-                //@@MixPanel.SendButtonEventAndProps(this, SCREEN_USER_MAP, mSharedPreferences);
-
                 Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);
                 captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivityForResult(captureClipActivityIntent, RESULT_CAPTURECLIP);
