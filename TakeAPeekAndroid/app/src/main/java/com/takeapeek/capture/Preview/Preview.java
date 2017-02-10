@@ -517,8 +517,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         		// don't set has_focus_area in this mode
         	}
         }
-        
-		if( !this.is_video && applicationInterface.getTouchCapturePref() )
+
+        boolean touchCapturePref = applicationInterface.getTouchCapturePref();
+		if( !this.is_video && touchCapturePref )
         {
 			logger.info("touch to capture");
 			// interpret as if user had clicked take photo/video button, except that we set the focus/metering areas
@@ -551,7 +552,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
     {
         logger.debug("onDoubleTap() Invoked.");
 
-		if( !is_video && applicationInterface.getDoubleTapCapturePref() )
+        boolean doubleTapCapturePref = applicationInterface.getDoubleTapCapturePref();
+		if( !is_video && doubleTapCapturePref )
         {
 			logger.info("double-tap to capture");
 			// interpret as if user had clicked take photo/video button (don't need to set focus/metering, as this was done in touchEvent() for the first touch of the double-tap)
@@ -758,7 +760,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         }
 
 		logger.info("textureview size: " + textureview_w + ", " + textureview_h);
-    	int rotation = getDisplayRotation();
+    	int rotation = 0;//@@getDisplayRotation();
     	Matrix matrix = new Matrix(); 
 		RectF viewRect = new RectF(0, 0, this.textureview_w, this.textureview_h); 
 		RectF bufferRect = new RectF(0, 0, this.preview_h, this.preview_w); 
@@ -1259,7 +1261,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			logger.info("camera not opened!");
 			return;
 		}
-		boolean do_startup_focus = !take_photo && applicationInterface.getStartupFocusPref();
+        //@@boolean setStartupFocus = applicationInterface.getStartupFocusPref();
+		boolean do_startup_focus = !take_photo;//@@ && setStartupFocus;
 
 		logger.info("take_photo? " + take_photo);
 		logger.info("do_startup_focus? " + do_startup_focus);
@@ -1276,7 +1279,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		setupCameraParameters();
 		
 		// now switch to video if saved
-		boolean saved_is_video = applicationInterface.isVideoPref();
+		boolean saved_is_video = true;//@@applicationInterface.isVideoPref();
 
 		logger.info("saved_is_video: " + saved_is_video);
 
@@ -1300,8 +1303,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
 			logger.info("set_flash_value_after_autofocus is now: " + set_flash_value_after_autofocus);
 		}
-		
-		if( this.supports_raw && applicationInterface.isRawPref() )
+
+        boolean isRawPref = false;//@@applicationInterface.isRawPref();
+		if( this.supports_raw &&  isRawPref)
         {
 			camera_controller.setRaw(true);
 		}
@@ -1319,9 +1323,10 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
 		// must be done after setting parameters, as this function may set parameters
 		// also needs to be done after starting preview for some devices (e.g., Nexus 7)
-		if( this.has_zoom && applicationInterface.getZoomPref() != 0 )
+        int zoomPref = 0;//@@applicationInterface.getZoomPref();
+		if( this.has_zoom && zoomPref != 0 )
         {
-			zoomTo(applicationInterface.getZoomPref());
+			zoomTo(zoomPref);
 		}
 		
 	    if( take_photo )
@@ -1384,16 +1389,16 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
 			logger.info("set up scene mode");
 
-			String value = applicationInterface.getSceneModePref();
+			//@@String value = applicationInterface.getSceneModePref();
 
-            logger.info("saved scene mode: " + value);
+            logger.info("saved scene mode: auto"/*@@ + value*/);
 
-			CameraController.SupportedValues supported_values = camera_controller.setSceneMode(value);
+			CameraController.SupportedValues supported_values = camera_controller.setSceneMode("auto"/*@@value*/);
 			if( supported_values != null )
             {
 				scene_modes = supported_values.values;
 	    		// now save, so it's available for PreferenceActivity
-				applicationInterface.setSceneModePref(supported_values.selected_value);
+				//@@applicationInterface.setSceneModePref(supported_values.selected_value);
 			}
 			else
             {
@@ -1473,10 +1478,10 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
 			if( this.supports_video_stabilization )
             {
-				boolean using_video_stabilization = applicationInterface.getVideoStabilizationPref();
+				//@@boolean using_video_stabilization = applicationInterface.getVideoStabilizationPref();
 
-				logger.info("using_video_stabilization?: " + using_video_stabilization);
-				camera_controller.setVideoStabilization(using_video_stabilization);
+				logger.info("using_video_stabilization?: true"/*@@ + using_video_stabilization*/);
+				camera_controller.setVideoStabilization(true/*@@using_video_stabilization*/);
 			}
 
 			logger.info("supports_video_stabilization?: " + supports_video_stabilization);
@@ -1485,7 +1490,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         {
 			logger.info("set up color effect");
 
-			String value = applicationInterface.getColorEffectPref();
+			String value = "none";//@@applicationInterface.getColorEffectPref();
 
 			logger.info("saved color effect: " + value);
 
@@ -1494,7 +1499,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             {
 				color_effects = supported_values.values;
 	    		// now save, so it's available for PreferenceActivity
-				applicationInterface.setColorEffectPref(supported_values.selected_value);
+				//@@applicationInterface.setColorEffectPref(supported_values.selected_value);
 			}
 			else
             {
@@ -1506,7 +1511,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         {
 			logger.info("set up white balance");
 
-			String value = applicationInterface.getWhiteBalancePref();
+			String value = "auto";//@@applicationInterface.getWhiteBalancePref();
 
 			logger.info("saved white balance: " + value);
 
@@ -1515,7 +1520,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             {
 				white_balances = supported_values.values;
 	    		// now save, so it's available for PreferenceActivity
-				applicationInterface.setWhiteBalancePref(supported_values.selected_value);
+				//@@applicationInterface.setWhiteBalancePref(supported_values.selected_value);
 			}
 			else
             {
@@ -1530,7 +1535,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         {
 			logger.info("set up iso");
 
-			String value = applicationInterface.getISOPref();
+			String value = "auto";//@@applicationInterface.getISOPref();
 
 			logger.info("saved iso: " + value);
 
@@ -1544,7 +1549,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 					has_manual_iso = true;
 				}
 	    		// now save, so it's available for PreferenceActivity
-				applicationInterface.setISOPref(supported_values.selected_value);
+				//@@applicationInterface.setISOPref(supported_values.selected_value);
 				
 				if( has_manual_iso )
                 {
@@ -1606,7 +1611,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				// if in manual ISO mode, we still want to get the valid exposure compensations, but shouldn't set exposure compensation
 				if( !has_manual_iso )
                 {
-					int exposure = applicationInterface.getExposureCompensationPref();
+					int exposure = 0;//@@applicationInterface.getExposureCompensationPref();
 					if( exposure < min_exposure || exposure > max_exposure )
                     {
 						exposure = 0;
@@ -1621,7 +1626,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 					}
 					camera_controller.setExposureCompensation(exposure);
 		    		// now save, so it's available for PreferenceActivity
-					applicationInterface.setExposureCompensationPref(exposure);
+					//@@applicationInterface.setExposureCompensationPref(exposure);
 				}
 			}
 			else
@@ -1689,7 +1694,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
         {
 			logger.info("set up jpeg quality");
-			int image_quality = applicationInterface.getImageQualityPref();
+			int image_quality = 100;//@@applicationInterface.getImageQualityPref();
 			camera_controller.setJpegQuality(image_quality);
 			logger.info("image quality: " + image_quality);
 		}
@@ -1752,7 +1757,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         {
             logger.info("flash values: " + supported_flash_values);
 
-            String flash_value = applicationInterface.getFlashPref();
+            String flash_value = "flash_auto";//@@applicationInterface.getFlashPref();
             if( flash_value.length() > 0 )
             {
                 logger.info("found existing flash_value: " + flash_value);
@@ -1782,7 +1787,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             {
 				logger.info("focus values: " + supported_focus_values);
 
-				setFocusPref(true);
+				//@@setFocusPref(true);
 			}
 			else
             {
@@ -2173,7 +2178,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		}
 		CamcorderProfile profile = null;
 		int cameraId = camera_controller.getCameraId();
-		if( applicationInterface.getForce4KPref() )
+
+        boolean force4KPref = false;//@@applicationInterface.getForce4KPref();
+		if(force4KPref)
         {
 			logger.info("force 4K UHD video");
 			profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
@@ -2350,10 +2357,10 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         logger.debug("calculateTargetRatioForPreview(.) Invoked.");
 
         double targetRatio = 0.0f;
-		String preview_size = applicationInterface.getPreviewSizePref();
+		//@@String preview_size = applicationInterface.getPreviewSizePref();
 		// should always use wysiwig for video mode, otherwise we get incorrect aspect ratio shown when recording video (at least on Galaxy Nexus, e.g., at 640x480)
 		// also not using wysiwyg mode with video caused corruption on Samsung cameras (tested with Samsung S3, Android 4.3, front camera, infinity focus)
-		if( preview_size.equals("preference_preview_size_wysiwyg") || this.is_video )
+		if( /*@@preview_size.equals("preference_preview_size_wysiwyg") || */this.is_video )
         {
 	        if( this.is_video )
             {
@@ -2646,6 +2653,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
 		logger.info("getImageVideoRotation() from current_rotation " + current_rotation);
 
+/*@@
         String lock_orientation = applicationInterface.getLockOrientationPref();
 
         if( lock_orientation.equals("landscape") )
@@ -2674,6 +2682,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		    return result;
 		}
 		else if( lock_orientation.equals("portrait") )
+@@*/
         {
 			int camera_orientation = camera_controller.getCameraOrientation();
 		    int result = 0;
@@ -2698,8 +2707,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			logger.info("getImageVideoRotation() lock to portrait, returns " + result);
 		    return result;
 		}
-		logger.info("getImageVideoRotation() returns current_rotation " + current_rotation);
-		return this.current_rotation;
+
+//@@        logger.info("getImageVideoRotation() returns current_rotation " + current_rotation);
+//@@		return this.current_rotation;
 	}
 
 	public void draw(Canvas canvas)
@@ -3243,7 +3253,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
     {
         logger.debug("setFocusPref() Invoked.");
 
-		String focus_value = applicationInterface.getFocusPref(is_video);
+		String focus_value = "";//@@applicationInterface.getFocusPref(is_video);
 		if( focus_value.length() > 0 )
         {
 			logger.info("found existing focus_value: " + focus_value);
@@ -3379,7 +3389,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 	    	if( save )
             {
 				// now save
-	    		applicationInterface.setFlashPref(flash_value);
+	    		//@@applicationInterface.setFlashPref(flash_value);
 	    	}
 		}
 	}
@@ -3632,10 +3642,11 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         this.startCameraPreview();
 
         //is_taking_photo = true;
-		long timer_delay = applicationInterface.getTimerPref();
+		long timer_delay = 0;//@@applicationInterface.getTimerPref();
 
-		String burst_mode_value = applicationInterface.getRepeatPref();
+		//@@String burst_mode_value = applicationInterface.getRepeatPref();
 		int n_burst = 1;
+/*@@
 		if( burst_mode_value.equals("unlimited") )
         {
    			logger.info("unlimited burst");
@@ -3643,15 +3654,16 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			remaining_burst_photos = -1;
 		}
 		else
+@@*/
         {
 			try
             {
-				n_burst = Integer.parseInt(burst_mode_value);
+				//@@n_burst = Integer.parseInt(burst_mode_value);
     			logger.info("n_burst: " + n_burst);
 			}
 	        catch(NumberFormatException e)
             {
-                Helper.Error(logger, "failed to parse preference_burst_mode value: " + burst_mode_value, e);
+                //@@Helper.Error(logger, "failed to parse preference_burst_mode value: " + burst_mode_value, e);
 
 	    		n_burst = 1;
 	        }
@@ -3871,7 +3883,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		ParcelFileDescriptor pfd_saf = null;
 		try
         {
-			video_method = applicationInterface.createOutputVideoMethod();
+			video_method = ApplicationInterface.VIDEOMETHOD_FILE;//@@applicationInterface.createOutputVideoMethod();
             logger.info("video_method? " + video_method);
     		if( video_method == ApplicationInterface.VIDEOMETHOD_FILE )
             {
@@ -3962,7 +3974,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				}
 			});
         	camera_controller.initVideoRecorderPrePrepare(video_recorder);
-			boolean record_audio = applicationInterface.getRecordAudioPref();
+			boolean record_audio = true;//@@applicationInterface.getRecordAudioPref();
 			if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED )
             {
 				// needed for Android 6, in case users deny storage permission, otherwise we'll crash
@@ -3975,10 +3987,11 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			}
 			if( record_audio )
             {
-        		String pref_audio_src = applicationInterface.getRecordAudioSourcePref();
-    			logger.info("pref_audio_src: " + pref_audio_src);
+//@@        		String pref_audio_src = applicationInterface.getRecordAudioSourcePref();
+//@@    			logger.info("pref_audio_src: " + pref_audio_src);
         		int audio_source = MediaRecorder.AudioSource.CAMCORDER;
-        		if( pref_audio_src.equals("audio_src_mic") )
+/*@@
+                if( pref_audio_src.equals("audio_src_mic") )
                 {
 	        		audio_source = MediaRecorder.AudioSource.MIC;
         		}
@@ -3990,6 +4003,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                 {
 	        		audio_source = MediaRecorder.AudioSource.VOICE_COMMUNICATION;
         		}
+@@*/
     			logger.info("audio_source: " + audio_source);
 				video_recorder.setAudioSource(audio_source);
 			}
@@ -4000,9 +4014,10 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			if( record_audio )
             {
 				video_recorder.setProfile(profile);
-        		String pref_audio_channels = applicationInterface.getRecordAudioChannelsPref();
+        		String pref_audio_channels = "audio_default";//@@applicationInterface.getRecordAudioChannelsPref();
     			logger.info("pref_audio_channels: " + pref_audio_channels);
-        		if( pref_audio_channels.equals("audio_mono") )
+/*@@
+                if( pref_audio_channels.equals("audio_mono") )
                 {
         			video_recorder.setAudioChannels(1);
         		}
@@ -4010,6 +4025,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                 {
         			video_recorder.setAudioChannels(2);
         		}
+@@*/
 			}
 			else
             {
@@ -4028,7 +4044,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             logger.info("video codec: " + profile.videoCodec);
 
     		//video_recorder.setMaxFileSize(15*1024*1024); // test
-			long video_max_filesize = applicationInterface.getVideoMaxFileSizePref();
+			long video_max_filesize = 0;//@@applicationInterface.getVideoMaxFileSizePref();
 			if( video_max_filesize > 0 )
             {
     			logger.info("set max file size of: " + video_max_filesize);
@@ -4070,12 +4086,12 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             	// handle restarts
 				if( remaining_restart_video == 0 && !max_filesize_restart )
                 {
-					remaining_restart_video = applicationInterface.getVideoRestartTimesPref();
+					remaining_restart_video = 0;//@@applicationInterface.getVideoRestartTimesPref();
 	    			logger.info("initialised remaining_restart_video to: " + remaining_restart_video);
 				}
 
 				// handle restart timer
-				long video_max_duration = applicationInterface.getVideoMaxDurationPref();
+				long video_max_duration = 10000;//@@applicationInterface.getVideoMaxDurationPref();
     			logger.info("video_max_duration: " + video_max_duration);
 				if( max_filesize_restart )
                 {
@@ -4134,7 +4150,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                     finishVideoTimer.schedule(finishVideoTimerTask = new FinishVideoTimerTask(), video_max_duration);
 				}
 
-				if( applicationInterface.getVideoFlashPref() && supportsFlash() )
+                boolean videoFlashPref = false;//@@applicationInterface.getVideoFlashPref();
+				if( videoFlashPref && supportsFlash() )
                 {
 					class FlashVideoTimerTask extends TimerTask
                     {

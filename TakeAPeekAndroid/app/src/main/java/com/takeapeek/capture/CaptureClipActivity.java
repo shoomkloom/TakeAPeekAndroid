@@ -1566,6 +1566,8 @@ public class CaptureClipActivity extends Activity implements
 		// force to portrait mode
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		// keep screen active - see http://stackoverflow.com/questions/2131948/force-screen-on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        /*@@
 		if(mSharedPreferences.getBoolean(com.takeapeek.capture.PreferenceKeys.getKeepDisplayOnPreferenceKey(), true) )
         {
             logger.info("do keep screen on");
@@ -1578,6 +1580,7 @@ public class CaptureClipActivity extends Activity implements
 
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
+
 		if(mSharedPreferences.getBoolean(com.takeapeek.capture.PreferenceKeys.getShowWhenLockedPreferenceKey(), true) )
         {
             logger.info("do show when locked");
@@ -1591,7 +1594,7 @@ public class CaptureClipActivity extends Activity implements
 
 	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 		}
-
+@@*/
         // set screen to max brightness - see http://stackoverflow.com/questions/11978042/android-screen-brightness-max-value
 		// done here rather than onCreate, so that changing it in preferences takes effect without restarting app
 /*@@
@@ -2277,7 +2280,8 @@ public class CaptureClipActivity extends Activity implements
 					}
 				});
 
-				if(mSharedPreferences.getBoolean(PreferenceKeys.getShowZoomSliderControlsPreferenceKey(), true) )
+                boolean showZoomSliderControlsPref = true;//@@mSharedPreferences.getBoolean(PreferenceKeys.getShowZoomSliderControlsPreferenceKey(), true);
+				if(showZoomSliderControlsPref)
                 {
 					if( !mainUI.inImmersiveMode() )
                     {

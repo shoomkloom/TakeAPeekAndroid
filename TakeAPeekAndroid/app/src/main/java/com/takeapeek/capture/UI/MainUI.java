@@ -44,10 +44,10 @@ public class MainUI
         logger.debug("layoutUI() Invoked.");
 
 		//this.preview.updateUIPlacement();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
-		String ui_placement = sharedPreferences.getString(PreferenceKeys.getUIPlacementPreferenceKey(), "ui_right");
+		//@@SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(main_activity);
+		String ui_placement = "ui_right";//@@sharedPreferences.getString(PreferenceKeys.getUIPlacementPreferenceKey(), "ui_right");
     	// we cache the preference_ui_placement to save having to check it in the draw() method
-		this.ui_placement_right = ui_placement.equals("ui_right");
+		this.ui_placement_right = true;//@@ui_placement.equals("ui_right");
 		logger.info("ui_placement: " + ui_placement);
 		// new code for orientation fixed to landscape	
 		// the display orientation should be locked to landscape, but how many degrees is that?

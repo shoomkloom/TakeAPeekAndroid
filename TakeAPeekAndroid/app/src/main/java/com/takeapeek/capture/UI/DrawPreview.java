@@ -168,7 +168,7 @@ public class DrawPreview
     {
         logger.debug("() Invoked.");
         
-		String color = mSharedPreferences.getString(PreferenceKeys.getShowAngleHighlightColorPreferenceKey(), "#14e715");
+		String color = "#14e715";//@@mSharedPreferences.getString(PreferenceKeys.getShowAngleHighlightColorPreferenceKey(), "#14e715");
 		return Color.parseColor(color);
     }
 
@@ -208,8 +208,10 @@ public class DrawPreview
 			}
 		}
 		final float scale = getContext().getResources().getDisplayMetrics().density;
-		String preference_grid = mSharedPreferences.getString(PreferenceKeys.getShowGridPreferenceKey(), "preference_grid_none");
-		if( camera_controller != null && taking_picture && getTakePhotoBorderPref() )
+		//@@String preference_grid = mSharedPreferences.getString(PreferenceKeys.getShowGridPreferenceKey(), "preference_grid_none");
+
+        //@@boolean takePhotoBorderPref = getTakePhotoBorderPref();
+		if( camera_controller != null && taking_picture/*@@ && takePhotoBorderPref*/)
         {
 			p.setColor(Color.WHITE);
 			p.setStyle(Paint.Style.STROKE);
@@ -390,11 +392,12 @@ public class DrawPreview
 				canvas.drawLine(diff+canvas.getHeight()-1.0f, 0.0f, diff, canvas.getHeight()-1.0f, p);
 			}
 		}
-@@*/
-		if( preview.isVideo() || mSharedPreferences.getString(PreferenceKeys.getPreviewSizePreferenceKey(), "preference_preview_size_wysiwyg").equals("preference_preview_size_wysiwyg") )
+
+        //@@String preferencePreviewSizePref = mSharedPreferences.getString(PreferenceKeys.getPreviewSizePreferenceKey(), "preference_preview_size_wysiwyg");
+		if( preview.isVideo() || preferencePreviewSizePref.equals("preference_preview_size_wysiwyg") )
         {
             logger.debug("() Invoked.");
-            
+
 			String preference_crop_guide = mSharedPreferences.getString(PreferenceKeys.getShowCropGuidePreferenceKey(), "crop_guide_none");
 			if( camera_controller != null && preview.getTargetRatio() > 0.0 && !preference_crop_guide.equals("crop_guide_none") )
             {
@@ -464,7 +467,6 @@ public class DrawPreview
 			}
 		}
 
-/*@@
 		// note, no need to check preferences here, as we do that when setting thumbnail_anim
 		if( camera_controller != null && this.thumbnail_anim && last_thumbnail != null )
 		{
@@ -637,7 +639,8 @@ public class DrawPreview
 			int pixels_offset = (int) (20 * scale + 0.5f); // convert dps to pixels
 		}
 
-		if( preview.supportsZoom() && camera_controller != null && mSharedPreferences.getBoolean(PreferenceKeys.getShowZoomPreferenceKey(), true) )
+        boolean showZoomPref = true;//@@mSharedPreferences.getBoolean(PreferenceKeys.getShowZoomPreferenceKey(), true);
+		if( preview.supportsZoom() && camera_controller != null && showZoomPref )
         {
 			float zoom_ratio = preview.getZoomRatio();
 			// only show when actually zoomed in
