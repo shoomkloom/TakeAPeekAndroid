@@ -1,5 +1,6 @@
 package com.takeapeek.common;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -308,6 +309,31 @@ public class Helper
 
 		return cropFile;
 	}
+
+    static public boolean CheckPermissions(Context context)
+    {
+        logger.debug("CheckPermissions() Invoked");
+
+        int numberOfPermissions = 6;
+        int permissionTypeArray[] = new int[numberOfPermissions];
+
+        permissionTypeArray[0] = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
+        permissionTypeArray[1] = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissionTypeArray[2] = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionTypeArray[3] = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO);
+        permissionTypeArray[4] = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+        permissionTypeArray[5] = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        for(int i=0; i<numberOfPermissions; i++)
+        {
+            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
 /*@@
 	static public String GetWidgetFilePath(Context context) throws IOException

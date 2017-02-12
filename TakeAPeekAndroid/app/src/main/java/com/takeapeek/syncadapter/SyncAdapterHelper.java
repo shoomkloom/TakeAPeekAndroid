@@ -308,9 +308,16 @@ public class SyncAdapterHelper implements Runnable,
 //@@        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         //Create a location request as long as this service is up
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && Helper.CheckPermissions(mContext) == true)
         {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            try
+            {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            }
+            catch(SecurityException e)
+            {
+                Helper.Error(logger, "SECURITY EXCEPTION: When trying to request location updates", e);
+            }
         }
     }
 

@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -127,31 +126,6 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
         setResult(RESULT_CANCELED);
 
         super.onBackPressed();
-    }
-
-    private boolean CheckPermissions()
-    {
-        logger.debug("CheckPermissions() Invoked");
-
-        int numberOfPermissions = 6;
-        int permissionTypeArray[] = new int[numberOfPermissions];
-
-        permissionTypeArray[0] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
-        permissionTypeArray[1] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
-        permissionTypeArray[2] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-        permissionTypeArray[3] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        permissionTypeArray[4] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
-        permissionTypeArray[5] = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        for(int i=0; i<numberOfPermissions; i++)
-        {
-            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void RequestPermissions()
@@ -290,7 +264,7 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
             case R.id.textview_button_letsgo:
                 logger.info("onClick(.) Invoked with R.id.textview_button_letsgo");
 
-                if(CheckPermissions() == true)
+                if(Helper.CheckPermissions(this) == true)
                 {
                     Helper.SetWalkthroughFinished(mSharedPreferences);
 

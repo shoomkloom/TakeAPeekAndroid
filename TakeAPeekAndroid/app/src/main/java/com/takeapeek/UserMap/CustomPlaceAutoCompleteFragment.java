@@ -1,9 +1,9 @@
 package com.takeapeek.usermap;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +21,6 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.takeapeek.R;
-import com.takeapeek.common.Helper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
     static private final Logger logger = LoggerFactory.getLogger(CustomPlaceAutoCompleteFragment.class);
 
     private EditText mEditTextSearch;
-
+    View mVar4;
     private View mZzaRh;
     private View mZzaRi;
     private EditText mZzaRj;
@@ -59,9 +58,12 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
     {
         logger.debug("onCreateView(...) Invoked");
 
-        View var4 = inflater.inflate(R.layout.fragment_custom_place_auto_complete, container, false);
+        if(mVar4 == null)
+        {
+            mVar4 = inflater.inflate(R.layout.fragment_custom_place_auto_complete, container, false);
+        }
 
-        mEditTextSearch = (EditText) var4.findViewById(R.id.editWorkLocation);
+        mEditTextSearch = (EditText) mVar4.findViewById(R.id.editWorkLocation);
         mEditTextSearch.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -71,7 +73,7 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
             }
         });
 
-        return var4;
+        return mVar4;
     }
 
 
@@ -82,8 +84,32 @@ public class CustomPlaceAutoCompleteFragment extends PlaceAutocompleteFragment
         this.mZzaRh = null;
         this.mZzaRi = null;
         this.mEditTextSearch = null;
+
         super.onDestroyView();
     }
+
+/*@@
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+
+        try
+        {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+        }
+        catch (NoSuchFieldException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+@@*/
 
     public void setBoundsBias(@Nullable LatLngBounds bounds)
     {

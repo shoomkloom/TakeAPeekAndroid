@@ -1,5 +1,8 @@
 package com.takeapeek.usermap;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +41,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -67,7 +69,6 @@ import com.takeapeek.common.AddressLoader;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
 import com.takeapeek.common.MixPanel;
-import com.takeapeek.common.NameValuePair;
 import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RelativeSliderLayout;
 import com.takeapeek.common.RequestObject;
@@ -102,7 +103,6 @@ import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
 
 import static com.takeapeek.common.Helper.dipToPx;
-import static com.takeapeek.common.MixPanel.SCREEN_USER_FEED;
 import static com.takeapeek.common.MixPanel.SCREEN_USER_MAP;
 
 public class UserMapActivity extends FragmentActivity implements
@@ -200,6 +200,12 @@ public class UserMapActivity extends FragmentActivity implements
         DatabaseManager.init(this);
 
         AppLoadLogic();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
     }
 
     /**
@@ -2018,22 +2024,34 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
                 {
                     if(doBlur)
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        if(mItemSizedBlurBitmapRequest != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        }
                     }
                     else
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        if(mItemSizedBitmapRequest != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmapRequest, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        }
                     }
                 }
                 else
                 {
                     if(doBlur)
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        if(mItemSizedBlurBitmap != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        }
                     }
                     else
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        if(mItemSizedBitmap != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmap, "1", mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        }
                     }
                 }
 
@@ -2082,22 +2100,34 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
                 {
                     if(doBlur)
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmapRequest, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        if(mItemSizedBlurBitmapRequest != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmapRequest, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        }
                     }
                     else
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmapRequest, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        if(mItemSizedBitmapRequest != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmapRequest, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        }
                     }
                 }
                 else
                 {
                     if(doBlur)
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmap, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        if(mItemSizedBlurBitmap != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmap, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER, true);
+                        }
                     }
                     else
                     {
-                        iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmap, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        if(mItemSizedBitmap != null)
+                        {
+                            iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmap, String.valueOf(mCluster.getSize()), mPointCenter, 70, "#FFFFFF", Paint.Align.CENTER);
+                        }
                     }
                 }
 
