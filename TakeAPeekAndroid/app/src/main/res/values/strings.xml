@@ -11,6 +11,9 @@
     <string name="error_download_peek">Could not download the peek right now. Please try again later.</string>
     <string name="permissions_title">Peek.To Permissions</string>
     <string name="error_permissions">Peek.To needs all permissions to work properly.\n\nIf you checked \'Never ask again\' you will need to reset Peek.To app permissions in Android Settings.</string>
+    <string name="error_permissions_location">Location Permission was not granted. Please reinstall and grant all permissions.</string>
+    <string name="error_location_service_title">Location Services are OFF</string>
+    <string name="error_location_service_message">Peek.To requires Location Services to work properly. Please turn ON your location services such as GPS.</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

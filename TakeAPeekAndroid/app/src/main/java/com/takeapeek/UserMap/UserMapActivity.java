@@ -191,6 +191,7 @@ public class UserMapActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         logger.debug("onCreate(.) Invoked");
 
         mAppEventsLogger = AppEventsLogger.newLogger(this);
@@ -248,9 +249,26 @@ public class UserMapActivity extends FragmentActivity implements
                     Helper.GetDisplayNameSuccess(mSharedPreferences) == true &&
                     Helper.GetDOBSuccess(mSharedPreferences) == true)
             {
-                if(ShowCaptureOnLoad() == false)
+                logger.info("Registration is complete, proceding...");
+
+                boolean locationServicesAvailable = Helper.CheckLocationServicesAvailable(this);
+
+                if(locationServicesAvailable == true)
                 {
-                    ShowUserMap();
+                    logger.info("Location services are on, proceding...");
+
+                    boolean showCaptureOnLoad = ShowCaptureOnLoad();
+
+                    if(showCaptureOnLoad == false)
+                    {
+                        logger.info("First Capture is done, proceding...");
+
+                        ShowUserMap();
+                    }
+                }
+                else
+                {
+                    logger.error("ERROR: Location services are off, closing the application");
                 }
             }
             else

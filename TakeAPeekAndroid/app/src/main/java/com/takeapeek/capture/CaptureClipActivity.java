@@ -3415,7 +3415,10 @@ public class CaptureClipActivity extends Activity implements
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if(Helper.CheckPermissions(this) == true)
+            {
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            }
         }
 
         if (mLastLocation == null)
@@ -3423,7 +3426,14 @@ public class CaptureClipActivity extends Activity implements
             logger.warn("mLastLocation == null, creating a location update request.");
             if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
             {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                if(Helper.CheckPermissions(this) == true)
+                {
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                }
+                else
+                {
+                    Helper.ErrorMessageWithExit(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_permissions_location));
+                }
             }
         }
         else

@@ -3,60 +3,6 @@
           xmlns:android="http://schemas.android.com/apk/res/android"
           android:installLocation="internalOnly">
 
-    <logback>
-        <configuration>
-            <appender
-                class="ch.qos.logback.core.rolling.RollingFileAppender"
-                xml:name="RootFileAppender">
-                <file>
-                    /sdcard/TakeAPeek/logs/takeapeek.log
-                </file>
-
-                <append>
-                    true
-                </append>
-
-                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-                    <fileNamePattern>
-                        /sdcard/takeapeek/logs/takeapeek.%i.log
-                    </fileNamePattern>
-
-                    <minIndex>
-                        1
-                    </minIndex>
-
-                    <maxIndex>
-                        100
-                    </maxIndex>
-                </rollingPolicy>
-
-                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-                    <maxFileSize>
-                        10MB
-                    </maxFileSize>
-                </triggeringPolicy>
-
-                <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-                    <layout class="ch.qos.logback.classic.log4j.XMLLayout">
-                        <locationInfo>
-                            true
-                        </locationInfo>
-
-                        <properties>
-                            true
-                        </properties>
-                    </layout>
-                </encoder>
-            </appender>
-
-            <root>
-                <level xml:value="debug"/>
-
-                <appender-ref xml:ref="RootFileAppender"/>
-            </root>
-        </configuration>
-    </logback>
-
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>

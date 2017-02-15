@@ -36,14 +36,17 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.Layout;
@@ -51,6 +54,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.AlignmentSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -99,6 +103,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 public class Helper
 {
@@ -182,6 +192,75 @@ public class Helper
         }
 
         return null;
+    }
+
+    static public void LoadLogBackConfiguration(final Context context)
+    {
+        new AsyncTask<Void, Void, Boolean>()
+        {
+            @Override
+            protected Boolean doInBackground(Void... params)
+            {
+                LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+                try
+                {
+                    loggerContext.reset();
+
+                    String logbackConfigPath = SaveLogBackConfigFile(context);
+
+                    JoranConfigurator joranConfigurator = new JoranConfigurator();
+                    joranConfigurator.setContext(loggerContext);
+                    joranConfigurator.doConfigure(logbackConfigPath); // loads logback file
+                }
+                catch (JoranException je)
+                {
+                    je.printStackTrace(); // Just in case, so we see a stacktrace
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace(); // Just in case, so we see a stacktrace
+                    return false;
+                }
+
+                return true;
+            }
+        }.execute();
+    }
+
+    static public String SaveLogBackConfigFile(Context context)
+    {
+        String filename = "logback.xml";
+        String takeAPeekLogConfigPath = null;
+        String configXML = "<configuration><appender name=\"FILE\" class=\"ch.qos.logback.core.rolling.RollingFileAppender\"><file>/sdcard/TakeAPeek/Logs/takeapeek.log</file><rollingPolicy class=\"ch.qos.logback.core.rolling.FixedWindowRollingPolicy\"><fileNamePattern>/sdcard/TakeAPeek/Logs/takeapeek.%i.log</fileNamePattern><minIndex>1</minIndex><maxIndex>20</maxIndex></rollingPolicy><triggeringPolicy class=\"ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy\"><maxFileSize>10MB</maxFileSize></triggeringPolicy><append>true</append><encoder class=\"ch.qos.logback.core.encoder.LayoutWrappingEncoder\"><layout class=\"ch.qos.logback.classic.log4j.XMLLayout\"><locationInfo>true</locationInfo><properties>true</properties></layout></encoder></appender><root level=\"DEBUG\"><appender-ref ref=\"FILE\" /></root></configuration>";
+
+        try
+        {
+            takeAPeekLogConfigPath = GetTakeAPeekPath(context) + "Logs/";
+            CreateDirectoryIfDoesNotExist(takeAPeekLogConfigPath, true);
+            takeAPeekLogConfigPath += filename;
+            File file = new File(takeAPeekLogConfigPath);
+
+            if(file.exists() == false)
+            {
+                OutputStream outputStream = new FileOutputStream(file);
+                outputStream.write(configXML.getBytes());
+                outputStream.close();
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            takeAPeekLogConfigPath = null;
+            Log.i("Helper", "EXCEPTION: FileNotFoundException in SaveResourceFile - " + e.getMessage());
+        }
+        catch (IOException e)
+        {
+            takeAPeekLogConfigPath = null;
+            Log.i("Helper", "EXCEPTION: IOException in SaveResourceFile - " + e.getMessage());
+        }
+
+        return takeAPeekLogConfigPath;
     }
 
 	static public boolean DoesTakeAPeekAccountExist(Context context, Handler handler)
@@ -1365,29 +1444,38 @@ public class Helper
 
         BlurMaskFilter blurMaskFilter = null;
 
-        Bitmap bmOverlay = Bitmap.createBitmap(backgroundBmp.getWidth(), backgroundBmp.getHeight(), backgroundBmp.getConfig());
-        
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.parseColor(textColor));
-        paint.setTextSize(textSize); 
-//@@        paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
-       	paint.setTextAlign(textAlign);
+        Bitmap bmOverlay = null;
 
-        if(doBlur == true)
+        if(backgroundBmp == null)
         {
-            blurMaskFilter = new BlurMaskFilter(textSize/10, BlurMaskFilter.Blur.NORMAL);
-            paint.setMaskFilter(blurMaskFilter);
+            Helper.Error(logger, "ERROR: backgroundBmp = null");
         }
-       	
-       	//@@Typeface boldTypeface = getBoldFont(context);
-       	//@@paint.setTypeface(boldTypeface);
+        else
+        {
+            bmOverlay = Bitmap.createBitmap(backgroundBmp.getWidth(), backgroundBmp.getHeight(), backgroundBmp.getConfig());
 
-        Canvas canvas = new Canvas(bmOverlay);
-        canvas.drawBitmap(backgroundBmp, new Matrix(), null); 
-        canvas.drawText(text, position.x, position.y, paint);
-        
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.parseColor(textColor));
+            paint.setTextSize(textSize);
+//@@        paint.setShadowLayer(1f, 0f, 1f, Color.DKGRAY);
+            paint.setTextAlign(textAlign);
+
+            if (doBlur == true)
+            {
+                blurMaskFilter = new BlurMaskFilter(textSize / 10, BlurMaskFilter.Blur.NORMAL);
+                paint.setMaskFilter(blurMaskFilter);
+            }
+
+            //@@Typeface boldTypeface = getBoldFont(context);
+            //@@paint.setTypeface(boldTypeface);
+
+            Canvas canvas = new Canvas(bmOverlay);
+            canvas.drawBitmap(backgroundBmp, new Matrix(), null);
+            canvas.drawText(text, position.x, position.y, paint);
+        }
+
         return bmOverlay; 
-    } 
+    }
     
     public static float GetPaintTextSize(Context context, int textSize, String text)
     {
@@ -1721,6 +1809,38 @@ public class Helper
             }
         });
 	}
+
+    public static boolean CheckLocationServicesAvailable(final Context context)
+    {
+        logger.debug("CheckLocationServicesAvailable(.) Invoked");
+
+        LocationManager service = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+        boolean isProviderEnabled = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        // check if enabled and if not send user to the GSP settings
+        // Better solution would be to display a dialog and suggesting to
+        // go to the settings
+        if (isProviderEnabled == false)
+        {
+            AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AppThemeAlertDialog);
+
+            alert.setTitle(R.string.error_location_service_title);
+            alert.setMessage(R.string.error_location_service_message);
+            alert.setCancelable(false);
+
+            alert.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int whichButton)
+                        {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            context.startActivity(intent);
+                        }
+                    }
+            ).show();
+        }
+
+        return isProviderEnabled;
+    }
 
     public static void SendUpdateNotification(Context context, SharedPreferences sharedPreferences)
     {

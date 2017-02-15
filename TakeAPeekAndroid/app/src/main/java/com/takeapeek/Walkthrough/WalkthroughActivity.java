@@ -181,6 +181,8 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
 
                 if(allPermissionsGranted == true)
                 {
+                    Helper.LoadLogBackConfiguration(this);
+
                     logger.info("All permissions were granted, finish the activity.");
 
                     Helper.SetWalkthroughFinished(mSharedPreferences);
@@ -266,6 +268,8 @@ public class WalkthroughActivity extends AppCompatActivity implements ViewPager.
 
                 if(Helper.CheckPermissions(this) == true)
                 {
+                    Helper.LoadLogBackConfiguration(this);
+
                     Helper.SetWalkthroughFinished(mSharedPreferences);
 
                     //Log event to FaceBook
