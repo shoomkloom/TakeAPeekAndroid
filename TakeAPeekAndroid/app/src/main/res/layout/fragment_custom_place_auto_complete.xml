@@ -32,6 +32,6 @@
         android:layout_marginRight="90dp"
         android:scaleType="fitCenter"
         android:src="@drawable/leftarrow"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
 
 </LinearLayout>

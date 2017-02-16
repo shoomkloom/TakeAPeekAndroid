@@ -659,7 +659,7 @@ public class UserMapActivity extends FragmentActivity implements
                         Animation fadeOutAnimation = AnimationUtils.loadAnimation(UserMapActivity.this, R.anim.fadeout);
                         imageViewSearchbarLeftArrow.setAnimation(fadeOutAnimation);
                         fadeOutAnimation.start();
-                        imageViewSearchbarLeftArrow.setVisibility(View.INVISIBLE);
+                        imageViewSearchbarLeftArrow.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -1892,6 +1892,8 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
     @Override
     protected void onBeforeClusterItemRendered(TAPClusterItem tapClusterItem, MarkerOptions markerOptions)
     {
+        logger.debug("onBeforeClusterItemRendered(..) Invoked");
+
         mHandlerItem.removeCallbacks(mUpdateTaskItem);
 
         Bitmap iconBitmap = null;
@@ -1926,13 +1928,22 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
             }
         }
 
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        if(iconBitmap != null)
+        {
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        }
+        else
+        {
+            logger.error("ERROR: iconBitmap = null, cannot set custom icon!");
+        }
         markerOptions.anchor(mAnchorX, mAnchorY);
     }
 
     @Override
     protected void onBeforeClusterRendered(Cluster<TAPClusterItem> cluster, MarkerOptions markerOptions)
     {
+        logger.debug("onBeforeClusterItemRendered(..) Invoked");
+
         mHandlerCluster.removeCallbacks(mUpdateTaskCluster);
 
         boolean doBlur = false;
@@ -1992,7 +2003,15 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
             }
         }
 
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        if(iconBitmap != null)
+        {
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        }
+        else
+        {
+            logger.error("ERROR: iconBitmap = null, cannot set custom icon!");
+        }
+
         markerOptions.anchor(mAnchorX, mAnchorY);
     }
 
