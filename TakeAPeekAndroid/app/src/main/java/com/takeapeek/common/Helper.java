@@ -7,12 +7,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.PeriodicSync;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
@@ -41,10 +39,8 @@ import android.media.AudioManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
@@ -2585,7 +2581,8 @@ public class Helper
 	        sharedPreferencesEditor.commit();
 		}
     }
-    
+
+    /*@@
     public static boolean HasScanInterval(Context context, long scanInterval)
     {
     	logger.debug("HasScanInterval(..) Invoked");
@@ -2613,7 +2610,7 @@ public class Helper
     	
     	return hasScanInterval;
     }
-    
+
     public static void SetScanInterval(Context context, long scanInterval) throws Exception
     {
     	logger.debug("SetScanInterval(..) Invoked");
@@ -2630,7 +2627,8 @@ public class Helper
     	
     	logger.info(String.format("SetScanInterval: Setting ContentResolver.addPeriodicSync = %d", scanInterval));
     }
-    
+    @@*/
+
     public static boolean IsInCall(Context context)
     {
     	logger.debug("IsInCall() Invoked");
