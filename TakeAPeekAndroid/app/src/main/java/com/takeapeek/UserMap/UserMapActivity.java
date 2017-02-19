@@ -243,11 +243,10 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("AppLoadLogic() Invoked");
 
-        if(Helper.GetWalkthroughFinished(mSharedPreferences) == true)
+        if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true)
         {
-            if(Helper.DoesTakeAPeekAccountExist(this, mHandler) == true &&
-                    Helper.GetDisplayNameSuccess(mSharedPreferences) == true &&
-                    Helper.GetDOBSuccess(mSharedPreferences) == true)
+            if(Helper.GetDisplayNameSuccess(mSharedPreferences) == true &&
+               Helper.GetDOBSuccess(mSharedPreferences) == true)
             {
                 logger.info("Registration is complete, proceding...");
 
