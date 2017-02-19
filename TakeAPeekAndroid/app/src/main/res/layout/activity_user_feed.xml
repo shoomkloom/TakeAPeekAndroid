@@ -76,7 +76,7 @@
         android:layout_below="@+id/imageview_video_countdown"
         android:textSize="18sp"
         android:textColor="@color/pt_white"
-        android:gravity="left"
+        android:gravity="center"
         android:padding="5dp"
         android:background="@color/pt_gray_faded"
         android:visibility="gone"/>
@@ -88,7 +88,7 @@
         android:layout_alignParentBottom="true"
         android:textSize="18sp"
         android:textColor="@color/pt_white"
-        android:gravity="left"
+        android:gravity="center"
         android:padding="5dp"
         android:background="@color/pt_gray_faded"
         android:visibility="gone"/>
