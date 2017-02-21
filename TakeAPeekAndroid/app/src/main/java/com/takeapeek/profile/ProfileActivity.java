@@ -149,7 +149,7 @@ public class ProfileActivity extends AppCompatActivity
     {
         logger.debug("InitList() Invoked");
 
-        List<Integer> profileTitlesList = Arrays.asList(new Integer[]{R.string.support, R.string.privacy_policy, R.string.terms_of_service, R.string.licenses});
+        List<Integer> profileTitlesList = Arrays.asList(new Integer[]{R.string.support, R.string.privacy_policy, R.string.terms_of_service /*@@, R.string.licenses*/});
 
         mProfileItemAdapter = new ProfileItemAdapter(this, R.layout.item_profile, profileTitlesList);
         mListViewProfileList.setAdapter(mProfileItemAdapter);

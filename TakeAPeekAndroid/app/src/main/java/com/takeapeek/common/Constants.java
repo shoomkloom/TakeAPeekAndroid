@@ -128,7 +128,10 @@ public class Constants
     public static final String ACCOUNT_PASS = "AccountPass";
     
     //URL to the Terms and Conditions page on the site
-    public static final String TERMS_AND_CONDITIONS_URL = "http://www.microsoft.com";//@@"http://facemesite.azurewebsites.net/Mobile/TOS.htm";
+    public static final String TERMS_AND_CONDITIONS_URL = "http://peektostorage.blob.core.windows.net/resources/TOS.htm";
+
+    //URL to the Terms and Conditions page on the site
+    public static final String PRIVACY_POLICY_URL = "http://peektostorage.blob.core.windows.net/resources/PrivacyPolicy.htm";
     
     //Profile info file name
     public static final String PROFILE_INFO_FILE_NAME = "profileInfo.txt";

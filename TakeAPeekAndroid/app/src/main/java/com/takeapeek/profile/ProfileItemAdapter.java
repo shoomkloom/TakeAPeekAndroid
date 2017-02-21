@@ -3,6 +3,7 @@ package com.takeapeek.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,27 +121,47 @@ public class ProfileItemAdapter extends ArrayAdapter<Integer>
             switch(v.getId())
             {
                 case R.id.textview_profile_invite_friends:
+                    logger.info("Clicked textview_profile_invite_friends");
+
                     final Intent inviteFriendsIntent1 = new Intent(mProfileActivity.get(), ShareActivity.class);
                     inviteFriendsIntent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     mProfileActivity.get().startActivity(inviteFriendsIntent1);
                     break;
 
                 default:
+                    Intent browserIntent = null;
+
                     switch (mProfileTitlesList.get(viewHolder.Position))
                     {
                         case R.string.support:
-                            Toast.makeText(mProfileActivity.get(), "Support", Toast.LENGTH_SHORT).show();
+                            logger.info("Clicked listview item support");
+
+                            String subject = String.format("%s %s", mProfileActivity.get().getString(R.string.support_subject), Helper.GetProfileId(mSharedPreferences));
+
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                            emailIntent.setData(Uri.parse("mailto: support@peekto.freshdesk.com"));
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, mProfileActivity.get().getString(R.string.support_body));
+                            mProfileActivity.get().startActivity(Intent.createChooser(emailIntent, "Send Support Request"));
                             break;
 
                         case R.string.privacy_policy:
-                            Toast.makeText(mProfileActivity.get(), "Privacy Policy", Toast.LENGTH_SHORT).show();
+                            logger.info("Clicked listview item privacy_policy");
+
+                            browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.PRIVACY_POLICY_URL));
+                            mProfileActivity.get().startActivity(browserIntent);
                             break;
 
                         case R.string.terms_of_service:
-                            Toast.makeText(mProfileActivity.get(), "Terms of Service", Toast.LENGTH_SHORT).show();
+                            logger.info("Clicked listview item terms_of_service");
+
+                            browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.TERMS_AND_CONDITIONS_URL));
+                            mProfileActivity.get().startActivity(browserIntent);
                             break;
 
                         case R.string.licenses:
+                            logger.info("Clicked listview item licenses");
+
                             Toast.makeText(mProfileActivity.get(), "Licenses", Toast.LENGTH_SHORT).show();
                             break;
 
