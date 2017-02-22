@@ -693,12 +693,6 @@ public class UserMapActivity extends FragmentActivity implements
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
 
-        if(Helper.GetFirstRun(mSharedPreferences) == false)
-        {
-            long currentTimeMillis = Helper.GetCurrentTimeMillis();
-            Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
-        }
-
         super.onPause();
     }
 

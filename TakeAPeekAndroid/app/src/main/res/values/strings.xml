@@ -176,7 +176,7 @@
     <string name="textview_request_peek">Request Peek</string>
     <string name="textview_action_title_request">sent you a request</string>
     <string name="textview_view_peek">View Peek</string>
-    <string name="textview_action_title_response">Sent you a Peek</string>
+    <string name="textview_action_title_response">sent you a Peek</string>
     <string name="textview_action_title_peek">created a Peek</string>
     <string name="textview_action_title_follow">is now following you</string>
     <string name="textview_notification_time_justnow">Just now</string>
