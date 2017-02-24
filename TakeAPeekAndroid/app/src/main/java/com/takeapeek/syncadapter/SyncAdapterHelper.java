@@ -159,6 +159,22 @@ public class SyncAdapterHelper implements Runnable,
 
             for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
             {
+                if(takeAPeekObject.Longitude == 0 && takeAPeekObject.Latitude == 0)
+                {
+                    logger.warn("Location is not available for this peek, attemting to get location");
+
+                    if(mLastLocation != null)
+                    {
+                        takeAPeekObject.Longitude = mLastLocation.getLongitude();
+                        takeAPeekObject.Latitude = mLastLocation.getLatitude();
+                    }
+                    else
+                    {
+                        logger.error("ERROR: Location is still not available, skipping this peek till next time");
+                        continue;
+                    }
+                }
+
                 try
                 {
                     //Create objects to upload

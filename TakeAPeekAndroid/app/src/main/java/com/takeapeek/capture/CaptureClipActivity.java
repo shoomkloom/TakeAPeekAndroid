@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -158,6 +159,9 @@ public class CaptureClipActivity extends Activity implements
     View mCornerOverlayOnThumbnail = null;
     ImageView mCapturePreviewThumbnail = null;
     VideoView mCapturePreviewVideo = null;
+    RelativeLayout mRelativeLayoutDetectingLocation = null;
+    ImageView mImageViewDetectingLocationProgressAnimation = null;
+    AnimationDrawable mAnimationDrawableProgressAnimation = null;
 
     @Override
     public void onAnimationStart(Animation animation)
@@ -217,7 +221,8 @@ public class CaptureClipActivity extends Activity implements
         Details,
         Capture,
         Preview,
-        Finish
+        Finish,
+        DetectLocation
     }
 
     private VideoCaptureStateEnum mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
@@ -441,6 +446,16 @@ public class CaptureClipActivity extends Activity implements
         mCornerOverlayOnThumbnail = findViewById(R.id.corner_overlay_on_thumbnail);
         mCapturePreviewThumbnail = (ImageView)findViewById(R.id.capture_preview_thumbnail);
         mCapturePreviewVideo = (VideoView)findViewById(R.id.capture_preview_video);
+
+        mRelativeLayoutDetectingLocation = (RelativeLayout)findViewById(R.id.relative_layout_detecting_location);
+        mImageViewDetectingLocationProgressAnimation = (ImageView) findViewById(R.id.imageview_detecting_location_progress);
+        mAnimationDrawableProgressAnimation = (AnimationDrawable) mImageViewDetectingLocationProgressAnimation.getBackground();
+
+        TextView textviewDetectLocationTitle1 = (TextView)findViewById(R.id.textview_detect_location_title1);
+        Helper.setTypeface(this, textviewDetectLocationTitle1, Helper.FontTypeEnum.boldFont);
+
+        TextView textviewDetectLocationTitle2 = (TextView)findViewById(R.id.textview_detect_location_title2);
+        Helper.setTypeface(this, textviewDetectLocationTitle2, Helper.FontTypeEnum.boldFont);
 
         UpdateUI();
         //End TAP specific code
@@ -3377,8 +3392,11 @@ public class CaptureClipActivity extends Activity implements
             mCompletedTakeAPeekObject.FilePath = videoFilePath;
             mCompletedTakeAPeekObject.CreationTime = System.currentTimeMillis();
             mCompletedTakeAPeekObject.ContentType = Constants.ContentTypeEnum.mp4.toString();
-            mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
-            mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
+            if(mLastLocation != null)
+            {
+                mCompletedTakeAPeekObject.Longitude = mLastLocation.getLongitude();
+                mCompletedTakeAPeekObject.Latitude = mLastLocation.getLatitude();
+            }
             mCompletedTakeAPeekObject.RelatedProfileID = mRelateProfileID;
             mCompletedTakeAPeekObject.Upload = 1;
 
@@ -3428,6 +3446,9 @@ public class CaptureClipActivity extends Activity implements
             {
                 if(Helper.CheckPermissions(this) == true)
                 {
+                    mVideoCaptureStateEnum = VideoCaptureStateEnum.DetectLocation;
+                    UpdateUI();
+
                     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
                 }
                 else
@@ -3448,7 +3469,8 @@ public class CaptureClipActivity extends Activity implements
         logger.debug("HandleNewLocation() Invoked");
         logger.info(String.format("Last location is: '%s'", mLastLocation.toString()));
 
-        //@@ Update server...?
+        mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+        UpdateUI();
     }
 
     @Override
@@ -3548,7 +3570,50 @@ public class CaptureClipActivity extends Activity implements
                 findViewById(R.id.zoom_seekbar).setVisibility(View.VISIBLE);
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
+                mRelativelayoutTapBar.setVisibility(View.VISIBLE);
                 mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_transparent_faded));
+
+                mRelativeLayoutDetectingLocation.setVisibility(View.GONE);
+                mAnimationDrawableProgressAnimation.stop();
+
+                break;
+
+            case DetectLocation:
+                mImageviewFlash.setVisibility(View.INVISIBLE);
+                mImageviewCaptureCountdown.setVisibility(View.GONE);
+                mImageviewSwitchCamera.setVisibility(View.INVISIBLE);
+                mRelativelayoutIntro.setVisibility(View.INVISIBLE);
+
+                mLinearLayoutIntro.setVisibility(View.INVISIBLE);
+
+                mImageviewIntroClose.setVisibility(View.GONE);
+                mLinearlayoutIntroDetails.setVisibility(View.GONE);
+                mTextviewButtonBack.setVisibility(View.GONE);
+
+                mTextviewButtonDone.setVisibility(View.GONE);
+                mCapturePreviewTitle.setVisibility(View.GONE);
+                mCapturePreviewThumbnailLayout.setVisibility(View.GONE);
+                mCornerOverlayOnThumbnail.setVisibility(View.GONE);
+
+                findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.tap_black));
+
+                findViewById(R.id.preview).setVisibility(View.VISIBLE);
+                findViewById(R.id.zoom_seekbar).setVisibility(View.VISIBLE);
+                findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
+
+                mRelativelayoutTapBar.setVisibility(View.GONE);
+
+                mRelativeLayoutDetectingLocation.setVisibility(View.VISIBLE);
+
+                //Loading animation
+                mImageViewDetectingLocationProgressAnimation.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        mAnimationDrawableProgressAnimation.start();
+                    }
+                });
 
                 break;
 
