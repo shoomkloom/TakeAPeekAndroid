@@ -58,7 +58,7 @@
             android:src="@drawable/button_stack"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentRight="true"/>
     </RelativeLayout>
 
     <RelativeLayout
