@@ -1796,12 +1796,19 @@ public class Helper
             @Override
             public void run()
             {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AppThemeAlertDialog);
+                try
+                {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AppThemeAlertDialog);
 
-                alert.setTitle(title);
-                alert.setMessage(message);
-                alert.setPositiveButton(buttonText, null);
-                alert.show();
+                    alert.setTitle(title);
+                    alert.setMessage(message);
+                    alert.setPositiveButton(buttonText, null);
+                    alert.show();
+                }
+                catch(Exception e)
+                {
+                    logger.error("EXCEPTION: when showing error message", e);
+                }
             }
         });
 	}
