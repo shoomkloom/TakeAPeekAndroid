@@ -1734,9 +1734,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				logger.info("check video quality: " + video_quality.get(i));
 
 				CamcorderProfile profile = getCamcorderProfile(video_quality.get(i));
-				if( profile.videoFrameWidth == 1280 && profile.videoFrameHeight == 720 )
-                //@@if( profile.videoFrameWidth == 1024 && profile.videoFrameHeight == 768 )
-                {
+				if( profile.videoFrameWidth == 1920 && profile.videoFrameHeight == 1080 ) 
+			{
 					current_video_quality = i;
 					break;
 				}
@@ -2114,9 +2113,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			return CamcorderProfile.get(0, CamcorderProfile.QUALITY_HIGH);
 		}
 		int cameraId = camera_controller.getCameraId();
-		CamcorderProfile camcorder_profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_720P); // default
-		try
-        {
+		CamcorderProfile camcorder_profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH); // default
+		try 
+		{
 			String profile_string = quality;
 			int index = profile_string.indexOf('_');
 			if( index != -1 )
@@ -2169,6 +2168,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
     {
         logger.debug("getCamcorderProfile() Invoked.");
 
+/*@@
 		// 4K UHD video is not yet supported by Android API (at least testing on Samsung S5 and Note 3, they do not return it via getSupportedVideoSizes(), nor via a CamcorderProfile (either QUALITY_HIGH, or anything else)
 		// but it does work if we explicitly set the resolution (at least tested on an S5)
 		if( camera_controller == null )
@@ -2176,9 +2176,13 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			logger.info("camera not opened!");
 			return CamcorderProfile.get(0, CamcorderProfile.QUALITY_HIGH);
 		}
-		CamcorderProfile profile = null;
+@@*/
 		int cameraId = camera_controller.getCameraId();
+        CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
+        profile.videoBitRate = 3000000;
+        return profile;
 
+/*@@
         boolean force4KPref = false;//@@applicationInterface.getForce4KPref();
 		if(force4KPref)
         {
@@ -2211,6 +2215,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				logger.info("bitrate invalid format, can't parse to int: " + bitrate_value);
 			}
 		}
+
 		String fps_value = "30";//@@applicationInterface.getVideoFPSPref();
 		if( !fps_value.equals("default") )
         {
@@ -2224,8 +2229,10 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             {
 				logger.info("fps invalid format, can't parse to int: " + fps_value);
 			}
-		}		
+		}
+
 		return profile;
+@@*/
 	}
 	
 	private static String formatFloatToString(final float f)

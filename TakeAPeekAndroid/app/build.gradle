@@ -9,8 +9,8 @@ android {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 76
-        versionName "0.9.76 beta"
+        versionCode 77
+        versionName "0.9.77 beta"
     }
     buildTypes {
         release {
@@ -42,6 +42,7 @@ dependencies {
     compile 'com.github.crosswall:Android-Coverflow:release-v1.0.4'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile "com.mixpanel.android:mixpanel-android:4.9.3"
+    compile 'com.flurgle:camerakit:0.9.13'
 }
 
 
