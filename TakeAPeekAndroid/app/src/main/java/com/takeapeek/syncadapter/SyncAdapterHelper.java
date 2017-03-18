@@ -352,14 +352,14 @@ public class SyncAdapterHelper implements Runnable,
                     String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
                     //Update server with my new location...
-                    new Transport().UpdateLocation(mContext, username, password,
-                            mLastLocation.getLongitude(), mLastLocation.getLatitude(), mSharedPreferences);
+                    new Transport().UpdateLocationBuild(mContext, username, password,
+                            mLastLocation.getLongitude(), mLastLocation.getLatitude(), mAppVersion, mSharedPreferences);
 
-                    logger.info(String.format("Updated new location : '%s'.", mLastLocation.toString()));
+                    logger.info(String.format("Updated new location: '%s', build: '%s'.", mLastLocation.toString(), mAppVersion));
                 }
                 catch(Exception e)
                 {
-                    Helper.Error(logger, "EXCEPTION: when calling Transport.UpdateLocation", e);
+                    Helper.Error(logger, "EXCEPTION: when calling Transport.UpdateLocationBuild", e);
                 }
             }
         };

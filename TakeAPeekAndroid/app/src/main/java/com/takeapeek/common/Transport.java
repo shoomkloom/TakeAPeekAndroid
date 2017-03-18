@@ -245,9 +245,9 @@ public class Transport
         return responseObject;
     }
 
-    public ResponseObject UpdateLocation(Context context, String userName, String password, double longitude, double latitude, SharedPreferences sharedPreferences) throws Exception
+    public ResponseObject UpdateLocationBuild(Context context, String userName, String password, double longitude, double latitude, String buildName, SharedPreferences sharedPreferences) throws Exception
     {
-        logger.debug("UpdateLocation(......) Invoked - before lock");
+        logger.debug("UpdateLocationBuild(......) Invoked - before lock");
 
         ResponseObject responseObject = null;
 
@@ -255,15 +255,16 @@ public class Transport
 
         try
         {
-            logger.debug("UpdateLocation(......) - inside lock");
+            logger.debug("UpdateLocationBuild(......) - inside lock");
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
-            nameValuePairs.add(new NameValuePair("action_type", "update_location"));
+            nameValuePairs.add(new NameValuePair("action_type", "update_location_build"));
             nameValuePairs.add(new NameValuePair("user_name", userName));
             nameValuePairs.add(new NameValuePair("password", password));
             nameValuePairs.add(new NameValuePair("longitude", String.format("%f", longitude)));
             nameValuePairs.add(new NameValuePair("latitude", String.format("%f", latitude)));
+            nameValuePairs.add(new NameValuePair("build", buildName));
 
             responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
         }
@@ -275,7 +276,7 @@ public class Transport
         finally
         {
             //@@lock.unlock();
-            logger.debug("UpdateLocation(......) - after unlock");
+            logger.debug("UpdateLocationBuild(......) - after unlock");
         }
 
         return responseObject;
