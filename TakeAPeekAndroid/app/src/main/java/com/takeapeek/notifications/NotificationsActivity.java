@@ -82,8 +82,6 @@ public class NotificationsActivity extends AppCompatActivity
 
         DatabaseManager.init(this);
 
-        ArrayList<TakeAPeekNotification> takeAPeekNotificationArrayList = GetTakeAPeekNotificationArray();
-
         TextView textviewNotificationsTitle = (TextView)findViewById(R.id.textview_notifications_title);
         Helper.setTypeface(this, textviewNotificationsTitle, Helper.FontTypeEnum.boldFont);
 
@@ -94,6 +92,17 @@ public class NotificationsActivity extends AppCompatActivity
 
         mImageViewProfileButton = (ImageView)findViewById(R.id.imageview_profile);
         mImageViewProfileButton.setOnClickListener(ClickListener);
+
+        InitNotificationList();
+
+        findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
+    }
+
+    private void InitNotificationList()
+    {
+        logger.debug("InitNotificationList() Invoked");
+
+        ArrayList<TakeAPeekNotification> takeAPeekNotificationArrayList = GetTakeAPeekNotificationArray();
 
         if(takeAPeekNotificationArrayList.size() == 0)
         {
@@ -120,8 +129,6 @@ public class NotificationsActivity extends AppCompatActivity
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.cancelAll();
-
-        findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
     }
 
     private ArrayList<TakeAPeekNotification> GetTakeAPeekNotificationArray()
@@ -187,6 +194,8 @@ public class NotificationsActivity extends AppCompatActivity
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
+
+        InitNotificationList();
     }
 
     private BroadcastReceiver onPushNotificationBroadcast = new BroadcastReceiver()
