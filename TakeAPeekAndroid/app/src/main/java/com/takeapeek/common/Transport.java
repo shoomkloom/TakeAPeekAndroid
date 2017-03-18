@@ -439,6 +439,41 @@ public class Transport
         return responseObject;
     }
 
+    public ResponseObject GetPeekMetaData(Context context, String userName, String password, String peekId, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("GetPeekMetaData(....) Invoked - before lock");
+
+        ResponseObject responseObject = null;
+
+        //@@lock.lock();
+
+        try
+        {
+            logger.debug("GetPeeks(....) - inside lock");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new NameValuePair("action_type", "get_peek_meta_data"));
+            nameValuePairs.add(new NameValuePair("user_name", userName));
+            nameValuePairs.add(new NameValuePair("password", password));
+            nameValuePairs.add(new NameValuePair("peek_id", peekId));
+
+            responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: inside GetPeeks(....)", e);
+            throw e;
+        }
+        finally
+        {
+            //@@lock.unlock();
+            logger.debug("GetPeeks(....) - after unlock");
+        }
+
+        return responseObject;
+    }
+
     public ResponseObject GetPushNotifcationData(Context context, String userName, String password, String srcProfileId, String relatedPeekId, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("GetPushNotifcationData(......) Invoked - before lock");

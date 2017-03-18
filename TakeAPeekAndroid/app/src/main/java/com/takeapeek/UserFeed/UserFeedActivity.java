@@ -386,7 +386,7 @@ public class UserFeedActivity extends AppCompatActivity
         ShowPeek(false, takeAPeekObject);
     }
 
-    public void ShowPeek(boolean fromHandler, final TakeAPeekObject takeAPeekObject)
+    public void ShowPeek(final boolean fromHandler, final TakeAPeekObject takeAPeekObject)
     {
         logger.debug("ShowPeek(..) Invoked");
 
@@ -396,21 +396,76 @@ public class UserFeedActivity extends AppCompatActivity
         mThumbnailLoader.SetThumbnail(this, -1, takeAPeekObject, mImageViewPeekThumbnail, mSharedPreferences);
 
         mCurrentTakeAPeekObject = takeAPeekObject;
-        String peekMP4StreamingURLStr = mCurrentTakeAPeekObject.PeekMP4StreamingURL;
 
-        if(fromHandler == true || peekMP4StreamingURLStr == null)
+        if(mCurrentTakeAPeekObject.PeekMP4StreamingURL == null)
         {
-            ShowPeekFile(fromHandler, takeAPeekObject);
+            //Refresh Peek data
+            new AsyncTask<Void, Void, ResponseObject>()
+            {
+                @Override
+                protected ResponseObject doInBackground(Void... params)
+                {
+                    try
+                    {
+                        String username = Helper.GetTakeAPeekAccountUsername(UserFeedActivity.this);
+                        String password = Helper.GetTakeAPeekAccountPassword(UserFeedActivity.this);
+
+                        return new Transport().GetPeekMetaData(
+                                UserFeedActivity.this, username, password,
+                                mCurrentTakeAPeekObject.TakeAPeekID,
+                                mSharedPreferences);
+                    }
+                    catch (Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(ResponseObject responseObject)
+                {
+                    logger.debug("onPostExecute(.) Invoked");
+
+                    if (responseObject != null)
+                    {
+                        if (responseObject.peeks != null && responseObject.peeks.size() > 0)
+                        {
+                            mCurrentTakeAPeekObject.PeekMP4StreamingURL = responseObject.peeks.get(0).PeekMP4StreamingURL;
+                            ShowPeekUpdatedMetaData(fromHandler);
+                        }
+                    }
+                    else
+                    {
+                        Helper.Error(logger, "ERROR: responseObject = null when getting Peek Meta Data");
+                    }
+                }
+            }.execute();
         }
         else
         {
-            ShowPeekStream(fromHandler, takeAPeekObject);
+            ShowPeekUpdatedMetaData(fromHandler);
+        }
+    }
+
+    private void ShowPeekUpdatedMetaData(boolean fromHandler)
+    {
+        logger.debug("ShowPeekUpdatedMetaData(.) Invoked");
+
+        if(fromHandler == true || mCurrentTakeAPeekObject.PeekMP4StreamingURL == null)
+        {
+            ShowPeekFile(fromHandler, mCurrentTakeAPeekObject);
+        }
+        else
+        {
+            ShowPeekStream(fromHandler, mCurrentTakeAPeekObject);
         }
 
-        FollowProfile(takeAPeekObject.ProfileID, takeAPeekObject.ProfileDisplayName);
+        FollowProfile(mCurrentTakeAPeekObject.ProfileID, mCurrentTakeAPeekObject.ProfileDisplayName);
 
         //Remove related notification
-        TakeAPeekNotification takeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotificationByPeek(takeAPeekObject.TakeAPeekID);
+        TakeAPeekNotification takeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotificationByPeek(mCurrentTakeAPeekObject.TakeAPeekID);
         if(takeAPeekNotification != null)
         {
             DatabaseManager.getInstance().DeleteTakeAPeekNotification(takeAPeekNotification);
