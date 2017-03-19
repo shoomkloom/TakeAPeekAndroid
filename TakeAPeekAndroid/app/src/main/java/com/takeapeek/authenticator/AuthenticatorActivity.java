@@ -1023,6 +1023,8 @@ public class AuthenticatorActivity extends AppCompatActivity
     		case verificationSuccess:
     			logger.info("HandleMessage::verificationSuccess");
 
+                mHandler.removeCallbacks(mReceiveSMSCountdownRunnable);
+
                 setResult(RESULT_OK);
                 finish();
 
