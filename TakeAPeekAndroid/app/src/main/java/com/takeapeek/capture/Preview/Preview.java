@@ -1539,7 +1539,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 
 			logger.info("saved iso: " + value);
 
-			CameraController.SupportedValues supported_values = camera_controller.setISO(value);
+			CameraController.SupportedValues supported_values = null;//@@camera_controller.setISO(value);
 			if( supported_values != null )
             {
 				isos = supported_values.values;
@@ -1704,9 +1704,9 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		initialiseVideoQuality();
 
 		current_video_quality = -1;
-		String video_quality_value_s = applicationInterface.getVideoQualityPref();
+		String video_quality_value_s = "";//@@applicationInterface.getVideoQualityPref();
 
-		logger.info("video_quality_value: " + video_quality_value_s);
+		//@@logger.info("video_quality_value: " + video_quality_value_s);
 
 		if( video_quality_value_s.length() > 0 )
         {
@@ -1734,8 +1734,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				logger.info("check video quality: " + video_quality.get(i));
 
 				CamcorderProfile profile = getCamcorderProfile(video_quality.get(i));
-				if( profile.videoFrameWidth == 1920 && profile.videoFrameHeight == 1080 ) 
-			{
+                if( profile.videoFrameWidth == 1280 && profile.videoFrameHeight == 720 )
+			    {
 					current_video_quality = i;
 					break;
 				}
@@ -2163,77 +2163,33 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         }
 		return camcorder_profile;
 	}
-	
-	public CamcorderProfile getCamcorderProfile()
+
+    public CamcorderProfile getCamcorderProfile()
     {
         logger.debug("getCamcorderProfile() Invoked.");
 
-/*@@
-		// 4K UHD video is not yet supported by Android API (at least testing on Samsung S5 and Note 3, they do not return it via getSupportedVideoSizes(), nor via a CamcorderProfile (either QUALITY_HIGH, or anything else)
-		// but it does work if we explicitly set the resolution (at least tested on an S5)
-		if( camera_controller == null )
+        if( camera_controller == null )
         {
-			logger.info("camera not opened!");
-			return CamcorderProfile.get(0, CamcorderProfile.QUALITY_HIGH);
-		}
-@@*/
-		int cameraId = camera_controller.getCameraId();
-        CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
-        profile.videoBitRate = 3000000;
+            logger.info("camera not opened!");
+            return CamcorderProfile.get(0, CamcorderProfile.QUALITY_HIGH);
+        }
+        CamcorderProfile profile = null;
+        int cameraId = camera_controller.getCameraId();
+
+        if( current_video_quality != -1 )
+        {
+            profile = getCamcorderProfile(video_quality.get(current_video_quality));
+        }
+        else
+        {
+            profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
+        }
+
+        profile.videoBitRate = 7000000;
+        profile.videoFrameRate = 30;
+
         return profile;
-
-/*@@
-        boolean force4KPref = false;//@@applicationInterface.getForce4KPref();
-		if(force4KPref)
-        {
-			logger.info("force 4K UHD video");
-			profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
-			profile.videoFrameWidth = 3840;
-			profile.videoFrameHeight = 2160;
-			profile.videoBitRate = (int)(profile.videoBitRate*2.8); // need a higher bitrate for the better quality - this is roughly based on the bitrate used by an S5's native camera app at 4K (47.6 Mbps, compared to 16.9 Mbps which is what's returned by the QUALITY_HIGH profile)
-		}
-		else if( current_video_quality != -1 )
-        {
-			profile = getCamcorderProfile(video_quality.get(current_video_quality));
-		}
-		else
-        {
-			profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
-		}
-
-		String bitrate_value = "3000000"; //@@applicationInterface.getVideoBitratePref();
-		if( !bitrate_value.equals("default") )
-        {
-			try
-            {
-				int bitrate = Integer.parseInt(bitrate_value);
-				logger.info("bitrate: " + bitrate);
-				profile.videoBitRate = bitrate;
-			}
-			catch(NumberFormatException exception)
-            {
-				logger.info("bitrate invalid format, can't parse to int: " + bitrate_value);
-			}
-		}
-
-		String fps_value = "30";//@@applicationInterface.getVideoFPSPref();
-		if( !fps_value.equals("default") )
-        {
-			try
-            {
-				int fps = Integer.parseInt(fps_value);
-				logger.info("fps: " + fps);
-				profile.videoFrameRate = fps;
-			}
-			catch(NumberFormatException exception)
-            {
-				logger.info("fps invalid format, can't parse to int: " + fps_value);
-			}
-		}
-
-		return profile;
-@@*/
-	}
+    }
 	
 	private static String formatFloatToString(final float f)
     {
@@ -4226,6 +4182,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 		this.phase = PHASE_NORMAL;
 		applicationInterface.cameraInOperation(false);
 		this.reconnectCamera(true);
+
+        applicationInterface.getMainActivity().FailedToStartVideoRecorder(profile);
 	}
 
 	/** Take photo. The caller should aready have set the phase to PHASE_TAKING_PHOTO.
@@ -4249,6 +4207,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                 {
 					logger.info("autofocus_in_continuous_mode: take photo after current focus");
 					take_photo_after_autofocus = true;
+                    camera_controller.setCaptureFollowAutofocusHint(true);
 				}
 				else
                 {
@@ -4276,7 +4235,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				}
 	              };
 
-            camera_controller.autoFocus(autoFocusCallback);
+            camera_controller.autoFocus(autoFocusCallback, true);
 		}
 		else if( skip_autofocus || this.recentlyFocused() )
         {
@@ -4302,6 +4261,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 					// In general, probably a good idea to not redo a focus - just use the one that's already in progress
 					logger.info("take photo after current focus");
 					take_photo_after_autofocus = true;
+                    camera_controller.setCaptureFollowAutofocusHint(true);
 				}
 				else
                 {
@@ -4317,7 +4277,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 						}
 			        };
 					logger.info("start autofocus to take picture");
-					camera_controller.autoFocus(autoFocusCallback);
+					camera_controller.autoFocus(autoFocusCallback, true);
 					count_cameraAutoFocus++;
 				}
 			}
@@ -4380,6 +4340,8 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 			private boolean success = false; // whether jpeg callback succeeded
 			private boolean has_date = false;
 			private Date current_date = null;
+
+            public void onStarted(){}
 
 			public void onCompleted()
             {
@@ -4627,7 +4589,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 				logger.info("set focus_success to " + focus_success);
 	    		this.focus_complete_time = -1;
 	    		this.successfully_focused = false;
-    			camera_controller.autoFocus(autoFocusCallback);
+    			camera_controller.autoFocus(autoFocusCallback, false);
     			count_cameraAutoFocus++;
     			this.focus_started_time = System.currentTimeMillis();
 				logger.info("autofocus started, count now: " + count_cameraAutoFocus);

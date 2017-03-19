@@ -3529,6 +3529,16 @@ public class CaptureClipActivity extends Activity implements
         }
     }
 
+    public void FailedToStartVideoRecorder(CamcorderProfile profile)
+    {
+        logger.debug("FailedToStartVideoRecorder(.) Invoked.");
+
+        mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
+        UpdateUI();
+
+        Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_starting_profile));
+    }
+
     private void UpdateUI()
     {
         logger.debug("UpdateUI() Invoked.");

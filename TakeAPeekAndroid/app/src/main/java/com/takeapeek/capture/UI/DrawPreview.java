@@ -69,7 +69,7 @@ public class DrawPreview
 
 	public DrawPreview(CaptureClipActivity main_activity, MyApplicationInterface applicationInterface)
     {
-        logger.debug("() Invoked.");
+        logger.debug("DrawPreview() Invoked.");
         
 		this.main_activity = main_activity;
 		this.applicationInterface = applicationInterface;
@@ -88,14 +88,14 @@ public class DrawPreview
 
 	private Context getContext()
     {
-        logger.debug("() Invoked.");
+        logger.debug("getContext() Invoked.");
         
         return main_activity;
     }
 	
 	public void updateThumbnail(Bitmap thumbnail)
     {
-        logger.debug("() Invoked.");
+        logger.debug("updateThumbnail(.) Invoked.");
         
 		if( applicationInterface.getThumbnailAnimationPref() )
         {
@@ -114,14 +114,14 @@ public class DrawPreview
     
 	public boolean hasThumbnailAnimation()
     {
-        logger.debug("() Invoked.");
+        logger.debug("hasThumbnailAnimation() Invoked.");
         
         return this.thumbnail_anim;
 	}
 
 	public void cameraInOperation(boolean in_operation)
     {
-        logger.debug("() Invoked.");
+        logger.debug("cameraInOperation() Invoked.");
         
     	if( in_operation && !main_activity.getPreview().isVideo() )
         {
@@ -135,7 +135,7 @@ public class DrawPreview
 
 	public void onContinuousFocusMove(boolean start)
     {
-        logger.debug("() Invoked.");
+        logger.debug("onContinuousFocusMove() Invoked.");
         
 		logger.info("onContinuousFocusMove: " + start);
 		if( start )
@@ -151,7 +151,7 @@ public class DrawPreview
 
 	public void clearContinuousFocusMove()
     {
-        logger.debug("() Invoked.");
+        logger.debug("clearContinuousFocusMove() Invoked.");
         
 		continuous_focus_moving = false;
 		continuous_focus_moving_ms = 0;
@@ -159,14 +159,14 @@ public class DrawPreview
 
 	private boolean getTakePhotoBorderPref()
     {
-        logger.debug("() Invoked.");
+        logger.debug("getTakePhotoBorderPref() Invoked.");
         
     	return true;//@@sharedPreferences.getBoolean(PreferenceKeys.getTakePhotoBorderPreferenceKey(), true);
     }
     
     private int getAngleHighlightColor()
     {
-        logger.debug("() Invoked.");
+        logger.debug("getAngleHighlightColor() Invoked.");
         
 		String color = "#14e715";//@@mSharedPreferences.getString(PreferenceKeys.getShowAngleHighlightColorPreferenceKey(), "#14e715");
 		return Color.parseColor(color);
@@ -174,7 +174,7 @@ public class DrawPreview
 
     private String getTimeStringFromSeconds(long time)
     {
-        logger.debug("() Invoked.");
+        logger.debug("getTimeStringFromSeconds() Invoked.");
         
     	int secs = (int)(time % 60);
     	time /= 60;
@@ -188,7 +188,7 @@ public class DrawPreview
 
 	public void onDrawPreview(final Canvas canvas)
     {
-        logger.debug("() Invoked.");
+        logger.debug("onDrawPreview() Invoked.");
         
 		final Preview preview  = main_activity.getPreview();
 		final CameraController camera_controller = preview.getCameraController();

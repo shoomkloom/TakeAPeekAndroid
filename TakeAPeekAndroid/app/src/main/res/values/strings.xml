@@ -49,6 +49,7 @@
     <string name="error_peek_too_short">Peek has to be longer than 3 seconds</string>
     <string name="detecting_location_title1">Peek.To cannot detect your location.\nPerhaps try going outside for better GPS reception?</string>
     <string name="detecting_location_title2">Detecting your location...</string>
+    <string name="error_starting_profile">There was an error starting the recording. Please press \'Back\' till you exit the application and then try again.</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

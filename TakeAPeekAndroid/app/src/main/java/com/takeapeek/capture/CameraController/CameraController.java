@@ -6,10 +6,8 @@ import android.hardware.camera2.DngCreator;
 import android.location.Location;
 import android.media.Image;
 import android.media.MediaRecorder;
+import android.util.Log;
 import android.view.SurfaceHolder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -23,75 +21,72 @@ import java.util.List;
  *  otherwise the calling application still controls the behaviour of the
  *  camera.
  */
-public abstract class CameraController
-{
-    static private final Logger logger = LoggerFactory.getLogger(CameraController.class);
+public abstract class CameraController {
+	private static final String TAG = "CameraController";
+	private final int cameraId;
 
-    private volatile int cameraId = 0; // must be volatile for test project reading the state
-
-    public static final long EXPOSURE_TIME_DEFAULT = 1000000000L/30;
+	public static final long EXPOSURE_TIME_DEFAULT = 1000000000L/30;
 
 	// for testing:
-	public int count_camera_parameters_exception = 0;
-	public int count_precapture_timeout = 0;
-    public boolean test_wait_capture_result = false; // whether to test delayed capture result in Camera2 API
+	public int count_camera_parameters_exception;
+	public int count_precapture_timeout;
+	public boolean test_wait_capture_result; // whether to test delayed capture result in Camera2 API
+	public volatile int test_capture_results; // for Camera2 API, only many capture requests completed with RequestTag.CAPTURE
+	public volatile int test_fake_flash_focus; // for Camera2 API, records torch turning on for fake flash during autofocus
+	public volatile int test_fake_flash_precapture; // for Camera2 API, records torch turning on for fake flash during precapture
+	public volatile int test_fake_flash_photo; // for Camera2 API, records torch turning on for fake flash for photo capture
+	public volatile int test_af_state_null_focus; // for Camera2 API, records af_state being null even when we've requested autofocus
 
-	public static class CameraFeatures
-    {
-		public boolean is_zoom_supported = false;
-		public int max_zoom = 0;
-		public List<Integer> zoom_ratios = null;
-		public boolean supports_face_detection = false;
-		public List<CameraController.Size> picture_sizes = null;
-		public List<CameraController.Size> video_sizes = null;
-		public List<CameraController.Size> preview_sizes = null;
-		public List<String> supported_flash_values = null;
-		public List<String> supported_focus_values = null;
-		public int max_num_focus_areas = 0;
-		public float minimum_focus_distance = 0.0f;
-		public boolean is_exposure_lock_supported = false;
-		public boolean is_video_stabilization_supported = false;
-		public boolean supports_iso_range = false;
-		public int min_iso = 0;
-		public int max_iso = 0;
-		public boolean supports_exposure_time = false;
-		public long min_exposure_time = 0L;
-		public long max_exposure_time = 0L;
-		public int min_exposure = 0;
-		public int max_exposure = 0;
-		public float exposure_step = 0.0f;
-		public boolean can_disable_shutter_sound = false;
-        public boolean supports_expo_bracketing = false;
-		public boolean supports_raw = false;
+	public static class CameraFeatures {
+		public boolean is_zoom_supported;
+		public int max_zoom;
+		public List<Integer> zoom_ratios;
+		public boolean supports_face_detection;
+		public List<CameraController.Size> picture_sizes;
+		public List<CameraController.Size> video_sizes;
+		public List<CameraController.Size> video_sizes_high_speed;
+		public List<CameraController.Size> preview_sizes;
+		public List<String> supported_flash_values;
+		public List<String> supported_focus_values;
+		public int max_num_focus_areas;
+		public float minimum_focus_distance;
+		public boolean is_exposure_lock_supported;
+		public boolean is_video_stabilization_supported;
+		public boolean supports_iso_range;
+		public int min_iso;
+		public int max_iso;
+		public boolean supports_exposure_time;
+		public long min_exposure_time;
+		public long max_exposure_time;
+		public int min_exposure;
+		public int max_exposure;
+		public float exposure_step;
+		public boolean can_disable_shutter_sound;
+		public boolean supports_expo_bracketing;
+		public boolean supports_raw;
+		public float view_angle_x; // horizontal angle of view in degrees (when unzoomed)
+		public float view_angle_y; // view angle of view in degrees (when unzoomed)
 	}
 
-	public static class Size
-    {
-		public int width = 0;
-		public int height = 0;
+	public static class Size {
+		public final int width;
+		public final int height;
 		
-		public Size(int width, int height)
-        {
+		public Size(int width, int height) {
 			this.width = width;
 			this.height = height;
 		}
 
 		@Override
-		public boolean equals(Object o)
-        {
+		public boolean equals(Object o) {
 			if( !(o instanceof Size) )
-            {
-                return false;
-            }
-
-            Size that = (Size)o;
-
-            return this.width == that.width && this.height == that.height;
+				return false;
+			Size that = (Size)o;
+			return this.width == that.width && this.height == that.height;
 		}
 		
 		@Override
-		public int hashCode()
-        {
+		public int hashCode() {
 			// must override this, as we override equals()
 			// can't use:
 			//return Objects.hash(width, height);
@@ -104,86 +99,76 @@ public abstract class CameraController
 	/** An area has values from [-1000,-1000] (for top-left) to [1000,1000] (for bottom-right) for whatever is
 	 * the current field of view (i.e., taking zoom into account).
 	 */
-	public static class Area
-    {
-		public Rect rect = null;
-		public int weight = 0;
+	public static class Area {
+		final Rect rect;
+		final int weight;
 		
-		public Area(Rect rect, int weight)
-        {
+		public Area(Rect rect, int weight) {
 			this.rect = rect;
 			this.weight = weight;
 		}
 	}
 	
-	public static interface FaceDetectionListener
-    {
+	public interface FaceDetectionListener {
 		void onFaceDetection(Face[] faces);
 	}
-
-    public interface PictureCallback
-    {
-        void onCompleted(); // called after all relevant on*PictureTaken() callbacks have been called and returned
-        void onPictureTaken(byte[] data);
-        /** Only called if RAW is requested.
-         *  Caller should call image.close() and dngCreator.close() when done with the image.
-         */
-        void onRawPictureTaken(DngCreator dngCreator, Image image);
-        /** Only called if burst is requested.
-         */
-        void onBurstPictureTaken(List<byte[]> images);
-        /* This is called for flash_frontscreen_auto or flash_frontscreen_on mode to indicate the caller should light up the screen
-         * (for flash_frontscreen_auto it will only be called if the scene is considered dark enough to require the screen flash).
-         * The screen flash can be removed when or after onCompleted() is called.
-         */
-        void onFrontScreenTurnOn();
-    }
 	
-	public static interface AutoFocusCallback
-    {
+	public interface PictureCallback {
+		void onStarted(); // called immediately before we start capturing the picture
+		void onCompleted(); // called after all relevant on*PictureTaken() callbacks have been called and returned
+		void onPictureTaken(byte[] data);
+		/** Only called if RAW is requested.
+		 *  Caller should call image.close() and dngCreator.close() when done with the image.
+		 */
+		void onRawPictureTaken(DngCreator dngCreator, Image image);
+		/** Only called if burst is requested.
+		 */
+		void onBurstPictureTaken(List<byte[]> images);
+		/* This is called for flash_frontscreen_auto or flash_frontscreen_on mode to indicate the caller should light up the screen
+		 * (for flash_frontscreen_auto it will only be called if the scene is considered dark enough to require the screen flash).
+		 * The screen flash can be removed when or after onCompleted() is called.
+		 */
+		void onFrontScreenTurnOn();
+	}
+	
+	public interface AutoFocusCallback {
 		void onAutoFocus(boolean success);
 	}
 	
-	public static interface ContinuousFocusMoveCallback
-    {
+	public interface ContinuousFocusMoveCallback {
 		void onContinuousFocusMove(boolean start);
 	}
 	
-	public static interface ErrorCallback
-    {
+	public interface ErrorCallback {
 		void onError();
 	}
 	
-	public static class Face
-    {
-		public int score = 0;
+	public static class Face {
+		public final int score;
 		/* The has values from [-1000,-1000] (for top-left) to [1000,1000] (for bottom-right) for whatever is
 		 * the current field of view (i.e., taking zoom into account).
 		 */
-		public Rect rect = null;
+		public final Rect rect;
 
-		Face(int score, Rect rect)
-        {
+		Face(int score, Rect rect) {
 			this.score = score;
 			this.rect = rect;
 		}
 	}
 	
-	public static class SupportedValues
-    {
-		public List<String> values = null;
-		public String selected_value = null;
-
-        SupportedValues(List<String> values, String selected_value)
-        {
+	public static class SupportedValues {
+		public final List<String> values;
+		public final String selected_value;
+		SupportedValues(List<String> values, String selected_value) {
 			this.values = values;
 			this.selected_value = selected_value;
 		}
 	}
 
 	public abstract void release();
+	public abstract void onError(); // triggers error mechanism - should only be called externally for testing purposes
 
-	public CameraController(int cameraId) {
+	CameraController(int cameraId) {
 		this.cameraId = cameraId;
 	}
 	public abstract String getAPI();
@@ -192,47 +177,73 @@ public abstract class CameraController
 		return cameraId;
 	}
 	public abstract SupportedValues setSceneMode(String value);
+	/**
+	 * @return The current scene mode. Will be null if scene mode not supported.
+     */
 	public abstract String getSceneMode();
 	public abstract SupportedValues setColorEffect(String value);
 	public abstract String getColorEffect();
 	public abstract SupportedValues setWhiteBalance(String value);
 	public abstract String getWhiteBalance();
+	/** Set an ISO value. Only supported if supports_iso_range is false.
+	 */
 	public abstract SupportedValues setISO(String value);
-    public abstract String getISOKey();
-	public abstract int getISO();
+	/** Switch between auto and manual ISO mode. Only supported if supports_iso_range is true.
+	 * @param manual_iso Whether to switch to manual mode or back to auto.
+	 * @param iso If manual_iso is true, this specifies the desired ISO value. If this is outside
+	 *            the min_iso/max_iso, the value will be snapped so it does lie within that range.
+	 *            If manual_iso i false, this value is ignored.
+	 */
+	public abstract void setManualISO(boolean manual_iso, int iso);
+
+	/**
+	 * @return Whether in manual ISO mode (as opposed to auto).
+     */
+	public abstract boolean isManualISO();
+	/** Specify a specific ISO value. Only supported if supports_iso_range is true. Callers should
+	 *  first switch to manual ISO mode using setManualISO().
+	 */
 	public abstract boolean setISO(int iso);
+    public abstract String getISOKey();
+	/** Returns the manual ISO value. Only supported if supports_iso_range is true.
+	 */
+	public abstract int getISO();
 	public abstract long getExposureTime();
 	public abstract boolean setExposureTime(long exposure_time);
     public abstract CameraController.Size getPictureSize();
     public abstract void setPictureSize(int width, int height);
     public abstract CameraController.Size getPreviewSize();
     public abstract void setPreviewSize(int width, int height);
-    public abstract void setExpoBracketing(boolean want_expo_bracketing);
-    /** n_images must be an odd number greater than 1.
-     */
-    public abstract void setExpoBracketingNImages(int n_images);
-    public abstract void setExpoBracketingStops(double stops);
-    public abstract void setUseExpoFastBurst(boolean use_expo_fast_burst);
+	public abstract void setExpoBracketing(boolean want_expo_bracketing);
+	/** n_images must be an odd number greater than 1.
+	 */
+	public abstract void setExpoBracketingNImages(int n_images);
+	public abstract void setExpoBracketingStops(double stops);
+	public abstract void setUseExpoFastBurst(boolean use_expo_fast_burst);
+	/** If optimise_ae_for_dro is true, then this is a hint that if in auto-exposure mode and flash/torch
+	 *  is not on, the CameraController should try to optimise for a DRO (dynamic range optimisation) mode.
+	 */
+	public abstract void setOptimiseAEForDRO(boolean optimise_ae_for_dro);
 	public abstract void setRaw(boolean want_raw);
-    /**
-     * setUseCamera2FakeFlash() should be called after creating the CameraController, and before calling getCameraFeatures() or
-     * starting the preview (as it changes the available flash modes).
-     * "Fake flash" is an alternative mode for handling flash, for devices that have poor Camera2 support - typical symptoms
-     * include precapture never starting, flash not firing, photos being over or under exposed.
-     * Instead, we fake the precapture and flash simply by turning on the torch. After turning on torch, we wait for ae to stop
-     * scanning (and af too, as it can start scanning in continuous mode) - this is effectively the equivalent of precapture -
-     * before taking the photo.
-     * In auto-focus mode, we make the decision ourselves based on the current ISO.
-     * We also handle the flash firing for autofocus by turning the torch on and off too. Advantages are:
-     *   - The flash tends to be brighter, and the photo can end up overexposed as a result if capture follows the autofocus.
-     *   - Some devices also don't seem to fire flash for autofocus in Camera2 mode (e.g., Samsung S7)
-     *   - When capture follows autofocus, we need to make the same decision for firing flash for both the autofocus and the capture.
-     */
-    public void setUseCamera2FakeFlash(boolean use_fake_precapture) {
-    }
-    public boolean getUseCamera2FakeFlash() {
-        return false;
-    }
+	/**
+	 * setUseCamera2FakeFlash() should be called after creating the CameraController, and before calling getCameraFeatures() or
+	 * starting the preview (as it changes the available flash modes).
+	 * "Fake flash" is an alternative mode for handling flash, for devices that have poor Camera2 support - typical symptoms
+	 * include precapture never starting, flash not firing, photos being over or under exposed.
+	 * Instead, we fake the precapture and flash simply by turning on the torch. After turning on torch, we wait for ae to stop
+	 * scanning (and af too, as it can start scanning in continuous mode) - this is effectively the equivalent of precapture -
+	 * before taking the photo. 
+	 * In auto-focus mode, we make the decision ourselves based on the current ISO.
+	 * We also handle the flash firing for autofocus by turning the torch on and off too. Advantages are:
+	 *   - The flash tends to be brighter, and the photo can end up overexposed as a result if capture follows the autofocus.
+	 *   - Some devices also don't seem to fire flash for autofocus in Camera2 mode (e.g., Samsung S7)
+	 *   - When capture follows autofocus, we need to make the same decision for firing flash for both the autofocus and the capture.
+	 */
+	public void setUseCamera2FakeFlash(boolean use_fake_precapture) {
+	}
+	public boolean getUseCamera2FakeFlash() {
+		return false;
+	}
 	public abstract void setVideoStabilization(boolean enabled);
 	public abstract boolean getVideoStabilization();
 	public abstract int getJpegQuality();
@@ -281,14 +292,24 @@ public abstract class CameraController
 	public abstract void reconnect() throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract void setPreviewDisplay(SurfaceHolder holder) throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract void setPreviewTexture(SurfaceTexture texture) throws com.takeapeek.capture.CameraController.CameraControllerException;
-    /** Starts the camera preview.
-     *  @throws CameraControllerException if the camera preview fails to start.
+	/** Starts the camera preview.
+	 *  @throws CameraControllerException if the camera preview fails to start.
      */
 	public abstract void startPreview() throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract void stopPreview();
 	public abstract boolean startFaceDetection();
 	public abstract void setFaceDetectionListener(final CameraController.FaceDetectionListener listener);
-	public abstract void autoFocus(final CameraController.AutoFocusCallback cb);
+
+	/**
+	 * @param cb Callback to be called when autofocus completes.
+	 * @param capture_follows_autofocus_hint Set to true if you intend to take a photo immediately after autofocus. If the
+	 *                                       decision changes after autofocus has started (e.g., user initiates autofocus,
+	 *                                       then takes photo before autofocus has completed), use setCaptureFollowAutofocusHint().
+     */
+	public abstract void autoFocus(final CameraController.AutoFocusCallback cb, boolean capture_follows_autofocus_hint);
+	/** See autoFocus() for details - used to update the capture_follows_autofocus_hint setting.
+     */
+	public abstract void setCaptureFollowAutofocusHint(boolean capture_follows_autofocus_hint);
 	public abstract void cancelAutoFocus();
 	public abstract void setContinuousFocusMoveCallback(ContinuousFocusMoveCallback cb);
 	public abstract void takePicture(final CameraController.PictureCallback picture, final ErrorCallback error);
@@ -300,9 +321,15 @@ public abstract class CameraController
 	public abstract void initVideoRecorderPrePrepare(MediaRecorder video_recorder);
 	public abstract void initVideoRecorderPostPrepare(MediaRecorder video_recorder) throws com.takeapeek.capture.CameraController.CameraControllerException;
 	public abstract String getParametersString();
-    public boolean captureResultIsAEScanning() {
-        return false;
-    }
+	public boolean captureResultIsAEScanning() {
+		return false;
+	}
+	/**
+	 * @return whether flash will fire; returns false if not known
+     */
+	public boolean needsFlash() {
+		return false;
+	}
 	public boolean captureResultHasIso() {
 		return false;
 	}
@@ -315,52 +342,41 @@ public abstract class CameraController
 	public long captureResultExposureTime() {
 		return 0;
 	}
-/*@@
-    public boolean captureResultHasFrameDuration() {
+	/*public boolean captureResultHasFrameDuration() {
 		return false;
-	}
-	public long captureResultFrameDuration() {
+	}*/
+	/*public long captureResultFrameDuration() {
 		return 0;
-	}
-	public boolean captureResultHasFocusDistance() {
+	}*/
+	/*public boolean captureResultHasFocusDistance() {
 		return false;
-	}
-	public float captureResultFocusDistanceMin() {
+	}*/
+	/*public float captureResultFocusDistanceMin() {
 		return 0.0f;
-	}
-	public float captureResultFocusDistanceMax() {
+	}*/
+	/*public float captureResultFocusDistanceMax() {
 		return 0.0f;
-	}
-@@*/
+	}*/
+
 	// gets the available values of a generic mode, e.g., scene, color etc, and makes sure the requested mode is available
-	SupportedValues checkModeIsSupported(List<String> values, String value, String default_value)
-    {
-        logger.debug("checkModeIsSupported(...) Invoked");
-
-		if( values != null && values.size() > 1 )
-        { // n.b., if there is only 1 supported value, we also return null, as no point offering the choice to the user (there are some devices, e.g., Samsung, that only have a scene mode of "auto")
-            for(int i=0;i<values.size();i++)
-            {
-                logger.info("supported value: " + values.get(i));
-            }
-
+	SupportedValues checkModeIsSupported(List<String> values, String value, String default_value) {
+		if( values != null && values.size() > 1 ) { // n.b., if there is only 1 supported value, we also return null, as no point offering the choice to the user (there are some devices, e.g., Samsung, that only have a scene mode of "auto")
+			//@@if( MyDebug.LOG ) {
+				for(int i=0;i<values.size();i++) {
+		        	Log.d(TAG, "supported value: " + values.get(i));
+				}
+			//@@}
 			// make sure result is valid
-			if( !values.contains(value) )
-            {
-                logger.info("value not valid!");
-
+			if( !values.contains(value) ) {
+				//@@if( MyDebug.LOG )
+					Log.d(TAG, "value not valid!");
 				if( values.contains(default_value) )
-                {
-                    value = default_value;
-                }
+					value = default_value;
 				else
-                {
-                    value = values.get(0);
-                }
-
-                logger.info("value is now: " + value);
+					value = values.get(0);
+                //@@if( MyDebug.LOG )
+					Log.d(TAG, "value is now: " + value);
 			}
-
 			return new SupportedValues(values, value);
 		}
 		return null;
