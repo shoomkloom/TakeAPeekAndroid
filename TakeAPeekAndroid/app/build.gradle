@@ -3,14 +3,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.takeapeek"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 80
-        versionName "0.9.80 beta"
+        versionCode 81
+        versionName "0.9.81 beta"
     }
     buildTypes {
         release {
@@ -21,6 +21,7 @@ android {
 }
 
 dependencies {
+    compile project(':camerakit')
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile files('libs/logback-android-1.1.1-6.jar')
@@ -29,7 +30,7 @@ dependencies {
     compile files('libs/gson-2.1.jar')
     compile files('libs/ormlite-android-4.47.jar')
     compile files('libs/ormlite-core-4.47.jar')
-    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.android.support:support-v13:25.0.0'
     compile 'com.android.support:design:25.0.0'
     compile 'com.google.firebase:firebase-core:9.8.0'
@@ -42,7 +43,6 @@ dependencies {
     compile 'com.github.crosswall:Android-Coverflow:release-v1.0.4'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile "com.mixpanel.android:mixpanel-android:4.9.3"
-    compile 'com.flurgle:camerakit:0.9.13'
 }
 
 
