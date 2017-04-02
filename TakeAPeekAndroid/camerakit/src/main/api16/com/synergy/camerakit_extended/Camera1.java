@@ -5,7 +5,6 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
@@ -441,8 +440,14 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
     }
 
     @Override
-    int getMaxZoomLevel() {
-        return mCamera.getParameters().getMaxZoom();
+    int getMaxZoomLevel()
+    {
+        if(mCamera != null && mCamera.getParameters() != null)
+        {
+            return mCamera.getParameters().getMaxZoom();
+        }
+
+        return 0;
     }
 
     // Internal:
@@ -494,29 +499,51 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
         }
     }
 
-    private void adjustCameraParameters() {
-        mPreview.setTruePreviewSize(
-                getPreviewResolution().getWidth(),
-                getPreviewResolution().getHeight()
-        );
+    private void adjustCameraParameters()
+    {
+        try
+        {
+            mPreview.setTruePreviewSize(
+                    getPreviewResolution().getWidth(),
+                    getPreviewResolution().getHeight()
+            );
+        }
+        catch(Exception e){}
 
-        mCameraParameters.setPreviewSize(
-                getPreviewResolution().getWidth(),
-                getPreviewResolution().getHeight()
-        );
+        try
+        {
+            mCameraParameters.setPreviewSize(
+                    getPreviewResolution().getWidth(),
+                    getPreviewResolution().getHeight()
+            );
+        }
+        catch(Exception e){}
 
-        mCameraParameters.setPictureSize(
-                getCaptureResolution().getWidth(),
-                getCaptureResolution().getHeight()
-        );
-        int rotation = (calculateCameraRotation(mDisplayOrientation)
-                + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0)) % 360;
-        mCameraParameters.setRotation(rotation);
+        try
+        {
+            mCameraParameters.setPictureSize(
+                    getCaptureResolution().getWidth(),
+                    getCaptureResolution().getHeight()
+            );
+        }
+        catch(Exception e){}
 
-        setFocus(mFocus);
-        setFlash(mFlash);
+        try
+        {
+            int rotation = (calculateCameraRotation(mDisplayOrientation)
+                    + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0)) % 360;
+            mCameraParameters.setRotation(rotation);
+        }
+        catch(Exception e){}
 
-        mCamera.setParameters(mCameraParameters);
+        try
+        {
+            setFocus(mFocus);
+            setFlash(mFlash);
+
+            mCamera.setParameters(mCameraParameters);
+        }
+        catch(Exception e){}
     }
 
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> captureSizes) {
@@ -598,7 +625,11 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
             mMediaRecorder.setOnInfoListener(this);
         } catch (Exception e) {
             e.printStackTrace();
-            mCamera.release();
+
+            if(mCamera != null)
+            {
+                mCamera.release();
+            }
         }
     }
 

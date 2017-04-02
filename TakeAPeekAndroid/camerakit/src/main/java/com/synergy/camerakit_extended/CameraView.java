@@ -164,14 +164,36 @@ public class CameraView extends FrameLayout {
      */
     public void start() {
         int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            new Thread(new Runnable() {
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED)
+        {
+            Thread openCameraThread = new Thread(new Runnable()
+            {
                 @Override
-                public void run() {
-                    mCameraImpl.start();
+                public void run()
+                {
+                    for(int i=0; i<3; i++)
+                    {
+                        try
+                        {
+                            mCameraImpl.start();
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            if(i >= 2)
+                            {
+                                throw e;
+                            }
+                        }
+                    }
                 }
-            }).start();
-        } else {
+            });
+
+            openCameraThread.setName("openCamera");
+            openCameraThread.start();
+        }
+        else
+        {
             requestCameraPermission();
         }
     }
