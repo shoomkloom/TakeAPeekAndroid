@@ -69,9 +69,9 @@
         android:background="@drawable/gradient_gray_fade"
         android:visibility="visible">
 
-        <fragment
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            class="com.takeapeek.usermap.CustomPlaceAutoCompleteFragment"
             android:id="@+id/autocomplete_fragment"
-            android:name="com.takeapeek.usermap.CustomPlaceAutoCompleteFragment"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
