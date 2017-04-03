@@ -580,7 +580,7 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
 
             if (mVideoProfile != null) {
                 if (CamcorderProfile.hasProfile(mCameraId, mVideoProfile)) {
-                    mMediaRecorder.setProfile(CamcorderProfile.get(mVideoProfile));
+                    mMediaRecorder.setProfile(CamcorderProfile.get(mCameraId, mVideoProfile));
                 }
             } else if (mVideoFormat != null ||
                     mVideoBitrate != null ||
@@ -599,7 +599,7 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
                     mMediaRecorder.setVideoSize(mVideoFrameWidth, mVideoFrameHeight);
                 }
             } else {
-                mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+                mMediaRecorder.setProfile(CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_HIGH));
             }
             if (mAudioBitrate != null) {
                 mMediaRecorder.setAudioEncodingBitRate(mAudioBitrate);
