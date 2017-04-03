@@ -38,7 +38,7 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="intro_create_peek">Create a Peek to Enter</string>
-    <string name="intro_record_till_0">Record till you reach 0 seconds</string>
+    <string name="intro_record_3_seconds">Peek must be longer than 3 seconds</string>
     <string name="intro_why">Why do I need to create a peek to enter?</string>
     <string name="intro_details_title">Why do I need to create a peek to enter?</string>
     <string name="intro_details_text">Peek.To lets you see peeks from other people. By creating a peek you help them discover you and your surroundings.\n\n Only 1 peek is needed (we won\'t ask you
@@ -48,7 +48,7 @@
     <string name="clip_will_be_sent">Your Peek is being sent</string>
     <string name="enter_peek_title_here">Add a title to your Peek</string>
     <string name="error_configure_failed">Failed to configure camera</string>
-    <string name="error_peek_too_short">Peek has to be longer than 3 seconds</string>
+    <string name="error_peek_too_short">Peek must be longer than 3 seconds</string>
     <string name="detecting_location_title1">Peek.To cannot detect your location.\nPerhaps try going outside for better GPS reception?</string>
     <string name="detecting_location_title2">Detecting your location...</string>
     <string name="error_starting_profile">There was an error starting the recording. Please press \'Back\' till you exit the application and then try again.</string>

@@ -3585,6 +3585,7 @@ public class Helper
         }
     }
 
+/*@@
     private static Typeface getNormalFont(Context context) 
     {
         if(NormalFont == null) 
@@ -3614,4 +3615,5 @@ public class Helper
         
         return LightFont;
     }
+@@*/
 }

@@ -85,6 +85,7 @@ public class CaptureClipActivity extends Activity implements
     ImageView mImageviewSwitchCamera = null;
     LinearLayout mLinearLayoutIntro = null;
     ImageView mImageviewIntroArrow = null;
+    TextView mTextviewIntroLine3 = null;
     ImageView mImageviewIntroClose = null;
     RelativeLayout mRelativelayoutIntro = null;
     LinearLayout mLinearlayoutIntroDetails = null;
@@ -256,8 +257,8 @@ public class CaptureClipActivity extends Activity implements
 
         mImageviewIntroArrow = (ImageView)findViewById(R.id.imageview_intro_arrow);
 
-        TextView textviewIntroLine3 = (TextView)findViewById(R.id.textview_intro_line3);
-        Helper.setTypeface(this, textviewIntroLine3, Helper.FontTypeEnum.boldFont);
+        mTextviewIntroLine3 = (TextView)findViewById(R.id.textview_intro_line3);
+        Helper.setTypeface(this, mTextviewIntroLine3, Helper.FontTypeEnum.boldFont);
 
         mImageviewIntroClose = (ImageView)findViewById(R.id.imageview_intro_close);
         mRelativelayoutIntro = (RelativeLayout)findViewById(R.id.relativelayout_intro);
@@ -265,13 +266,13 @@ public class CaptureClipActivity extends Activity implements
         mRelativelayoutTapBar = (RelativeLayout)findViewById(R.id.relativelayout_tap_bar);
 
         mTextviewButtonBack = (TextView)findViewById(R.id.textview_button_back);
-        Helper.setTypeface(this, mTextviewButtonBack, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, mTextviewButtonBack, Helper.FontTypeEnum.normalFont);
 
         mTextviewButtonVideo = (TextView)findViewById(R.id.textview_button_video);
         mTextviewButtonVideo.setOnTouchListener(TakeVideoTouchListener);
 
         mTextviewButtonDone = (TextView)findViewById(R.id.textview_button_done);
-        Helper.setTypeface(this, mTextviewButtonDone, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, mTextviewButtonDone, Helper.FontTypeEnum.normalFont);
 
         mCapturePreviewTitle = (EditText)findViewById(R.id.capture_preview_title);
         Helper.setTypeface(this, mCapturePreviewTitle, Helper.FontTypeEnum.normalFont);
@@ -420,7 +421,7 @@ public class CaptureClipActivity extends Activity implements
                     {
                         mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
                         UpdateUI();
-                        Helper.ShowCenteredToast(CaptureClipActivity.this, R.string.error_peek_too_short);
+                        ShowShortPeekError();
 
                         //Force stopVideo so that the timer task does not continue
                         mCamera.stopRecordingVideo();
@@ -843,7 +844,7 @@ public class CaptureClipActivity extends Activity implements
 
         if(tooShort)
         {
-            Helper.ShowCenteredToast(CaptureClipActivity.this, R.string.error_peek_too_short);
+            ShowShortPeekError();
         }
         else
         {
@@ -873,6 +874,35 @@ public class CaptureClipActivity extends Activity implements
                 Helper.Error(logger, "EXCEPTION: when creating the thumbnail", e);
             }
         }
+    }
+
+    private void ShowShortPeekError()
+    {
+        logger.debug("ShowShortPeekError() Invoked");
+
+        mTextviewIntroLine3.setText(R.string.error_peek_too_short);
+
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeinquick);
+        mTextviewIntroLine3.setAnimation(fadeInAnimation);
+        mImageviewIntroArrow.setAnimation(fadeInAnimation);
+        fadeInAnimation.start();
+
+        mTextviewIntroLine3.setVisibility(View.VISIBLE);
+        mImageviewIntroArrow.setVisibility(View.VISIBLE);
+
+        mHandler.postDelayed(new Runnable()
+        {
+            public void run()
+            {
+                Animation fadeOutAnimation = AnimationUtils.loadAnimation(CaptureClipActivity.this, R.anim.fadeout);
+                mTextviewIntroLine3.setAnimation(fadeOutAnimation);
+                mImageviewIntroArrow.setAnimation(fadeOutAnimation);
+                fadeOutAnimation.start();
+
+                mTextviewIntroLine3.setVisibility(View.INVISIBLE);
+                mImageviewIntroArrow.setVisibility(View.INVISIBLE);
+            }
+        }, 2000);
     }
 
     @Override
@@ -994,13 +1024,15 @@ public class CaptureClipActivity extends Activity implements
                 if(Helper.GetFirstRun(mSharedPreferences) == true)
                 {
                     mLinearLayoutIntro.setVisibility(View.VISIBLE);
+                    mImageviewIntroArrow.setVisibility(View.VISIBLE);
+                    mTextviewIntroLine3.setVisibility(View.VISIBLE);
                 }
                 else
                 {
                     mLinearLayoutIntro.setVisibility(View.INVISIBLE);
+                    mImageviewIntroArrow.setVisibility(View.INVISIBLE);
+                    mTextviewIntroLine3.setVisibility(View.INVISIBLE);
                 }
-
-                mImageviewIntroArrow.setVisibility(View.VISIBLE);
 
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
