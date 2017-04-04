@@ -304,10 +304,10 @@ public class CaptureClipActivity extends Activity implements
 
         mCamera.setVideoProfile(CamcorderProfile.QUALITY_720P);
         mCamera.setFocus(CameraKit.Constants.FOCUS_CONTINUOUS);
-        mCamera.setZoom(CameraKit.Constants.ZOOM_SLIDER);
+        mCamera.setZoom(CameraKit.Constants.ZOOM_PINCH);
 
-        SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
-        mCamera.setSeekBar(zoomSeekBar);
+        //@@SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
+        //@@mCamera.setSeekBar(zoomSeekBar);
 
         int bitrate = 1500;
         mCamera.setVideoBitrate((bitrate + 300) * 1000);
@@ -1050,9 +1050,11 @@ public class CaptureClipActivity extends Activity implements
 
                 findViewById(R.id.camera).setVisibility(View.VISIBLE);
 
+/*@@
                 SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
                 zoomSeekBar.setVisibility(View.VISIBLE);
                 zoomSeekBar.setProgress(0);
+@@*/
 
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
@@ -1083,7 +1085,7 @@ public class CaptureClipActivity extends Activity implements
                 findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.tap_black));
 
                 findViewById(R.id.camera).setVisibility(View.VISIBLE);
-                findViewById(R.id.zoom_seekbar).setVisibility(View.VISIBLE);
+                //@@findViewById(R.id.zoom_seekbar).setVisibility(View.VISIBLE);
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
                 mRelativelayoutTapBar.setVisibility(View.GONE);
@@ -1172,7 +1174,7 @@ public class CaptureClipActivity extends Activity implements
 
                 findViewById(R.id.relativelayout_background).setBackgroundColor(ContextCompat.getColor(this, R.color.pt_white));
                 findViewById(R.id.camera).setVisibility(View.INVISIBLE);
-                findViewById(R.id.zoom_seekbar).setVisibility(View.INVISIBLE);
+                //@@findViewById(R.id.zoom_seekbar).setVisibility(View.INVISIBLE);
                 findViewById(R.id.capture_preview_container).setVisibility(View.GONE);
 
                 mRelativelayoutTapBar.setBackgroundColor(ContextCompat.getColor(this, R.color.pt_green_2));

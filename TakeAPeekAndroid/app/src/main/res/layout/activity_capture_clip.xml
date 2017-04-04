@@ -19,6 +19,7 @@
         app:ckJpegQuality="100"
         app:ckMethod="standard" />
 
+<!--
     <SeekBar
         android:id="@+id/zoom_seekbar"
         android:layout_width="150dp"
@@ -30,7 +31,7 @@
         android:layout_marginRight="-50dp"
         android:progressDrawable="@drawable/seekbar_track"
         android:theme="@style/AppTheme.SeekBar"/>
-
+-->
     <!-- TAP specific layout -->
     <ImageView
         android:id="@+id/imageview_flash"
