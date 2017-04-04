@@ -22,7 +22,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:padding="17dp"/>
+            android:padding="20dp"/>
 
         <TextView
             android:id="@+id/textview_following_title"

@@ -55,7 +55,7 @@ public class FollowingActivity extends AppCompatActivity
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         TextView followingTitle = (TextView)findViewById(R.id.textview_following_title);
-        Helper.setTypeface(this, followingTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, followingTitle, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_up).setOnClickListener(new View.OnClickListener()
         {

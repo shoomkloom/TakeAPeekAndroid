@@ -55,7 +55,7 @@ public class FollowersActivity extends AppCompatActivity
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         TextView followersTitle = (TextView)findViewById(R.id.textview_followers_title);
-        Helper.setTypeface(this, followersTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, followersTitle, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_up).setOnClickListener(new View.OnClickListener()
         {

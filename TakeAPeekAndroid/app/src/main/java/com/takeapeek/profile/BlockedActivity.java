@@ -55,7 +55,7 @@ public class BlockedActivity extends AppCompatActivity
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
 
         TextView blockedTitle = (TextView)findViewById(R.id.textview_blocked_title);
-        Helper.setTypeface(this, blockedTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, blockedTitle, Helper.FontTypeEnum.normalFont);
 
         findViewById(R.id.imageview_up).setOnClickListener(new View.OnClickListener()
         {
