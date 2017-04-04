@@ -636,9 +636,16 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
     private void prepareMediaRecorder() {
         try {
             mMediaRecorder.prepare();
+
+            if(mFacing == CameraKit.Constants.FACING_FRONT)
+            {
+                Thread.sleep(500);
+            }
         } catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch(InterruptedException e) {
             e.printStackTrace();
         }
     }
