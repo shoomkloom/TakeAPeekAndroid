@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.takeapeek.common.MixPanel.SCREEN_USER_MAP;
 
@@ -45,7 +44,6 @@ public class PeekStackPagerAdapter extends PagerAdapter
     AppEventsLogger mAppEventsLogger = null;
 
     private WeakReference<UserMapActivity> mUserMapActivityWeakReference = null;
-    HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = null;
     ArrayList mProfileObjectList = null;
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
     private final AddressLoader mAddressLoader = new AddressLoader();
@@ -54,11 +52,10 @@ public class PeekStackPagerAdapter extends PagerAdapter
 
     private AsyncTask<Object, Void, ResponseObject> mAsyncTaskFollowAction = null;
 
-    public PeekStackPagerAdapter(UserMapActivity userMapActivity, HashMap<Integer, ProfileObject> hashMapIndexToProfileObject)
+    public PeekStackPagerAdapter(UserMapActivity userMapActivity, ArrayList profileObjectList)
     {
         mUserMapActivityWeakReference = new WeakReference<UserMapActivity> (userMapActivity);
-        mHashMapIndexToProfileObject = hashMapIndexToProfileObject;
-        mProfileObjectList = new ArrayList(mHashMapIndexToProfileObject.values());
+        mProfileObjectList = profileObjectList;
         mSharedPreferences = mUserMapActivityWeakReference.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
 
         DatabaseManager.init(mUserMapActivityWeakReference.get());
@@ -142,6 +139,25 @@ public class PeekStackPagerAdapter extends PagerAdapter
     {
         ProfileObject profileObject = (ProfileObject)mProfileObjectList.get(position);
         return profileObject.displayName;
+    }
+
+    public ProfileObject GetProfileObject(int position)
+    {
+        return (ProfileObject)mProfileObjectList.get(position);
+    }
+
+    public int GetStackProfilePosition(String profileId)
+    {
+        for(int i=0; i<mProfileObjectList.size(); i++)
+        {
+            ProfileObject currentProfileObject = (ProfileObject)mProfileObjectList.get(i);
+            if(currentProfileObject.profileId.compareToIgnoreCase(profileId) == 0)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private View.OnClickListener ClickListener = new View.OnClickListener()

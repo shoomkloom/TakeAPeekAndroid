@@ -3011,7 +3011,7 @@ public class Helper
 
         ArrayList<TakeAPeekObject> takeAPeekObjectArray = new ArrayList<TakeAPeekObject>();
 
-        if(profileObject.peeks != null)
+        if(profileObject != null && profileObject.peeks != null)
         {
             DatabaseManager.init(context);
             HashMap<String, TakeAPeekObject> takeAPeekObjectViewedHash = DatabaseManager.getInstance().GetTakeAPeekObjectViewedHash();

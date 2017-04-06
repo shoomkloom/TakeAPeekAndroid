@@ -137,7 +137,7 @@ public class UserMapActivity extends FragmentActivity implements
     private boolean mFirstLoad = false;
     HashMap<String, Integer> mHashMapProfileObjectToIndex = new HashMap<String, Integer>();
     HashMap<Integer, ProfileObject> mHashMapIndexToProfileObject = new HashMap<Integer, ProfileObject>();
-    HashMap<Integer, ProfileObject> mHashMapIndexToProfileStackObject = new HashMap<Integer, ProfileObject>();
+    ArrayList mProfileStackList = new ArrayList();
 
     private LatLngBounds mLatLngBounds = null;
     private LatLngBounds mLatLngBoundsIntent = null;
@@ -616,7 +616,7 @@ public class UserMapActivity extends FragmentActivity implements
             ClusterManagerClear();
 
             //Clear the adapter
-            mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileStackObject);
+            mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mProfileStackList);
             mViewPager.setAdapter(mPeekStackPagerAdapter);
 
             //Refresh data from the server
@@ -745,14 +745,18 @@ public class UserMapActivity extends FragmentActivity implements
         logger.debug("onClusterClick(.) Invoked");
 
         //Show peek for first profile
-        mUserStackItemPosition = cluster.getItems().iterator().next().mIndex;
-
-        if(mHashMapIndexToProfileStackObject.size() > 0)
+        for(TAPClusterItem clusterItem : cluster.getItems())
         {
-            if(mUserStackItemPosition < 0)
+            int userStackItemPosition = mPeekStackPagerAdapter.GetStackProfilePosition(clusterItem.mProfileObject.profileId);
+            if(userStackItemPosition > -1)
             {
-                mUserStackItemPosition = mHashMapIndexToProfileStackObject.keySet().iterator().next().intValue();
+                mUserStackItemPosition = userStackItemPosition;
+                break;
             }
+        }
+
+        if(mUserStackItemPosition > -1)
+        {
             ShowUserPeekStack();
         }
         else
@@ -772,14 +776,10 @@ public class UserMapActivity extends FragmentActivity implements
     @Override
     public boolean onClusterItemClick(TAPClusterItem item)
     {
-        mUserStackItemPosition = item.mIndex;
+        mUserStackItemPosition = mPeekStackPagerAdapter.GetStackProfilePosition(item.mProfileObject.profileId);
 
-        if(mHashMapIndexToProfileStackObject.size() > 0)
+        if(mUserStackItemPosition > -1)
         {
-            if(mUserStackItemPosition < 0)
-            {
-                mUserStackItemPosition = mHashMapIndexToProfileStackObject.keySet().iterator().next().intValue();
-            }
             ShowUserPeekStack();
         }
         else
@@ -935,29 +935,18 @@ public class UserMapActivity extends FragmentActivity implements
 
                                     mClusterManager.cluster();
 
-                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mHashMapIndexToProfileStackObject);
+                                    mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mProfileStackList);
                                     mViewPager.setAdapter(mPeekStackPagerAdapter);
 
                                     if(mOpenStack == true)
                                     {
                                         mOpenStack = false;
 
-                                        boolean hasValidPeeks = (mHashMapIndexToProfileStackObject.size() > 0);
-
-                                        if(hasValidPeeks)
+                                        if(mProfileStackList.size() > 0)
                                         {
-                                            //Show the peek stack
-                                            mUserStackItemPosition = mClusterManagerAlgorithm.getItems().iterator().next().mIndex;
-
-                                            ProfileObject profileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
-                                            if(profileObject != null)
-                                            {
-                                                ShowUserPeekStack();
-                                            }
-                                            else
-                                            {
-                                                logger.error(String.format("ERROR: When trying to open stack with hasValidPeeks = true, mUserStackItemPosition = '%d' and ProfileObject = null", mUserStackItemPosition));
-                                            }
+                                            //Show the peek stack with the first profile's peek
+                                            mUserStackItemPosition = 0;
+                                            ShowUserPeekStack();
                                         }
                                     }
                                 }
@@ -1082,12 +1071,12 @@ public class UserMapActivity extends FragmentActivity implements
         mClusterManager.cluster();
     }
 
-    private void ClusterManagerAddItem(int i, ProfileObject profileObject)
+    private void ClusterManagerAddItem(int clusterItemIndex, ProfileObject profileObject)
     {
         logger.debug("ClusterManagerAddItem(..) Invoked");
 
-        mHashMapIndexToProfileObject.put(i, profileObject);
-        mHashMapProfileObjectToIndex.put(profileObject.profileId, i);
+        mHashMapIndexToProfileObject.put(clusterItemIndex, profileObject);
+        mHashMapProfileObjectToIndex.put(profileObject.profileId, clusterItemIndex);
 
         ArrayList<TakeAPeekObject> profileUnViewedPeeks = Helper.GetProfileUnViewedPeeks(UserMapActivity.this, profileObject);
 
@@ -1106,13 +1095,10 @@ public class UserMapActivity extends FragmentActivity implements
 
         if(hasPeeks == true)
         {
-            mHashMapIndexToProfileStackObject.put(i, profileObject);
-            mClusterManager.addItem(new TAPClusterItem(i, profileObject));
+            mProfileStackList.add(profileObject);
         }
-        else
-        {
-            mClusterManager.addItem(new TAPClusterItem(-1, profileObject));
-        }
+
+        mClusterManager.addItem(new TAPClusterItem(clusterItemIndex, profileObject));
     }
 
     private void ClusterManagerClear()
@@ -1121,8 +1107,9 @@ public class UserMapActivity extends FragmentActivity implements
 
         mHashMapIndexToProfileObject.clear();
         mHashMapProfileObjectToIndex.clear();
-        mHashMapIndexToProfileStackObject.clear();
+        mProfileStackList.clear();
         mClusterManager.clearItems();
+        mClusterManager.cluster();
     }
 
     @Override
@@ -1222,9 +1209,10 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("FillPeekInfo() Invoked");
 
-        ClusterManagerSingleItem(mUserStackItemPosition);
+        ProfileObject profileObject = mPeekStackPagerAdapter.GetProfileObject(mUserStackItemPosition);
+        int clusterItemIndex = mHashMapProfileObjectToIndex.get(profileObject.profileId);
+        ClusterManagerSingleItem(clusterItemIndex);
 
-        ProfileObject profileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
         TakeAPeekObject takeAPeekObject = GetProfileLatestUnViewedPeek(profileObject);
 
         LatLng markerLatLng = new LatLng(
@@ -1465,12 +1453,12 @@ public class UserMapActivity extends FragmentActivity implements
 
                     if(mClusterManagerAlgorithm.getItems().size() > 0)
                     {
-                        boolean hasValidPeeks = (mHashMapIndexToProfileStackObject.size() > 0);
+                        boolean hasValidPeeks = (mProfileStackList.size() > 0);
 
                         if(hasValidPeeks && mUserStackItemPosition == -1)
                         {
                             //Show the peek stack
-                            mUserStackItemPosition = mClusterManagerAlgorithm.getItems().iterator().next().mIndex;
+                            mUserStackItemPosition = 0;
                             ShowUserPeekStack();
                         }
                         else if(mUserStackItemPosition != -1)
@@ -1541,7 +1529,7 @@ public class UserMapActivity extends FragmentActivity implements
                         {
                             Point markerPosition = mGoogleMap.getProjection().toScreenLocation(tapClusterItem.getPosition());
                             boolean inCutOut = Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) < mCutOutView.mRadius;
-                            isInCutOutHash.put(tapClusterItem.mIndex, inCutOut);
+                            isInCutOutHash.put(tapClusterItem.mClusterItemIndex, inCutOut);
                         }
 
                         //Start asynchronous request to server
@@ -1569,7 +1557,7 @@ public class UserMapActivity extends FragmentActivity implements
                                     {
                                         if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) == 0)
                                         {
-                                            if(isInCutOutHash.get(tapClusterItem.mIndex) == true)
+                                            if(isInCutOutHash.get(tapClusterItem.mClusterItemIndex) == true)
                                             {
                                                 mNumberOfRequests++;
 
@@ -1787,12 +1775,12 @@ public class UserMapActivity extends FragmentActivity implements
 class TAPClusterItem implements ClusterItem
 {
     ProfileObject mProfileObject = null;
-    int mIndex = -1;
+    int mClusterItemIndex = -1;
     LatLng mPosition = null;
 
-    public TAPClusterItem(int index, ProfileObject profileObject)
+    public TAPClusterItem(int clusterItemIndex, ProfileObject profileObject)
     {
-        mIndex = index;
+        mClusterItemIndex = clusterItemIndex;
         mProfileObject = profileObject;
         mPosition = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
     }
