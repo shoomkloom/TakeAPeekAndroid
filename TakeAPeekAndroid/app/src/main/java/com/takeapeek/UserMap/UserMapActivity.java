@@ -353,7 +353,7 @@ public class UserMapActivity extends FragmentActivity implements
         });
 
         mTextViewStackUserName = (TextView)findViewById(R.id.stack_name);
-        Helper.setTypeface(this, mTextViewStackUserName, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, mTextViewStackUserName, Helper.FontTypeEnum.normalFont);
         mTextViewStackUserName.setOnClickListener(ClickListener);
 
         mTextViewStackPeekTitle = (TextView)findViewById(R.id.peek_stack_title);
@@ -1050,15 +1050,15 @@ public class UserMapActivity extends FragmentActivity implements
         return foundAddress;
     }
 
-    private void ClusterManagerSingleItem(int position)
+    private void ClusterManagerSingleItem(int clusterItemIndex)
     {
         logger.debug("ClusterManagerSingleItem(int) Invoked");
 
-        ProfileObject profileObject = mHashMapIndexToProfileObject.get(position);
+        ProfileObject profileObject = mHashMapIndexToProfileObject.get(clusterItemIndex);
 
         if(profileObject != null)
         {
-            ClusterManagerSingleItem(new TAPClusterItem(position, profileObject));
+            ClusterManagerSingleItem(new TAPClusterItem(clusterItemIndex, profileObject));
         }
     }
 
@@ -1481,7 +1481,7 @@ public class UserMapActivity extends FragmentActivity implements
                         logger.info("Stack is visible, go to the user feed");
 
                         //Show the user feed activity
-                        ProfileObject profileObject = mHashMapIndexToProfileObject.get(mUserStackItemPosition);
+                        ProfileObject profileObject = mPeekStackPagerAdapter.GetProfileObject(mUserStackItemPosition);
                         String profileObjectJSON = new Gson().toJson(profileObject);
 
                         final Intent intent = new Intent(UserMapActivity.this, UserFeedActivity.class);
