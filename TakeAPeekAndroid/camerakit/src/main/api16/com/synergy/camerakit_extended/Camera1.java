@@ -170,7 +170,11 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
                 }
             }
 
-            mCamera.setParameters(mCameraParameters);
+            try {
+                mCamera.setParameters(mCameraParameters);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         } else {
             mFlash = flash;
         }
@@ -312,25 +316,30 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
 
     @Override
     Size getPreviewResolution() {
-        if (mPreviewSize == null && mCameraParameters != null) {
-            TreeSet<Size> sizes = new TreeSet<>();
-            for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
-                sizes.add(new Size(size.width, size.height));
+        if (mPreviewSize == null) {
+            if (mCameraParameters==null && mCamera!=null){
+                mCameraParameters = mCamera.getParameters();
             }
+            if (mCameraParameters!=null) {
+                TreeSet<Size> sizes = new TreeSet<>();
+                for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
+                    sizes.add(new Size(size.width, size.height));
+                }
 
-            TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
-                    mCameraParameters.getSupportedPreviewSizes(),
-                    mCameraParameters.getSupportedPictureSizes()
-            );
-            AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
+                TreeSet<AspectRatio> aspectRatios = findCommonAspectRatios(
+                        mCameraParameters.getSupportedPreviewSizes(),
+                        mCameraParameters.getSupportedPictureSizes()
+                );
+                AspectRatio targetRatio = aspectRatios.size() > 0 ? aspectRatios.last() : null;
 
-            Iterator<Size> descendingSizes = sizes.descendingIterator();
-            Size size;
-            while (descendingSizes.hasNext() && mPreviewSize == null) {
-                size = descendingSizes.next();
-                if (targetRatio == null || targetRatio.matches(size)) {
-                    mPreviewSize = size;
-                    break;
+                Iterator<Size> descendingSizes = sizes.descendingIterator();
+                Size size;
+                while (descendingSizes.hasNext() && mPreviewSize == null) {
+                    size = descendingSizes.next();
+                    if (targetRatio == null || targetRatio.matches(size)) {
+                        mPreviewSize = size;
+                        break;
+                    }
                 }
             }
         }
@@ -440,14 +449,8 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
     }
 
     @Override
-    int getMaxZoomLevel()
-    {
-        if(mCamera != null && mCamera.getParameters() != null)
-        {
-            return mCamera.getParameters().getMaxZoom();
-        }
-
-        return 0;
+    int getMaxZoomLevel() {
+        return mCamera.getParameters().getMaxZoom();
     }
 
     // Internal:
@@ -499,51 +502,32 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
         }
     }
 
-    private void adjustCameraParameters()
-    {
-        try
-        {
-            mPreview.setTruePreviewSize(
-                    getPreviewResolution().getWidth(),
-                    getPreviewResolution().getHeight()
-            );
-        }
-        catch(Exception e){}
+    private void adjustCameraParameters() {
+        mPreview.setTruePreviewSize(
+                getPreviewResolution().getWidth(),
+                getPreviewResolution().getHeight()
+        );
 
-        try
-        {
-            mCameraParameters.setPreviewSize(
-                    getPreviewResolution().getWidth(),
-                    getPreviewResolution().getHeight()
-            );
-        }
-        catch(Exception e){}
+        mCameraParameters.setPreviewSize(
+                getPreviewResolution().getWidth(),
+                getPreviewResolution().getHeight()
+        );
 
-        try
-        {
-            mCameraParameters.setPictureSize(
-                    getCaptureResolution().getWidth(),
-                    getCaptureResolution().getHeight()
-            );
-        }
-        catch(Exception e){}
+        mCameraParameters.setPictureSize(
+                getCaptureResolution().getWidth(),
+                getCaptureResolution().getHeight()
+        );
+        int rotation = (calculateCameraRotation(mDisplayOrientation)
+                + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0)) % 360;
+        mCameraParameters.setRotation(rotation);
 
-        try
-        {
-            int rotation = (calculateCameraRotation(mDisplayOrientation)
-                    + (mFacing == CameraKit.Constants.FACING_FRONT ? 180 : 0)) % 360;
-            mCameraParameters.setRotation(rotation);
-        }
-        catch(Exception e){}
-
-        try
-        {
-            setFocus(mFocus);
-            setFlash(mFlash);
-
+        setFocus(mFocus);
+        setFlash(mFlash);
+        try {
             mCamera.setParameters(mCameraParameters);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        catch(Exception e){}
     }
 
     private TreeSet<AspectRatio> findCommonAspectRatios(List<Camera.Size> previewSizes, List<Camera.Size> captureSizes) {
@@ -577,10 +561,11 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
             mMediaRecorder.setCamera(mCamera);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-
             if (mVideoProfile != null) {
                 if (CamcorderProfile.hasProfile(mCameraId, mVideoProfile)) {
-                    mMediaRecorder.setProfile(CamcorderProfile.get(mCameraId, mVideoProfile));
+                    mMediaRecorder.setProfile(CamcorderProfile.get(mVideoProfile));
+                }else{
+                    mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
                 }
             } else if (mVideoFormat != null ||
                     mVideoBitrate != null ||
@@ -599,7 +584,7 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
                     mMediaRecorder.setVideoSize(mVideoFrameWidth, mVideoFrameHeight);
                 }
             } else {
-                mMediaRecorder.setProfile(CamcorderProfile.get(mCameraId, CamcorderProfile.QUALITY_HIGH));
+                mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
             }
             if (mAudioBitrate != null) {
                 mMediaRecorder.setAudioEncodingBitRate(mAudioBitrate);
@@ -625,27 +610,16 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
             mMediaRecorder.setOnInfoListener(this);
         } catch (Exception e) {
             e.printStackTrace();
-
-            if(mCamera != null)
-            {
-                mCamera.release();
-            }
+            mCamera.release();
         }
     }
 
     private void prepareMediaRecorder() {
         try {
             mMediaRecorder.prepare();
-
-            if(mFacing == CameraKit.Constants.FACING_FRONT)
-            {
-                Thread.sleep(500);
-            }
         } catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch(InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -699,26 +673,26 @@ public class Camera1 extends CameraImpl implements MediaRecorder.OnInfoListener 
                             parameters.setMeteringAreas(meteringAreas);
                             try {
                                 mCamera.setParameters(parameters);
+                                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                                    @Override
+                                    public void onAutoFocus(boolean success, Camera camera) {
+                                        camera.cancelAutoFocus();
+                                        Camera.Parameters params = camera.getParameters();
+                                        if (!params.getFocusMode().equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                                            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                                            params.setFocusAreas(null);
+                                            params.setMeteringAreas(null);
+                                            camera.setParameters(params);
+                                        }
+
+                                        if (mAutofocusCallback != null) {
+                                            mAutofocusCallback.onAutoFocus(success, camera);
+                                        }
+                                    }
+                                });
                             } catch (Exception e){
                                 e.printStackTrace();
                             }
-                            mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                                @Override
-                                public void onAutoFocus(boolean success, Camera camera) {
-                                    camera.cancelAutoFocus();
-                                    Camera.Parameters params = camera.getParameters();
-                                    if (!params.getFocusMode().equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-                                        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-                                        params.setFocusAreas(null);
-                                        params.setMeteringAreas(null);
-                                        camera.setParameters(params);
-                                    }
-
-                                    if (mAutofocusCallback != null) {
-                                        mAutofocusCallback.onAutoFocus(success, camera);
-                                    }
-                                }
-                            });
                         } else {
                             mCamera.autoFocus(new Camera.AutoFocusCallback() {
                                 @Override
