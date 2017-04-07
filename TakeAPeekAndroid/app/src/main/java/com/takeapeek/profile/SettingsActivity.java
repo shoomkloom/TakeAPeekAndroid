@@ -131,7 +131,7 @@ public class SettingsActivity extends AppCompatActivity
         DatabaseManager.init(this);
 
         TextView textviewSettingsTitle = (TextView)findViewById(R.id.textview_settings_title);
-        Helper.setTypeface(this, textviewSettingsTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, textviewSettingsTitle, Helper.FontTypeEnum.normalFont);
 
         TextView textviewProfileAccountTitle = (TextView)findViewById(R.id.textview_profile_account_title);
         Helper.setTypeface(this, textviewProfileAccountTitle, Helper.FontTypeEnum.normalFont);

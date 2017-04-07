@@ -247,6 +247,7 @@ public class UserFeedActivity extends AppCompatActivity
         mPostPreviewPane =  (RelativeLayout)findViewById(R.id.user_feed_post_preview);
 
         findViewById(R.id.imageview_intro_close).setOnClickListener(ClickListener);
+        findViewById(R.id.textview_preview_button_unfollow).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_block).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_report).setOnClickListener(ClickListener);
 
@@ -820,6 +821,61 @@ public class UserFeedActivity extends AppCompatActivity
                     OpenMapActivity();
                     break;
 
+                case R.id.textview_preview_button_unfollow:
+                    logger.info("onClick: textview_preview_button_unfollow clicked");
+
+                    new AsyncTask<Void, Void, Boolean>()
+                    {
+                        @Override
+                        protected Boolean doInBackground(Void... params)
+                        {
+                            try
+                            {
+                                String username = Helper.GetTakeAPeekAccountUsername(UserFeedActivity.this);
+                                String password = Helper.GetTakeAPeekAccountPassword(UserFeedActivity.this);
+
+                                new Transport().SetRelation(
+                                        UserFeedActivity.this, username, password,
+                                        mProfileObject.profileId,
+                                        Constants.RelationTypeEnum.Unfollow.name(),
+                                        mSharedPreferences);
+
+                                TakeAPeekRelation takeAPeekRelation = DatabaseManager.getInstance().GetTakeAPeekRelationFollow(mProfileObject.profileId);
+                                DatabaseManager.getInstance().DeleteTakeAPeekRelation(takeAPeekRelation);
+
+                                return true;
+                            }
+                            catch(Exception e)
+                            {
+                                Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
+                            }
+
+                            return false;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Boolean result)
+                        {
+                            logger.debug("onPostExecute(.) Invoked");
+
+                            if(result == true)
+                            {
+                                //Refresh the adapter data
+                                UserFeedActivity.this.UpdateRelations();
+
+                                String message = String.format(UserFeedActivity.this.getString(R.string.set_relation_unfollow), mProfileObject.displayName);
+                                Helper.ShowCenteredToast(UserFeedActivity.this, message);
+                            }
+                            else
+                            {
+                                String error = String.format(UserFeedActivity.this.getString(R.string.error_set_relation_unfollow), mProfileObject.displayName);
+                                Helper.ShowCenteredToast(UserFeedActivity.this, error);
+                            }
+                        }
+                    }.execute();
+
+                    break;
+
                 case R.id.textview_preview_button_block:
                     logger.info("onClick: textview_preview_button_block clicked");
 
@@ -1061,6 +1117,41 @@ public class UserFeedActivity extends AppCompatActivity
             }
         }
     };
+
+    public void UpdateRelations()
+    {
+        logger.debug("UpdateRelations() Invoked");
+
+        //Get the updated relation list and update the list
+        new AsyncTask<UserFeedActivity, Void, Boolean>()
+        {
+            UserFeedActivity mUserFeedActivity = null;
+
+            @Override
+            protected Boolean doInBackground(UserFeedActivity... params)
+            {
+                mUserFeedActivity = params[0];
+
+                try
+                {
+                    Helper.UpdateRelations(UserFeedActivity.this, mSharedPreferences);
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+            }
+        }.execute(UserFeedActivity.this);
+    }
 
     private void OpenMapActivity()
     {

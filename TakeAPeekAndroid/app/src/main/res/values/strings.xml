@@ -254,6 +254,7 @@
     <!-- User Feed -->
     <string name="feed_report">Report</string>
     <string name="feed_block">Block</string>
+    <string name="feed_unfollow">Unfollow</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

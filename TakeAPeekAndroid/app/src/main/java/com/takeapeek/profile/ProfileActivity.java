@@ -66,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity
 
         String displayName = Helper.GetProfileDisplayName(mSharedPreferences);
         TextView textviewProfileTitle = (TextView)findViewById(R.id.textview_profile_title);
-        Helper.setTypeface(this, textviewProfileTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, textviewProfileTitle, Helper.FontTypeEnum.normalFont);
         textviewProfileTitle.setText(displayName);
 
         //List View

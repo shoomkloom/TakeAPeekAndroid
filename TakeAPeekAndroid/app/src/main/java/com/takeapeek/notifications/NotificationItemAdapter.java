@@ -130,21 +130,21 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             }
 
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_notification_src_name);
-            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewSrcProfileName.setOnClickListener(ClickListener);
             viewHolder.mTextViewSrcProfileName.setTag(viewHolder);
 
             viewHolder.mTextViewNotificationTime = (TextView)view.findViewById(R.id.textview_notification_time);
-            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewNotificationTime, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewNotificationTime, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewNotificationAddress = (TextView)view.findViewById(R.id.textview_notification_address);
-            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewNotificationAddress, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewNotificationAddress, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewNotificationActionTitle = (TextView)view.findViewById(R.id.textview_notification_action_title);
-            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewNotificationActionTitle, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewNotificationActionTitle, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_notification_action);
-            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mNotificationsActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 

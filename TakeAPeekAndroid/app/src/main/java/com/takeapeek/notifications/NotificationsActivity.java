@@ -83,7 +83,7 @@ public class NotificationsActivity extends AppCompatActivity
         DatabaseManager.init(this);
 
         TextView textviewNotificationsTitle = (TextView)findViewById(R.id.textview_notifications_title);
-        Helper.setTypeface(this, textviewNotificationsTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, textviewNotificationsTitle, Helper.FontTypeEnum.normalFont);
 
         //List View
         mListViewNotificationList = (ListView)findViewById(R.id.listview_notifications_list);

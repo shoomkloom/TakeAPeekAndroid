@@ -131,7 +131,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
 
         //Initate members for UI elements
         TextView textviewPlacesTitle = (TextView)findViewById(R.id.textview_places_title);
-        Helper.setTypeface(this, textviewPlacesTitle, Helper.FontTypeEnum.boldFont);
+        Helper.setTypeface(this, textviewPlacesTitle, Helper.FontTypeEnum.normalFont);
 
         //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.places_progress);
