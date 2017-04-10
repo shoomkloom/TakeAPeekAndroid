@@ -141,10 +141,12 @@ public class CaptureClipActivity extends Activity implements
                 {
                     if (mCamera.getFacing() == CameraKit.Constants.FACING_BACK)
                     {
+                        SetupFrontCamera();
                         mCamera.setFacing(CameraKit.Constants.FACING_FRONT);
                     }
                     else 
                     {
+                        SetupBackCamera();
                         mCamera.setFacing(CameraKit.Constants.FACING_BACK);
                     }
                 }
@@ -234,8 +236,10 @@ public class CaptureClipActivity extends Activity implements
         mAnimationFlipFromMiddle = AnimationUtils.loadAnimation(this, R.anim.flip_from_middle);
         mAnimationFlipFromMiddle.setAnimationListener(this);
 
-        //Set up the camera
-        SetupCamera();
+        //Set up the back camera
+        SetupBackCamera();
+
+        mCamera.setCameraListener(VideoCameraListener);
 
         mImageviewFlash = (ImageView)findViewById(R.id.imageview_flash);
         mImageviewCaptureCountdown = (ImageView)findViewById(R.id.imageview_capture_countdown);
@@ -296,9 +300,9 @@ public class CaptureClipActivity extends Activity implements
         //End TAP specific code
 	}
 
-    private void SetupCamera()
+    private void SetupBackCamera()
     {
-        logger.debug("SetupCamera() Invoked");
+        logger.debug("SetupBackCamera() Invoked");
 
         mCamera = (CameraView)findViewById(R.id.camera);
 
@@ -314,8 +318,26 @@ public class CaptureClipActivity extends Activity implements
 
         int maxTime = 10; //10 seconds
         mCamera.setMaximumRecordingTime(maxTime * 1000);
+    }
 
-        mCamera.setCameraListener(VideoCameraListener);
+    private void SetupFrontCamera()
+    {
+        logger.debug("SetupFrontCamera() Invoked");
+
+        mCamera = (CameraView)findViewById(R.id.camera);
+
+        mCamera.setVideoProfile(CamcorderProfile.QUALITY_480P);
+        mCamera.setFocus(CameraKit.Constants.FOCUS_CONTINUOUS);
+        mCamera.setZoom(CameraKit.Constants.ZOOM_PINCH);
+
+        //@@SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
+        //@@mCamera.setSeekBar(zoomSeekBar);
+
+        int bitrate = 1500;
+        mCamera.setVideoBitrate((bitrate + 300) * 1000);
+
+        int maxTime = 10; //10 seconds
+        mCamera.setMaximumRecordingTime(maxTime * 1000);
     }
 
 	@Override
