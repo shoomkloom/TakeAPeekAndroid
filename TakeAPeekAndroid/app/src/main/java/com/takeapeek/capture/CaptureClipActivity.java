@@ -45,6 +45,7 @@ import com.takeapeek.common.Helper;
 import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.NameValuePair;
 import com.takeapeek.ormlite.DatabaseManager;
+import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.takeapeek.common.Constants.RELATEDNOTIFICATIONIDEXTRA_KEY;
 
 /** The main Activity for Open Camera.
  */
@@ -175,6 +178,7 @@ public class CaptureClipActivity extends Activity implements
     private VideoCaptureStateEnum mVideoCaptureStateEnum = VideoCaptureStateEnum.Start;
 
     private String mRelateProfileID = null;
+    private String mRelateNotificationID = null;
     private TakeAPeekObject mCompletedTakeAPeekObject = null;
 
     private GoogleApiClient mGoogleApiClient = null;
@@ -213,6 +217,7 @@ public class CaptureClipActivity extends Activity implements
         if(intent != null)
         {
             mRelateProfileID = intent.getStringExtra(Constants.RELATEDPROFILEIDEXTRA_KEY);
+            mRelateNotificationID = intent.getStringExtra(Constants.RELATEDNOTIFICATIONIDEXTRA_KEY);
         }
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
@@ -772,6 +777,16 @@ public class CaptureClipActivity extends Activity implements
             mCompletedTakeAPeekObject.Title = mCapturePreviewTitle.getText().toString();
 
             UploadRecordedVideo(mCompletedTakeAPeekObject);
+
+            if(mRelateNotificationID != null)
+            {
+                //Remove related notification
+                TakeAPeekNotification takeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotification(mRelateNotificationID);
+                if(takeAPeekNotification != null)
+                {
+                    DatabaseManager.getInstance().DeleteTakeAPeekNotification(takeAPeekNotification);
+                }
+            }
 
             Helper.ShowCenteredToast(this, R.string.clip_will_be_sent);
 

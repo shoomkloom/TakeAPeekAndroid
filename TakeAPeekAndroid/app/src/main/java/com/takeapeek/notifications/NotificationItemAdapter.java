@@ -231,6 +231,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                             final Intent captureClipActivityIntent = new Intent(mNotificationsActivity.get(), CaptureClipActivity.class);
                             captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, viewHolder.mSrcProfileObject.profileId);
+                            captureClipActivityIntent.putExtra(Constants.RELATEDNOTIFICATIONIDEXTRA_KEY, viewHolder.mTakeAPeekNotification.notificationId);
                             mNotificationsActivity.get().startActivity(captureClipActivityIntent);
                             break;
 
