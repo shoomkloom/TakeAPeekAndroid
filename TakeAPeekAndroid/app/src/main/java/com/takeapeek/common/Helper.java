@@ -70,6 +70,7 @@ import com.takeapeek.common.Constants.ProfileStateEnum;
 import com.takeapeek.common.Constants.UpdateTypeEnum;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekContactUpdateTimes;
+import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.syncadapter.ActiveSyncService;
@@ -1034,6 +1035,27 @@ public class Helper
 		
 		return showUploadTempDirectoryPath;
 	}
+
+    static public void RemoveOldNotifications(Context context)
+    {
+        logger.debug("RemoveOldNotifications(.) Invoked");
+
+        DatabaseManager.init(context);
+        List<TakeAPeekNotification> takeAPeekNotificationList = DatabaseManager.getInstance().GetTakeAPeekNotificationList();
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        long currentMillis = System.currentTimeMillis();
+
+        for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+        {
+            if(currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_HOUR)
+            {
+                notificationManager.cancel(takeAPeekNotification.notificationIntId);
+            }
+        }
+    }
 	
 	static public void DispatchTakePictureIntent(Activity activity, int actionCode, Uri fileUri) 
 	{    

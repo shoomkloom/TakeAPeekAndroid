@@ -110,6 +110,15 @@ public class SyncAdapterHelper implements Runnable,
 
             try
             {
+                Helper.RemoveOldNotifications(mContext);
+            }
+            catch(Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION! When calling Helper.RemoveOldNotifications(.)", e);
+            }
+
+            try
+            {
                 UploadPendingPeeks();
             }
             catch(Exception e)
