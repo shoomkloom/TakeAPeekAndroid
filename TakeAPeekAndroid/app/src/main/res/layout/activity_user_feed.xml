@@ -258,7 +258,8 @@
                 android:gravity="center_horizontal"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:visibility="gone" >
 
                 <ImageView
                     android:layout_width="70dp"
@@ -271,8 +272,7 @@
                 android:id="@+id/button_control_background_close"
                 android:layout_width="match_parent"
                 android:layout_height="115dp"
-                android:layout_alignParentTop="true"
-                android:visibility="gone" >
+                android:layout_alignParentTop="true" >
 
                 <LinearLayout
                     android:id="@+id/button_control_close"
