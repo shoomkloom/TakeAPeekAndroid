@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,13 +20,35 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.facebook.appevents.AppEventsLogger;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.takeapeek.R;
@@ -58,10 +81,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.takeapeek.R.id.textview_preview_button_report;
-import static com.takeapeek.R.id.top_bar;
-import static com.takeapeek.common.MixPanel.SCREEN_USER_FEED;
-
 public class UserFeedActivity extends AppCompatActivity
 {
     static private final Logger logger = LoggerFactory.getLogger(UserFeedActivity.class);
@@ -79,7 +98,9 @@ public class UserFeedActivity extends AppCompatActivity
     ImageView mImageViewProgressAnimation = null;
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
     ImageView mImageViewPeekThumbnail = null;
-    VideoView mVideoViewPeekItem = null;
+    SimpleExoPlayerView mVideoViewPeekItem = null;
+    SimpleExoPlayer mVideoPlayer = null;
+    ProgressBar mBufferedProgress = null;
     TextView mTextViewVideoTitle = null;
     TextView mTextViewVideoAddress = null;
     ImageView mVideoCountDown = null;
@@ -136,16 +157,16 @@ public class UserFeedActivity extends AppCompatActivity
         public void run()
         {
             //Update Video counter
-            int durationInMillis = mVideoViewPeekItem.getDuration();
-            int currentPositionInMillis = mVideoViewPeekItem.getCurrentPosition();
-            int timeLeftInMillis = durationInMillis - currentPositionInMillis;
+            long durationInMillis = mVideoPlayer.getDuration();
+            long currentPositionInMillis = mVideoPlayer.getCurrentPosition();
+            long timeLeftInMillis = durationInMillis - currentPositionInMillis;
             Date videoDateObject = new Date(timeLeftInMillis);
             DateFormat dateFormat = new SimpleDateFormat("s");
             String formattedTime = dateFormat.format(videoDateObject);
             int countDown = Integer.parseInt(formattedTime);
             UpdateVideoCountdownUI(countDown);
 
-            if(mVideoViewPeekItem.isPlaying() == true)
+            if(mVideoPlayer.getPlayWhenReady() == true)
             {
                 mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
             }
@@ -213,7 +234,7 @@ public class UserFeedActivity extends AppCompatActivity
 
         //Initate members for UI elements
 
-        mTopBar = (RelativeLayout)findViewById(top_bar);
+        mTopBar = (RelativeLayout)findViewById(R.id.top_bar);
 
         //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.user_feed_progress);
@@ -226,7 +247,8 @@ public class UserFeedActivity extends AppCompatActivity
         mAnimationDrawableVideoProgressAnimation = (AnimationDrawable)mImageViewPeekVideoProgress.getBackground();
         mTextViewPeekVideoProgress = (TextView)findViewById(R.id.textview_video_progress);
         Helper.setTypeface(this, mTextViewPeekVideoProgress, Helper.FontTypeEnum.boldFont);
-        mVideoViewPeekItem = (VideoView)findViewById(R.id.user_peek_feed_video);
+        mVideoViewPeekItem = (SimpleExoPlayerView)findViewById(R.id.user_peek_feed_video);
+        mBufferedProgress = (ProgressBar) findViewById(R.id.bufferprogress);
         mTextViewVideoTitle = (TextView)findViewById(R.id.user_peek_video_title);
         Helper.setTypeface(this, mTextViewVideoTitle, Helper.FontTypeEnum.normalFont);
         mTextViewVideoAddress = (TextView)findViewById(R.id.user_peek_video_address);
@@ -269,6 +291,11 @@ public class UserFeedActivity extends AppCompatActivity
         mEnumActivityState = EnumActivityState.loading;
         UpdateUI();
 
+        if (Util.SDK_INT <= 23 || mVideoPlayer == null)
+        {
+            prepExoPlayer();
+        }
+
         final Intent intent = getIntent();
         if(intent != null)
         {
@@ -277,8 +304,6 @@ public class UserFeedActivity extends AppCompatActivity
 
             if(mProfileObject != null)
             {
-                //Set the name in the top bar
-                //@@getSupportActionBar().setTitle(profileObject.displayName);
                 TextView title = (TextView)findViewById(R.id.textview_user_feed_title);
                 Helper.setTypeface(this, title, Helper.FontTypeEnum.boldFont);
                 title.setText(mProfileObject.displayName);
@@ -298,9 +323,6 @@ public class UserFeedActivity extends AppCompatActivity
                     mEnumActivityState = EnumActivityState.emptyList;
                     UpdateUI();
                 }
-
-                //@@ This causes a "blinking" of the list's images...
-                //@@mTimerHandler.postDelayed(mTimerRunnable, Constants.INTERVAL_MINUTE);
             }
 
             String peekObjectJSON = intent.getStringExtra(Constants.PARAM_PEEKOBJECT);
@@ -328,9 +350,9 @@ public class UserFeedActivity extends AppCompatActivity
         {
             case previewPlayingFile:
             case previewPlayingStream:
-                if(mVideoViewPeekItem != null && mVideoViewPeekItem.isPlaying() == true)
+                if(mVideoViewPeekItem != null && mVideoPlayer.getPlayWhenReady() == true)
                 {
-                    mVideoViewPeekItem.stopPlayback();
+                    mVideoPlayer.stop();
                     mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
                 }
 
@@ -363,6 +385,22 @@ public class UserFeedActivity extends AppCompatActivity
 
         IntentFilter intentFilter = new IntentFilter(Constants.PUSH_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
+
+        if (Util.SDK_INT <= 23 || mVideoPlayer == null)
+        {
+            prepExoPlayer();
+        }
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+
+        if (Util.SDK_INT > 23)
+        {
+            prepExoPlayer();
+        }
     }
 
     @Override
@@ -372,12 +410,119 @@ public class UserFeedActivity extends AppCompatActivity
 
         mTimerHandler.removeCallbacks(mTimerRunnable);
 
+        if (Util.SDK_INT <= 23)
+        {
+            mVideoPlayer.release();
+        }
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);
 
         long currentTimeMillis = Helper.GetCurrentTimeMillis();
         Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
         super.onPause();
+    }
+
+    @Override
+    public void onStop()
+    {
+        if (Util.SDK_INT > 23)
+        {
+            mVideoPlayer.release();
+        }
+
+        super.onStop();
+    }
+
+    private void prepExoPlayer()
+    {
+        if(mVideoPlayer != null)
+        {
+            return;
+        }
+
+        mVideoViewPeekItem.setUseArtwork(true);
+
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        LoadControl loadControl = new DefaultLoadControl();
+        mVideoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+        mVideoPlayer.addListener(new ExoPlayer.EventListener()
+        {
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest)
+            {
+
+            }
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections)
+            {
+
+            }
+            @Override
+            public void onLoadingChanged(boolean isLoading)
+            {
+
+            }
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState)
+            {
+                switch (playbackState)
+                {
+                    case ExoPlayer.STATE_READY:
+                        mBufferedProgress.setVisibility(View.GONE);
+
+                        mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
+                        mVideoCountDown.setVisibility(View.VISIBLE);
+
+                        break;
+                    case ExoPlayer.STATE_BUFFERING:
+                        mBufferedProgress.setVisibility(View.VISIBLE);
+                        break;
+                    case ExoPlayer.STATE_IDLE:
+                        mBufferedProgress.setVisibility(View.GONE);
+                        break;
+                    case ExoPlayer.STATE_ENDED:
+                        mBufferedProgress.setVisibility(View.GONE);
+                        Helper.ClearFullscreen(mVideoViewPeekItem);
+                        CompletePlayBack(mCurrentTakeAPeekObject);
+                        break;
+                }
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error)
+            {
+                mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
+
+                Helper.ClearFullscreen(mVideoViewPeekItem);
+                mTextViewVideoTitle.setText("");
+                mTextViewVideoAddress.setText("");
+
+                mEnumActivityState = EnumActivityState.previewStopped;
+                UpdateUI();
+
+                Helper.Error(logger, "EXCEPTION: When trying to play peek", error);
+                Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%s)", getString(R.string.error_playing_peek), error.toString()));
+
+                //Delete the downloaded clip file so we can try again
+                try
+                {
+                    Helper.DeletePeekFile(UserFeedActivity.this, mCurrentTakeAPeekObject.TakeAPeekID);
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, String.format("EXCEPTION: When trying to delete peek '%s'", mCurrentTakeAPeekObject.TakeAPeekID));
+                }
+            }
+
+            @Override
+            public void onPositionDiscontinuity() {
+
+            }
+        });
+        mVideoViewPeekItem.setPlayer(mVideoPlayer);
     }
 
     public void ShowPeek(TakeAPeekObject takeAPeekObject)
@@ -454,6 +599,20 @@ public class UserFeedActivity extends AppCompatActivity
     {
         logger.debug("ShowPeekUpdatedMetaData(.) Invoked");
 
+        try
+        {
+            String thumbnailFullPath = Helper.GetPeekThumbnailFullPath(this, mCurrentTakeAPeekObject.TakeAPeekID);
+
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeFile(thumbnailFullPath, bmOptions);
+
+            mVideoViewPeekItem.setDefaultArtwork(bitmap);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when trying to set setDefaultArtwork to ExoPlayer", e);
+        }
+
         if(fromHandler == true || mCurrentTakeAPeekObject.PeekMP4StreamingURL == null)
         {
             ShowPeekFile(fromHandler, mCurrentTakeAPeekObject);
@@ -501,69 +660,10 @@ public class UserFeedActivity extends AppCompatActivity
                 return;
             }
 
-            mVideoViewPeekItem.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-            {
-                @Override
-                public void onPrepared(MediaPlayer mp)
-                {
-                    logger.debug("MediaPlayer.OnPreparedListener:onPrepared(.) Invoked");
-
-                    //Start the video play time display
-                    mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
-                    mVideoCountDown.setVisibility(View.VISIBLE);
-                }
-            });
-
-            mVideoViewPeekItem.setOnErrorListener(new MediaPlayer.OnErrorListener()
-            {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra)
-                {
-                    logger.error("MediaPlayer.OnErrorListener:onError(...) Invoked");
-
-                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
-
-                    Helper.ClearFullscreen(mVideoViewPeekItem);
-                    mTextViewVideoTitle.setText("");
-                    mTextViewVideoAddress.setText("");
-
-                    mEnumActivityState = EnumActivityState.previewStopped;
-                    UpdateUI();
-
-                    Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
-                    Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%d, %d)", getString(R.string.error_playing_peek), what, extra));
-
-                    //Delete the downloaded clip file so we can try again
-                    String peekFilePath = null;
-                    try
-                    {
-                        peekFilePath = Helper.GetVideoPeekFilePath(UserFeedActivity.this, takeAPeekObject.TakeAPeekID);
-                        File peekFile = new File(peekFilePath);
-                        if(peekFile.exists() == true)
-                        {
-                            logger.info(String.format("'%s' exists, deleting after error...", peekFilePath));
-                            peekFile.delete();
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Helper.Error(logger, String.format("EXCEPTION: When trying to delete '%s'", peekFilePath));
-                    }
-
-                    return true;
-                }
-            });
-
             mEnumActivityState = EnumActivityState.previewPlayingFile;
             UpdateUI();
 
-            mVideoViewPeekItem.setVideoPath(peekFilePath);
-            mVideoViewPeekItem.requestFocus();
-
-            Helper.SetFullscreen(mVideoViewPeekItem);
-
-            mVideoViewPeekItem.start();
-            if(takeAPeekObject.Title == null || takeAPeekObject.Title == "")
+            if(takeAPeekObject.Title == null || takeAPeekObject.Title.compareToIgnoreCase("") == 0)
             {
                 mTextViewVideoTitle.setVisibility(View.GONE);
             }
@@ -578,16 +678,16 @@ public class UserFeedActivity extends AppCompatActivity
                 addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
             }
 
-            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mp)
-                {
-                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
+            Uri url = Uri.parse(peekFilePath);
 
-                    CompletePlayBack(takeAPeekObject);
-                }
-            });
+            DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "yourApplicationName"), defaultBandwidthMeter);
+            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            MediaSource videoSource = new ExtractorMediaSource(url, dataSourceFactory, extractorsFactory, null, null);
+            mVideoPlayer.prepare(videoSource);
+            mVideoPlayer.setPlayWhenReady(true);
+
+            Helper.SetFullscreen(mVideoViewPeekItem);
         }
         catch (Exception e)
         {
@@ -615,53 +715,10 @@ public class UserFeedActivity extends AppCompatActivity
         //Play the video from stream
         try
         {
-            mVideoViewPeekItem.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-            {
-                @Override
-                public void onPrepared(MediaPlayer mp)
-                {
-                    logger.debug("MediaPlayer.OnPreparedListener:onPrepared(.) Invoked");
-
-                    //Start the video play time display
-                    mVideoTimeHandler.postDelayed(mVideoTimeRunnable, 200);
-                    mVideoCountDown.setVisibility(View.VISIBLE);
-
-                    Helper.SetFullscreen(mVideoViewPeekItem);
-                }
-            });
-
-            mVideoViewPeekItem.setOnErrorListener(new MediaPlayer.OnErrorListener()
-            {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra)
-                {
-                    logger.error("MediaPlayer.OnErrorListener:onError(...) Invoked");
-
-                    mVideoTimeHandler.removeCallbacks(mVideoTimeRunnable);
-
-                    Helper.ClearFullscreen(mVideoViewPeekItem);
-                    mTextViewVideoTitle.setText("");
-                    mTextViewVideoAddress.setText("");
-
-                    mEnumActivityState = EnumActivityState.previewStopped;
-                    UpdateUI();
-
-                    Helper.Error(logger, String.format("EXCEPTION: When trying to play peek; what=%d, extra=%d.", what, extra));
-                    Helper.ErrorMessage(UserFeedActivity.this, mHandler, getString(R.string.Error), getString(R.string.ok), String.format("%s (%d, %d)", getString(R.string.error_playing_peek), what, extra));
-
-                    return true;
-                }
-            });
-
             mEnumActivityState = EnumActivityState.previewPlayingStream;
             UpdateUI();
 
-            // Get the URL from String VideoURL
-            Uri url = Uri.parse(mCurrentTakeAPeekObject.PeekMP4StreamingURL);
-            mVideoViewPeekItem.setVideoURI(url);
-            mVideoViewPeekItem.requestFocus();
-
-            if(takeAPeekObject.Title == null || takeAPeekObject.Title == "")
+            if(takeAPeekObject.Title == null || takeAPeekObject.Title.compareToIgnoreCase("") == 0)
             {
                 mTextViewVideoTitle.setVisibility(View.GONE);
             }
@@ -676,21 +733,15 @@ public class UserFeedActivity extends AppCompatActivity
                 addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
             }
 
-            mVideoViewPeekItem.start();
+            Uri url = Uri.parse(mCurrentTakeAPeekObject.PeekMP4StreamingURL);
 
-            mVideoViewPeekItem.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mp)
-                {
-                    logger.debug("MediaPlayer.OnCompletionListener:onCompletion(.) Invoked");
+            DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "yourApplicationName"), defaultBandwidthMeter);
+            MediaSource videoSource = new HlsMediaSource(url, dataSourceFactory, null, null);
+            mVideoPlayer.prepare(videoSource);
+            mVideoPlayer.setPlayWhenReady(true);
 
-                    mTextViewVideoTitle.setText("");
-                    mTextViewVideoAddress.setText("");
-
-                    CompletePlayBack(takeAPeekObject);
-                }
-            });
+            Helper.SetFullscreen(mVideoViewPeekItem);
         }
         catch (Exception e)
         {
@@ -758,38 +809,6 @@ public class UserFeedActivity extends AppCompatActivity
         {
             mEnumActivityState = EnumActivityState.emptyList;
             UpdateUI();
-        }
-    }
-
-    private void StyleMediaController(View view)
-    {
-        logger.debug("StyleMediaController(.) Invoked");
-
-        if (view instanceof MediaController)
-        {
-            MediaController v = (MediaController) view;
-            for(int i = 0; i < v.getChildCount(); i++)
-            {
-                StyleMediaController(v.getChildAt(i));
-            }
-        }
-        else if (view instanceof LinearLayout)
-        {
-            LinearLayout ll = (LinearLayout) view;
-            for(int i = 0; i < ll.getChildCount(); i++)
-            {
-                StyleMediaController(ll.getChildAt(i));
-            }
-        }
-        else if (view instanceof SeekBar)
-        {
-            ((SeekBar) view).setEnabled(false);
-            //@@((SeekBar) view).setProgressDrawable(getResources().getDrawable(R.drawable.progressbar));
-            //@@((SeekBar) view).setThumb(getResources().getDrawable(R.drawable.progresshandle));
-        }
-        else if (view instanceof ImageView || view instanceof TextView)
-        {
-            view.setVisibility(View.GONE);
         }
     }
 
@@ -915,7 +934,7 @@ public class UserFeedActivity extends AppCompatActivity
                                 String message = String.format(UserFeedActivity.this.getString(R.string.set_relation_block), mCurrentTakeAPeekObject.ProfileDisplayName);
                                 Helper.ShowCenteredToast(UserFeedActivity.this, message);
 
-                                MixPanel.BlockUserEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED, mSharedPreferences);
+                                MixPanel.BlockUserEventAndProps(UserFeedActivity.this, MixPanel.SCREEN_USER_FEED, mSharedPreferences);
                             }
                             else
                             {
@@ -937,8 +956,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                     break;
 
-                case textview_preview_button_report:
-                    logger.info("onClick: textview_preview_button_report clicked");
+                case R.id.textview_preview_button_report:
+                    logger.info("onClick: R.id.textview_preview_button_report clicked");
 
                     new AsyncTask<Void, Void, Boolean>()
                     {
@@ -1007,7 +1026,7 @@ public class UserFeedActivity extends AppCompatActivity
                     findViewById(R.id.button_control).setVisibility(View.GONE);
                     findViewById(R.id.button_control_background_close).setVisibility(View.VISIBLE);
 
-                    MixPanel.PeekButtonEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED);
+                    MixPanel.PeekButtonEventAndProps(UserFeedActivity.this, MixPanel.SCREEN_USER_FEED);
 
                     break;
 
@@ -1022,7 +1041,7 @@ public class UserFeedActivity extends AppCompatActivity
                 case R.id.button_send_peek:
                     logger.info("onClick: button_send_peek clicked");
 
-                    MixPanel.SendButtonEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED, mSharedPreferences);
+                    MixPanel.SendButtonEventAndProps(UserFeedActivity.this, MixPanel.SCREEN_USER_FEED, mSharedPreferences);
 
                     final Intent captureClipActivityIntent = new Intent(UserFeedActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1091,7 +1110,7 @@ public class UserFeedActivity extends AppCompatActivity
                                             //Log event to FaceBook
                                             mAppEventsLogger.logEvent("Peek_Request");
 
-                                            MixPanel.RequestButtonEventAndProps(UserFeedActivity.this, SCREEN_USER_FEED, 1, mSharedPreferences);
+                                            MixPanel.RequestButtonEventAndProps(UserFeedActivity.this, MixPanel.SCREEN_USER_FEED, 1, mSharedPreferences);
                                         }
                                     }
                                     catch(Exception e)

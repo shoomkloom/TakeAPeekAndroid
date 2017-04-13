@@ -74,6 +74,7 @@ import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.syncadapter.ActiveSyncService;
+import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,35 +110,35 @@ import static android.content.Context.LOCATION_SERVICE;
 
 public class Helper
 {
-	static private final Logger logger = LoggerFactory.getLogger(Helper.class);
+    static private final Logger logger = LoggerFactory.getLogger(Helper.class);
 
-	static private ReentrantLock lockProfileData = new ReentrantLock();
-	static ReentrantLock lockTakeAPeekContactData = new ReentrantLock();
-	
-	//@@static public ReentrantLock lockHTTPRequest = new ReentrantLock();
-	static public ReentrantLock lockProfilePicture = new ReentrantLock();
-	static public ReentrantLock lockNotifications = new ReentrantLock();
-	static public ReentrantLock lockContactPicture = new ReentrantLock();
-	static public ReentrantLock lockGlobalContactPicture = new ReentrantLock();
-	
-	static private String UserName = null;
-	static private String Password = null;
-	static private boolean OfflineGetGlobalsImages = true;
-	
-	static public void SetOfflineGetGlobalsImages(boolean offlineGetGlobalsImages)
-	{
-		logger.debug(String.format("OfflineGetGlobalsImages = %b", offlineGetGlobalsImages));
-		OfflineGetGlobalsImages = offlineGetGlobalsImages;
-	}
-	
-	static public boolean GetOfflineGetGlobalsImages()
-	{
-		logger.debug(String.format("Returning OfflineGetGlobalsImages = %b", OfflineGetGlobalsImages));
-		return OfflineGetGlobalsImages;
-	}
+    static private ReentrantLock lockProfileData = new ReentrantLock();
+    static ReentrantLock lockTakeAPeekContactData = new ReentrantLock();
 
-	static public synchronized int getNotificationIDCounter(SharedPreferences sharedPreferences)
-	{
+    //@@static public ReentrantLock lockHTTPRequest = new ReentrantLock();
+    static public ReentrantLock lockProfilePicture = new ReentrantLock();
+    static public ReentrantLock lockNotifications = new ReentrantLock();
+    static public ReentrantLock lockContactPicture = new ReentrantLock();
+    static public ReentrantLock lockGlobalContactPicture = new ReentrantLock();
+
+    static private String UserName = null;
+    static private String Password = null;
+    static private boolean OfflineGetGlobalsImages = true;
+
+    static public void SetOfflineGetGlobalsImages(boolean offlineGetGlobalsImages)
+    {
+        logger.debug(String.format("OfflineGetGlobalsImages = %b", offlineGetGlobalsImages));
+        OfflineGetGlobalsImages = offlineGetGlobalsImages;
+    }
+
+    static public boolean GetOfflineGetGlobalsImages()
+    {
+        logger.debug(String.format("Returning OfflineGetGlobalsImages = %b", OfflineGetGlobalsImages));
+        return OfflineGetGlobalsImages;
+    }
+
+    static public synchronized int getNotificationIDCounter(SharedPreferences sharedPreferences)
+    {
         lockNotifications.lock();
         int uniqueIndex = 0;
 
@@ -152,21 +153,21 @@ public class Helper
             lockNotifications.unlock();
         }
 
-		return uniqueIndex;
-	}
-	
-	static public void ExitApp()
-	{
-		logger.debug("ExitApp() Invoked");
+        return uniqueIndex;
+    }
+
+    static public void ExitApp()
+    {
+        logger.debug("ExitApp() Invoked");
 		
 		/*              
 		 * Force the system to close the app down completely instead of              
 		 * retaining it in the background. The virtual machine that runs the              
 		 * app will be killed. The app will be completely created as a new              
 		 * app in a new virtual machine running in a new process if the user              
-		 * starts the app again.              */             
-		System.exit(0); 
-	}
+		 * starts the app again.              */
+        System.exit(0);
+    }
 
     static public ResponseObject RefreshFCMToken(Context context, SharedPreferences sharedPreferences)
     {
@@ -183,7 +184,7 @@ public class Helper
 
             return new Transport().RegisterFCMToken(context, userName, password, refreshedToken, sharedPreferences);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Error(logger, "EXCEPTION: When trying to register the new Firebase messaging token", e);
         }
@@ -239,7 +240,7 @@ public class Helper
             takeAPeekLogConfigPath += filename;
             File file = new File(takeAPeekLogConfigPath);
 
-            if(file.exists() == false)
+            if (file.exists() == false)
             {
                 OutputStream outputStream = new FileOutputStream(file);
                 outputStream.write(configXML.getBytes());
@@ -260,58 +261,58 @@ public class Helper
         return takeAPeekLogConfigPath;
     }
 
-	static public boolean DoesTakeAPeekAccountExist(Context context, Handler handler)
+    static public boolean DoesTakeAPeekAccountExist(Context context, Handler handler)
     {
-    	logger.debug("DoesTakeAPeekAccountExist() Invoked");
-    	
-    	boolean accountExists = false;
-    	
-    	Account takeAPeekAccount = null;
-		try 
-		{
-			takeAPeekAccount = GetTakeAPeekAccount(context);
-		} 
-		catch (Exception e) 
-		{
-			Error(logger, "EXCEPTION: More than one TakeAPeek account - exiting application.", e);
-			ErrorMessageWithExit(context, handler, context.getString(R.string.Error), context.getString(R.string.Exit), context.getString(R.string.error_more_than_one_account));
-		}
-		
-    	if(takeAPeekAccount != null)
-    	{
-    		accountExists = true;
-    	}
-    	
-    	return accountExists;
+        logger.debug("DoesTakeAPeekAccountExist() Invoked");
+
+        boolean accountExists = false;
+
+        Account takeAPeekAccount = null;
+        try
+        {
+            takeAPeekAccount = GetTakeAPeekAccount(context);
+        }
+        catch (Exception e)
+        {
+            Error(logger, "EXCEPTION: More than one TakeAPeek account - exiting application.", e);
+            ErrorMessageWithExit(context, handler, context.getString(R.string.Error), context.getString(R.string.Exit), context.getString(R.string.error_more_than_one_account));
+        }
+
+        if (takeAPeekAccount != null)
+        {
+            accountExists = true;
+        }
+
+        return accountExists;
     }
-	
-	static public String GetTakeAPeekDataDirectoryPath(Context context) throws IOException
-	{
-		logger.debug("GetTakeAPeekDataDirectoryPath() Invoked");
+
+    static public String GetTakeAPeekDataDirectoryPath(Context context) throws IOException
+    {
+        logger.debug("GetTakeAPeekDataDirectoryPath() Invoked");
 		
 		/*@@
 		 * Can't use getExternalFilesDir(null) because of a bug in Froyo...
 		 * String appDataPath = MoBeatActivity.instance.getExternalFilesDir(null).getAbsolutePath(); 
 		 */
-		String takeAPeekDataDirectoryPath = context.getApplicationInfo().dataDir + File.separator;
-		
-		//@@String takeAPeekDataDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "takeapeek/data/";
-		
-		CreateDirectoryIfDoesNotExist(takeAPeekDataDirectoryPath, true);
-		
-		return takeAPeekDataDirectoryPath;
-	}
+        String takeAPeekDataDirectoryPath = context.getApplicationInfo().dataDir + File.separator;
 
-	static public String GetTakeAPeekPath(Context context) throws IOException
-	{
-		logger.debug("GetTakeAPeekPath(.) Invoked");
-		
-		String takeapeekDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "TakeAPeek/";
-		
-		CreateDirectoryIfDoesNotExist(takeapeekDirectoryPath, true);
-		
-		return takeapeekDirectoryPath;
-	}
+        //@@String takeAPeekDataDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "takeapeek/data/";
+
+        CreateDirectoryIfDoesNotExist(takeAPeekDataDirectoryPath, true);
+
+        return takeAPeekDataDirectoryPath;
+    }
+
+    static public String GetTakeAPeekPath(Context context) throws IOException
+    {
+        logger.debug("GetTakeAPeekPath(.) Invoked");
+
+        String takeapeekDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "TakeAPeek/";
+
+        CreateDirectoryIfDoesNotExist(takeapeekDirectoryPath, true);
+
+        return takeapeekDirectoryPath;
+    }
 
     static public String GetPeekThumbnailFullPath(Context context, String peekId) throws IOException
     {
@@ -353,38 +354,38 @@ public class Helper
         return GetTakeAPeekPath(context) + Constants.MIXPANELPARAMS_FILE_NAME;
     }
 
-	static public String GetLogsZipFilePath(Context context) throws IOException
-	{
-		logger.debug("GetLogsZipFilePath(.) Invoked");
-		
-		return GetTakeAPeekPath(context) + Constants.LOGSZIPFILE_FILE_NAME;
-	}
-	
-	static public String GetTempCropFilePath(Context context) throws IOException
-	{
-		logger.debug("GetTempCropFilePath(.) Invoked");
-		
-		String tempDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "takeapeek/Temp/";
-		
-		CreateDirectoryIfDoesNotExist(tempDirectoryPath, true);
-		
-		return tempDirectoryPath + "pickImage.png";
-	}
-	
-	static public File GetTempCropFile(Context context) throws IOException
-	{
-		logger.debug("GetTempCropFile() Invoked");
-		
-		String cropFilePath = GetTempCropFilePath(context);
-		
-		File cropFile = new File(cropFilePath);
-		if(cropFile != null)
-		{
-			cropFile.createNewFile();
-		}
+    static public String GetLogsZipFilePath(Context context) throws IOException
+    {
+        logger.debug("GetLogsZipFilePath(.) Invoked");
 
-		return cropFile;
-	}
+        return GetTakeAPeekPath(context) + Constants.LOGSZIPFILE_FILE_NAME;
+    }
+
+    static public String GetTempCropFilePath(Context context) throws IOException
+    {
+        logger.debug("GetTempCropFilePath(.) Invoked");
+
+        String tempDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "takeapeek/Temp/";
+
+        CreateDirectoryIfDoesNotExist(tempDirectoryPath, true);
+
+        return tempDirectoryPath + "pickImage.png";
+    }
+
+    static public File GetTempCropFile(Context context) throws IOException
+    {
+        logger.debug("GetTempCropFile() Invoked");
+
+        String cropFilePath = GetTempCropFilePath(context);
+
+        File cropFile = new File(cropFilePath);
+        if (cropFile != null)
+        {
+            cropFile.createNewFile();
+        }
+
+        return cropFile;
+    }
 
     static public boolean CheckPermissions(Context context)
     {
@@ -400,9 +401,9 @@ public class Helper
         permissionTypeArray[4] = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
         permissionTypeArray[5] = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        for(int i=0; i<numberOfPermissions; i++)
+        for (int i = 0; i < numberOfPermissions; i++)
         {
-            if(permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
+            if (permissionTypeArray[i] != PackageManager.PERMISSION_GRANTED)
             {
                 return false;
             }
@@ -499,162 +500,167 @@ public class Helper
     }
 @@*/
 
-	/**
-	 * Get the path for the TakeAPeek profile directory
-	 * @return
-	 * @throws IOException
-	 */
-	static public String GetProfileDirectoryPath(Context context) throws IOException
-	{
-		logger.debug("GetProfileDirectoryPath() Invoked");
-		
-		String takeAPeekProfileDirectoryPath = GetTakeAPeekDataDirectoryPath(context) + "Profile/";
-		
-		CreateDirectoryIfDoesNotExist(takeAPeekProfileDirectoryPath);
-		
-		return takeAPeekProfileDirectoryPath;
-	}
-	
-	/**
-	 * Get the path for the TakeAPeek profile JSON file: 'profileInfo.txt'
-	 * @return
-	 * @throws IOException
-	 */
-	static private String GetTakeAPeekProfilePath(Context context) throws IOException
-	{
-		logger.debug("GetTakeAPeekProfileJSONPath() Invoked");
-		
-		String takeAPeekProfileJSONPath = GetProfileDirectoryPath(context) + Constants.PROFILE_INFO_FILE_NAME;
-		
-		return takeAPeekProfileJSONPath;
-	}
-	
-	/**
-	 * Get the path for the TakeAPeek profile image file: 'profileImage.png'
-	 * @return
-	 * @throws IOException
-	 */
-	static public String GetTakeAPeekProfileImagePath(Context context) throws IOException
-	{
-		logger.debug("GetTakeAPeekProfileImagePath(.) Invoked");
-		
-		String takeAPeekProfileImagePath = GetProfileDirectoryPath(context) + Constants.PROFILE_IMAGE_FILE_NAME;
-		
-		return takeAPeekProfileImagePath;
-	}
-	
-	static public String GetTakeAPeekProfileSampledImagePath(Context context) throws IOException
-	{
-		logger.debug("GetTakeAPeekProfileSampledImagePath(.) Invoked");
-		
-		String takeAPeekProfileSampledImagePath = GetProfileDirectoryPath(context) + Constants.PROFILE_SAMPLED_IMAGE_FILE_NAME;
-		
-		return takeAPeekProfileSampledImagePath;
-	}
-	
-	static public String GetResponseDirectoryPath(Context context) throws IOException
-	{
-		logger.debug("GetResponseDirectoryPath(.) Invoked");
-		
-		String takeAPeekResponseDirectoryPath = GetTakeAPeekDataDirectoryPath(context) + "Response/";
-		
-		CreateDirectoryIfDoesNotExist(takeAPeekResponseDirectoryPath);
-		
-		return takeAPeekResponseDirectoryPath;
-	}
-	
-	/**
-	 * Get the path for new TakeAPeek contact photos just downloaded
-	 * @return
-	 * @throws IOException
-	 */
-	static public String GetResponseTakeAPeekPhotoPath(Context context) throws IOException
-	{
-		logger.debug("GetResponseTakeAPeekPhotoPath(.) Invoked");
-		
-		String takeAPeekResponseTakeAPeekPhotoPath = GetResponseDirectoryPath(context) + "TakeAPeekPhoto/";
-		
-		CreateDirectoryIfDoesNotExist(takeAPeekResponseTakeAPeekPhotoPath);
-		
-		return takeAPeekResponseTakeAPeekPhotoPath;
-	}
-	
-	/**
-	 * Get the path for original contact photos just scanned
-	 * @return
-	 * @throws IOException
-	 */
-	static public String GetResponseOriginalPhotoPath(Context context) throws IOException
-	{
-		logger.debug("GetResponseOriginalPhotoPath() Invoked");
-		
-		String takeAPeekResponseOriginalPhotoPath = GetResponseDirectoryPath(context) + "OriginalPhoto/";
-		
-		CreateDirectoryIfDoesNotExist(takeAPeekResponseOriginalPhotoPath);
-		
-		return takeAPeekResponseOriginalPhotoPath;
-	}
-	
-	static public void CreateDirectoryIfDoesNotExist(String directoryPath) throws IOException
-	{
-		logger.debug("CreateDirectoryIfDoesNotExist(.) Invoked");
-		
-		CreateDirectoryIfDoesNotExist(directoryPath, false);
-	}
-	
-	static public void CreateDirectoryIfDoesNotExist(String directoryPath, boolean noMedia) throws IOException
-	{
-		logger.debug("CreateDirectoryIfDoesNotExist(..) Invoked");
-		
-		File dir = new File(directoryPath); 
-		if(!dir.exists()) 
-		{ 
-		    //Create the folder and the .nomedia file
-			boolean success = (new File(directoryPath)).mkdirs();  
-			if (success && noMedia)
-			{
-				//Create the .nomedia file
-				success = (new File(directoryPath + ".nomedia")).createNewFile();
-			}
-			
-			if (!success)
-			{
-			    // Directory creation failed 
-				String error = String.format("ERROR: Folder '%s' does not exist and could not be created", directoryPath);
-				logger.warn(error); 
-				throw new IOException(error);
-		    } 
-		}
-	}
-	
-	static public String GetUploadDirectoryPath(Context context) throws Exception 
-	{
-		logger.debug("GetUploadDirectoryPath() Invoked");
-		
-		String showUploadDirectoryPath = GetTakeAPeekDataDirectoryPath(context) + "Upload/";
-				
-		File dir = new File(showUploadDirectoryPath); 
-		if(!dir.exists()) 
-		{ 
-		    //Create the 'Upload' folder and the .nomedia file
-			boolean success = (new File(showUploadDirectoryPath)).mkdirs();  
-			if (success)
-			{
-				//Create the .nomedia file
-				success = (new File(showUploadDirectoryPath + ".nomedia")).createNewFile();
-			}
-			
-			if (!success)
-			{
-			    // Directory creation failed 
-				String error = "ERROR: Folder " + showUploadDirectoryPath + " does not exist and could not be created";
-				logger.warn(String.format("Data folder not created: %s", error)); 
-				throw new Exception(error);
-		    } 
-		} 
-		
-		return showUploadDirectoryPath;
-	}
+    /**
+     * Get the path for the TakeAPeek profile directory
+     *
+     * @return
+     * @throws IOException
+     */
+    static public String GetProfileDirectoryPath(Context context) throws IOException
+    {
+        logger.debug("GetProfileDirectoryPath() Invoked");
+
+        String takeAPeekProfileDirectoryPath = GetTakeAPeekDataDirectoryPath(context) + "Profile/";
+
+        CreateDirectoryIfDoesNotExist(takeAPeekProfileDirectoryPath);
+
+        return takeAPeekProfileDirectoryPath;
+    }
+
+    /**
+     * Get the path for the TakeAPeek profile JSON file: 'profileInfo.txt'
+     *
+     * @return
+     * @throws IOException
+     */
+    static private String GetTakeAPeekProfilePath(Context context) throws IOException
+    {
+        logger.debug("GetTakeAPeekProfileJSONPath() Invoked");
+
+        String takeAPeekProfileJSONPath = GetProfileDirectoryPath(context) + Constants.PROFILE_INFO_FILE_NAME;
+
+        return takeAPeekProfileJSONPath;
+    }
+
+    /**
+     * Get the path for the TakeAPeek profile image file: 'profileImage.png'
+     *
+     * @return
+     * @throws IOException
+     */
+    static public String GetTakeAPeekProfileImagePath(Context context) throws IOException
+    {
+        logger.debug("GetTakeAPeekProfileImagePath(.) Invoked");
+
+        String takeAPeekProfileImagePath = GetProfileDirectoryPath(context) + Constants.PROFILE_IMAGE_FILE_NAME;
+
+        return takeAPeekProfileImagePath;
+    }
+
+    static public String GetTakeAPeekProfileSampledImagePath(Context context) throws IOException
+    {
+        logger.debug("GetTakeAPeekProfileSampledImagePath(.) Invoked");
+
+        String takeAPeekProfileSampledImagePath = GetProfileDirectoryPath(context) + Constants.PROFILE_SAMPLED_IMAGE_FILE_NAME;
+
+        return takeAPeekProfileSampledImagePath;
+    }
+
+    static public String GetResponseDirectoryPath(Context context) throws IOException
+    {
+        logger.debug("GetResponseDirectoryPath(.) Invoked");
+
+        String takeAPeekResponseDirectoryPath = GetTakeAPeekDataDirectoryPath(context) + "Response/";
+
+        CreateDirectoryIfDoesNotExist(takeAPeekResponseDirectoryPath);
+
+        return takeAPeekResponseDirectoryPath;
+    }
+
+    /**
+     * Get the path for new TakeAPeek contact photos just downloaded
+     *
+     * @return
+     * @throws IOException
+     */
+    static public String GetResponseTakeAPeekPhotoPath(Context context) throws IOException
+    {
+        logger.debug("GetResponseTakeAPeekPhotoPath(.) Invoked");
+
+        String takeAPeekResponseTakeAPeekPhotoPath = GetResponseDirectoryPath(context) + "TakeAPeekPhoto/";
+
+        CreateDirectoryIfDoesNotExist(takeAPeekResponseTakeAPeekPhotoPath);
+
+        return takeAPeekResponseTakeAPeekPhotoPath;
+    }
+
+    /**
+     * Get the path for original contact photos just scanned
+     *
+     * @return
+     * @throws IOException
+     */
+    static public String GetResponseOriginalPhotoPath(Context context) throws IOException
+    {
+        logger.debug("GetResponseOriginalPhotoPath() Invoked");
+
+        String takeAPeekResponseOriginalPhotoPath = GetResponseDirectoryPath(context) + "OriginalPhoto/";
+
+        CreateDirectoryIfDoesNotExist(takeAPeekResponseOriginalPhotoPath);
+
+        return takeAPeekResponseOriginalPhotoPath;
+    }
+
+    static public void CreateDirectoryIfDoesNotExist(String directoryPath) throws IOException
+    {
+        logger.debug("CreateDirectoryIfDoesNotExist(.) Invoked");
+
+        CreateDirectoryIfDoesNotExist(directoryPath, false);
+    }
+
+    static public void CreateDirectoryIfDoesNotExist(String directoryPath, boolean noMedia) throws IOException
+    {
+        logger.debug("CreateDirectoryIfDoesNotExist(..) Invoked");
+
+        File dir = new File(directoryPath);
+        if (!dir.exists())
+        {
+            //Create the folder and the .nomedia file
+            boolean success = (new File(directoryPath)).mkdirs();
+            if (success && noMedia)
+            {
+                //Create the .nomedia file
+                success = (new File(directoryPath + ".nomedia")).createNewFile();
+            }
+
+            if (!success)
+            {
+                // Directory creation failed
+                String error = String.format("ERROR: Folder '%s' does not exist and could not be created", directoryPath);
+                logger.warn(error);
+                throw new IOException(error);
+            }
+        }
+    }
+
+    static public String GetUploadDirectoryPath(Context context) throws Exception
+    {
+        logger.debug("GetUploadDirectoryPath() Invoked");
+
+        String showUploadDirectoryPath = GetTakeAPeekDataDirectoryPath(context) + "Upload/";
+
+        File dir = new File(showUploadDirectoryPath);
+        if (!dir.exists())
+        {
+            //Create the 'Upload' folder and the .nomedia file
+            boolean success = (new File(showUploadDirectoryPath)).mkdirs();
+            if (success)
+            {
+                //Create the .nomedia file
+                success = (new File(showUploadDirectoryPath + ".nomedia")).createNewFile();
+            }
+
+            if (!success)
+            {
+                // Directory creation failed
+                String error = "ERROR: Folder " + showUploadDirectoryPath + " does not exist and could not be created";
+                logger.warn(String.format("Data folder not created: %s", error));
+                throw new Exception(error);
+            }
+        }
+
+        return showUploadDirectoryPath;
+    }
 
 /*@@
 	static public void SaveBitmapToProfileImage(Context context, Bitmap bitmap) throws FileNotFoundException, IOException
@@ -691,7 +697,7 @@ public class Helper
 
             File sizedBitmapFile = new File(sizedBitmapPath);
 
-            if(sizedBitmapFile != null && sizedBitmapFile.exists())
+            if (sizedBitmapFile != null && sizedBitmapFile.exists())
             {
                 sizedBitmap = BitmapFactory.decodeFile(sizedBitmapPath, bitmapFactoryOptions);
             }
@@ -718,7 +724,7 @@ public class Helper
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Helper.Error(logger, "EXCEPTION: When trying to resize a bitmap", e);
         }
@@ -797,22 +803,22 @@ public class Helper
         return takeAPeekContactThumbnail;
 	}
 @@*/
-	
-	static public  void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force) throws Exception
-	{
-		logger.debug("DownloadProfileImages(...) Invoked");
-		
-		DownloadProfileImages(context, takeAPeekContactList, force, false);
-	}
-	
-	static public void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force, boolean checkIfPhotoFileUpdated) throws Exception
-	{
-		logger.debug("DownloadProfileImages(..) Invoked");
-		
-		if(takeAPeekContactList.isEmpty() == false)
-		{
-			String takeAPeekAccountUsername = Helper.GetTakeAPeekAccountUsername(context);
-			String takeAPeekAccountPassword = Helper.GetTakeAPeekAccountPassword(context);
+
+    static public void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force) throws Exception
+    {
+        logger.debug("DownloadProfileImages(...) Invoked");
+
+        DownloadProfileImages(context, takeAPeekContactList, force, false);
+    }
+
+    static public void DownloadProfileImages(Context context, ArrayList<ProfileObject> takeAPeekContactList, boolean force, boolean checkIfPhotoFileUpdated) throws Exception
+    {
+        logger.debug("DownloadProfileImages(..) Invoked");
+
+        if (takeAPeekContactList.isEmpty() == false)
+        {
+            String takeAPeekAccountUsername = Helper.GetTakeAPeekAccountUsername(context);
+            String takeAPeekAccountPassword = Helper.GetTakeAPeekAccountPassword(context);
 
 /*@@
 			DatabaseManager.init(context);
@@ -826,38 +832,38 @@ public class Helper
 				DownloadProfileImage(context, gaTracker, takeAPeekAccountUsername, takeAPeekAccountPassword, takeAPeekContact, force, checkIfPhotoFileUpdated, takeAPeekContactUpdateTimes);
 			}
 @@*/
-		}
-	}
-	
-	static public String GetProfileImageThumbnailFilePath(Context context, ProfileObject takeAPeekContact) throws Exception
-	{
-		logger.debug("GetProfileImageThumbnailFilePath(..) Invoked");
-		
-		String profileImageFilePath = GetProfileImageFilePath(context, takeAPeekContact);
-		
-		return  profileImageFilePath.replace(".png", String.format("_%d.png", takeAPeekContact.photoServerTime));
-	}
-	
-	static public String GetProfileImageFilePath(Context context, ProfileObject takeAPeekContact) throws Exception
-	{
-		logger.debug("GetProfileImageFilePath(..) Invoked");
-		
-		//Use profileId if userNumber is null
-		String postfix = 
-				(takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0) ?
-						takeAPeekContact.profileId : takeAPeekContact.userNumber;
+        }
+    }
 
-		String responseTakeAPeekPhotoFilePath = GetResponseTakeAPeekPhotoFilePath(context, postfix);
-		
-		if(takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0)
-		{
-			logger.info("Using profileId so adding photoServerTime");
-			
-			responseTakeAPeekPhotoFilePath = responseTakeAPeekPhotoFilePath.replace(".png", String.format("_%d.png", takeAPeekContact.photoServerTime));
-		}
-		
-		return responseTakeAPeekPhotoFilePath;
-	}
+    static public String GetProfileImageThumbnailFilePath(Context context, ProfileObject takeAPeekContact) throws Exception
+    {
+        logger.debug("GetProfileImageThumbnailFilePath(..) Invoked");
+
+        String profileImageFilePath = GetProfileImageFilePath(context, takeAPeekContact);
+
+        return profileImageFilePath.replace(".png", String.format("_%d.png", takeAPeekContact.photoServerTime));
+    }
+
+    static public String GetProfileImageFilePath(Context context, ProfileObject takeAPeekContact) throws Exception
+    {
+        logger.debug("GetProfileImageFilePath(..) Invoked");
+
+        //Use profileId if userNumber is null
+        String postfix =
+                (takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0) ?
+                        takeAPeekContact.profileId : takeAPeekContact.userNumber;
+
+        String responseTakeAPeekPhotoFilePath = GetResponseTakeAPeekPhotoFilePath(context, postfix);
+
+        if (takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0)
+        {
+            logger.info("Using profileId so adding photoServerTime");
+
+            responseTakeAPeekPhotoFilePath = responseTakeAPeekPhotoFilePath.replace(".png", String.format("_%d.png", takeAPeekContact.photoServerTime));
+        }
+
+        return responseTakeAPeekPhotoFilePath;
+    }
 
     static public int GetDiffYears(Calendar first, Calendar last)
     {
@@ -866,72 +872,72 @@ public class Helper
         int diff = last.get(Calendar.YEAR) - first.get(Calendar.YEAR);
 
         if (first.get(Calendar.MONTH) > last.get(Calendar.MONTH) ||
-            (first.get(Calendar.MONTH) == last.get(Calendar.MONTH) && first.get(Calendar.DATE) > last.get(Calendar.DATE)))
+                (first.get(Calendar.MONTH) == last.get(Calendar.MONTH) && first.get(Calendar.DATE) > last.get(Calendar.DATE)))
         {
             diff--;
         }
 
         return diff;
     }
-	
-	static public void DownloadProfileImage(Context context, String accountUserName, String accountPassword, ProfileObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
-	{
-		logger.debug("DownloadProfileImages(......) Invoked");
-		
-		String profileImageFilePath = GetProfileImageFilePath(context, takeAPeekContact);
-		File profileImageFile = new File(profileImageFilePath);
-		
-		if(profileImageFile.exists() == false)
-		{
-			force = true;
-		}
-		else if(checkIfPhotoFileUpdated == true)
-		{
-			if(takeAPeekContactUpdateTimes == null || takeAPeekContact.photoServerTime > takeAPeekContactUpdateTimes.PhotoServerTime)
-			{
-				force = true;
-			}
-		}
-		
-		//Download the contact's photo
-		if(force == true)
-		{
-			String postfix = 
-					(takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0) ?
-					takeAPeekContact.profileId : takeAPeekContact.userNumber;
-			
-			String pathToEmpty = GetResponseTakeAPeekPhotoPath(context, postfix);
-			
-			try
-			{
-				deleteNonRecursive(new File(pathToEmpty));
-			}
-			catch(Exception e)
-			{
-				Helper.Error(logger, String.format("EXCEPTION: When deleteing all files under='%s'", pathToEmpty), e);
-			}
-			
-			try
-			{
-				Helper.CreateDirectoryIfDoesNotExist(profileImageFilePath, false);
 
-				if(takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0)
-				{
+    static public void DownloadProfileImage(Context context, String accountUserName, String accountPassword, ProfileObject takeAPeekContact, boolean force, boolean checkIfPhotoFileUpdated, TakeAPeekContactUpdateTimes takeAPeekContactUpdateTimes) throws Exception
+    {
+        logger.debug("DownloadProfileImages(......) Invoked");
+
+        String profileImageFilePath = GetProfileImageFilePath(context, takeAPeekContact);
+        File profileImageFile = new File(profileImageFilePath);
+
+        if (profileImageFile.exists() == false)
+        {
+            force = true;
+        }
+        else if (checkIfPhotoFileUpdated == true)
+        {
+            if (takeAPeekContactUpdateTimes == null || takeAPeekContact.photoServerTime > takeAPeekContactUpdateTimes.PhotoServerTime)
+            {
+                force = true;
+            }
+        }
+
+        //Download the contact's photo
+        if (force == true)
+        {
+            String postfix =
+                    (takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0) ?
+                            takeAPeekContact.profileId : takeAPeekContact.userNumber;
+
+            String pathToEmpty = GetResponseTakeAPeekPhotoPath(context, postfix);
+
+            try
+            {
+                deleteNonRecursive(new File(pathToEmpty));
+            }
+            catch (Exception e)
+            {
+                Helper.Error(logger, String.format("EXCEPTION: When deleteing all files under='%s'", pathToEmpty), e);
+            }
+
+            try
+            {
+                Helper.CreateDirectoryIfDoesNotExist(profileImageFilePath, false);
+
+                if (takeAPeekContact.userNumber == null || takeAPeekContact.userNumber.compareTo("") == 0)
+                {
                     new Transport().DownloadFileByProfile(context, accountUserName, accountPassword,
-						takeAPeekContact.profileId, profileImageFilePath);
-				}
-				else
-				{
+                            takeAPeekContact.profileId, profileImageFilePath);
+                }
+                else
+                {
                     new Transport().DownloadFile(context, accountUserName, accountPassword,
-						takeAPeekContact.userNumber, profileImageFilePath, null);
-				}
-			}
-			catch(Exception e)
-			{
-				Helper.Error(logger, String.format("EXCEPTION: When downloading a profile image for takeAPeekContactId/profileId='%s'", postfix), e);
-			}
-		}
-	}
+                            takeAPeekContact.userNumber, profileImageFilePath, null);
+                }
+            }
+            catch (Exception e)
+            {
+                Helper.Error(logger, String.format("EXCEPTION: When downloading a profile image for takeAPeekContactId/profileId='%s'", postfix), e);
+            }
+        }
+    }
 
     static public void UpdateRelations(Context context, SharedPreferences sharedPreferences) throws Exception
     {
@@ -945,7 +951,7 @@ public class Helper
         DatabaseManager.init(context);
         DatabaseManager.getInstance().ClearAllTakeAPeekRelations();
 
-        if(takeAPeekRelationList != null)
+        if (takeAPeekRelationList != null)
         {
             for (TakeAPeekRelation takeAPeekRelation : takeAPeekRelationList)
             {
@@ -953,88 +959,88 @@ public class Helper
             }
         }
     }
-	
-	static public String GetResponseTakeAPeekPhotoPath(Context context, String userNumber) throws Exception
-	{
-		logger.debug("GetResponseTakeAPeekPhotoPath(..) Invoked");
-		
-		String fileSystemTakeAPeekContactId = userNumber.replace(" ", "");
-		fileSystemTakeAPeekContactId = fileSystemTakeAPeekContactId.replace("+", "");
-		
-		return String.format("%s%s", Helper.GetResponseTakeAPeekPhotoPath(context),
-				fileSystemTakeAPeekContactId);
-	}
-	
-	static public String GetResponseTakeAPeekPhotoFilePath(Context context, String userNumber) throws Exception
-	{
-		logger.debug("GetResponseTakeAPeekPhotoFilePath(..) Invoked");
-		
-		String fileSystemTakeAPeekContactId = userNumber.replace(" ", "");
-		fileSystemTakeAPeekContactId = fileSystemTakeAPeekContactId.replace("+", "");
-		
-		return String.format("%s%s%s", Helper.GetResponseTakeAPeekPhotoPath(context, userNumber),
-				File.separator, Constants.CONTACT_IMAGE_FILE_NAME);
-	}
-	
-	public static void CopyFile(File sourceFile, File destFile) throws IOException 
-	{
-		logger.debug("CopyFile(..) Invoked");
-		
-		if(!destFile.exists()) 
-		{
-	        destFile.createNewFile();
-	    }
 
-	    FileChannel source = null;
-	    FileChannel destination = null;
+    static public String GetResponseTakeAPeekPhotoPath(Context context, String userNumber) throws Exception
+    {
+        logger.debug("GetResponseTakeAPeekPhotoPath(..) Invoked");
 
-	    try 
-	    {
-	        source = new FileInputStream(sourceFile).getChannel();
-	        destination = new FileOutputStream(destFile).getChannel();
-	        destination.transferFrom(source, 0, source.size());
-	    }
-	    finally 
-	    {
-	        if(source != null) 
-	        {
-	            source.close();
-	        }
-	        if(destination != null) 
-	        {
-	            destination.close();
-	        }
-	    }
-	}
-	
-	static public String GetUploadTempDirectoryPath(Context context) throws Exception 
-	{
-		logger.debug("GetUploadTempDirectoryPath() Invoked");
-		
-		String showUploadTempDirectoryPath = GetUploadDirectoryPath(context) + "Temp/";
-				
-		File dir = new File(showUploadTempDirectoryPath); 
-		if(!dir.exists()) 
-		{ 
-		    //Create the 'Upload' folder and the .nomedia file
-			boolean success = (new File(showUploadTempDirectoryPath)).mkdirs();  
-			if (success)
-			{
-				//Create the .nomedia file
-				success = (new File(showUploadTempDirectoryPath + ".nomedia")).createNewFile();
-			}
-			
-			if (!success)
-			{
-			    // Directory creation failed 
-				String error = "ERROR: Folder " + showUploadTempDirectoryPath + " does not exist and could not be created";
-				logger.warn(String.format("Data folder not created: %s", error)); 
-				throw new Exception(error);
-		    } 
-		} 
-		
-		return showUploadTempDirectoryPath;
-	}
+        String fileSystemTakeAPeekContactId = userNumber.replace(" ", "");
+        fileSystemTakeAPeekContactId = fileSystemTakeAPeekContactId.replace("+", "");
+
+        return String.format("%s%s", Helper.GetResponseTakeAPeekPhotoPath(context),
+                fileSystemTakeAPeekContactId);
+    }
+
+    static public String GetResponseTakeAPeekPhotoFilePath(Context context, String userNumber) throws Exception
+    {
+        logger.debug("GetResponseTakeAPeekPhotoFilePath(..) Invoked");
+
+        String fileSystemTakeAPeekContactId = userNumber.replace(" ", "");
+        fileSystemTakeAPeekContactId = fileSystemTakeAPeekContactId.replace("+", "");
+
+        return String.format("%s%s%s", Helper.GetResponseTakeAPeekPhotoPath(context, userNumber),
+                File.separator, Constants.CONTACT_IMAGE_FILE_NAME);
+    }
+
+    public static void CopyFile(File sourceFile, File destFile) throws IOException
+    {
+        logger.debug("CopyFile(..) Invoked");
+
+        if (!destFile.exists())
+        {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try
+        {
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        }
+        finally
+        {
+            if (source != null)
+            {
+                source.close();
+            }
+            if (destination != null)
+            {
+                destination.close();
+            }
+        }
+    }
+
+    static public String GetUploadTempDirectoryPath(Context context) throws Exception
+    {
+        logger.debug("GetUploadTempDirectoryPath() Invoked");
+
+        String showUploadTempDirectoryPath = GetUploadDirectoryPath(context) + "Temp/";
+
+        File dir = new File(showUploadTempDirectoryPath);
+        if (!dir.exists())
+        {
+            //Create the 'Upload' folder and the .nomedia file
+            boolean success = (new File(showUploadTempDirectoryPath)).mkdirs();
+            if (success)
+            {
+                //Create the .nomedia file
+                success = (new File(showUploadTempDirectoryPath + ".nomedia")).createNewFile();
+            }
+
+            if (!success)
+            {
+                // Directory creation failed
+                String error = "ERROR: Folder " + showUploadTempDirectoryPath + " does not exist and could not be created";
+                logger.warn(String.format("Data folder not created: %s", error));
+                throw new Exception(error);
+            }
+        }
+
+        return showUploadTempDirectoryPath;
+    }
 
     static public void RemoveOldNotifications(Context context)
     {
@@ -1048,12 +1054,25 @@ public class Helper
 
         long currentMillis = System.currentTimeMillis();
 
-        for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
+        for (TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
         {
-            if(currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_HOUR)
+            if (currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_HOUR)
             {
                 notificationManager.cancel(takeAPeekNotification.notificationIntId);
             }
+        }
+    }
+
+    static public void DeletePeekFile(Context context, String takeAPeekID) throws IOException
+    {
+        logger.debug("DeletePeekFile(..) Invoked");
+
+        String peekFilePath = Helper.GetVideoPeekFilePath(context, takeAPeekID);
+        File peekFile = new File(peekFilePath);
+        if(peekFile.exists() == true)
+        {
+            logger.info(String.format("'%s' exists, deleting after error...", peekFilePath));
+            peekFile.delete();
         }
     }
 	
