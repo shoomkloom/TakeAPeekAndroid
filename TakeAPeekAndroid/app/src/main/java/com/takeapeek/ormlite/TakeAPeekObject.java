@@ -52,7 +52,7 @@ public class TakeAPeekObject
     public String PeekMP4StreamingURL;
 
     @DatabaseField(dataType= DataType.INTEGER, columnName = "Viewed")
-    public int Viewed;
+    public int Viewed = 0;
 
     @DatabaseField(dataType= DataType.INTEGER, columnName = "Upload")
     public int Upload;

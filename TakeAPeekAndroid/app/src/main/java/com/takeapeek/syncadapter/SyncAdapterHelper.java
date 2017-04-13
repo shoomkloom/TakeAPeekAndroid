@@ -134,6 +134,15 @@ public class SyncAdapterHelper implements Runnable,
             {
                 Helper.Error(logger, "EXCEPTION! When calling UpdateRelations(..)", e);
             }
+
+            try
+            {
+                RemoveOldFiles();
+            }
+            catch(Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION! When calling RemoveOldFiles()", e);
+            }
 		} 
 		catch (Exception e) 
 		{
@@ -145,6 +154,63 @@ public class SyncAdapterHelper implements Runnable,
 			logger.debug("run() Invoked - after unlock");
 		}
 	}
+
+    private void RemoveOldFiles()
+    {
+        logger.debug("RemoveOldFiles() Invoked");
+
+        //Get all uploaded or viewed Peeks
+        List<TakeAPeekObject> takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectList();
+
+        if(takeAPeekObjectList != null)
+        {
+            for (TakeAPeekObject takeAPeekObject : takeAPeekObjectList)
+            {
+                if(takeAPeekObject.Viewed == 1)
+                {
+                    String mp4Path = takeAPeekObject.FilePath;
+
+                    try
+                    {
+                        if(mp4Path == null || mp4Path.compareToIgnoreCase("") == 0)
+                        {
+                            mp4Path = Helper.GetVideoPeekFilePath(mContext, takeAPeekObject.TakeAPeekID);
+                        }
+
+                        File mp4ToDelete = new File(mp4Path);
+                        if (mp4ToDelete.exists() == true)
+                        {
+                            mp4ToDelete.delete();
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, String.format("Could not delete '%s'", mp4Path));
+                    }
+
+                    String pngPath = takeAPeekObject.FilePath.replace(".mp4", "_thumbnail.png");
+
+                    try
+                    {
+                        if(pngPath == null || pngPath.compareToIgnoreCase("") == 0)
+                        {
+                            pngPath = Helper.GetPeekThumbnailFullPath(mContext, takeAPeekObject.TakeAPeekID);
+                        }
+
+                        File pngToDelete = new File(pngPath);
+                        if (pngToDelete.exists() == true)
+                        {
+                            pngToDelete.delete();
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, String.format("Could not delete '%s'", pngPath));
+                    }
+                }
+            }
+        }
+    }
 
 	private void UploadPendingPeeks() throws Exception
 	{
@@ -192,6 +258,7 @@ public class SyncAdapterHelper implements Runnable,
                     {
                         Helper.Error(logger, String.format("ERROR: file %s does not exist", takeAPeekObject.FilePath));
                         takeAPeekObject.Upload = 0;
+                        takeAPeekObject.Viewed = 1; //Mark as viewed so that they will be deleted later
                         DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                         continue;
                     }
@@ -199,6 +266,7 @@ public class SyncAdapterHelper implements Runnable,
                     {
                         logger.warn("Peek older than 1 hour, skipping upload and setting Upload = 0");
                         takeAPeekObject.Upload = 0;
+                        takeAPeekObject.Viewed = 1; //Mark as viewed so that they will be deleted later
                         DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                         continue;
                     }
@@ -225,6 +293,7 @@ public class SyncAdapterHelper implements Runnable,
 
                     logger.info("Peek uploaded successfully, setting Upload = 0");
                     takeAPeekObject.Upload = 0;
+                    takeAPeekObject.Viewed = 1; //Mark as viewed so that they will be deleted later
                     DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                 }
                 catch(Exception ex)
