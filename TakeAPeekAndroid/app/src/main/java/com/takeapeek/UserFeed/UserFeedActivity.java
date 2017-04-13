@@ -1015,8 +1015,16 @@ public class UserFeedActivity extends AppCompatActivity
 
                     mCurrentTakeAPeekObject = null;
 
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
+                    if(mPeekItemAdapter.getCount() > 0)
+                    {
+                        mEnumActivityState = EnumActivityState.list;
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        finish();
+                    }
+
                     break;
 
                 case R.id.button_control:
