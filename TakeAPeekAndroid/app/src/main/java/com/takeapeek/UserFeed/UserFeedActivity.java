@@ -1005,8 +1005,15 @@ public class UserFeedActivity extends AppCompatActivity
                         }
                     }.execute();
 
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
+                    if(mPeekItemAdapter.getCount() > 0)
+                    {
+                        mEnumActivityState = EnumActivityState.list;
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        finish();
+                    }
 
                     break;
 
@@ -1056,16 +1063,30 @@ public class UserFeedActivity extends AppCompatActivity
                     captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mCurrentTakeAPeekObject.ProfileID);
                     startActivity(captureClipActivityIntent);
 
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
+                    if(mPeekItemAdapter.getCount() > 0)
+                    {
+                        mEnumActivityState = EnumActivityState.list;
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        finish();
+                    }
 
                     break;
 
                 case R.id.button_request_peek:
                     logger.info("onClick: button_request_peek clicked");
 
-                    mEnumActivityState = EnumActivityState.list;
-                    UpdateUI();
+                    if(mPeekItemAdapter.getCount() > 0)
+                    {
+                        mEnumActivityState = EnumActivityState.list;
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        finish();
+                    }
 
                     if(mAsyncTaskRequestPeek == null)
                     {
@@ -1126,8 +1147,15 @@ public class UserFeedActivity extends AppCompatActivity
                                         Helper.Error(logger, "EXCEPTION: When getting response to Request Peek", e);
                                     }
 
-                                    mEnumActivityState = EnumActivityState.list;
-                                    UpdateUI();
+                                    if(mPeekItemAdapter.getCount() > 0)
+                                    {
+                                        mEnumActivityState = EnumActivityState.list;
+                                        UpdateUI();
+                                    }
+                                    else
+                                    {
+                                        finish();
+                                    }
                                 }
                             }.execute();
                         }
