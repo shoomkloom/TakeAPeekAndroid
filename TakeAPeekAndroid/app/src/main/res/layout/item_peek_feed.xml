@@ -101,18 +101,24 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:paddingLeft="5dp"
+            android:paddingLeft="40dp"
             android:paddingRight="30dp"
             android:textSize="13sp"
             android:textColor="@color/pt_gray"
             android:background="@drawable/rounded_corner_bottom"
-            android:drawableLeft="@drawable/peek_address"
-            android:drawablePadding="5dp"
             android:translationZ="4dp"
             android:maxLines="1"
             android:ellipsize="end"
             android:gravity="left"
             android:layout_alignParentBottom="true" />
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="25dp"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentBottom="true"
+            android:translationZ="4dp"
+            android:src="@drawable/ic_peek_address" />
 
     </RelativeLayout>
 
