@@ -255,6 +255,7 @@
     <string name="feed_report">Report</string>
     <string name="feed_block">Block</string>
     <string name="feed_unfollow">Unfollow</string>
+    <string name="feed_response_by">Response by %1$s</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

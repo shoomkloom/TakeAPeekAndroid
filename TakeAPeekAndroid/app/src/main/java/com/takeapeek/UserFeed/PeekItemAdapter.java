@@ -130,11 +130,21 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             //Load the thumbnail asynchronously
             mThumbnailLoader.SetThumbnail(mUserFeedActivity.get(), position, viewHolder.mTakeAPeekObject, viewHolder.mImageViewPeekThumbnail, mSharedPreferences);
 
-            viewHolder.mTextViewUserFeedDisplayname.setText(viewHolder.mTakeAPeekObject.ProfileDisplayName);
+            //Set Peek profile display name
+            String profileDisplayName = viewHolder.mTakeAPeekObject.ProfileDisplayName;
+            if(mUserFeedActivity.get().mProfileObject.profileId.compareToIgnoreCase(viewHolder.mTakeAPeekObject.ProfileID) != 0)
+            {
+                profileDisplayName = String.format(mUserFeedActivity.get().getString(R.string.feed_response_by), viewHolder.mTakeAPeekObject.ProfileDisplayName);
+            }
+            viewHolder.mTextViewUserFeedDisplayname.setText(profileDisplayName);
 
+            //Set the peek title
             viewHolder.mTextViewUserFeedTitle.setText(viewHolder.mTakeAPeekObject.Title);
 
+            //Set the peek time
             viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity.get(), viewHolder.mTakeAPeekObject.CreationTime));
+
+            //Set the peek location
             if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
             {
                 LatLng location = new LatLng(viewHolder.mTakeAPeekObject.Latitude, viewHolder.mTakeAPeekObject.Longitude);
