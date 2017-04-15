@@ -474,7 +474,14 @@ public class NotificationPopupActivity extends FragmentActivity implements
             {
                 case R.id.button_close:
                     logger.info("onClick: button_close clicked");
+
+                    //Remove related notification
+                    if(mTakeAPeekNotification != null)
+                    {
+                        DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
+                    }
                     finish();
+
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                     break;
 
@@ -506,7 +513,14 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mProfileObject.profileId);
                     startActivity(captureClipActivityIntent);
+
+                    //Remove related notification
+                    if(mTakeAPeekNotification != null)
+                    {
+                        DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
+                    }
                     finish();
+
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                     break;
 
@@ -569,7 +583,13 @@ public class NotificationPopupActivity extends FragmentActivity implements
                                     }
                                     finally
                                     {
+                                        //Remove related notification
+                                        if(mTakeAPeekNotification != null)
+                                        {
+                                            DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
+                                        }
                                         finish();
+
                                         overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                                     }
                                 }
@@ -593,7 +613,14 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     userFeedActivityIntent.putExtra(Constants.PARAM_PROFILEOBJECT, mTakeAPeekNotification.srcProfileJson);
                     userFeedActivityIntent.putExtra(Constants.PARAM_PEEKOBJECT, mTakeAPeekNotification.relatedPeekJson);
                     startActivity(userFeedActivityIntent);
+
+                    //Remove related notification
+                    if(mTakeAPeekNotification != null)
+                    {
+                        DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
+                    }
                     finish();
+
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                     break;
 
@@ -604,7 +631,14 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     userFeedActivityNoPlayIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     userFeedActivityNoPlayIntent.putExtra(Constants.PARAM_PROFILEOBJECT, mTakeAPeekNotification.srcProfileJson);
                     startActivity(userFeedActivityNoPlayIntent);
+
+                    //Remove related notification
+                    if(mTakeAPeekNotification != null)
+                    {
+                        DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
+                    }
                     finish();
+
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
 
                     break;
