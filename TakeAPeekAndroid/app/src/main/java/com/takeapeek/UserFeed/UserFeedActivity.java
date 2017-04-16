@@ -1005,15 +1005,8 @@ public class UserFeedActivity extends AppCompatActivity
                         }
                     }.execute();
 
-                    if(mPeekItemAdapter.getCount() > 0)
-                    {
-                        mEnumActivityState = EnumActivityState.list;
-                        UpdateUI();
-                    }
-                    else
-                    {
-                        finish();
-                    }
+                    mEnumActivityState = EnumActivityState.list;
+                    UpdateUI();
 
                     break;
 
