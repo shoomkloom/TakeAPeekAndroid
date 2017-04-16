@@ -95,7 +95,7 @@ public class BlockedItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             Helper.setTypeface(mBlockedActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_blocked_action);
-            Helper.setTypeface(mBlockedActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mBlockedActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 

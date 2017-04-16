@@ -1025,7 +1025,7 @@ public class DatabaseManager
         return takeAPeekRelationList;
     }
 
-    public TakeAPeekRelation GetTakeAPeekRelation(String relationId)
+    public TakeAPeekRelation GetTakeAPeekRelation(long relationId)
     {
         logger.debug("GetTakeAPeekRelation(.) Invoked - before lock");
 
@@ -1048,7 +1048,7 @@ public class DatabaseManager
         }
         catch (Exception e)
         {
-            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekRelation with relationID=%s", relationId), e);
+            Helper.Error(logger, String.format("EXCEPTION: when trying to query for TakeAPeekRelation with relationID=%d", relationId), e);
         }
         finally
         {

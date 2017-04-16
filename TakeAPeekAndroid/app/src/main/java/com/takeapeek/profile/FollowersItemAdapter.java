@@ -101,12 +101,12 @@ public class FollowersItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewFollowButton = (TextView)view.findViewById(R.id.textview_followers_follow_action);
-            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewFollowButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewFollowButton, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewFollowButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewFollowButton.setTag(viewHolder);
 
             viewHolder.mTextViewBlockButton = (TextView)view.findViewById(R.id.textview_followers_block_action);
-            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewBlockButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowersActivity.get(), viewHolder.mTextViewBlockButton, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewBlockButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewBlockButton.setTag(viewHolder);
 

@@ -38,6 +38,7 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
     WeakReference<FollowingActivity> mFollowingActivity = null;
     List<TakeAPeekRelation> mTakeAPeekFollowingList = null;
+    List<TakeAPeekRelation> mTakeAPeekUnFollowedList = null;
 
     private static LayoutInflater mLayoutInflater = null;
 
@@ -99,16 +100,26 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 
             viewHolder.mTakeAPeekFollowing = mTakeAPeekFollowingList.get(position);
 
+            if(viewHolder.mTakeAPeekFollowing.type.compareToIgnoreCase(Constants.RelationTypeEnum.None.name()) == 0)
+            {
+                if(mTakeAPeekUnFollowedList == null)
+                {
+                    mTakeAPeekUnFollowedList = new ArrayList<TakeAPeekRelation>();
+                }
+
+                mTakeAPeekUnFollowedList.add(viewHolder.mTakeAPeekFollowing);
+            }
+
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_following_src_name);
             Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
             viewHolder.mTextViewFollowActionButton = (TextView)view.findViewById(R.id.textview_following_action);
-            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewFollowActionButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewFollowActionButton, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewFollowActionButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewFollowActionButton.setTag(viewHolder);
 
             viewHolder.mTextViewRequstButton = (TextView)view.findViewById(R.id.textview_request_peek_action);
-            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewRequstButton, Helper.FontTypeEnum.boldFont);
+            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewRequstButton, Helper.FontTypeEnum.normalFont);
             viewHolder.mTextViewRequstButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewRequstButton.setTag(viewHolder);
 
@@ -125,6 +136,21 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             viewHolder.mTakeAPeekFollowing = mTakeAPeekFollowingList.get(position);
 
             viewHolder.mTextViewSrcProfileName.setText(viewHolder.mTakeAPeekFollowing.targetDisplayName);
+
+            if(viewHolder.mTakeAPeekFollowing.type.compareToIgnoreCase(Constants.RelationTypeEnum.None.name()) == 0)
+            {
+                viewHolder.mTextViewFollowActionButton.setBackgroundResource(R.drawable.button_green);
+                viewHolder.mTextViewFollowActionButton.setText(R.string.follow);
+
+                viewHolder.mTextViewRequstButton.setVisibility(View.GONE);
+            }
+            else
+            {
+                viewHolder.mTextViewFollowActionButton.setBackgroundResource(R.drawable.button_gray);
+                viewHolder.mTextViewFollowActionButton.setText(R.string.unfollow);
+
+                viewHolder.mTextViewRequstButton.setVisibility(View.VISIBLE);
+            }
         }
 
         return view;
@@ -144,58 +170,16 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                 case R.id.textview_following_action:
                     logger.info("onClick: textview_following_action");
 
-                    new AsyncTask<ViewHolder, Void, Boolean>()
+                    if(viewHolder.mTakeAPeekFollowing.type.compareToIgnoreCase(Constants.RelationTypeEnum.None.name()) == 0)
                     {
-                        ViewHolder mViewHolder = null;
-
-                        @Override
-                        protected Boolean doInBackground(ViewHolder... params)
-                        {
-                            mViewHolder = params[0];
-
-                            try
-                            {
-                                String username = Helper.GetTakeAPeekAccountUsername(mFollowingActivity.get());
-                                String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity.get());
-
-                                new Transport().SetRelation(
-                                        mFollowingActivity.get(), username, password,
-                                        mViewHolder.mTakeAPeekFollowing.targetId,
-                                        Constants.RelationTypeEnum.Unfollow.name(),
-                                        mSharedPreferences);
-
-                                DatabaseManager.getInstance().DeleteTakeAPeekRelation(mViewHolder.mTakeAPeekFollowing);
-
-                                return true;
-                            }
-                            catch(Exception e)
-                            {
-                                Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
-                            }
-
-                            return false;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Boolean result)
-                        {
-                            logger.debug("onPostExecute(.) Invoked");
-
-                            if(result == true)
-                            {
-                                //Refresh the adapter data
-                                mFollowingActivity.get().UpdateRelations();
-
-                                String message = String.format(mFollowingActivity.get().getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
-                                Helper.ShowCenteredToast(mFollowingActivity.get(), message);
-                            }
-                            else
-                            {
-                                String error = String.format(mFollowingActivity.get().getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
-                                Helper.ShowCenteredToast(mFollowingActivity.get(), error);
-                            }
-                        }
-                    }.execute(viewHolder);
+                        logger.info("takeAPeekRelation.type is 'None', click to follow");
+                        DoFollow(viewHolder);
+                    }
+                    else
+                    {
+                        logger.info("takeAPeekRelation.type is 'Follow', click to unfollow");
+                        DoUnfollow(viewHolder);
+                    }
 
                     break;
 
@@ -276,4 +260,135 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             }
         }
     };
+
+    private void DoUnfollow(ViewHolder viewHolder)
+    {
+        new AsyncTask<ViewHolder, Void, Boolean>()
+        {
+            ViewHolder mViewHolder = null;
+
+            @Override
+            protected Boolean doInBackground(ViewHolder... params)
+            {
+                mViewHolder = params[0];
+
+                try
+                {
+                    String username = Helper.GetTakeAPeekAccountUsername(mFollowingActivity.get());
+                    String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity.get());
+
+                    new Transport().SetRelation(
+                            mFollowingActivity.get(), username, password,
+                            mViewHolder.mTakeAPeekFollowing.targetId,
+                            Constants.RelationTypeEnum.Unfollow.name(),
+                            mSharedPreferences);
+
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                if(result == true)
+                {
+                    mViewHolder.mTakeAPeekFollowing.type = Constants.RelationTypeEnum.None.name();
+                    DatabaseManager.getInstance().UpdateTakeAPeekRelation(mViewHolder.mTakeAPeekFollowing);
+
+                    if(mTakeAPeekUnFollowedList == null)
+                    {
+                        mTakeAPeekUnFollowedList = new ArrayList<TakeAPeekRelation>();
+                    }
+
+                    mTakeAPeekUnFollowedList.add(mViewHolder.mTakeAPeekFollowing);
+
+                    //Refresh the adapter data
+                    mFollowingActivity.get().UpdateRelations(mTakeAPeekUnFollowedList);
+
+                    String message = String.format(mFollowingActivity.get().getString(R.string.set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                    Helper.ShowCenteredToast(mFollowingActivity.get(), message);
+                }
+                else
+                {
+                    String error = String.format(mFollowingActivity.get().getString(R.string.error_set_relation_unfollow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                    Helper.ShowCenteredToast(mFollowingActivity.get(), error);
+                }
+            }
+        }.execute(viewHolder);
+    }
+
+    private void DoFollow(ViewHolder viewHolder)
+    {
+        new AsyncTask<ViewHolder, Void, Boolean>()
+        {
+            ViewHolder mViewHolder = null;
+
+            @Override
+            protected Boolean doInBackground(ViewHolder... params)
+            {
+                mViewHolder = params[0];
+
+                try
+                {
+                    String username = Helper.GetTakeAPeekAccountUsername(mFollowingActivity.get());
+                    String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity.get());
+
+                    new Transport().SetRelation(
+                            mFollowingActivity.get(), username, password,
+                            mViewHolder.mTakeAPeekFollowing.targetId,
+                            Constants.RelationTypeEnum.Follow.name(),
+                            mSharedPreferences);
+
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Helper.Error(logger, "EXCEPTION: When trying to update relation", e);
+                }
+
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result)
+            {
+                logger.debug("onPostExecute(.) Invoked");
+
+                if(result == true)
+                {
+                    if(mTakeAPeekUnFollowedList != null)
+                    {
+                       for(int i=0; i<mTakeAPeekUnFollowedList.size(); i++)
+                       {
+                           TakeAPeekRelation takeAPeekRelation = mTakeAPeekUnFollowedList.get(i);
+                           if(takeAPeekRelation.relationId == mViewHolder.mTakeAPeekFollowing.relationId)
+                           {
+                               mTakeAPeekUnFollowedList.remove(i);
+                               break;
+                           }
+                       }
+                    }
+
+                    //Refresh the adapter data
+                    mFollowingActivity.get().UpdateRelations(mTakeAPeekUnFollowedList);
+
+                    String message = String.format(mFollowingActivity.get().getString(R.string.set_relation_follow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                    Helper.ShowCenteredToast(mFollowingActivity.get(), message);
+                }
+                else
+                {
+                    String error = String.format(mFollowingActivity.get().getString(R.string.error_set_relation_follow), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                    Helper.ShowCenteredToast(mFollowingActivity.get(), error);
+                }
+            }
+        }.execute(viewHolder);
+    }
 }

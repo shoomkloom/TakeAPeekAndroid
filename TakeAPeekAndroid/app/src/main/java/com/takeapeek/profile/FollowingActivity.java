@@ -70,12 +70,12 @@ public class FollowingActivity extends AppCompatActivity
             }
         });
 
-        RefreshAdapterData();
+        RefreshAdapterData(null);
 
-        UpdateRelations();
+        UpdateRelations(null);
     }
 
-    public void RefreshAdapterData()
+    public void RefreshAdapterData(List<TakeAPeekRelation> takeAPeekUnFollowedList)
     {
         logger.debug("RefreshAdapterData() Invoked");
 
@@ -91,6 +91,11 @@ public class FollowingActivity extends AppCompatActivity
             else
             {
                 //Refresh adapter list
+                if(takeAPeekUnFollowedList != null)
+                {
+                    takeAPeekFollowingList.addAll(takeAPeekUnFollowedList);
+                }
+
                 mFollowingItemAdapter.clear();
                 mFollowingItemAdapter.addAll(takeAPeekFollowingList);
                 mFollowingItemAdapter.notifyDataSetChanged();
@@ -109,7 +114,7 @@ public class FollowingActivity extends AppCompatActivity
         }
     }
 
-    public void UpdateRelations()
+    public void UpdateRelations(final List<TakeAPeekRelation> takeAPeekUnFollowedList)
     {
         logger.debug("UpdateRelations() Invoked");
 
@@ -143,7 +148,7 @@ public class FollowingActivity extends AppCompatActivity
 
                 if(result == true)
                 {
-                    RefreshAdapterData();
+                    RefreshAdapterData(takeAPeekUnFollowedList);
                 }
             }
         }.execute(FollowingActivity.this);
