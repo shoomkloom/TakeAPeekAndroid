@@ -475,11 +475,6 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 case R.id.button_close:
                     logger.info("onClick: button_close clicked");
 
-                    //Remove related notification
-                    if(mTakeAPeekNotification != null)
-                    {
-                        DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
-                    }
                     finish();
 
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
