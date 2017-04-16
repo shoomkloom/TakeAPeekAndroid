@@ -233,6 +233,7 @@
     <string name="following">Following</string>
     <string name="textview_following_empty">You are not following anybody...</string>
     <string name="following_unfollow">Unfollow</string>
+    <string name="following_request_peek">Request Peek</string>
     <string name="followers">Followers</string>
     <string name="textview_followers_empty">Nobody is following you...</string>
     <string name="followers_follow">Follow</string>

@@ -9,9 +9,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.facebook.appevents.AppEventsLogger;
+import com.google.gson.Gson;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
+import com.takeapeek.common.RequestObject;
+import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekRelation;
@@ -20,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +34,7 @@ import java.util.List;
 public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
 {
     static private final Logger logger = LoggerFactory.getLogger(FollowingItemAdapter.class);
+    AppEventsLogger mAppEventsLogger = null;
 
     WeakReference<FollowingActivity> mFollowingActivity = null;
     List<TakeAPeekRelation> mTakeAPeekFollowingList = null;
@@ -39,7 +46,8 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
     private class ViewHolder
     {
         TextView mTextViewSrcProfileName = null;
-        TextView mTextViewButton = null;
+        TextView mTextViewFollowActionButton = null;
+        TextView mTextViewRequstButton = null;
 
         TakeAPeekRelation mTakeAPeekFollowing = null;
         int Position = -1;
@@ -58,6 +66,8 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
         mLayoutInflater = (LayoutInflater)mFollowingActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         mSharedPreferences = mFollowingActivity.get().getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+
+        mAppEventsLogger = AppEventsLogger.newLogger(mFollowingActivity.get());
     }
 
     @Override
@@ -92,10 +102,15 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
             viewHolder.mTextViewSrcProfileName = (TextView)view.findViewById(R.id.textview_following_src_name);
             Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewSrcProfileName, Helper.FontTypeEnum.normalFont);
 
-            viewHolder.mTextViewButton = (TextView)view.findViewById(R.id.textview_following_action);
-            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewButton, Helper.FontTypeEnum.boldFont);
-            viewHolder.mTextViewButton.setOnClickListener(ClickListener);
-            viewHolder.mTextViewButton.setTag(viewHolder);
+            viewHolder.mTextViewFollowActionButton = (TextView)view.findViewById(R.id.textview_following_action);
+            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewFollowActionButton, Helper.FontTypeEnum.boldFont);
+            viewHolder.mTextViewFollowActionButton.setOnClickListener(ClickListener);
+            viewHolder.mTextViewFollowActionButton.setTag(viewHolder);
+
+            viewHolder.mTextViewRequstButton = (TextView)view.findViewById(R.id.textview_request_peek_action);
+            Helper.setTypeface(mFollowingActivity.get(), viewHolder.mTextViewRequstButton, Helper.FontTypeEnum.boldFont);
+            viewHolder.mTextViewRequstButton.setOnClickListener(ClickListener);
+            viewHolder.mTextViewRequstButton.setTag(viewHolder);
 
             view.setTag(viewHolder);
         }
@@ -122,12 +137,12 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
         {
             logger.debug("OnClickListener:onClick(.) Invoked");
 
+            ViewHolder viewHolder = (ViewHolder)v.getTag();
+
             switch (v.getId())
             {
                 case R.id.textview_following_action:
                     logger.info("onClick: textview_following_action");
-
-                    ViewHolder viewHolder = (ViewHolder)v.getTag();
 
                     new AsyncTask<ViewHolder, Void, Boolean>()
                     {
@@ -181,6 +196,79 @@ public class FollowingItemAdapter extends ArrayAdapter<TakeAPeekRelation>
                             }
                         }
                     }.execute(viewHolder);
+
+                    break;
+
+                case R.id.textview_request_peek_action:
+                    logger.info("onClick: textview_request_peek_action");
+
+                    try
+                    {
+                        //Start asynchronous request to server
+                        new AsyncTask<ViewHolder, Void, ResponseObject>()
+                        {
+                            ViewHolder mViewHolder = null;
+
+                            @Override
+                            protected ResponseObject doInBackground(ViewHolder... params)
+                            {
+                                mViewHolder = params[0];
+
+                                try
+                                {
+                                    logger.info("Sending peek request to single profile");
+
+                                    RequestObject requestObject = new RequestObject();
+                                    requestObject.targetProfileList = new ArrayList<String>();
+
+                                    requestObject.targetProfileList.add(mViewHolder.mTakeAPeekFollowing.targetId);
+
+                                    String metaDataJson = new Gson().toJson(requestObject);
+
+                                    String userName = Helper.GetTakeAPeekAccountUsername(mFollowingActivity.get());
+                                    String password = Helper.GetTakeAPeekAccountPassword(mFollowingActivity.get());
+
+                                    return new Transport().RequestPeek(mFollowingActivity.get(), userName, password, metaDataJson, mSharedPreferences);
+                                }
+                                catch (Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: doInBackground: Exception when requesting peek", e);
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(ResponseObject responseObject)
+                            {
+                                try
+                                {
+                                    if (responseObject == null)
+                                    {
+                                        Helper.ErrorMessage(mFollowingActivity.get(), null, mFollowingActivity.get().getString(R.string.Error), mFollowingActivity.get().getString(R.string.ok), mFollowingActivity.get().getString(R.string.error_request_peek));
+                                    }
+                                    else
+                                    {
+                                        String message = String.format(mFollowingActivity.get().getString(R.string.notification_popup_requested_peeks_to), mViewHolder.mTakeAPeekFollowing.targetDisplayName);
+                                        Helper.ShowCenteredToast(mFollowingActivity.get(), message);
+
+                                        //Log event to FaceBook
+                                        mAppEventsLogger.logEvent("Peek_Request");
+
+                                        MixPanel.RequestButtonEventAndProps(mFollowingActivity.get(), MixPanel.SCREEN_USER_FEED, 1, mSharedPreferences);
+                                    }
+                                }
+                                catch(Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: When getting response to Request Peek", e);
+                                }
+                            }
+                        }.execute(viewHolder);
+                    }
+                    catch (Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: onPostExecute: Exception when requesting peek", e);
+                    }
 
                     break;
 
