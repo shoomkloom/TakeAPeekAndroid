@@ -24,6 +24,7 @@ import com.takeapeek.common.ProfileObject;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
+import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.userfeed.UserFeedActivity;
@@ -56,7 +57,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
     private final AddressLoader mAddressLoader = new AddressLoader();
 
     static private ReentrantLock requestPeekLock = new ReentrantLock();
-    private AsyncTask<ProfileObject, Void, ResponseObject> mAsyncTaskRequestPeek = null;
+    private AsyncTask<Object, Void, ResponseObject> mAsyncTaskRequestPeek = null;
 
     Handler mHandler = new Handler();
 
@@ -83,6 +84,8 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
         mNotificationsActivity = new WeakReference<NotificationsActivity>(notificationsActivity);
         mTakeAPeekNotificationList = takeAPeekNotificationList;
+
+        DatabaseManager.init(mNotificationsActivity.get());
 
         mLayoutInflater = (LayoutInflater)mNotificationsActivity.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -258,14 +261,16 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                                     if (mAsyncTaskRequestPeek == null)
                                     {
                                         //Start asynchronous request to server
-                                        mAsyncTaskRequestPeek = new AsyncTask<ProfileObject, Void, ResponseObject>()
+                                        mAsyncTaskRequestPeek = new AsyncTask<Object, Void, ResponseObject>()
                                         {
                                             ProfileObject mProfileObject = null;
+                                            TakeAPeekNotification mTakeAPeekNotification = null;
 
                                             @Override
-                                            protected ResponseObject doInBackground(ProfileObject... params)
+                                            protected ResponseObject doInBackground(Object... params)
                                             {
-                                                mProfileObject = params[0];
+                                                mProfileObject = (ProfileObject)params[0];
+                                                mTakeAPeekNotification = (TakeAPeekNotification)params[1];
 
                                                 try
                                                 {
@@ -306,6 +311,14 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
                                                         //Log event to FaceBook
                                                         mAppEventsLogger.logEvent("Peek_Request");
+
+                                                        //Remove related notification
+                                                        if(mTakeAPeekNotification != null)
+                                                        {
+                                                            DatabaseManager.getInstance().DeleteTakeAPeekNotification(mTakeAPeekNotification);
+
+                                                            mNotificationsActivity.get().InitNotificationList();
+                                                        }
                                                     }
                                                 }
                                                 finally
@@ -313,7 +326,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                                                     mAsyncTaskRequestPeek = null;
                                                 }
                                             }
-                                        }.execute(viewHolder.mSrcProfileObject);
+                                        }.execute(viewHolder.mSrcProfileObject, viewHolder.mTakeAPeekNotification);
                                     }
                                 }
                                 catch (Exception e)

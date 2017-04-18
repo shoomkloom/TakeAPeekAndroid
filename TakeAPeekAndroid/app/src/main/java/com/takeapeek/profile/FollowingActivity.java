@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -85,6 +87,8 @@ public class FollowingActivity extends AppCompatActivity
         {
             if (mFollowingItemAdapter == null)
             {
+                SortRelationList(takeAPeekFollowingList);
+
                 mFollowingItemAdapter = new FollowingItemAdapter(this, R.layout.item_following, takeAPeekFollowingList);
                 mListViewFollowingList.setAdapter(mFollowingItemAdapter);
             }
@@ -95,6 +99,8 @@ public class FollowingActivity extends AppCompatActivity
                 {
                     takeAPeekFollowingList.addAll(takeAPeekUnFollowedList);
                 }
+
+                SortRelationList(takeAPeekFollowingList);
 
                 mFollowingItemAdapter.clear();
                 mFollowingItemAdapter.addAll(takeAPeekFollowingList);
@@ -112,6 +118,20 @@ public class FollowingActivity extends AppCompatActivity
             mListViewFollowingList.setVisibility(View.VISIBLE);
             mTextViewEmptyList.setVisibility(View.GONE);
         }
+    }
+
+    private void SortRelationList(List<TakeAPeekRelation> takeAPeekFollowingList)
+    {
+        logger.debug("SortRelationList(.) Invoked");
+
+        Collections.sort(takeAPeekFollowingList, new Comparator<TakeAPeekRelation>()
+        {
+            @Override
+            public int compare(TakeAPeekRelation lhs, TakeAPeekRelation rhs)
+            {
+                return lhs.targetDisplayName.compareTo(rhs.targetDisplayName);
+            }
+        });
     }
 
     public void UpdateRelations(final List<TakeAPeekRelation> takeAPeekUnFollowedList)

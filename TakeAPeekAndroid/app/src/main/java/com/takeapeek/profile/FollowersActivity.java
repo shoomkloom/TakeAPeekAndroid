@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -83,6 +85,8 @@ public class FollowersActivity extends AppCompatActivity
 
         if(takeAPeekFollowersList != null)
         {
+            SortRelationList(takeAPeekFollowersList);
+
             if (mFollowersItemAdapter == null)
             {
                 mFollowersItemAdapter = new FollowersItemAdapter(this, R.layout.item_followers, takeAPeekFollowersList);
@@ -107,6 +111,20 @@ public class FollowersActivity extends AppCompatActivity
             mListViewFollowersList.setVisibility(View.VISIBLE);
             mTextViewEmptyList.setVisibility(View.GONE);
         }
+    }
+
+    private void SortRelationList(List<TakeAPeekRelation> takeAPeekFollowersList)
+    {
+        logger.debug("SortRelationList(.) Invoked");
+
+        Collections.sort(takeAPeekFollowersList, new Comparator<TakeAPeekRelation>()
+        {
+            @Override
+            public int compare(TakeAPeekRelation lhs, TakeAPeekRelation rhs)
+            {
+                return lhs.sourceDisplayName.compareTo(rhs.sourceDisplayName);
+            }
+        });
     }
 
     public void UpdateRelations()
