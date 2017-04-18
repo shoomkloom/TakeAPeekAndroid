@@ -98,7 +98,7 @@ public class NotificationsActivity extends AppCompatActivity
         findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
     }
 
-    private void InitNotificationList()
+    public void InitNotificationList()
     {
         logger.debug("InitNotificationList() Invoked");
 
