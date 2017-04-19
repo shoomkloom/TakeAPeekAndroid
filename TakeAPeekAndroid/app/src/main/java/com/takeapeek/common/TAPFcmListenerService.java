@@ -203,6 +203,10 @@ public class TAPFcmListenerService extends FirebaseMessagingService
         String contentTitle = null;
         String contentText = null;
         Bitmap thumbnailBitmap = null;
+
+        Intent intent = new Intent(this, NotificationsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         switch(pushNotificationTypeEnum)
         {
             case request:
@@ -214,12 +218,18 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                 contentTitle = getString(R.string.notification_content_title_response);
                 contentText = String.format(getString(R.string.notification_content_text_response), profileObject.displayName);
                 thumbnailBitmap = GetNotificationThumnail(takeAPeekObject);
+
+                intent.putExtra(Constants.PARAM_PROFILEOBJECT, takeAPeekNotification.srcProfileJson);
+                intent.putExtra(Constants.PARAM_PEEKOBJECT, takeAPeekNotification.relatedPeekJson);
                 break;
 
             case peek:
                 contentTitle = getString(R.string.notification_content_title_peek);
                 contentText = String.format(getString(R.string.notification_content_text_peek), profileObject.displayName);
                 thumbnailBitmap = GetNotificationThumnail(takeAPeekObject);
+
+                intent.putExtra(Constants.PARAM_PROFILEOBJECT, takeAPeekNotification.srcProfileJson);
+                intent.putExtra(Constants.PARAM_PEEKOBJECT, takeAPeekNotification.relatedPeekJson);
                 break;
 
             case follow:
@@ -230,8 +240,6 @@ public class TAPFcmListenerService extends FirebaseMessagingService
             default: break;
         }
 
-        Intent intent = new Intent(this, NotificationsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, takeAPeekNotification.notificationIntId,
                 intent, PendingIntent.FLAG_ONE_SHOT);

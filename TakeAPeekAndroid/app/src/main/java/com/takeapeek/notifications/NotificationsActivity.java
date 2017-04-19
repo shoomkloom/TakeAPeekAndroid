@@ -18,10 +18,12 @@ import android.widget.TextView;
 import com.takeapeek.R;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.RunnableWithArg;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.profile.ProfileActivity;
+import com.takeapeek.userfeed.UserFeedActivity;
 import com.takeapeek.usermap.UserMapActivity;
 
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.takeapeek.common.MixPanel.SCREEN_NOTIFICATION;
 
 public class NotificationsActivity extends AppCompatActivity
 {
@@ -96,6 +100,37 @@ public class NotificationsActivity extends AppCompatActivity
         InitNotificationList();
 
         findViewById(R.id.imageview_map).setOnClickListener(ClickListener);
+
+        final Intent intent = getIntent();
+        if(intent != null)
+        {
+            String profileObjectJSON = intent.getStringExtra(Constants.PARAM_PROFILEOBJECT);
+            String peekObjectJSON = intent.getStringExtra(Constants.PARAM_PEEKOBJECT);
+
+            if(peekObjectJSON != null)
+            {
+                ShowPeek(profileObjectJSON, peekObjectJSON);
+            }
+        }
+        else
+        {
+            Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), getString(R.string.error_no_profile));
+        }
+
+        setIntent(null);
+    }
+
+    private void ShowPeek(String srcProfileJson, String relatedPeekJson)
+    {
+        logger.debug("ShowPeek(..) Invoked");
+
+        MixPanel.ViewPeekClickEventAndProps(this, SCREEN_NOTIFICATION, mSharedPreferences);
+
+        final Intent userFeedActivityIntent = new Intent(this, UserFeedActivity.class);
+        userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        userFeedActivityIntent.putExtra(Constants.PARAM_PROFILEOBJECT, srcProfileJson);
+        userFeedActivityIntent.putExtra(Constants.PARAM_PEEKOBJECT, relatedPeekJson);
+        startActivity(userFeedActivityIntent);
     }
 
     public void InitNotificationList()
