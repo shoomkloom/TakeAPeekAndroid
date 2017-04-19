@@ -469,15 +469,6 @@ public class UserMapActivity extends FragmentActivity implements
         startActivityForResult(walkthroughActivityIntent, RESULT_WALKTHROUGH);
     }
 
-    private void ShowTrendingPlaces()
-    {
-        logger.debug("ShowTrendingPlaces() Invoked");
-
-        Intent trendingPlacesActivityIntent = new Intent(this, TrendingPlacesActivity.class);
-        trendingPlacesActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(trendingPlacesActivityIntent);
-    }
-
     private boolean ShowCaptureOnLoad()
     {
         logger.debug("ShowCaptureOnLoad() Invoked");
@@ -488,6 +479,8 @@ public class UserMapActivity extends FragmentActivity implements
         {
             long currentTimeMillis = Helper.GetCurrentTimeMillis();
             long lastCaptureMillis = Helper.GetLastCapture(mSharedPreferences);
+
+            logger.info(String.format("currentTimeMillis = '%d', lastCaptureMillis = '%d'", currentTimeMillis, lastCaptureMillis));
 
             if (currentTimeMillis - lastCaptureMillis > Constants.INTERVAL_TENMINUTES)
             {
