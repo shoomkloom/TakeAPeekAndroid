@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 
@@ -203,6 +204,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
         String contentTitle = null;
         String contentText = null;
         Bitmap thumbnailBitmap = null;
+        android.support.v4.app.NotificationCompat.BigPictureStyle bigPictureStyle = new android.support.v4.app.NotificationCompat.BigPictureStyle();
 
         Intent intent = new Intent(this, NotificationsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -250,13 +252,24 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
         if(thumbnailBitmap != null)
         {
-            notificationBuilder.setLargeIcon(thumbnailBitmap);
+            bigPictureStyle = new android.support.v4.app.NotificationCompat.BigPictureStyle();
+            bigPictureStyle.bigPicture(thumbnailBitmap);
+            bigPictureStyle.setBigContentTitle(contentText);
+
+            if(takeAPeekObject.Title != null && takeAPeekObject.Title.compareTo("") != 0)
+            {
+                String summaryText = String.format("\"%s\"", takeAPeekObject.Title);
+                bigPictureStyle.setSummaryText(summaryText);
+            }
+
+            notificationBuilder.setStyle(bigPictureStyle);
         }
 
         notificationBuilder.setContentTitle(contentTitle);
         notificationBuilder.setContentText(contentText);
         notificationBuilder.setAutoCancel(true);
         notificationBuilder.setSound(defaultSoundUri);
+        notificationBuilder.setColor(ContextCompat.getColor(this, R.color.pt_red));
         notificationBuilder.setContentIntent(pendingIntent);;
 
         NotificationManager notificationManager =
