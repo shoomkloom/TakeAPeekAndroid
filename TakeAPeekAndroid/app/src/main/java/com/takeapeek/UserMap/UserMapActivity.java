@@ -561,7 +561,7 @@ public class UserMapActivity extends FragmentActivity implements
             List<TakeAPeekNotification> takeAPeekNotificationList = DatabaseManager.getInstance().GetTakeAPeekNotificationUnnotifiedList();
             for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
             {
-                if(Helper.GetCurrentTimeMillis() - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR)
+                if(Helper.GetCurrentTimeMillis() - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
                 {
                     numberOfNewNotifications++;
                 }
