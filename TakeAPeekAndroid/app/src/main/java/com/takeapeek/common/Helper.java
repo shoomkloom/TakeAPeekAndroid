@@ -1056,7 +1056,7 @@ public class Helper
 
         for (TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
         {
-            if (currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_HOUR)
+            if (currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
             {
                 notificationManager.cancel(takeAPeekNotification.notificationIntId);
             }

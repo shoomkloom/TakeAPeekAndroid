@@ -262,7 +262,7 @@ public class SyncAdapterHelper implements Runnable,
                         DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                         continue;
                     }
-                    else if(Helper.GetCurrentTimeMillis() - takeAPeekObject.CreationTime > Constants.INTERVAL_HOUR)
+                    else if(Helper.GetCurrentTimeMillis() - takeAPeekObject.CreationTime > Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
                     {
                         logger.warn("Peek older than 1 hour, skipping upload and setting Upload = 0");
                         takeAPeekObject.Upload = 0;

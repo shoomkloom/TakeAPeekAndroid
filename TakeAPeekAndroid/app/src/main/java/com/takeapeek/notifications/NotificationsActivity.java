@@ -185,7 +185,7 @@ public class NotificationsActivity extends AppCompatActivity
             {
                 if (oldNotification == false)
                 {
-                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR)
+                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
                     {
                         takeAPeekNotificationArrayList.add(takeAPeekNotification);
                     }
