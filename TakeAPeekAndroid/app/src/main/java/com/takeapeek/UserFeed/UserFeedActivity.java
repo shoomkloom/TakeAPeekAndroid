@@ -49,6 +49,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.takeapeek.R;
@@ -85,6 +86,8 @@ public class UserFeedActivity extends AppCompatActivity
 {
     static private final Logger logger = LoggerFactory.getLogger(UserFeedActivity.class);
     AppEventsLogger mAppEventsLogger = null;
+
+    private static final int RESULT_REQUEST_INVITE = 9004;
 
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
@@ -272,6 +275,8 @@ public class UserFeedActivity extends AppCompatActivity
         findViewById(R.id.textview_preview_button_unfollow).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_block).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_report).setOnClickListener(ClickListener);
+        findViewById(R.id.textview_preview_button_share).setOnClickListener(ClickListener);
+        findViewById(R.id.imageview_share).setOnClickListener(ClickListener);
 
         findViewById(R.id.button_control).setOnClickListener(ClickListener);
         findViewById(R.id.button_control_close).setOnClickListener(ClickListener);
@@ -432,6 +437,32 @@ public class UserFeedActivity extends AppCompatActivity
         }
 
         super.onStop();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        logger.debug("onActivityResult(...) Invoked");
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_REQUEST_INVITE)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                // Get the invitation IDs of all sent messages
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                for (String id : ids)
+                {
+                    logger.info("onActivityResult: sent invitation " + id);
+                }
+            }
+            else
+            {
+                // Sending failed or it was canceled, show failure message to the user
+                // ...
+            }
+        }
     }
 
     private void prepExoPlayer()
@@ -957,7 +988,7 @@ public class UserFeedActivity extends AppCompatActivity
                     break;
 
                 case R.id.textview_preview_button_report:
-                    logger.info("onClick: R.id.textview_preview_button_report clicked");
+                    logger.info("onClick: textview_preview_button_report clicked");
 
                     new AsyncTask<Void, Void, Boolean>()
                     {
@@ -1011,7 +1042,7 @@ public class UserFeedActivity extends AppCompatActivity
                     break;
 
                 case R.id.imageview_intro_close:
-                    logger.info("onClick: button_close clicked");
+                    logger.info("onClick: imageview_intro_close clicked");
 
                     mCurrentTakeAPeekObject = null;
 
@@ -1025,6 +1056,41 @@ public class UserFeedActivity extends AppCompatActivity
                         finish();
                     }
 
+                    break;
+
+                case R.id.textview_preview_button_share:
+                case R.id.imageview_share:
+                    logger.info("onClick: textview_preview_button_share/imageview_share clicked");
+
+                    try
+                    {
+                        String invitationCTA = getString(R.string.invitation_cta);
+                        String invitationMessage = String.format(getString(R.string.invitation_message), Helper.GetProfileDisplayName(mSharedPreferences));
+                        if (mCurrentTakeAPeekObject.Title != null && mCurrentTakeAPeekObject.Title.compareToIgnoreCase("") != 0)
+                        {
+                            invitationMessage = String.format("%s: '%s'.", invitationMessage, mCurrentTakeAPeekObject.Title);
+                        }
+                        else
+                        {
+                            invitationMessage += ".";
+                        }
+
+                        String peekDeepLinkStr = String.format("https://peek.to/peek/%s", mCurrentTakeAPeekObject.TakeAPeekID);
+                        String thumbnailURL = String.format("https://rest.peek.to/rest/ClientAPI?action_type=get_peek_thumb&peek_id=%s", mCurrentTakeAPeekObject.TakeAPeekID);
+
+                        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                                .setMessage(invitationMessage)
+                                .setDeepLink(Uri.parse(peekDeepLinkStr))
+                                .setCustomImage(Uri.parse(thumbnailURL))
+                                .setCallToActionText(invitationCTA)
+                                .build();
+
+                        startActivityForResult(intent, RESULT_REQUEST_INVITE);
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When trying to load invitation UI", e);
+                    }
                     break;
 
                 case R.id.button_control:
