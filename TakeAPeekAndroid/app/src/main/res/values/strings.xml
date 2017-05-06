@@ -257,6 +257,10 @@
     <string name="feed_block">Block</string>
     <string name="feed_unfollow">Unfollow</string>
     <string name="feed_response_by">Response by %1$s</string>
+    <string name="feed_share">Share this peek with friends</string>
+    <string name="invitation_title">Share Peek with friends:</string>
+    <string name="invitation_message">%1$s wants to share this hot Peek with you</string>
+    <string name="invitation_cta">Click to view Peek</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

@@ -251,6 +251,25 @@
             android:layout_alignParentRight="true"
             android:src="@drawable/button_close" />
 
+        <TextView
+            android:id = "@+id/textview_preview_button_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="3dp"
+            android:textSize="15sp"
+            android:layout_centerInParent="true"
+            android:textColor="@drawable/button_transparent_white"
+            android:text="@string/feed_share" />
+
+        <ImageView
+            android:id="@+id/imageview_share"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:layout_toLeftOf="@+id/textview_preview_button_share"
+            android:layout_alignBottom="@+id/textview_preview_button_share"
+            android:src="@drawable/ic_share" />
+
         <!-- Buttons -->
         <RelativeLayout
             android:id="@+id/button_control_background"
