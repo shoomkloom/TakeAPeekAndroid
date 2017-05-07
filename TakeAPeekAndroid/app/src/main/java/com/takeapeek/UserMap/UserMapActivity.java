@@ -392,7 +392,7 @@ public class UserMapActivity extends FragmentActivity implements
         // Check for App Invite invitations and launch deep-link activity if possible.
         // Requires that an Activity is registered in AndroidManifest.xml to handle
         // deep-link URLs.
-        boolean autoLaunchDeepLink = false;
+        boolean autoLaunchDeepLink = true;
         AppInvite.AppInviteApi.getInvitation(mGoogleApiClientAppInvite, this, autoLaunchDeepLink)
                 .setResultCallback(new ResultCallback<AppInviteInvitationResult>()
         {
@@ -407,6 +407,8 @@ public class UserMapActivity extends FragmentActivity implements
                     Intent intent = result.getInvitationIntent();
                     String deepLink = AppInviteReferral.getDeepLink(intent);
                     String invitationId = AppInviteReferral.getInvitationId(intent);
+
+                    logger.info(String.format("getInvitation data: deepLink='%s', invitationId='%s'", deepLink, invitationId));
 
                     // Because autoLaunchDeepLink = true we don't have to do anything
                     // here, but we could set that to false and manually choose
