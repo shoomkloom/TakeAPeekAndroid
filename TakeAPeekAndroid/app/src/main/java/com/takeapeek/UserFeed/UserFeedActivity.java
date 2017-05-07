@@ -702,12 +702,10 @@ public class UserFeedActivity extends AppCompatActivity
             {
                 mTextViewVideoTitle.setText(takeAPeekObject.Title);
             }
-            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
-            {
-                AddressLoader addressLoader = new AddressLoader();
-                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
-            }
+
+            AddressLoader addressLoader = new AddressLoader();
+            LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+            addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
 
             Uri url = Uri.parse(peekFilePath);
 
@@ -757,12 +755,10 @@ public class UserFeedActivity extends AppCompatActivity
             {
                 mTextViewVideoTitle.setText(takeAPeekObject.Title);
             }
-            if(takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
-            {
-                AddressLoader addressLoader = new AddressLoader();
-                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
-            }
+
+            AddressLoader addressLoader = new AddressLoader();
+            LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+            addressLoader.SetAddress(this, location, mTextViewVideoAddress, mSharedPreferences);
 
             Uri url = Uri.parse(mCurrentTakeAPeekObject.PeekMP4StreamingURL);
 

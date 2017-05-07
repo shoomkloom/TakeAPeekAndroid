@@ -1390,20 +1390,12 @@ public class UserMapActivity extends FragmentActivity implements
             mTextViewStackPeekTime.setVisibility(View.VISIBLE);
             mTextViewStackPeekTime.setText(Helper.GetFormttedDiffTime(UserMapActivity.this, takeAPeekObject.CreationTime));
 
-            if (takeAPeekObject.Latitude > 0 && takeAPeekObject.Longitude > 0)
-            {
-                mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
-                findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
-                AddressLoader addressLoader = new AddressLoader();
+            mTextViewStackPeekAddress.setVisibility(View.VISIBLE);
+            findViewById(R.id.peek_stack_address_image).setVisibility(View.VISIBLE);
+            AddressLoader addressLoader = new AddressLoader();
 
-                LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
-                addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
-            }
-            else
-            {
-                mTextViewStackPeekAddress.setVisibility(View.GONE);
-                findViewById(R.id.peek_stack_address_image).setVisibility(View.GONE);
-            }
+            LatLng location = new LatLng(takeAPeekObject.Latitude, takeAPeekObject.Longitude);
+            addressLoader.SetAddress(UserMapActivity.this, location, mTextViewStackPeekAddress, mSharedPreferences);
         }
         else
         {

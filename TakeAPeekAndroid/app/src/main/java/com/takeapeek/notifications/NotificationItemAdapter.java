@@ -151,11 +151,8 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
             viewHolder.mTextViewButton.setOnClickListener(ClickListener);
             viewHolder.mTextViewButton.setTag(viewHolder);
 
-            if(viewHolder.mSrcProfileObject.latitude > 0 && viewHolder.mSrcProfileObject.longitude > 0)
-            {
-                LatLng location = new LatLng(viewHolder.mSrcProfileObject.latitude, viewHolder.mSrcProfileObject.longitude);
-                mAddressLoader.SetAddress(mNotificationsActivity.get(), location, viewHolder.mTextViewNotificationAddress, mSharedPreferences);
-            }
+            LatLng location = new LatLng(viewHolder.mSrcProfileObject.latitude, viewHolder.mSrcProfileObject.longitude);
+            mAddressLoader.SetAddress(mNotificationsActivity.get(), location, viewHolder.mTextViewNotificationAddress, mSharedPreferences);
 
             view.setTag(viewHolder);
         }

@@ -145,11 +145,8 @@ public class PeekItemAdapter extends ArrayAdapter<TakeAPeekObject>
             viewHolder.mTextViewUserFeedTime.setText(Helper.GetFormttedDiffTime(mUserFeedActivity.get(), viewHolder.mTakeAPeekObject.CreationTime));
 
             //Set the peek location
-            if(viewHolder.mTakeAPeekObject.Latitude > 0 && viewHolder.mTakeAPeekObject.Longitude > 0)
-            {
-                LatLng location = new LatLng(viewHolder.mTakeAPeekObject.Latitude, viewHolder.mTakeAPeekObject.Longitude);
-                mAddressLoader.SetAddress(mUserFeedActivity.get(), location, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
-            }
+            LatLng location = new LatLng(viewHolder.mTakeAPeekObject.Latitude, viewHolder.mTakeAPeekObject.Longitude);
+            mAddressLoader.SetAddress(mUserFeedActivity.get(), location, viewHolder.mTextViewUserFeedAddress, mSharedPreferences);
         }
 
         return view;

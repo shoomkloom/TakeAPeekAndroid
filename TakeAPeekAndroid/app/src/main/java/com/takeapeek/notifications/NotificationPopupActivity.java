@@ -194,13 +194,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     textViewLocation.setVisibility(View.VISIBLE);
 
-                    if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
-                    {
-                        LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
+                    LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
 
-                        mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
-                    }
+                    mAddressLoader = new AddressLoader();
+                    mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
 
                     //Titles
                     textViewTitleBig.setText(getString(R.string.request_big_title));
@@ -227,13 +224,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     textViewLocation.setVisibility(View.VISIBLE);
 
-                    if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
-                    {
-                        LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
+                    LatLng takeAPeekObjectResponseLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
 
-                        mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
-                    }
+                    mAddressLoader = new AddressLoader();
+                    mAddressLoader.SetAddress(this, takeAPeekObjectResponseLocation, textViewLocation, mSharedPreferences);
 
                     //Titles
                     textViewTitleBig.setText(getString(R.string.response_big_title));
@@ -260,13 +254,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     textViewLocation.setVisibility(View.VISIBLE);
 
-                    if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
-                    {
-                        LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
+                    LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
 
-                        mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
-                    }
+                    mAddressLoader = new AddressLoader();
+                    mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
 
                     //Titles
                     textViewTitleBig.setText(getString(R.string.peek_big_title));
@@ -293,13 +284,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     textViewLocation.setVisibility(View.VISIBLE);
 
-                    if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
-                    {
-                        LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
+                    LatLng takeAPeekObjectShareLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
 
-                        mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
-                    }
+                    mAddressLoader = new AddressLoader();
+                    mAddressLoader.SetAddress(this, takeAPeekObjectShareLocation, textViewLocation, mSharedPreferences);
 
                     //Titles
                     textViewTitleBig.setText(getString(R.string.share_big_title));
@@ -329,13 +317,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     textViewLocation.setVisibility(View.VISIBLE);
 
-                    if(mProfileObject.latitude > 0 && mProfileObject.longitude > 0)
-                    {
-                        LatLng profileObjectLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
+                    LatLng profileObjectFollowLocation = new LatLng(mProfileObject.latitude, mProfileObject.longitude);
 
-                        mAddressLoader = new AddressLoader();
-                        mAddressLoader.SetAddress(this, profileObjectLocation, textViewLocation, mSharedPreferences);
-                    }
+                    mAddressLoader = new AddressLoader();
+                    mAddressLoader.SetAddress(this, profileObjectFollowLocation, textViewLocation, mSharedPreferences);
 
                     //Titles
                     textViewTitleBig.setText(getString(R.string.follow_big_title));

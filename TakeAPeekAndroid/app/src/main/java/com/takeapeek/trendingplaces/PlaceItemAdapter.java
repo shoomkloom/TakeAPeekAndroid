@@ -133,14 +133,10 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
             viewHolder.mImagePlaceThumbnail.setTag("Thumbnail_" + viewHolder.Position);
             mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity.get(), position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
 
-            if(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude > 0 &&
-                    viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude > 0)
-            {
-                LatLng location = new LatLng(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude,
-                        viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude);
+            LatLng location = new LatLng(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude,
+                    viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude);
 
-                mAddressLoader.SetAddress(mTrendingPlacesActivity.get(), location, viewHolder.mTextViewPlaceAddress, mSharedPreferences);
-            }
+            mAddressLoader.SetAddress(mTrendingPlacesActivity.get(), location, viewHolder.mTextViewPlaceAddress, mSharedPreferences);
 
             String numberOfPeeks = String.format(mTrendingPlacesActivity.get().getString(R.string.place_number_of_peeks), viewHolder.mTrendingPlaceObject.Peeks.size());
             viewHolder.mTextViewNumberOfPeeks.setText(numberOfPeeks);
