@@ -132,7 +132,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                         takeAPeekNotification.srcProfileJson = responseObject.pushNotificationData.srcProfileJson;
                         takeAPeekNotification.relatedPeekJson = responseObject.pushNotificationData.relatedPeekJson;
 
-                        TakeAPeekObject takeAPeekObject = new Gson().fromJson(takeAPeekNotification.srcProfileJson, TakeAPeekObject.class);
+                        TakeAPeekObject takeAPeekObject = new Gson().fromJson(takeAPeekNotification.relatedPeekJson, TakeAPeekObject.class);
 
                         try
                         {
@@ -144,11 +144,12 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                                         takeAPeekObject.ProfileID,
                                         takeAPeekObject.ProfileDisplayName,
                                         Helper.GetProfileId(sharedPreferences),
-                                        null);
+                                        Helper.GetProfileDisplayName(sharedPreferences));
                                 DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelation);
 
                                 //Log event to FaceBook
-                                mAppEventsLogger.logEvent("Followed_User");
+                                //@@ This is not a new followed user rather, I just got notified that someone is following me
+                                //@@mAppEventsLogger.logEvent("Followed_User");
                             }
                         }
                         catch(Exception e)

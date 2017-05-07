@@ -1,8 +1,5 @@
 package com.takeapeek.usermap;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,10 +31,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
@@ -74,6 +77,7 @@ import com.takeapeek.common.RelativeSliderLayout;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
+import com.takeapeek.common.TAPFcmListenerService;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.common.ZoomedAddressCreator;
@@ -97,6 +101,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 import me.crosswall.lib.coverflow.CoverFlow;
@@ -131,6 +136,7 @@ public class UserMapActivity extends FragmentActivity implements
 
     GoogleMap mGoogleMap = null;
     private GoogleApiClient mGoogleApiClient = null;
+    private GoogleApiClient mGoogleApiClientAppInvite = null;
     ClusterManager<TAPClusterItem> mClusterManager = null;
     private Algorithm<TAPClusterItem> mClusterManagerAlgorithm = null;
 
@@ -256,7 +262,7 @@ public class UserMapActivity extends FragmentActivity implements
                 {
                     logger.info("Location services are on, proceding...");
 
-                    boolean showCaptureOnLoad = ShowCaptureOnLoad();
+                    boolean showCaptureOnLoad = ShowCaptureOnLoad(true);
 
                     if(showCaptureOnLoad == false)
                     {
@@ -299,6 +305,12 @@ public class UserMapActivity extends FragmentActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
+                .build();
+
+        // Create an auto-managed GoogleApiClient with access to App Invites.
+        mGoogleApiClientAppInvite = new GoogleApiClient.Builder(this)
+                .addApi(AppInvite.API)
+                .enableAutoManage(this, this)
                 .build();
 
         //Retrieve the PlaceAutocompleteFragment.
@@ -377,25 +389,32 @@ public class UserMapActivity extends FragmentActivity implements
                 .spaceSize(0f)
                 .build();
 
-        final Intent intent = getIntent();
-        if(intent != null)
+        // Check for App Invite invitations and launch deep-link activity if possible.
+        // Requires that an Activity is registered in AndroidManifest.xml to handle
+        // deep-link URLs.
+        boolean autoLaunchDeepLink = false;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClientAppInvite, this, autoLaunchDeepLink)
+                .setResultCallback(new ResultCallback<AppInviteInvitationResult>()
         {
-            Bundle bundle = getIntent().getExtras();
-            if(bundle != null)
+            @Override
+            public void onResult(AppInviteInvitationResult result)
             {
-                String openStack = getIntent().getStringExtra(Constants.PARAM_OPEN_STACK);
-                if(openStack != null)
+                logger.debug("getInvitation:onResult:" + result.getStatus());
+
+                if (result.getStatus().isSuccess())
                 {
-                    mOpenStack = true;
-                }
-                else
-                {
-                    mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+                    // Extract information from the intent
+                    Intent intent = result.getInvitationIntent();
+                    String deepLink = AppInviteReferral.getDeepLink(intent);
+                    String invitationId = AppInviteReferral.getInvitationId(intent);
+
+                    // Because autoLaunchDeepLink = true we don't have to do anything
+                    // here, but we could set that to false and manually choose
+                    // an Activity to launch to handle the deep link here.
+                    // ...
                 }
             }
-        }
-
-        setIntent(null);
+        });
     }
 
     @Override
@@ -423,7 +442,7 @@ public class UserMapActivity extends FragmentActivity implements
             case RESULT_AUTHENTICATE:
                 logger.info("onActivityResult: requestCode = 'RESULT_AUTHENTICATE'");
 
-                if(ShowCaptureOnLoad() == false)
+                if(ShowCaptureOnLoad(true) == false)
                 {
                     ShowUserMap();
                 }
@@ -469,7 +488,7 @@ public class UserMapActivity extends FragmentActivity implements
         startActivityForResult(walkthroughActivityIntent, RESULT_WALKTHROUGH);
     }
 
-    private boolean ShowCaptureOnLoad()
+    private boolean ShowCaptureOnLoad(boolean doCapture)
     {
         logger.debug("ShowCaptureOnLoad() Invoked");
 
@@ -486,9 +505,12 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 showCaptureOnLoad = true;
 
-                Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);
-                captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivityForResult(captureClipActivityIntent, RESULT_CAPTURECLIP);
+                if(doCapture == true)
+                {
+                    Intent captureClipActivityIntent = new Intent(this, CaptureClipActivity.class);
+                    captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivityForResult(captureClipActivityIntent, RESULT_CAPTURECLIP);
+                }
             }
         }
         catch(Exception e)
@@ -603,6 +625,16 @@ public class UserMapActivity extends FragmentActivity implements
             mGoogleApiClient.connect();
         }
 
+        if (mGoogleApiClientAppInvite != null)
+        {
+            mGoogleApiClientAppInvite.connect();
+        }
+
+        if(ShowCaptureOnLoad(false) == false)
+        {
+            ProcessIntent();
+        }
+
         if (mGoogleMap != null)
         {
             //Clear the cluster manager
@@ -623,6 +655,124 @@ public class UserMapActivity extends FragmentActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(onPushNotificationBroadcast, intentFilter);
 
         AnimateTrendingPlacesButton();
+    }
+
+    private void ProcessIntent()
+    {
+        logger.debug("ProcessIntent() Invoked");
+
+        final Intent intent = getIntent();
+        if(intent != null)
+        {
+            Bundle bundle = getIntent().getExtras();
+            if(bundle != null)
+            {
+                String action = intent.getAction();
+
+                if(action != null && action.compareToIgnoreCase("android.intent.action.VIEW") == 0)
+                {
+                    Uri data = intent.getData();
+
+                    String dataLastSegment = data.getLastPathSegment();
+                    String[] dataSegments = dataLastSegment.split("_");
+                    final String srcProfileId = dataSegments[0];
+                    final String srcPeekId = dataSegments[1];
+
+                    logger.info(String.format("Deep link found: srcProfileId = %s, srcPeekId = %s", srcProfileId, srcPeekId));
+
+                    if(srcProfileId != null && srcProfileId.compareToIgnoreCase("") != 0 &&
+                       srcPeekId != null && srcPeekId.compareToIgnoreCase("") != 0)
+                    {
+                        //Simulate a notification arriving with this profile id and peek id
+                        new AsyncTask<Void, Void, Boolean>()
+                        {
+                            TakeAPeekNotification mTakeAPeekNotification = null;
+
+                            @Override
+                            protected Boolean doInBackground(Void... params)
+                            {
+                                try
+                                {
+                                    int notificationIntId = Helper.getNotificationIDCounter(mSharedPreferences);
+
+                                    mTakeAPeekNotification = new TakeAPeekNotification();
+                                    mTakeAPeekNotification.notificationId = UUID.randomUUID().toString();
+                                    mTakeAPeekNotification.type = Constants.PushNotificationTypeEnum.share.name();
+                                    mTakeAPeekNotification.srcProfileId = srcProfileId;
+                                    mTakeAPeekNotification.creationTime = Helper.GetCurrentTimeMillis();
+                                    mTakeAPeekNotification.relatedPeekId = srcPeekId;
+                                    mTakeAPeekNotification.notificationIntId = notificationIntId;
+
+                                    //Get the Push Notification Data with these srcProfileId and relatedPeekId
+                                    String accountUsername = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                    String accountPassword = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
+
+                                    ResponseObject responseObject = new Transport().GetPushNotifcationData(
+                                            UserMapActivity.this, accountUsername, accountPassword,
+                                            mTakeAPeekNotification.srcProfileId, mTakeAPeekNotification.relatedPeekId, mSharedPreferences);
+
+                                    if(responseObject != null && responseObject.pushNotificationData != null)
+                                    {
+                                        mTakeAPeekNotification.srcProfileJson = responseObject.pushNotificationData.srcProfileJson;
+                                        mTakeAPeekNotification.relatedPeekJson = responseObject.pushNotificationData.relatedPeekJson;
+                                    }
+
+                                    return true;
+                                }
+                                catch (Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: when processing deep link", e);
+                                }
+
+                                return false;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Boolean success)
+                            {
+                                logger.debug("onPostExecute(.) Invoked");
+
+                                try
+                                {
+                                    if(success == true && mTakeAPeekNotification != null)
+                                    {
+                                        DatabaseManager.getInstance().AddTakeAPeekNotification(mTakeAPeekNotification);
+
+                                        final Intent notificationPopupActivityIntent = new Intent(UserMapActivity.this, NotificationPopupActivity.class);
+                                        notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, mTakeAPeekNotification.notificationId);
+                                        startActivity(notificationPopupActivityIntent);
+                                        overridePendingTransition(R.anim.zoominbounce, R.anim.donothing);
+                                    }
+                                }
+                                catch(Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: When trying to create a 'share' popup notification", e);
+                                }
+                            }
+                        }.execute();
+                    }
+                    else
+                    {
+                        logger.error(String.format("ERROR: Deep link found with nulls: srcProfileId = %s, srcPeekId = %s", srcProfileId, srcPeekId));
+                    }
+                }
+                else
+                {
+                    String openStack = getIntent().getStringExtra(Constants.PARAM_OPEN_STACK);
+                    if (openStack != null)
+                    {
+                        mOpenStack = true;
+                    }
+                    else
+                    {
+                        mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+                    }
+                }
+            }
+        }
+
+        setIntent(null);
     }
 
     private void AnimateTrendingPlacesButton()
@@ -682,6 +832,11 @@ public class UserMapActivity extends FragmentActivity implements
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
+        }
+
+        if (mGoogleApiClientAppInvite != null && mGoogleApiClientAppInvite.isConnected())
+        {
+            mGoogleApiClientAppInvite.disconnect();
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onPushNotificationBroadcast);

@@ -1075,7 +1075,7 @@ public class UserFeedActivity extends AppCompatActivity
                             invitationMessage += ".";
                         }
 
-                        String peekDeepLinkStr = String.format("https://peek.to/peek/%s", mCurrentTakeAPeekObject.TakeAPeekID);
+                        String peekDeepLinkStr = String.format("https://peek.to/peek/%s_%s", Helper.GetProfileId(mSharedPreferences), mCurrentTakeAPeekObject.TakeAPeekID);
                         String thumbnailURL = String.format("https://rest.peek.to/rest/ClientAPI?action_type=get_peek_thumb&peek_id=%s", mCurrentTakeAPeekObject.TakeAPeekID);
 
                         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))

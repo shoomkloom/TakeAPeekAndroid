@@ -79,7 +79,8 @@ public class Constants
         response,
         peek,
         follow,
-        online
+        online,
+        share
     }
 
     public enum RelationTypeEnum

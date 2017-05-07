@@ -278,6 +278,39 @@ public class NotificationPopupActivity extends FragmentActivity implements
 
                     break;
 
+                case share:
+                    findViewById(R.id.peek_notification_preview).setVisibility(View.VISIBLE);
+
+                    textViewPeekTitle.setText(mTakeAPeekObject.Title);
+
+                    mThumbnailLoader = new ThumbnailLoader();
+                    mThumbnailLoader.SetThumbnail(this, -1, mTakeAPeekObject, imageViewPeekThumbnail, mSharedPreferences);
+
+                    textViewUserFeedTime.setText(Helper.GetFormttedDiffTime(this, mTakeAPeekObject.CreationTime));
+
+                    textViewDisplayName.setVisibility(View.VISIBLE);
+                    textViewDisplayName.setText(mProfileObject.displayName);
+
+                    textViewLocation.setVisibility(View.VISIBLE);
+
+                    if(mTakeAPeekObject.Latitude > 0 && mTakeAPeekObject.Longitude > 0)
+                    {
+                        LatLng takeAPeekObjectLocation = new LatLng(mTakeAPeekObject.Latitude, mTakeAPeekObject.Longitude);
+
+                        mAddressLoader = new AddressLoader();
+                        mAddressLoader.SetAddress(this, takeAPeekObjectLocation, textViewLocation, mSharedPreferences);
+                    }
+
+                    //Titles
+                    textViewTitleBig.setText(getString(R.string.share_big_title));
+                    textViewTitleSmall.setText(R.string.share_small_title);
+
+                    //Control buttons
+                    linearLayoutButtonSend.setVisibility(View.VISIBLE);
+                    linearLayoutButtonRequest.setVisibility(View.VISIBLE);
+
+                    break;
+
                 case follow:
                     //Map fragment: Obtain the SupportMapFragment and get notified when the map is ready to be used.
                     SupportMapFragment mapFragmentFollow = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);

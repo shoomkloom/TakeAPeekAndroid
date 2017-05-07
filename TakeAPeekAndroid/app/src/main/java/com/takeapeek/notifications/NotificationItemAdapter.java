@@ -195,6 +195,12 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
                     viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_gray);
                     break;
 
+                case share:
+                    viewHolder.mTextViewButton.setText(R.string.textview_view_peek);
+                    viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_share);
+                    viewHolder.mTextViewButton.setBackgroundResource(R.drawable.button_gray);
+                    break;
+
                 case follow:
                     viewHolder.mTextViewButton.setText(R.string.textview_request_peek);
                     viewHolder.mTextViewNotificationActionTitle.setText(R.string.textview_action_title_follow);
@@ -240,6 +246,7 @@ public class NotificationItemAdapter extends ArrayAdapter<TakeAPeekNotification>
 
                         case response:
                         case peek:
+                        case share:
                             logger.info("Starting UserFeedActivity with PARAM_PEEKOBJECT");
 
                             MixPanel.ViewPeekClickEventAndProps(mNotificationsActivity.get(), SCREEN_NOTIFICATION, mSharedPreferences);

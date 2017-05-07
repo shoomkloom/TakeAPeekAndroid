@@ -184,6 +184,7 @@
     <string name="textview_view_peek">View Peek</string>
     <string name="textview_action_title_response">sent you a Peek</string>
     <string name="textview_action_title_peek">created a Peek</string>
+    <string name="textview_action_title_share">shared a Peek</string>
     <string name="textview_action_title_follow">is now following you</string>
     <string name="textview_notification_time_justnow">Just now</string>
     <string name="textview_notification_time_one_minute">1 minute ago</string>
@@ -208,10 +209,12 @@
     <string name="request_small_title">Show them why you are special</string>
     <string name="response_big_title">sent you a Peek</string>
     <string name="response_small_title">Check it out!</string>
-    <string name="peek_big_title">created a Peek just now</string>
+    <string name="peek_big_title">just created a Peek</string>
     <string name="peek_small_title">Check it out!</string>
     <string name="follow_big_title">is now following you</string>
     <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s</string>
+    <string name="share_big_title">shared a Peek with you</string>
+    <string name="share_small_title">Check it out!</string>
 
     <!-- Trending Places -->
     <string name="places_title">Trending Locations</string>
