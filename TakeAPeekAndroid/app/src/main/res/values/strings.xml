@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Peek.To</string>
+    <string name="app_code">k3qyp</string>
     <string name="app_name_lower">peek.to</string>
     <string name="label">Peek.To</string>
     <string name="no_connection">No Connection</string>

@@ -46,9 +46,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "https://peek.to/peek” -->
-                <data android:scheme="https"
-                      android:host="peek.to"
-                      android:pathPrefix="/peek" />
+                <!-- data android:scheme="https" android:host="k3qyp.app.goo.gl" /-->
+                <data android:scheme="https" android:host="peek.to" android:pathPrefix="/peek"/>
             </intent-filter>
         </activity>
 <!--

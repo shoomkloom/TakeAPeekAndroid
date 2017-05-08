@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -839,6 +840,30 @@ public class UserFeedActivity extends AppCompatActivity
         }
     }
 
+    public Uri BuildDeepLink(@NonNull String deepLink)
+    {
+        logger.debug("BuildDeepLink(.) Invoked");
+
+        // Get the unique appcode for this app.
+        String appCode = getString(R.string.app_code);
+
+        // Get this app's package name.
+        String packageName = getApplicationContext().getPackageName();
+
+        // Build the link with all required parameters
+        Uri.Builder builder = new Uri.Builder()
+                .scheme("https")
+                .authority(appCode + ".app.goo.gl")
+                .path("/")
+                .appendQueryParameter("link", deepLink)
+                .appendQueryParameter("apn", packageName)
+                .appendQueryParameter("ifl", "https://peek.to/install.html");
+
+
+        // Return the completed deep link.
+        return builder.build();
+    }
+
     private View.OnClickListener ClickListener = new View.OnClickListener()
     {
         @Override
@@ -1072,11 +1097,13 @@ public class UserFeedActivity extends AppCompatActivity
                         }
 
                         String peekDeepLinkStr = String.format("https://peek.to/peek/%s_%s", Helper.GetProfileId(mSharedPreferences), mCurrentTakeAPeekObject.TakeAPeekID);
+                        Uri deepLinkUri = BuildDeepLink(peekDeepLinkStr);
+
                         String thumbnailURL = String.format("https://rest.peek.to/rest/ClientAPI?action_type=get_peek_thumb&peek_id=%s", mCurrentTakeAPeekObject.TakeAPeekID);
 
-                        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                                 .setMessage(invitationMessage)
-                                .setDeepLink(Uri.parse(peekDeepLinkStr))
+                                .setDeepLink(deepLinkUri)
                                 .setCustomImage(Uri.parse(thumbnailURL))
                                 .setCallToActionText(invitationCTA)
                                 .build();
