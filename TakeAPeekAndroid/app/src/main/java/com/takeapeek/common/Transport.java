@@ -259,11 +259,16 @@ public class Transport
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
+            String longitudeStr = Double.toString(longitude);
+            String latitudeStr = Double.toString(latitude);
+
+            logger.info(String.format("Calling update_location_build with longitudeStr=%s, latitudeStr=%s", longitudeStr, latitudeStr));
+
             nameValuePairs.add(new NameValuePair("action_type", "update_location_build"));
             nameValuePairs.add(new NameValuePair("user_name", userName));
             nameValuePairs.add(new NameValuePair("password", password));
-            nameValuePairs.add(new NameValuePair("longitude", String.format("%f", longitude)));
-            nameValuePairs.add(new NameValuePair("latitude", String.format("%f", latitude)));
+            nameValuePairs.add(new NameValuePair("longitude", longitudeStr));
+            nameValuePairs.add(new NameValuePair("latitude", latitudeStr));
             nameValuePairs.add(new NameValuePair("build", buildName));
 
             responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
