@@ -1,0 +1,436 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta content="width=mobile-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no" name="viewport">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;">
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+    <meta content="#fff" name="sr bgcolor">
+    <title>Email Template</title>
+    <style>
+        @font-face {
+            font-family: Releway-ExtraBold;
+            src: url('https://peek.to/fonts/Raleway-ExtraBold.ttf')
+        }
+        @font-face {
+            font-family: Releway-Bold;
+            src: url('https://peek.to/fonts/Raleway-Bold.ttf')
+        }
+        @font-face {
+            font-family: Raleway-Regular;
+            src: url('https://peek.to/fonts/Raleway-Regular.ttf')
+        }
+        @font-face {
+            font-family: Raleway-Black;
+            src: url('https://peek.to/fonts/Raleway-Black.ttf')
+        }
+        @font-face {
+            font-family: Raleway-Medium;
+            src: url('https://peek.to/fonts/Raleway-Medium.ttf')
+        }
+        @font-face {
+            font-family: 'Raleway';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Raleway'), local('Raleway-Regular'), url(https://fonts.gstatic.com/s/raleway/v11/yQiAaD56cjx1AooMTSghGfY6323mHUZFJMgTvxaG2iE.woff2) format('woff2');
+            unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+        }
+        /* latin */
+        @font-face {
+            font-family: 'Raleway';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Raleway'), local('Raleway-Regular'), url(https://fonts.gstatic.com/s/raleway/v11/0dTEPzkLWceF7z0koJaX1A.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+        }
+        html,
+        body {
+            width: 100%;
+            margin: 0;
+            font-family: 'Raleway', 'Arial', 'Calibri', sans-serif;
+        }
+
+        .ExternalClass {
+            width: 100%;
+        }
+
+        .ReadMsgBody {
+            width: 100%;
+        }
+
+        .ExternalClass,
+        .ExternalClass p,
+        .ExternalClass span,
+        .ExternalClass font,
+        .ExternalClass td,
+        . ExternalClass div {
+            line-height: 100%;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            margin: 0;
+            mso-table-lspace: 0;
+            mso-table-rspace: 0;
+            padding: 0;
+        }
+
+        a {
+            color: #a5ac07;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            opacity: 0.7;
+            transition: all .25s ease-in-out
+        }
+
+        @media only screen and (max-width: 800px) {
+            table[class=container800] {
+                width: 100% !important;
+            }
+            table[class=container800_img] {
+                width: 50% !important;
+            }
+            table[class=half-container800] {
+                width: 50% !important;
+            }
+            table[class=preheader] {
+                width: 90% !important;
+            }
+            td[class=hide800] {
+                display: none!important
+            }
+        }
+
+        @media only screen and (max-width: 640px) {
+            table[class=full],
+            table[class=container800] {
+                width: 100%!important;
+            }
+            table[class=container800],
+            table[class=container600],
+            table[class=container590],
+            table[class=container500] {
+                width: 370px !important;
+            }
+            table[class=container186],
+            table[class=container290],
+            table[class=container200] {
+                width: 320px !important;
+            }
+            table[class=container800_img],
+            table[class=half-container800] {
+                width: 100% !important;
+            }
+            table[class=half-container600],
+            table[class=container120],
+            td[class=container120] {
+                width: 49% !important;
+            }
+            table[class=about180] {
+                width: 250px !important;
+            }
+            table[class=container340] {
+                width: 370px !important;
+            }
+            td[class=center] {
+                text-align: center!important;
+                vertical-align: middle!important
+            }
+            img[class=img_scale],
+            td[class=img_scale] {
+                width: 100%!important;
+                height: auto!important
+            }
+            td[class=hide],
+            br[class=hide] {
+                display: none!important
+            }
+            td[class=show] {
+                display: block!important
+            }
+            td[class=padding_10] {
+                padding: 0 10px!important
+            }
+            td[class=padding_20],
+            td[class=padding_20_show] {
+                padding: 0 20px!important;
+                height: auto !important
+            }
+            img[class=divider] {
+                width: 100%!important;
+                height: 1px!important
+            }
+            td[class=mobile-width] {
+                padding: 0 25% !important
+            }
+            td[class=main-section-header],
+            div[class=main-section-header] {
+                font-size: 30px!important;
+                line-height: 38px!important
+            }
+            td[class=mobile_para] {
+                font-size: 14px!important;
+                line-height: 26px!important
+            }
+        }
+
+        @media only screen and (max-width:480px) {
+            table[class=container800],
+            table[class=full],
+            table[class=container600],
+            table[class=container590],
+            table[class=container500] {
+                width: 100% !important;
+                height: auto !important
+            }
+            table[class=container186],
+            table[class=container290],
+            table[class=container200] {
+                width: 200px !important;
+            }
+            table[class=container800_img],
+            table[class=half-container800],
+            table[class=container120],
+            td[class=container120] {
+                width: 100% !important;
+            }
+            table[class=half-container600],
+            table[class=container120],
+            td[class=container120] {
+                width: 49% !important;
+            }
+            table[class=container340] {
+                width: 260px !important;
+            }
+            table[class=about180] {
+                width: 140px !important;
+            }
+            td[class=center],
+            td[class=align-center] {
+                text-align: center!important;
+                vertical-align: middle!important
+            }
+            img[class=img_scale],
+            td[class=img_scale] {
+                width: 100%!important;
+                height: auto!important
+            }
+            td[class=hide],
+            br[class=hide] {
+                display: none!important
+            }
+            td[class=show] {
+                display: block!important
+            }
+            td[class=padding_20],
+            td[class=padding_20_show] {
+                padding: 0 20px!important
+            }
+            img[class=divider] {
+                width: 100%!important;
+                height: 1px!important
+            }
+            td[class=main-section-header],
+            div[class=main-section-header] {
+                font-size: 26px!important;
+            }
+            td[class=mobile_para],
+            div[class=mobile_para] {
+                font-size: 14px!important;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body marginwidth="0" marginheight="0" style="margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; width: 100%; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;" offset="0" topmargin="0" leftmargin="0">
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#EEEEEE" data-module="module2" data-thumb="" style="background-color: #EEEEEE;" data-bgcolor="Body bgcolor" class="">
+    <tbody>
+    <tr>
+        <td align="center">
+            <table border="0" align="center" width="100%" style="width: 100%; max-width: 800px; background-color: #000000; background-size: cover; background-position: 50% 0%; background-repeat: no-repeat;" cellpadding="0" cellspacing="0" bgcolor="#233a4d" data-bg="Background1" data-bgcolor="Background1">
+
+                <!-- Header Nav -->
+                <tbody>
+                <tr>
+                    <td align="center" data-bgcolor="Nav Background" style="width: 100%; max-width: 800px; background-color: #ffffff" cellpadding="0" cellspacing="0">
+                        <!--
+                        <table border="0" align="center" width="600" style="" cellpadding="0" cellspacing="0" class="container600">
+
+                            <tbody>
+
+                            <tr>
+                                <td height="50" style="font-size: 50px; line-height: 50px;">&nbsp;</td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <table align="left" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                                        <tbody><tr>
+
+                                            <td align="left" mc:edit="big-title1" style="letter-spacing: 1px;color: #000000;font-size: 18px; font-family: 'Raleway', 'Open Sans', sans-serif; line-height: 26px;font-weight: 600;" data-size="Header title" data-max="72" data-color="Header title">
+                                                <div style="line-height: 130%;">
+                                                        <span class="text_container">
+                                           <multiline>%%APPINVITE_TOPTEXT_PLACEHOLDER%%</multiline>
+                                           </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody></table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="20" style="font-size: 20px; line-height: 20px;">&nbsp;</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        -->
+                    </td>
+                </tr>
+                <!-- end section -->
+
+
+                <tr>
+                    <td height="1" style="font-size: 1px; line-height: 1px; background-color: #e0c25a">&nbsp;</td>
+                </tr>
+
+
+                <!-- end section -->
+
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" data-module="module16" data-thumb="http://www.stampready.net/dashboard/editor/user_uploads/zip_uploads/2016/03/20/7vBjWbpCO3ftdN9QwlhmiYAZ/demo/thumbnails/module16.png" style="background-color: #EEEEEE;" data-bgcolor="Body bgcolor" class="">
+    <tbody>
+    <tr>
+        <td align="center">
+            <table border="0" align="center" width="100%" bgcolor="#000000" style="background-color: #000000;width:100%;max-width: 800px;" cellpadding="0" cellspacing="0" data-bgcolor="White-Bg">
+
+                <tbody>
+
+                <tr>
+                    <td align="center" style="font-family: 'Lato', 'Calibri', sans-serif; font-size: 18px; font-weight: 300; color: #516072; line-height: 24px;">
+                        <img editable="true" src="http://omar-faruque.com/template/peek/pik.jpg" class="img_scale" alt="1" width="100%" style="display: block;">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!--3rd-->
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" data-module="module4" data-thumb="http://www.stampready.net/dashboard/editor/user_uploads/zip_uploads/2016/03/20/7vBjWbpCO3ftdN9QwlhmiYAZ/demo/thumbnails/module4.png" style="background-color: #EEEEEE;" data-bgcolor="Body bgcolor" class="">
+    <tbody>
+    <tr>
+        <td align="center">
+            <table border="0" align="center" width="100%" style="background-color: #ffffff;width:100%;max-width: 800px;" cellpadding="0" cellspacing="0" data-bgcolor="White-Bg">
+
+                <tbody>
+                <tr>
+                    <td height="50" style="font-size: 50px; line-height: 50px;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" class="padding_20_show">
+                        <table border="0" align="center" width="600" cellpadding="0" cellspacing="0" class="container600">
+                            <tbody>
+                            <tr>
+                                <td height="10" style="font-size: 10px; line-height: 10px;"></td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <table align="left" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                                        <tbody><tr>
+
+                                            <td align="left" mc:edit="big-title1" style="color: #000000;font-size: 20px; font-family: 'Raleway', 'Open Sans', sans-serif; line-height: 26px;font-weight: 200;" data-size="Header title" data-max="72" data-color="Header title">
+                                                <!-- ======= section text ====== -->
+                                                <div style="line-height:150%;">
+                                                    <span class="text_container"> <multiline>
+                                                %%APPINVITE_SECTIONTEXT_PLACEHOLDER%%
+                                                    </multiline>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody></table>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td height="50" style="font-size: 50px; line-height: 50px;">&nbsp;</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" data-module="module4" data-thumb="http://www.stampready.net/dashboard/editor/user_uploads/zip_uploads/2016/03/20/7vBjWbpCO3ftdN9QwlhmiYAZ/demo/thumbnails/module4.png" style="background-color: #EEEEEE;" data-bgcolor="Body bgcolor" class="">
+    <tbody>
+    <tr>
+        <td align="center">
+            <table border="0" align="center" width="100%" style="background-color: #ffffff;width:100%;max-width: 800px;" cellpadding="0" cellspacing="0" data-bgcolor="White-Bg">
+
+                <tbody>
+
+                <tr>
+                    <td align="center" class="padding_20_show">
+                        <table border="0" align="center" width="680" cellpadding="0" cellspacing="0" class="container600">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-family: 'Raleway-Regular', 'Calibri', sans-serif; font-size: 18px; font-weight: 300; color: #516072; line-height: 24px;">
+                                    <a href="%%APPINVITE_LINK_PLACEHOLDER%%" target="_blank" style="display: block; border-style: none !important; border: 0 !important;" class="editable_img">
+                                        <img editable="true" src="%%APPINVITE_THUMBNAIL_PLACEHOLDER%%" class="img_scale" width="100%" style="display: block;">
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="45" style="font-size: 15px; line-height:15px;"></td>
+                            </tr>
+                            <tr>
+                                <!-- ======= logo ======= -->
+                                <td align="center">
+                                    <a href="%%APPINVITE_LINK_PLACEHOLDER%%" target="_blank" style="display: block; border-style: none !important; border: 0 !important;" class="editable_img">
+                                        <!--img editable="true" mc:edit="logo" width="70%" border="0" style="display: block; width:65%" src="http://omar-faruque.com/template/peek/eee.jpg" alt="logo"-->
+                                        <span border="0" style="display: block; padding:20px; background-color:crimson; color:white; width:50%;font-size: 20px; font-family: 'Raleway', 'Open Sans', sans-serif; line-height: 26px;font-weight: 200;">%%APPINVITE_BUTTONTEXT_PLACEHOLDER%%</span>
+                                    </a>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td height="50" style="font-size: 50px; line-height: 50px;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td height="1" style="font-size: 1px; line-height: 1px; background-color: #e0c25a">&nbsp;</td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -684,6 +684,57 @@ public class Helper
 	}
 @@*/
 
+    static public String LoadAssetTextAsString(Context context, String assetFileName)
+    {
+        logger.debug("LoadAssetTextAsString(..) Invoked");
+
+        BufferedReader bufferedReader = null;
+
+        try
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            InputStream inputStream = context.getAssets().open(assetFileName);
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String str;
+            boolean isFirst = true;
+            while ( (str = bufferedReader.readLine()) != null )
+            {
+                if (isFirst)
+                {
+                    isFirst = false;
+                }
+                else
+                {
+                    stringBuilder.append('\n');
+                }
+                stringBuilder.append(str);
+            }
+
+            return stringBuilder.toString();
+        }
+        catch (IOException e)
+        {
+            Error(logger, "Error opening asset " + assetFileName, e);
+        }
+        finally
+        {
+            if (bufferedReader != null)
+            {
+                try
+                {
+                    bufferedReader.close();
+                }
+                catch (IOException e)
+                {
+                    Error(logger, "Error closing asset " + assetFileName, e);
+                }
+            }
+        }
+
+        return null;
+    }
+
     static public Bitmap GetSizedBitmapFromResource(Context context, SharedPreferences sharedPreferences, int resourceId, String sizedBitmapPath, int widthInDip, int heightInDip)
     {
         logger.debug("GetSizedBitmapFromResource(.....) Invoked");

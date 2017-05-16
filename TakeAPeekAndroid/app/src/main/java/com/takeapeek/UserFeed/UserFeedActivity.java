@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -840,30 +839,6 @@ public class UserFeedActivity extends AppCompatActivity
         }
     }
 
-    public Uri BuildDeepLink(@NonNull String deepLink)
-    {
-        logger.debug("BuildDeepLink(.) Invoked");
-
-        // Get the unique appcode for this app.
-        String appCode = getString(R.string.app_code);
-
-        // Get this app's package name.
-        String packageName = getApplicationContext().getPackageName();
-
-        // Build the link with all required parameters
-        Uri.Builder builder = new Uri.Builder()
-                .scheme("https")
-                .authority(appCode + ".app.goo.gl")
-                .path("/")
-                .appendQueryParameter("link", deepLink)
-                .appendQueryParameter("apn", packageName)
-                .appendQueryParameter("ifl", "https://peek.to/install.html");
-
-
-        // Return the completed deep link.
-        return builder.build();
-    }
-
     private View.OnClickListener ClickListener = new View.OnClickListener()
     {
         @Override
@@ -1085,27 +1060,30 @@ public class UserFeedActivity extends AppCompatActivity
 
                     try
                     {
-                        String invitationCTA = getString(R.string.invitation_cta);
-                        String invitationMessage = String.format(getString(R.string.invitation_message), Helper.GetProfileDisplayName(mSharedPreferences));
-                        if (mCurrentTakeAPeekObject.Title != null && mCurrentTakeAPeekObject.Title.compareToIgnoreCase("") != 0)
-                        {
-                            invitationMessage = String.format("%s: '%s'.", invitationMessage, mCurrentTakeAPeekObject.Title);
-                        }
-                        else
-                        {
-                            invitationMessage += ".";
-                        }
-
+                        String invitationMessage = getString(R.string.invitation_email_top_text);
                         String peekDeepLinkStr = String.format("https://peek.to/peek/%s_%s", Helper.GetProfileId(mSharedPreferences), mCurrentTakeAPeekObject.TakeAPeekID);
-                        Uri deepLinkUri = BuildDeepLink(peekDeepLinkStr);
 
                         String thumbnailURL = String.format("https://rest.peek.to/rest/ClientAPI?action_type=get_peek_thumb&peek_id=%s", mCurrentTakeAPeekObject.TakeAPeekID);
 
-                         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                        String addressStr = mTextViewVideoAddress.getText().toString();
+                        String sectionText = getString(R.string.invitation_email_section_text_1);
+                        if(addressStr != null && addressStr.compareToIgnoreCase("") != 0)
+                        {
+                            sectionText += " " + getString(R.string.invitation_email_section_text_2) + " " + addressStr;
+                        }
+                        sectionText += getString(R.string.invitation_email_section_text_3);
+
+                        String customHTML = Helper.LoadAssetTextAsString(UserFeedActivity.this, "template.html");
+                        customHTML = customHTML.replace(Constants.APPINVITE_THUMBNAIL_PLACEHOLDER, thumbnailURL);
+                        customHTML = customHTML.replace(Constants.APPINVITE_BUTTONTEXT_PLACEHOLDER, getString(R.string.invitation_cta));
+                        customHTML = customHTML.replace(Constants.APPINVITE_SECTIONTEXT_PLACEHOLDER, sectionText);
+
+                        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                                 .setMessage(invitationMessage)
-                                .setDeepLink(deepLinkUri)
-                                .setCustomImage(Uri.parse(thumbnailURL))
-                                .setCallToActionText(invitationCTA)
+                                .setDeepLink(Uri.parse(peekDeepLinkStr))
+                                //@@.setOtherPlatformsTargetApplication(AppInviteInvitation.IntentBuilder.PlatformMode.PROJECT_PLATFORM_IOS, "472227973071-jq5hsbp21f28dke9pq3r5atc0ojk18rm.apps.googleusercontent.com")
+                                .setEmailHtmlContent(customHTML)
+                                .setEmailSubject(getString(R.string.invitation_email_subject))
                                 .build();
 
                         startActivityForResult(intent, RESULT_REQUEST_INVITE);
@@ -1114,6 +1092,7 @@ public class UserFeedActivity extends AppCompatActivity
                     {
                         Helper.Error(logger, "EXCEPTION: When trying to load invitation UI", e);
                     }
+
                     break;
 
                 case R.id.button_control:

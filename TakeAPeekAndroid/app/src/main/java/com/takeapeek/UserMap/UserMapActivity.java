@@ -389,7 +389,7 @@ public class UserMapActivity extends FragmentActivity implements
         // Check for App Invite invitations and launch deep-link activity if possible.
         // Requires that an Activity is registered in AndroidManifest.xml to handle
         // deep-link URLs.
-        boolean autoLaunchDeepLink = false;
+        boolean autoLaunchDeepLink = true;
         AppInvite.AppInviteApi.getInvitation(mGoogleApiClientAppInvite, this, autoLaunchDeepLink)
                 .setResultCallback(new ResultCallback<AppInviteInvitationResult>()
         {
@@ -402,14 +402,10 @@ public class UserMapActivity extends FragmentActivity implements
                 {
                     // Extract information from the intent
                     Intent intent = result.getInvitationIntent();
+                    String deepLink = AppInviteReferral.getDeepLink(intent);
+                    String invitationId = AppInviteReferral.getInvitationId(intent);
 
-                    String deepLinkStr = AppInviteReferral.getDeepLink(intent);
-                    Uri deepLink = Uri.parse(deepLinkStr);
-
-                    String peekToLinkStr = deepLink.getQueryParameter("link");
-                    Uri peekToLink = Uri.parse(peekToLinkStr);
-
-                    ProcessDeepLink(peekToLink);
+                    logger.info(String.format("getInvitation data: deepLink='%s', invitationId='%s'", deepLink, invitationId));
 
                     // Because autoLaunchDeepLink = true we don't have to do anything
                     // here, but we could set that to false and manually choose
@@ -676,7 +672,89 @@ public class UserMapActivity extends FragmentActivity implements
                 {
                     Uri data = intent.getData();
 
-                    ProcessDeepLink(data);
+                    String dataLastSegment = data.getLastPathSegment();
+                    String[] dataSegments = dataLastSegment.split("_");
+                    final String srcProfileId = dataSegments[0];
+                    final String srcPeekId = dataSegments[1];
+
+                    logger.info(String.format("Deep link found: srcProfileId = %s, srcPeekId = %s", srcProfileId, srcPeekId));
+
+                    if(srcProfileId != null && srcProfileId.compareToIgnoreCase("") != 0 &&
+                            srcPeekId != null && srcPeekId.compareToIgnoreCase("") != 0)
+                    {
+                        //Simulate a notification arriving with this profile id and peek id
+                        new AsyncTask<Void, Void, Boolean>()
+                        {
+                            TakeAPeekNotification mTakeAPeekNotification = null;
+
+                            @Override
+                            protected Boolean doInBackground(Void... params)
+                            {
+                                try
+                                {
+                                    int notificationIntId = Helper.getNotificationIDCounter(mSharedPreferences);
+
+                                    mTakeAPeekNotification = new TakeAPeekNotification();
+                                    mTakeAPeekNotification.notificationId = UUID.randomUUID().toString();
+                                    mTakeAPeekNotification.type = Constants.PushNotificationTypeEnum.share.name();
+                                    mTakeAPeekNotification.srcProfileId = srcProfileId;
+                                    mTakeAPeekNotification.creationTime = Helper.GetCurrentTimeMillis();
+                                    mTakeAPeekNotification.relatedPeekId = srcPeekId;
+                                    mTakeAPeekNotification.notificationIntId = notificationIntId;
+
+                                    //Get the Push Notification Data with these srcProfileId and relatedPeekId
+                                    String accountUsername = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
+                                    String accountPassword = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
+
+                                    ResponseObject responseObject = new Transport().GetPushNotifcationData(
+                                            UserMapActivity.this, accountUsername, accountPassword,
+                                            mTakeAPeekNotification.srcProfileId, mTakeAPeekNotification.relatedPeekId, mSharedPreferences);
+
+                                    if(responseObject != null && responseObject.pushNotificationData != null)
+                                    {
+                                        mTakeAPeekNotification.srcProfileJson = responseObject.pushNotificationData.srcProfileJson;
+                                        mTakeAPeekNotification.relatedPeekJson = responseObject.pushNotificationData.relatedPeekJson;
+                                    }
+
+                                    return true;
+                                }
+                                catch (Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: when processing deep link", e);
+                                }
+
+                                return false;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Boolean success)
+                            {
+                                logger.debug("onPostExecute(.) Invoked");
+
+                                try
+                                {
+                                    if(success == true && mTakeAPeekNotification != null)
+                                    {
+                                        DatabaseManager.getInstance().AddTakeAPeekNotification(mTakeAPeekNotification);
+
+                                        final Intent notificationPopupActivityIntent = new Intent(UserMapActivity.this, NotificationPopupActivity.class);
+                                        notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        notificationPopupActivityIntent.putExtra(Constants.PUSH_BROADCAST_EXTRA_ID, mTakeAPeekNotification.notificationId);
+                                        startActivity(notificationPopupActivityIntent);
+                                        overridePendingTransition(R.anim.zoominbounce, R.anim.donothing);
+                                    }
+                                }
+                                catch(Exception e)
+                                {
+                                    Helper.Error(logger, "EXCEPTION: When trying to create a 'share' popup notification", e);
+                                }
+                            }
+                        }.execute();
+                    }
+                    else
+                    {
+                        logger.error(String.format("ERROR: Deep link found with nulls: srcProfileId = %s, srcPeekId = %s", srcProfileId, srcPeekId));
+                    }
                 }
                 else
                 {

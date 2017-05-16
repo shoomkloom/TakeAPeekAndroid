@@ -359,4 +359,9 @@ public class Constants
     
     //Share Bar constants
     public static int SHARE_NUMBER_POPULAR_BUTTONS = 5;
+
+    //Invite placeholders
+    public static String APPINVITE_SECTIONTEXT_PLACEHOLDER = "%%APPINVITE_SECTIONTEXT_PLACEHOLDER%%";
+    public static String APPINVITE_THUMBNAIL_PLACEHOLDER = "%%APPINVITE_THUMBNAIL_PLACEHOLDER%%";
+    public static String APPINVITE_BUTTONTEXT_PLACEHOLDER = "%%APPINVITE_BUTTONTEXT_PLACEHOLDER%%";
 }

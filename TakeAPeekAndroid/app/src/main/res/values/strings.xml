@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Peek.To</string>
     <string name="app_code">k3qyp</string>
+    <string name="ios_package">com.takeapeek.ios</string>
+    <string name="install_link">https://peek.to/install.html</string>
     <string name="app_name_lower">peek.to</string>
     <string name="label">Peek.To</string>
     <string name="no_connection">No Connection</string>
@@ -263,8 +265,13 @@
     <string name="feed_response_by">Response by %1$s</string>
     <string name="feed_share">Share this peek with friends</string>
     <string name="invitation_title">Share Peek with friends:</string>
-    <string name="invitation_message">%1$s wants to share this hot Peek with you</string>
-    <string name="invitation_cta">Click to view Peek</string>
+    <string name="invitation_message">Invitation Message</string>
+    <string name="invitation_cta">View Peek!</string>
+    <string name="invitation_email_subject">Check out this hot Peek</string>
+    <string name="invitation_email_top_text">Install Peek.To</string>
+    <string name="invitation_email_section_text_1">Hi,&lt;br&gt;Check out what just happened</string>
+    <string name="invitation_email_section_text_2">near</string>
+    <string name="invitation_email_section_text_3">. Install the &lt;a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\" style=\"color: blue\"&gt; Peek:to app&lt;/a&gt;. to see the video and discover more videos near locations that you care about . You should definitely &lt;a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\" style=\"color: blue\"&gt;try it out &lt;/a&gt;</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

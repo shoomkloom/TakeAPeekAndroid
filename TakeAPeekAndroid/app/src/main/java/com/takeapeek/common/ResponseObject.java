@@ -29,4 +29,6 @@ public class ResponseObject
     public ArrayList<TrendingPlaceObject> trendingPlaces;
 
     public TakeAPeekNotification pushNotificationData;
+
+    public boolean pushIdExpired = false;
 }

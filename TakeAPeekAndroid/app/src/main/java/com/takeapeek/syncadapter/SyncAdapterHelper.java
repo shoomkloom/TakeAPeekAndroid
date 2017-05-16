@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.takeapeek.common.Constants;
 import com.takeapeek.common.Helper;
+import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekObject;
@@ -430,10 +431,24 @@ public class SyncAdapterHelper implements Runnable,
                     String password = Helper.GetTakeAPeekAccountPassword(mContext);
 
                     //Update server with my new location...
-                    new Transport().UpdateLocationBuild(mContext, username, password,
+                    ResponseObject responseObject = new Transport().UpdateLocationBuild(mContext, username, password,
                             mLastLocation.getLongitude(), mLastLocation.getLatitude(), mAppVersion, mSharedPreferences);
 
                     logger.info(String.format("Updated new location: '%s', build: '%s'.", mLastLocation.toString(), mAppVersion));
+
+                    if(responseObject != null && responseObject.pushIdExpired == true)
+                    {
+                        try
+                        {
+                            logger.error("pushIdExpired = true, registering a new push token");
+
+                            Helper.RefreshFCMToken(mContext, mSharedPreferences);
+                        }
+                        catch(Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION: when calling Helper.RefreshFCMToken", e);
+                        }
+                    }
                 }
                 catch(Exception e)
                 {
