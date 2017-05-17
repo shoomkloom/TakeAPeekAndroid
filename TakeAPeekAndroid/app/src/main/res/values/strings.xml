@@ -272,6 +272,7 @@
     <string name="invitation_email_section_text_1">Hi,&lt;br&gt;Check out what just happened</string>
     <string name="invitation_email_section_text_2">near</string>
     <string name="invitation_email_section_text_3">. Install the &lt;a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\" style=\"color: blue\"&gt; Peek:to app&lt;/a&gt;. to see the video and discover more videos near locations that you care about . You should definitely &lt;a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\" style=\"color: blue\"&gt;try it out &lt;/a&gt;</string>
+    <string name="invitation_email_section_ios_text">iPhone users click &lt;a href=\"https://peek.to/install.html\" style=\"color: blue\"&gt;here&lt;/a&gt;</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -839,6 +840,32 @@ public class UserFeedActivity extends AppCompatActivity
         }
     }
 
+    public Uri BuildDeepLink(@NonNull String deepLink)
+    {
+        logger.debug("BuildDeepLink(.) Invoked");
+
+        // Get the unique appcode for this app.
+        String appCode = getString(R.string.app_code);
+        String iosPackageName = getString(R.string.ios_package);
+        String installLInk = getString(R.string.install_link);
+
+        // Get this app's package name.
+        String packageName = getApplicationContext().getPackageName();
+
+        // Build the link with all required parameters
+        Uri.Builder builder = new Uri.Builder()
+                .scheme("https")
+                .authority(appCode + ".app.goo.gl")
+                .path("/")
+                .appendQueryParameter("link", deepLink)
+                .appendQueryParameter("apn", packageName)
+                .appendQueryParameter("ibi", iosPackageName)
+                .appendQueryParameter("ifl", installLInk);
+
+        // Return the completed deep link.
+        return builder.build();
+    }
+
     private View.OnClickListener ClickListener = new View.OnClickListener()
     {
         @Override
@@ -1062,6 +1089,8 @@ public class UserFeedActivity extends AppCompatActivity
                     {
                         String invitationMessage = getString(R.string.invitation_email_top_text);
                         String peekDeepLinkStr = String.format("https://peek.to/peek/%s_%s", Helper.GetProfileId(mSharedPreferences), mCurrentTakeAPeekObject.TakeAPeekID);
+                        //@@Uri peekDeepLink = BuildDeepLink(peekDeepLinkStr);
+                        //@@String peekDeepLinkDecodedStr = Uri.decode(peekDeepLink.toString());
 
                         String thumbnailURL = String.format("https://rest.peek.to/rest/ClientAPI?action_type=get_peek_thumb&peek_id=%s", mCurrentTakeAPeekObject.TakeAPeekID);
 
@@ -1073,10 +1102,14 @@ public class UserFeedActivity extends AppCompatActivity
                         }
                         sectionText += getString(R.string.invitation_email_section_text_3);
 
+                        String iosText = getString(R.string.invitation_email_section_ios_text);
+
                         String customHTML = Helper.LoadAssetTextAsString(UserFeedActivity.this, "template.html");
                         customHTML = customHTML.replace(Constants.APPINVITE_THUMBNAIL_PLACEHOLDER, thumbnailURL);
                         customHTML = customHTML.replace(Constants.APPINVITE_BUTTONTEXT_PLACEHOLDER, getString(R.string.invitation_cta));
                         customHTML = customHTML.replace(Constants.APPINVITE_SECTIONTEXT_PLACEHOLDER, sectionText);
+                        //@@customHTML = customHTML.replace(Constants.APPINVITE_PEEKLINK_PLACEHOLDER, peekDeepLinkDecodedStr);
+                        customHTML = customHTML.replace(Constants.APPINVITE_IOSTEXT_PLACEHOLDER, iosText);
 
                         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                                 .setMessage(invitationMessage)
