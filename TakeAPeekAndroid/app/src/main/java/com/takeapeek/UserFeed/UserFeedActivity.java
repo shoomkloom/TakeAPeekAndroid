@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -449,8 +450,12 @@ public class UserFeedActivity extends AppCompatActivity
 
         if (requestCode == RESULT_REQUEST_INVITE)
         {
+            logger.info("onActivityResult: requestCode = RESULT_REQUEST_INVITE");
+
             if (resultCode == RESULT_OK)
             {
+                logger.info("onActivityResult: resultCode = RESULT_OK");
+
                 // Get the invitation IDs of all sent messages
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                 for (String id : ids)
@@ -460,8 +465,14 @@ public class UserFeedActivity extends AppCompatActivity
             }
             else
             {
-                // Sending failed or it was canceled, show failure message to the user
-                // ...
+                logger.error(String.format("onActivityResult: resultCode = %d", resultCode));
+
+                String error = String.format("onActivityResult: sent invitation requestCode=%d, resultCode=%d, data.getDataString=%s", requestCode, resultCode, data.getDataString());
+                logger.info(error);
+
+                /*@@*/
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                /*@@*/
             }
         }
     }

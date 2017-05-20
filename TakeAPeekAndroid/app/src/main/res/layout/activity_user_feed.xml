@@ -261,7 +261,7 @@
             android:layout_centerInParent="true"
             android:textColor="@drawable/button_transparent_white"
             android:text="@string/feed_share"
-            android:visibility="visible"/>
+            android:visibility="invisible"/>
 
         <ImageView
             android:id="@+id/imageview_share"
@@ -270,7 +270,7 @@
             android:layout_toLeftOf="@+id/textview_preview_button_share"
             android:layout_alignBottom="@+id/textview_preview_button_share"
             android:src="@drawable/ic_share"
-            android:visibility="visible"/>
+            android:visibility="invisible"/>
 
         <!-- Buttons -->
         <RelativeLayout
