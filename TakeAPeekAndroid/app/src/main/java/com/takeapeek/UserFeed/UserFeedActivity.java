@@ -24,7 +24,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -467,12 +466,11 @@ public class UserFeedActivity extends AppCompatActivity
             {
                 logger.error(String.format("onActivityResult: resultCode = %d", resultCode));
 
-                String error = String.format("onActivityResult: sent invitation requestCode=%d, resultCode=%d, data.getDataString=%s", requestCode, resultCode, data.getDataString());
+                String error = String.format("requestCode=%d, resultCode=%d, data.getDataString=%s", requestCode, resultCode, data == null ? "null" : data.getDataString());
                 logger.info(error);
 
-                /*@@*/
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
-                /*@@*/
+                String errorMessage = getString(R.string.invitation_error_message) + "\n\n" + error;
+                Helper.ErrorMessage(this, mHandler, getString(R.string.Error), getString(R.string.ok), errorMessage);
             }
         }
     }
