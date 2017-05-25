@@ -240,6 +240,11 @@ public class Constants
     public static final String DISPLAY_NAME_SUCCESS = "DisplayNameSuccess";
     public static final String DOB_SUCCESS = "DOBSuccess";
     public static final String WALKTHROUGH_FINISHED = "WalkthroughFinished";
+    public static final String COACHMARK_1_PLAYED = "CoachMark1Played";
+    public static final String COACHMARK_2_PLAYED = "CoachMark2Played";
+    public static final String COACHMARK_3_PLAYED = "CoachMark3Played";
+    public static final String COACHMARK_4_PLAYED = "CoachMark4Played";
+    public static final String COACHMARK_5_PLAYED = "CoachMark5Played";
     public static final String PROFILE_ID = "ProfileId";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String SHOW_NOTIFICATIONS = "ShowNotifications";

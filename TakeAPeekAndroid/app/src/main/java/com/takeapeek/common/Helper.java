@@ -2990,6 +2990,94 @@ public class Helper
     }
     //WalkThrough finished
 
+    //CoachMark played
+    // 1
+    public static Boolean GetCoachMark1Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetCoachMark1Played(.) Invoked");
+
+        boolean walkthroughFinished = sharedPreferences.getBoolean(Constants.COACHMARK_1_PLAYED, false);
+        return walkthroughFinished;
+    }
+
+    public static void SetCoachMark1Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetCoachMark1Played(.) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(Constants.COACHMARK_1_PLAYED, true);
+        sharedPreferencesEditor.commit();
+    }
+    // 2
+    public static Boolean GetCoachMark2Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetCoachMark2Played(.) Invoked");
+
+        boolean coachMarkPlayed = sharedPreferences.getBoolean(Constants.COACHMARK_2_PLAYED, false);
+        return coachMarkPlayed;
+    }
+
+    public static void SetCoachMark2Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetCoachMark2Played(.) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(Constants.COACHMARK_2_PLAYED, true);
+        sharedPreferencesEditor.commit();
+    }
+    // 3
+    public static Boolean GetCoachMark3Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetCoachMark3Played(.) Invoked");
+
+        boolean coachMarkPlayed = sharedPreferences.getBoolean(Constants.COACHMARK_3_PLAYED, false);
+        return coachMarkPlayed;
+    }
+
+    public static void SetCoachMark3Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetCoachMark3Played(.) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(Constants.COACHMARK_3_PLAYED, true);
+        sharedPreferencesEditor.commit();
+    }
+    // 4
+    public static Boolean GetCoachMark4Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetCoachMark4Played(.) Invoked");
+
+        boolean coachMarkPlayed = sharedPreferences.getBoolean(Constants.COACHMARK_4_PLAYED, false);
+        return coachMarkPlayed;
+    }
+
+    public static void SetCoachMark4Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetCoachMark4Played(.) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(Constants.COACHMARK_4_PLAYED, true);
+        sharedPreferencesEditor.commit();
+    }
+    // 5
+    public static Boolean GetCoachMark5Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetCoachMark5Played(.) Invoked");
+
+        boolean coachMarkPlayed = sharedPreferences.getBoolean(Constants.COACHMARK_5_PLAYED, false);
+        return coachMarkPlayed;
+    }
+
+    public static void SetCoachMark5Played(SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetCoachMark5Played(.) Invoked");
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(Constants.COACHMARK_5_PLAYED, true);
+        sharedPreferencesEditor.commit();
+    }
+    //CoachMark played
+
     //City Name
     public static String GetLocality(SharedPreferences sharedPreferences)
     {

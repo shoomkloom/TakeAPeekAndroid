@@ -3,6 +3,7 @@
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".usermap.UserMapActivity"
+    android:id="@+id/user_map_main_linearlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -252,6 +253,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
+        <View
+            android:id="@+id/coachmark_target_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="60dp"
+            android:visibility="invisible">
+        </View>
+
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -268,6 +277,34 @@
             android:layout_width="match_parent"
             android:layout_height="115dp"
             android:layout_gravity="bottom">
+
+            <View
+                android:id="@+id/fancy_show_case_button_map_control"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="invisible"/>
+
+            <View
+                android:id="@+id/fancy_show_case_button_request_peek"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="38dp"
+                android:layout_marginBottom="15dp"
+                android:visibility="invisible"/>
+
+            <View
+                android:id="@+id/fancy_show_case_button_send_peek"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="38dp"
+                android:layout_marginBottom="15dp"
+                android:visibility="invisible"/>
 
             <LinearLayout
                 android:id="@+id/button_map_control"

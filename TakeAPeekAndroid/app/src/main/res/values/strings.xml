@@ -177,6 +177,14 @@
     <string name="click_here_to_request_peek">Click here to request a Peek!</string>
     <string name="no_available_peeks">No available Peeks.\nSend a request to get new Peeks.</string>
     <string name="profile_has_no_peeks_for">No Peeks available for %1$s.\nSend a request to get new Peeks.</string>
+    <string name="coachmark_button">Got It!</string>
+    <string name="coachmark1_title">Let’s request your first Peek!</string>
+    <string name="coachmark1_text">Make sure you have red markers in the circle.\n(You can zoom out the map to see more.)</string>
+    <string name="coachmark2_text">Now click the center button to get started.</string>
+    <string name="coachmark3_text">Click here to request a Peek.\n(Don\'t worry no one knows it\'s you :-)</string>
+    <string name="coachmark4_title">Fantastic!</string>
+    <string name="coachmark4_text">You just requested your first Peek!\nGreen markers show your active requests.</string>
+    <string name="coachmark5_text">Click here to create a Peek so other users will discover you and respond.</string>
 
     <!-- Notifications -->
     <string name="title_activity_notifications">Notifications</string>
@@ -273,6 +281,7 @@
     <string name="invitation_email_section_text_2">near</string>
     <string name="invitation_email_section_text_3">. Install the &lt;a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\" style=\"color: blue\"&gt; Peek:to app&lt;/a&gt;. to see the video and discover more videos near locations that you care about . You should definitely &lt;a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\" style=\"color: blue\"&gt;try it out &lt;/a&gt;</string>
     <string name="invitation_email_section_ios_text">iPhone users click &lt;a href=\"https://peek.to/install.html\" style=\"color: blue\"&gt;here&lt;/a&gt;</string>
+    <string name="invitation_error_message">There was an error sending the Invite, please try again later.</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

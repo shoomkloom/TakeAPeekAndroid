@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.location.Address;
@@ -22,6 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -31,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.appinvite.AppInvite;
@@ -77,7 +78,6 @@ import com.takeapeek.common.RelativeSliderLayout;
 import com.takeapeek.common.RequestObject;
 import com.takeapeek.common.ResponseObject;
 import com.takeapeek.common.RunnableWithArg;
-import com.takeapeek.common.TAPFcmListenerService;
 import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.common.ZoomedAddressCreator;
@@ -106,6 +106,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import me.crosswall.lib.coverflow.CoverFlow;
 import me.crosswall.lib.coverflow.core.PagerContainer;
+import me.toptas.fancyshowcase.FancyShowCaseView;
+import me.toptas.fancyshowcase.OnViewInflateListener;
 
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -168,6 +170,8 @@ public class UserMapActivity extends FragmentActivity implements
     private CutOutView mCutOutView = null;
     TextView mTextviewTrendingLocations = null;
     RelativeSliderLayout mRelativeSliderLayout = null;
+
+    FancyShowCaseView mFancyShowCaseView = null;
 
     int mUserStackItemPosition = -1;
     boolean mOpenStack = false;
@@ -774,6 +778,231 @@ public class UserMapActivity extends FragmentActivity implements
         setIntent(null);
     }
 
+    private void HideCoachMark()
+    {
+        logger.debug("HideCoachMark() Invoked");
+
+        if(mFancyShowCaseView != null)
+        {
+            final View decorView = findViewById(R.id.user_map_main_linearlayout);
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+            mFancyShowCaseView.hide();
+            mFancyShowCaseView = null;
+        }
+    }
+
+    private void ShowCoachMark_1()
+    {
+        logger.debug("ShowCoachMark_1() Invoked");
+
+        if(Helper.GetCoachMark1Played(mSharedPreferences) == true)
+        {
+            logger.info("Helper.GetCoachMark1Played == true, quick return");
+            return;
+        }
+
+        Helper.SetCoachMark1Played(mSharedPreferences);
+
+        Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
+
+        final View decorView = findViewById(R.id.user_map_main_linearlayout);
+        Helper.SetFullscreen(decorView);
+
+        mFancyShowCaseView = new FancyShowCaseView.Builder(this)
+                .focusOn(findViewById(R.id.coachmark_target_view))
+                .focusCircleRadiusFactor(0.6)
+                .enterAnimation(enterAnimation)
+                .customView(R.layout.fancy_show_case_view_1, new OnViewInflateListener() {
+                    @Override
+                    public void onViewInflated(View view) {
+                        view.findViewById(R.id.button_fancy_show_case_view_1).setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                HideCoachMark();
+
+                                mHandler.postDelayed(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        ShowCoachMark_2();
+                                    }
+                                }, 1000);
+                            }
+                        });
+                    }
+                })
+                .closeOnTouch(false)
+                .build();
+
+        mFancyShowCaseView.show();
+
+        //Zoom out a little
+        CameraUpdate cameraUpdate = CameraUpdateFactory.zoomTo(10);
+        mGoogleMap.animateCamera(cameraUpdate);
+    }
+
+    private void ShowCoachMark_2()
+    {
+        logger.debug("ShowCoachMark_2() Invoked");
+
+        if(Helper.GetCoachMark2Played(mSharedPreferences) == true)
+        {
+            logger.info("Helper.GetCoachMark2Played == true, quick return");
+            return;
+        }
+
+        Helper.SetCoachMark2Played(mSharedPreferences);
+
+        Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
+
+        mFancyShowCaseView = new FancyShowCaseView.Builder(this)
+                .focusOn(findViewById(R.id.fancy_show_case_button_map_control))
+                .enterAnimation(enterAnimation)
+                .customView(R.layout.fancy_show_case_view_2, new OnViewInflateListener() {
+                    @Override
+                    public void onViewInflated(View view) {
+                        view.findViewById(R.id.button_fancy_show_case_view_2).setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                HideCoachMark();
+                            }
+                        });
+                    }
+                })
+                .closeOnTouch(false)
+                .build();
+
+        mFancyShowCaseView.show();
+    }
+
+    private void ShowCoachMark_3()
+    {
+        logger.debug("ShowCoachMark_3() Invoked");
+
+        if(Helper.GetCoachMark3Played(mSharedPreferences) == true)
+        {
+            logger.info("Helper.GetCoachMark3Played == true, quick return");
+            return;
+        }
+
+        Helper.SetCoachMark3Played(mSharedPreferences);
+
+        Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
+
+        mFancyShowCaseView = new FancyShowCaseView.Builder(this)
+                .focusOn(findViewById(R.id.fancy_show_case_button_request_peek))
+                .enterAnimation(enterAnimation)
+                .customView(R.layout.fancy_show_case_view_3, new OnViewInflateListener() {
+                    @Override
+                    public void onViewInflated(View view) {
+                        view.findViewById(R.id.button_fancy_show_case_view_3).setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                HideCoachMark();
+                            }
+                        });
+                    }
+                })
+                .closeOnTouch(false)
+                .build();
+
+        mFancyShowCaseView.show();
+    }
+
+    private void ShowCoachMark_4()
+    {
+        logger.debug("ShowCoachMark_4() Invoked");
+
+        if(Helper.GetCoachMark4Played(mSharedPreferences) == true)
+        {
+            logger.info("Helper.GetCoachMark4Played == true, quick return");
+            return;
+        }
+
+        Helper.SetCoachMark4Played(mSharedPreferences);
+
+        Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
+
+        final View decorView = findViewById(R.id.user_map_main_linearlayout);
+        Helper.SetFullscreen(decorView);
+
+        mFancyShowCaseView = new FancyShowCaseView.Builder(this)
+                .focusOn(findViewById(R.id.coachmark_target_view))
+                .focusCircleRadiusFactor(0.6)
+                .enterAnimation(enterAnimation)
+                .customView(R.layout.fancy_show_case_view_4, new OnViewInflateListener() {
+                    @Override
+                    public void onViewInflated(View view) {
+                        view.findViewById(R.id.button_fancy_show_case_view_4).setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                HideCoachMark();
+
+                                mHandler.postDelayed(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        ShowCoachMark_5();
+                                    }
+                                }, 1000);
+                            }
+                        });
+                    }
+                })
+                .closeOnTouch(false)
+                .build();
+
+        mFancyShowCaseView.show();
+    }
+
+    private void ShowCoachMark_5()
+    {
+        logger.debug("ShowCoachMark_5() Invoked");
+
+        if(Helper.GetCoachMark3Played(mSharedPreferences) == true)
+        {
+            logger.info("Helper.GetCoachMark3Played == true, quick return");
+            return;
+        }
+
+        Helper.SetCoachMark5Played(mSharedPreferences);
+
+        Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
+
+        mFancyShowCaseView = new FancyShowCaseView.Builder(this)
+                .focusOn(findViewById(R.id.fancy_show_case_button_send_peek))
+                .enterAnimation(enterAnimation)
+                .customView(R.layout.fancy_show_case_view_5, new OnViewInflateListener() {
+                    @Override
+                    public void onViewInflated(View view) {
+                        view.findViewById(R.id.button_fancy_show_case_view_5).setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                HideCoachMark();
+                            }
+                        });
+                    }
+                })
+                .closeOnTouch(false)
+                .build();
+
+        mFancyShowCaseView.show();
+    }
+
+/*@@
     private void ProcessDeepLink(Uri deepLink)
     {
         logger.debug("ProcessDeepLink(.) Invoked");
@@ -862,6 +1091,7 @@ public class UserMapActivity extends FragmentActivity implements
             logger.error(String.format("ERROR: Deep link found with nulls: srcProfileId = %s, srcPeekId = %s", srcProfileId, srcPeekId));
         }
     }
+@@*/
 
     private void AnimateTrendingPlacesButton()
     {
@@ -972,6 +1202,8 @@ public class UserMapActivity extends FragmentActivity implements
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(lastLocationLatLng, 15);
                 mGoogleMap.moveCamera(cameraUpdate);
             }
+
+            ShowCoachMark_1();
         }
     }
 
@@ -1615,6 +1847,8 @@ public class UserMapActivity extends FragmentActivity implements
                 case R.id.button_map_control:
                     logger.info("onClick: button_map_control clicked");
 
+                    HideCoachMark();
+
                     findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_transparent_faded)));
                     findViewById(R.id.button_map_control).setVisibility(View.GONE);
                     findViewById(R.id.button_map_control_close).setVisibility(View.VISIBLE);
@@ -1622,6 +1856,15 @@ public class UserMapActivity extends FragmentActivity implements
                     findViewById(R.id.button_request_peek).setVisibility(View.VISIBLE);
 
                     MixPanel.PeekButtonEventAndProps(UserMapActivity.this, MixPanel.SCREEN_USER_MAP);
+
+                    mHandler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            ShowCoachMark_3();
+                        }
+                    }, 1000);
 
                     break;
 
@@ -1639,6 +1882,8 @@ public class UserMapActivity extends FragmentActivity implements
                 case R.id.button_send_peek:
                     logger.info("OnClickListener:onClick: button_send_peek clicked");
 
+                    HideCoachMark();
+
                     MixPanel.SendButtonEventAndProps(UserMapActivity.this, MixPanel.SCREEN_USER_MAP, mSharedPreferences);
 
                     final Intent captureClipActivityIntent = new Intent(UserMapActivity.this, CaptureClipActivity.class);
@@ -1649,13 +1894,37 @@ public class UserMapActivity extends FragmentActivity implements
                 case R.id.user_peek_stack_button_request_peeks:
                     logger.info("OnClickListener:onClick: user_peek_stack_button_request_peeks clicked");
 
+                    HideCoachMark();
+
                     SendRequest();
+
+                    mHandler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            ShowCoachMark_4();
+                        }
+                    }, 1000);
+
                     break;
 
                 case R.id.button_request_peek:
                     logger.info("OnClickListener:onClick: button_request_peek clicked");
 
+                    HideCoachMark();
+
                     SendRequest();
+
+                    mHandler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            ShowCoachMark_4();
+                        }
+                    }, 1000);
+
                     break;
 
                 case R.id.textview_new_notifications:
@@ -1668,6 +1937,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                     mHandler.postDelayed(new Runnable()
                     {
+                        @Override
                         public void run()
                         {
                             QuickCloseUserPeekStack();
@@ -1718,6 +1988,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                         mHandler.postDelayed(new Runnable()
                         {
+                            @Override
                             public void run()
                             {
                                 QuickCloseUserPeekStack();
