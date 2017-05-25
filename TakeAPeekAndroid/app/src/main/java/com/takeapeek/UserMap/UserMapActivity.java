@@ -970,7 +970,7 @@ public class UserMapActivity extends FragmentActivity implements
     {
         logger.debug("ShowCoachMark_5() Invoked");
 
-        if(Helper.GetCoachMark3Played(mSharedPreferences) == true)
+        if(Helper.GetCoachMark5Played(mSharedPreferences) == true)
         {
             logger.info("Helper.GetCoachMark3Played == true, quick return");
             return;
