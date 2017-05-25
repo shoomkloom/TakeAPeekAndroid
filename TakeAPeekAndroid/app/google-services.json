@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "472227973071-805po050kc329ttp1jj18h1k1lditip7.apps.googleusercontent.com",
+          "client_id": "472227973071-4q2javv0l7ialpbi1qtf5h30907qnfpb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.takeapeek",
-            "certificate_hash": "41667347704aa2b49be0433eb9afb488fe9ed1ca"
+            "certificate_hash": "9cb208b0ce510b839138d1de06721366f6e7079e"
           }
         },
         {
