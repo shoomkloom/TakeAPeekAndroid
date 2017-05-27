@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.location.Address;
@@ -23,9 +22,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -785,7 +784,11 @@ public class UserMapActivity extends FragmentActivity implements
         if(mFancyShowCaseView != null)
         {
             final View decorView = findViewById(R.id.user_map_main_linearlayout);
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+            if(ViewConfiguration.get(this).hasPermanentMenuKey() == false)
+            {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            }
 
             mFancyShowCaseView.hide();
             mFancyShowCaseView = null;
@@ -807,7 +810,11 @@ public class UserMapActivity extends FragmentActivity implements
         Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
 
         final View decorView = findViewById(R.id.user_map_main_linearlayout);
-        Helper.SetFullscreen(decorView);
+
+        if(ViewConfiguration.get(this).hasPermanentMenuKey() == false)
+        {
+            Helper.SetFullscreen(decorView);
+        }
 
         mFancyShowCaseView = new FancyShowCaseView.Builder(this)
                 .focusOn(findViewById(R.id.coachmark_target_view))
@@ -932,7 +939,11 @@ public class UserMapActivity extends FragmentActivity implements
         Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.fancy_show_case_slide_in);
 
         final View decorView = findViewById(R.id.user_map_main_linearlayout);
-        Helper.SetFullscreen(decorView);
+
+        if(ViewConfiguration.get(this).hasPermanentMenuKey() == false)
+        {
+            Helper.SetFullscreen(decorView);
+        }
 
         mFancyShowCaseView = new FancyShowCaseView.Builder(this)
                 .focusOn(findViewById(R.id.coachmark_target_view))
@@ -1313,16 +1324,24 @@ public class UserMapActivity extends FragmentActivity implements
         {
             try
             {
+                if(mAsyncTaskGetProfilesInBounds != null)
+                {
+                    mAsyncTaskGetProfilesInBounds.cancel(true);
+                    mAsyncTaskGetProfilesInBounds = null;
+                }
+
+                if(mZoomedAddressCreator != null)
+                {
+                    mZoomedAddressCreator.cancel(true);
+                    mZoomedAddressCreator = null;
+                }
+
+                mClusterManager.cluster();
+
                 boundsLock.lock();
 
-                if ((force == true || mLayoutPeekStack.getVisibility() == View.GONE) &&
-                        mAsyncTaskGetProfilesInBounds == null)
+                if ((force == true || mLayoutPeekStack.getVisibility() == View.GONE))
                 {
-                    if(mZoomedAddressCreator != null)
-                    {
-                        mZoomedAddressCreator.cancel(true);
-                    }
-
                     int gapDPInPixels = Helper.dipToPx(20);
 
                     LatLng center = mGoogleMap.getCameraPosition().target;
@@ -1354,11 +1373,21 @@ public class UserMapActivity extends FragmentActivity implements
                                 String userName = Helper.GetTakeAPeekAccountUsername(UserMapActivity.this);
                                 String password = Helper.GetTakeAPeekAccountPassword(UserMapActivity.this);
 
-                                return new Transport().GetProfilesInBounds(
+                                if(isCancelled())
+                                {
+                                    logger.warn("mAsyncTaskGetProfilesInBounds is cancelled, returning");
+                                    return null;
+                                }
+
+                                ResponseObject responseObject = new Transport().GetProfilesInBounds(
                                         UserMapActivity.this, userName, password,
                                         latLngBounds.northeast.latitude, latLngBounds.northeast.longitude,
                                         latLngBounds.southwest.latitude, latLngBounds.southwest.longitude,
                                         mSharedPreferences);
+
+
+
+                                return responseObject;
                             }
                             catch (Exception e)
                             {

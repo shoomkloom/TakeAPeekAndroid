@@ -2996,8 +2996,8 @@ public class Helper
     {
         logger.debug("GetCoachMark1Played(.) Invoked");
 
-        boolean walkthroughFinished = sharedPreferences.getBoolean(Constants.COACHMARK_1_PLAYED, false);
-        return walkthroughFinished;
+        boolean coachMarkPlayed = sharedPreferences.getBoolean(Constants.COACHMARK_1_PLAYED, false);
+        return coachMarkPlayed;
     }
 
     public static void SetCoachMark1Played(SharedPreferences sharedPreferences)
