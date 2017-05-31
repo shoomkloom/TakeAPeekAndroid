@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 /**
  * Created by orenslev on 12/05/2016.
  */
-public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
+public class PlaceItemAdapter extends RecyclerView.Adapter<PlaceItemAdapter.ViewHolder>
 {
     static private final Logger logger = LoggerFactory.getLogger(PlaceItemAdapter.class);
 
@@ -42,26 +43,39 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
 
     SharedPreferences mSharedPreferences = null;
 
-    private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
+    int mCurrentPosition = -1;
+
+    //@@private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
     private final AddressLoader mAddressLoader = new AddressLoader();
 
-    private class ViewHolder
+    // Provide a reference to the views for each data item
+    // Complex data items may need more than one view per item, and
+    // you provide access to all the views for a data item in a view holder
+    public static class ViewHolder extends RecyclerView.ViewHolder
     {
+        // each data item is just a string in this case
         ImageView mImagePlaceThumbnail = null;
         TextView mTextViewPlaceAddress = null;
         TextView mTextViewNumberOfPeeks = null;
+        int mPeekIndex = -1;
+        int mPreviousPeekIndex = -1;
 
-        TrendingPlaceObject mTrendingPlaceObject = null;
-        int Position = -1;
-        int PeekIndex = -1;
-        int PreviousPeekIndex = -1;
+        public ViewHolder(View parent,
+                          ImageView imagePlaceThumbnail,
+                          TextView textViewPlaceAddress,
+                          TextView textViewNumberOfPeeks)
+        {
+            super(parent);
+
+            mImagePlaceThumbnail = imagePlaceThumbnail;
+            mTextViewPlaceAddress = textViewPlaceAddress;
+            mTextViewNumberOfPeeks = textViewNumberOfPeeks;
+        }
     }
 
     // Constructor
     public PlaceItemAdapter(TrendingPlacesActivity trendingPlacesActivity, int itemResourceId, ArrayList<TrendingPlaceObject> trendingPlaceObjectList)
     {
-        super(trendingPlacesActivity, itemResourceId, trendingPlaceObjectList);
-
         logger.debug("PlaceItemAdapter(...) Invoked");
 
         mTrendingPlacesActivity = new WeakReference<TrendingPlacesActivity>(trendingPlacesActivity);
@@ -76,7 +90,7 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
     }
 
     @Override
-    public int getCount()
+    public int getItemCount()
     {
         if(mTrendingPlaceObjectList == null)
         {
@@ -88,108 +102,86 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
         }
     }
 
+    // Create new views (invoked by the layout manager)
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public PlaceItemAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        logger.debug("getView(...) Invoked");
+        // create a new view
+        View topLayoutView = (RelativeLayout) LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_place, parent, false);
 
-        ViewHolder viewHolder = null;
+        ImageView imagePlaceThumbnail = (ImageView)topLayoutView.findViewById(R.id.place_thumbnail);
 
-        View view = convertView;
-        if(convertView == null)
-        {
-            view = mLayoutInflater.inflate(R.layout.item_place, null);
+        TextView textViewPlaceAddress = (TextView)topLayoutView.findViewById(R.id.place_address);
+        Helper.setTypeface(mTrendingPlacesActivity.get(), textViewPlaceAddress, Helper.FontTypeEnum.boldFont);
 
-            viewHolder = new ViewHolder();
+        TextView textViewNumberOfPeeks = (TextView)topLayoutView.findViewById(R.id.place_number_of_peeks);
+        Helper.setTypeface(mTrendingPlacesActivity.get(), textViewNumberOfPeeks, Helper.FontTypeEnum.normalFont);
 
-            viewHolder.mImagePlaceThumbnail = (ImageView)view.findViewById(R.id.place_thumbnail);
-            viewHolder.mImagePlaceThumbnail.setOnClickListener(ClickListener);
-
-            viewHolder.mTextViewPlaceAddress = (TextView)view.findViewById(R.id.place_address);
-            Helper.setTypeface(mTrendingPlacesActivity.get(), viewHolder.mTextViewPlaceAddress, Helper.FontTypeEnum.boldFont);
-
-            viewHolder.mTextViewNumberOfPeeks = (TextView)view.findViewById(R.id.place_number_of_peeks);
-            Helper.setTypeface(mTrendingPlacesActivity.get(), viewHolder.mTextViewNumberOfPeeks, Helper.FontTypeEnum.normalFont);
-
-            view.setTag(viewHolder);
-        }
-        else
-        {
-            viewHolder = (ViewHolder)convertView.getTag();
-        }
-
-        viewHolder.Position = position;
-        if(mTrendingPlaceObjectList != null)
-        {
-            viewHolder.mTrendingPlaceObject = mTrendingPlaceObjectList.get(position);
-
-            //Advance the PeekIndex in a loop
-            viewHolder.PeekIndex += 1;
-            if(viewHolder.PeekIndex >= viewHolder.mTrendingPlaceObject.Peeks.size())
-            {
-                viewHolder.PeekIndex = 0;
-            }
-
-            if(viewHolder.PeekIndex != viewHolder.PreviousPeekIndex)
-            {
-                //Load the thumbnail asynchronously
-                viewHolder.mImagePlaceThumbnail.setTag("Thumbnail_" + viewHolder.Position);
-                mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity.get(), position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
-            }
-            viewHolder.PreviousPeekIndex = viewHolder.PeekIndex;
-
-            LatLng location = new LatLng(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude,
-                    viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude);
-
-            mAddressLoader.SetAddress(mTrendingPlacesActivity.get(), location, viewHolder.mTextViewPlaceAddress, mSharedPreferences);
-
-            String numberOfPeeks = String.format(mTrendingPlacesActivity.get().getString(R.string.place_number_of_peeks), viewHolder.mTrendingPlaceObject.Peeks.size());
-            viewHolder.mTextViewNumberOfPeeks.setText(numberOfPeeks);
-        }
-
-        return view;
+        ViewHolder viewHolder = new ViewHolder(topLayoutView, imagePlaceThumbnail, textViewPlaceAddress, textViewNumberOfPeeks);
+        return viewHolder;
     }
 
-    private View.OnClickListener ClickListener = new View.OnClickListener()
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(ViewHolder holder, final int position)
     {
-        @Override
-        public void onClick(final View v)
+        logger.debug("onBindViewHolder(..) Invoked");
+
+        if(mTrendingPlaceObjectList != null)
         {
-            logger.debug("OnClickListener:onClick(.) Invoked");
+            final TrendingPlaceObject trendingPlaceObject = mTrendingPlaceObjectList.get(position);
 
-            ViewHolder viewHolder = (ViewHolder)((View)v.getParent()).getTag();
-            if(viewHolder == null)
+            //Advance the PeekIndex in a loop
+            holder.mPeekIndex += 1;
+            if(holder.mPeekIndex >= trendingPlaceObject.Peeks.size())
             {
-                viewHolder = (ViewHolder)((View)v.getParent().getParent()).getTag();
+                holder.mPeekIndex = 0;
             }
 
-            final ViewHolder finalViewHolder = viewHolder;
-
-            switch(v.getId())
+            if(holder.mPeekIndex != holder.mPreviousPeekIndex)
             {
-                case R.id.place_thumbnail:
-                    logger.info("onClick: place_thumbnail clicked");
-
-                    //Calculate bounding box from peeks
-                    LatLngBounds.Builder latLngBoundsBuilder = new LatLngBounds.Builder();
-
-                    for(int i=0; i<finalViewHolder.mTrendingPlaceObject.Peeks.size(); i++)
-                    {
-                        LatLng latLng = new LatLng(finalViewHolder.mTrendingPlaceObject.Peeks.get(i).Latitude, finalViewHolder.mTrendingPlaceObject.Peeks.get(i).Longitude);
-                        latLngBoundsBuilder.include(latLng);
-                    }
-
-                    LatLngBounds latLngBounds = latLngBoundsBuilder.build();
-
-                    Intent intent = new Intent(mTrendingPlacesActivity.get(), UserMapActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("com.google.android.gms.maps.model.LatLngBounds", latLngBounds);
-                    mTrendingPlacesActivity.get().startActivity(intent);
-
-                    break;
-
-                default: break;
+                //Load the thumbnail asynchronously
+                holder.mImagePlaceThumbnail.setTag(position);
+                new ThumbnailLoader().SetThumbnail(mTrendingPlacesActivity.get(), position, trendingPlaceObject.Peeks.get(holder.mPeekIndex), holder.mImagePlaceThumbnail, mSharedPreferences);
             }
+            holder.mPreviousPeekIndex = holder.mPeekIndex;
+
+            holder.mImagePlaceThumbnail.setOnClickListener(new View.OnClickListener()
+            {
+               @Override
+               public void onClick(View view)
+               {
+                   logger.info("onClick: place_thumbnail clicked");
+
+                   TrendingPlaceObject trendingPlaceObject = mTrendingPlaceObjectList.get(position);
+
+                   //Calculate bounding box from peeks
+                   LatLngBounds.Builder latLngBoundsBuilder = new LatLngBounds.Builder();
+
+                   for(int i=0; i<trendingPlaceObject.Peeks.size(); i++)
+                   {
+                       LatLng latLng = new LatLng(trendingPlaceObject.Peeks.get(i).Latitude, trendingPlaceObject.Peeks.get(i).Longitude);
+                       latLngBoundsBuilder.include(latLng);
+                   }
+
+                   LatLngBounds latLngBounds = latLngBoundsBuilder.build();
+                   LatLng boundsCenter = latLngBounds.getCenter();
+
+                   Intent intent = new Intent(mTrendingPlacesActivity.get(), UserMapActivity.class);
+                   intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                   intent.putExtra("com.google.android.gms.maps.model.LatLng", boundsCenter);
+                   mTrendingPlacesActivity.get().startActivity(intent);
+               }
+            });
+
+            LatLng location = new LatLng(trendingPlaceObject.Peeks.get(holder.mPeekIndex).Latitude,
+                    trendingPlaceObject.Peeks.get(holder.mPeekIndex).Longitude);
+
+            mAddressLoader.SetAddress(mTrendingPlacesActivity.get(), location, holder.mTextViewPlaceAddress, mSharedPreferences);
+
+            String numberOfPeeks = String.format(mTrendingPlacesActivity.get().getString(R.string.place_number_of_peeks), trendingPlaceObject.Peeks.size());
+            holder.mTextViewNumberOfPeeks.setText(numberOfPeeks);
         }
-    };
+    }
 }

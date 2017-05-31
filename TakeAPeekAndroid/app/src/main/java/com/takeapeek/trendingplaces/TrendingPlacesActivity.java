@@ -12,9 +12,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.takeapeek.R;
@@ -44,8 +45,12 @@ public class TrendingPlacesActivity extends AppCompatActivity
     SharedPreferences mSharedPreferences = null;
     Handler mHandler = new Handler();
 
-    ListView mListViewFeedList = null;
-    PlaceItemAdapter mPlaceItemAdapter = null;
+//@@    ListView mListViewFeedList = null;
+//@@    PlaceItemAdapter mPlaceItemAdapter = null;
+
+    private RecyclerView mListViewFeedList;
+    private RecyclerView.Adapter mPlaceItemAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     ImageView mImageViewProgressAnimation = null;
     AnimationDrawable mAnimationDrawableProgressAnimation = null;
@@ -136,8 +141,15 @@ public class TrendingPlacesActivity extends AppCompatActivity
         //Progress animation
         mImageViewProgressAnimation = (ImageView) findViewById(R.id.places_progress);
         mAnimationDrawableProgressAnimation = (AnimationDrawable) mImageViewProgressAnimation.getBackground();
+
         //List View
-        mListViewFeedList = (ListView)findViewById(R.id.listview_places_list);
+        mListViewFeedList = (RecyclerView)findViewById(R.id.listview_places_list);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mListViewFeedList.setHasFixedSize(true);
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mListViewFeedList.setLayoutManager(mLayoutManager);
 
         mTextViewEmptyList = (TextView)findViewById(R.id.textview_places_empty);
         Helper.setTypeface(this, mTextViewEmptyList, Helper.FontTypeEnum.normalFont);
