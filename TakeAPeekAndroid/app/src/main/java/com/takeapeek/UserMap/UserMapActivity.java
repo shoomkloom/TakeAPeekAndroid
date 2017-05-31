@@ -144,7 +144,7 @@ public class UserMapActivity extends FragmentActivity implements
     ArrayList mProfileStackList = new ArrayList();
 
     private LatLngBounds mLatLngBounds = null;
-    private LatLngBounds mLatLngBoundsIntent = null;
+    private LatLng mLatLngBoundCenterIntent = null;
     private static int CAMERA_MOVE_REACT_THRESHOLD_MS = 500;
     private long mLastCallMs = Long.MIN_VALUE;
     private AsyncTask<LatLngBounds, Void, ResponseObject> mAsyncTaskGetProfilesInBounds = null;
@@ -768,7 +768,7 @@ public class UserMapActivity extends FragmentActivity implements
                     }
                     else
                     {
-                        mLatLngBoundsIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLngBounds");
+                        mLatLngBoundCenterIntent = bundle.getParcelable("com.google.android.gms.maps.model.LatLng");
                     }
                 }
             }
@@ -1198,10 +1198,10 @@ public class UserMapActivity extends FragmentActivity implements
 
         if (mGoogleMap != null)
         {
-            if(mLatLngBoundsIntent != null)
+            if(mLatLngBoundCenterIntent != null)
             {
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mLatLngBoundsIntent, 50));
-                mLatLngBoundsIntent = null;
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngBoundCenterIntent, 12));
+                mLatLngBoundCenterIntent = null;
 
                 ShowProfilesInBounds(true);
             }
