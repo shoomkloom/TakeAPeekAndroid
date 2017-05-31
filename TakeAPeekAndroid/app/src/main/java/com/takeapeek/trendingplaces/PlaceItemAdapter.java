@@ -54,6 +54,7 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
         TrendingPlaceObject mTrendingPlaceObject = null;
         int Position = -1;
         int PeekIndex = -1;
+        int PreviousPeekIndex = -1;
     }
 
     // Constructor
@@ -129,9 +130,13 @@ public class PlaceItemAdapter extends ArrayAdapter<TrendingPlaceObject>
                 viewHolder.PeekIndex = 0;
             }
 
-            //Load the thumbnail asynchronously
-            viewHolder.mImagePlaceThumbnail.setTag("Thumbnail_" + viewHolder.Position);
-            mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity.get(), position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
+            if(viewHolder.PeekIndex != viewHolder.PreviousPeekIndex)
+            {
+                //Load the thumbnail asynchronously
+                viewHolder.mImagePlaceThumbnail.setTag("Thumbnail_" + viewHolder.Position);
+                mThumbnailLoader.SetThumbnail(mTrendingPlacesActivity.get(), position, viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex), viewHolder.mImagePlaceThumbnail, mSharedPreferences);
+            }
+            viewHolder.PreviousPeekIndex = viewHolder.PeekIndex;
 
             LatLng location = new LatLng(viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Latitude,
                     viewHolder.mTrendingPlaceObject.Peeks.get(viewHolder.PeekIndex).Longitude);
