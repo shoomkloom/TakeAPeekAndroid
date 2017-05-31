@@ -1096,6 +1096,8 @@ public class UserFeedActivity extends AppCompatActivity
 
                     try
                     {
+                        MixPanel.SharePeekEventAndProps(UserFeedActivity.this, MixPanel.SCREEN_USER_FEED, mSharedPreferences);
+
                         String invitationMessage = getString(R.string.invitation_email_top_text);
                         String peekDeepLinkStr = String.format("https://peek.to/peek/%s_%s", Helper.GetProfileId(mSharedPreferences), mCurrentTakeAPeekObject.TakeAPeekID);
                         //@@Uri peekDeepLink = BuildDeepLink(peekDeepLinkStr);

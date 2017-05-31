@@ -192,7 +192,7 @@
         android:id="@+id/user_feed_post_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/pt_gray_faded">
+        android:background="@color/pt_black_faded">
 
         <TextView
             android:id = "@+id/textview_preview_button_unfollow"
@@ -261,7 +261,7 @@
             android:layout_centerInParent="true"
             android:textColor="@drawable/button_transparent_white"
             android:text="@string/feed_share"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
         <ImageView
             android:id="@+id/imageview_share"
@@ -270,7 +270,7 @@
             android:layout_toLeftOf="@+id/textview_preview_button_share"
             android:layout_alignBottom="@+id/textview_preview_button_share"
             android:src="@drawable/ic_share"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
         <!-- Buttons -->
         <RelativeLayout

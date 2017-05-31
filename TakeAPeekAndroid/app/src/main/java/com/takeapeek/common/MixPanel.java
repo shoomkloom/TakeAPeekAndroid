@@ -475,6 +475,48 @@ public class MixPanel
         }
     }
 
+    static public void SharePeekEventAndProps(Context context, String screenName, SharedPreferences sharedPreferences)
+    {
+        logger.debug("SharePeekEventAndProps(...) Invoked");
+
+        try
+        {
+            long currentDate = Helper.GetCurrentTimeMillis();
+            String currentLocality = Helper.GetLocality(sharedPreferences);
+
+            //Log event to MixPanel
+            List<NameValuePair> eventProps = new ArrayList<NameValuePair>();
+            eventProps.add(new NameValuePair("Date", currentDate));
+            eventProps.add(new NameValuePair("Screen", screenName));
+            eventProps.add(new NameValuePair("Locality", currentLocality));
+            MixPanel.Instance(context).SendEvent("Share Peek Click", eventProps);
+
+            //Set once super properties
+            List<NameValuePair> superOnceProps = new ArrayList<NameValuePair>();
+            superOnceProps.add(new NameValuePair("Date of first peek Shared", currentDate));
+            MixPanel.Instance(context).SetSuperPropertiesOnce(superOnceProps);
+
+            Object dateOfFirstPeekSharedObj = MixPanel.Instance(context).GetSuperProperty("Date of first peek Shared");
+            long dateOfFirstPeekShared = dateOfFirstPeekSharedObj == null ? 0L : (long) dateOfFirstPeekSharedObj;
+
+            Object totalSharePeekClickObj = MixPanel.Instance(context).GetSuperProperty("Total Number of Peek Share clicks");
+            long totalSharePeekClick = totalSharePeekClickObj == null ? 1L : (long) totalSharePeekClickObj + 1L;
+
+            //Set super properties
+            List<NameValuePair> superProps = new ArrayList<NameValuePair>();
+            superProps.add(new NameValuePair("Date of first peek Shared", dateOfFirstPeekShared));
+            superProps.add(new NameValuePair("Total Number of Peek Share clicks", totalSharePeekClick));
+            MixPanel.Instance(context).SetSuperProperties(superProps);
+
+            //Set people properties
+            MixPanel.Instance(context).SetPeopleProperties(superProps);
+        }
+        catch(Exception e)
+        {
+            logger.error("EXCEPTION: in SharePeekEventAndProps", e);
+        }
+    }
+
     static public void ViewPeekClickEventAndProps(Context context, String screenName, SharedPreferences sharedPreferences)
     {
         logger.debug("ViewPeekClickEventAndProps(...) Invoked");
