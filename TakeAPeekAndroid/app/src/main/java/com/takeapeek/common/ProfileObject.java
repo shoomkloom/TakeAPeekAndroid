@@ -49,7 +49,7 @@ public class ProfileObject implements Serializable
     public double longitude = 0;
     public double latitude = 0;
 
-    public Constants.RelationTypeEnum relationTypeEnum = Constants.RelationTypeEnum.None;
+    public Constants.RelationTypeEnum relationTypeEnum = Constants.RelationTypeEnum.Unknown;
 
     public ArrayList<TakeAPeekObject> peeks;
 

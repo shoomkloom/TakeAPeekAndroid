@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.takeapeek.common.MixPanel.SCREEN_USER_MAP;
 
@@ -61,6 +62,76 @@ public class PeekStackPagerAdapter extends PagerAdapter
         DatabaseManager.init(mUserMapActivityWeakReference.get());
 
         mAppEventsLogger = AppEventsLogger.newLogger(mUserMapActivityWeakReference.get());
+
+        if(mProfileObjectList.size() > 0)
+        {
+            //If there is an Unknown relation, update the relations for the entire Profile list
+            ProfileObject firstProfileObject = (ProfileObject) mProfileObjectList.get(0);
+            if (firstProfileObject.relationTypeEnum == Constants.RelationTypeEnum.Unknown)
+            {
+                //Get the all relations and update the profile list
+                new AsyncTask<WeakReference<UserMapActivity>, Void, Boolean>()
+                {
+                    WeakReference<UserMapActivity> mUserMapActivityWeakReference = null;
+
+                    @Override
+                    protected Boolean doInBackground(WeakReference<UserMapActivity>... params)
+                    {
+                        mUserMapActivityWeakReference = (WeakReference<UserMapActivity>) params[0];
+
+                        try
+                        {
+                            String userName = Helper.GetTakeAPeekAccountUsername(mUserMapActivityWeakReference.get());
+                            String password = Helper.GetTakeAPeekAccountPassword(mUserMapActivityWeakReference.get());
+
+                            ArrayList<TakeAPeekRelation> takeAPeekRelationsList = new Transport().GetAllRelations(mUserMapActivityWeakReference.get(), userName, password, mSharedPreferences);
+
+                            HashMap<String, TakeAPeekRelation> relationObjectHash = new HashMap<String, TakeAPeekRelation>();
+                            if (takeAPeekRelationsList != null)
+                            {
+                                for (TakeAPeekRelation takeAPeekRelation : takeAPeekRelationsList)
+                                {
+                                    relationObjectHash.put(takeAPeekRelation.targetId, takeAPeekRelation);
+                                }
+                            }
+
+                            for (int i = 0; i < mProfileObjectList.size(); i++)
+                            {
+                                ProfileObject profileObject = (ProfileObject) mProfileObjectList.get(i);
+
+                                if (relationObjectHash.containsKey(profileObject.profileId) == true)
+                                {
+                                    profileObject.relationTypeEnum = Constants.RelationTypeEnum.valueOf(relationObjectHash.get(profileObject.profileId).type);
+                                }
+                                else
+                                {
+                                    profileObject.relationTypeEnum = Constants.RelationTypeEnum.None;
+                                }
+                            }
+
+                            return true;
+                        }
+                        catch (Exception e)
+                        {
+                            Helper.Error(logger, "EXCEPTION! When calling GetAllRelations(..)", e);
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean result)
+                    {
+                        logger.debug("onPostExecute(.) Invoked");
+
+                        if (result == true)
+                        {
+                            mUserMapActivityWeakReference.get().RefreshPeekStackPagerAdapter();
+                        }
+                    }
+                }.execute(mUserMapActivityWeakReference);
+            }
+        }
     }
 
     @Override
@@ -79,21 +150,6 @@ public class PeekStackPagerAdapter extends PagerAdapter
         textViewUserStackFollow.setOnClickListener(ClickListener);
         textViewUserStackFollow.setTag(position);
 
-        switch(profileObject.relationTypeEnum)
-        {
-            case Follow:
-                textViewUserStackFollow.setText(R.string.unfollow);
-                textViewUserStackFollow.setBackgroundResource(R.drawable.button_gray);
-                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
-                break;
-
-            default:
-                textViewUserStackFollow.setText(R.string.follow);
-                textViewUserStackFollow.setBackgroundResource(R.drawable.button_green);
-                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
-                break;
-        }
-
         final TakeAPeekObject takeAPeekObject = mUserMapActivityWeakReference.get().GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
 
         if(takeAPeekObject != null)
@@ -110,6 +166,27 @@ public class PeekStackPagerAdapter extends PagerAdapter
         else
         {
             textViewPeekThumbnailPlay.setVisibility(View.GONE);
+        }
+
+        switch(profileObject.relationTypeEnum)
+        {
+            case Unknown:
+                textViewUserStackFollow.setVisibility(View.INVISIBLE);
+                break;
+
+            case Follow:
+                textViewUserStackFollow.setVisibility(View.VISIBLE);
+                textViewUserStackFollow.setText(R.string.unfollow);
+                textViewUserStackFollow.setBackgroundResource(R.drawable.button_gray);
+                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_unfollow, 0, 0, 0);
+                break;
+
+            default:
+                textViewUserStackFollow.setVisibility(View.VISIBLE);
+                textViewUserStackFollow.setText(R.string.follow);
+                textViewUserStackFollow.setBackgroundResource(R.drawable.button_green);
+                textViewUserStackFollow.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_follow, 0, 0, 0);
+                break;
         }
 
         collection.addView(viewGroup);

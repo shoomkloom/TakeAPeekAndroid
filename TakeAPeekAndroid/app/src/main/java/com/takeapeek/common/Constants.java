@@ -85,6 +85,7 @@ public class Constants
 
     public enum RelationTypeEnum
     {
+        Unknown,
         None,
         Follow,
         Block,

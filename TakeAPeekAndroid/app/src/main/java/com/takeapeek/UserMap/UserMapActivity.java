@@ -1342,18 +1342,6 @@ public class UserMapActivity extends FragmentActivity implements
 
                 if ((force == true || mLayoutPeekStack.getVisibility() == View.GONE))
                 {
-                    int gapDPInPixels = Helper.dipToPx(20);
-
-                    LatLng center = mGoogleMap.getCameraPosition().target;
-                    Point pointCenter = mGoogleMap.getProjection().toScreenLocation(center);
-                    Point pointToTheLeft = new Point(pointCenter.x - gapDPInPixels, pointCenter.y);
-                    Point pointToTheRight = new Point(pointCenter.x + gapDPInPixels, pointCenter.y);
-                    LatLng latlngToTheLeft = mGoogleMap.getProjection().fromScreenLocation(pointToTheLeft);
-                    LatLng latlngToTheRight = mGoogleMap.getProjection().fromScreenLocation(pointToTheRight);
-
-                    mZoomedAddressCreator = new ZoomedAddressCreator(this, latlngToTheLeft, latlngToTheRight, mTextViewStackUserName);
-                    mZoomedAddressCreator.execute();
-
                     //Start asynchronous request to server
                     mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
                     {
@@ -1385,8 +1373,6 @@ public class UserMapActivity extends FragmentActivity implements
                                         latLngBounds.southwest.latitude, latLngBounds.southwest.longitude,
                                         mSharedPreferences);
 
-
-
                                 return responseObject;
                             }
                             catch (Exception e)
@@ -1408,6 +1394,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                                     logger.info(String.format("Got %d profiles in the bounds", responseObject.profiles.size()));
 
+/*@@
                                     //Collect
                                     HashMap<String, TakeAPeekRelation> relationObjectHash = new HashMap<String, TakeAPeekRelation>();
                                     if(responseObject.relations != null)
@@ -1417,15 +1404,17 @@ public class UserMapActivity extends FragmentActivity implements
                                             relationObjectHash.put(takeAPeekRelation.targetId, takeAPeekRelation);
                                         }
                                     }
+@@*/
 
                                     int i = 0;
                                     for (ProfileObject profileObject : responseObject.profiles)
                                     {
+/*@@
                                         if(relationObjectHash.containsKey(profileObject.profileId) == true)
                                         {
                                             profileObject.relationTypeEnum = Constants.RelationTypeEnum.valueOf(relationObjectHash.get(profileObject.profileId).type);
                                         }
-
+@@*/
                                         ClusterManagerAddItem(i, profileObject);
                                         i++;
                                     }
@@ -1454,6 +1443,19 @@ public class UserMapActivity extends FragmentActivity implements
                             }
                         }
                     }.execute(latLngBounds);
+
+                    //Update the location text
+                    int gapDPInPixels = Helper.dipToPx(20);
+
+                    LatLng center = mGoogleMap.getCameraPosition().target;
+                    Point pointCenter = mGoogleMap.getProjection().toScreenLocation(center);
+                    Point pointToTheLeft = new Point(pointCenter.x - gapDPInPixels, pointCenter.y);
+                    Point pointToTheRight = new Point(pointCenter.x + gapDPInPixels, pointCenter.y);
+                    LatLng latlngToTheLeft = mGoogleMap.getProjection().fromScreenLocation(pointToTheLeft);
+                    LatLng latlngToTheRight = mGoogleMap.getProjection().fromScreenLocation(pointToTheRight);
+
+                    mZoomedAddressCreator = new ZoomedAddressCreator(this, latlngToTheLeft, latlngToTheRight, mTextViewStackUserName);
+                    mZoomedAddressCreator.execute();
                 }
             }
             catch (Exception e)
@@ -1472,6 +1474,19 @@ public class UserMapActivity extends FragmentActivity implements
 
         mLastCallMs = snap;
         mLatLngBounds = latLngBounds;
+    }
+
+    public void RefreshPeekStackPagerAdapter()
+    {
+        logger.debug("RefreshPeekStackPagerAdapter() Invoked");
+
+        mPeekStackPagerAdapter = new PeekStackPagerAdapter(UserMapActivity.this, mProfileStackList);
+        mViewPager.setAdapter(mPeekStackPagerAdapter);
+
+        if(mUserStackItemPosition > -1)
+        {
+            mViewPager.setCurrentItem(mUserStackItemPosition);
+        }
     }
 
     private String GetZoomedAddress() throws Exception
@@ -2407,31 +2422,36 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         Bitmap iconBitmap = null;
 
+/*@@
         boolean doBlur = false;
         Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
         if(mUserMapActivityWeakReference.get().mUserStackItemPosition == -1 && mCutOutView.mCenter != null)
         {
             doBlur = false;//@@Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
         }
-
+@@*/
         if(DatabaseManager.getInstance().GetTakeAPeekRequestWithProfileIdCount(tapClusterItem.mProfileObject.profileId) > 0)
         {
+/*@@
             if(doBlur)
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmapRequest, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
+@@*/
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmapRequest, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
             }
         }
         else
         {
+/*@@
             if(doBlur)
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmap, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
+@@*/
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmap, "1", mPointCenter, 60, "#FFFFFF", Paint.Align.CENTER);
             }
@@ -2455,12 +2475,14 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         mHandlerCluster.removeCallbacks(mUpdateTaskCluster);
 
+/*@@
         boolean doBlur = false;
         Point markerPosition = mGoogleMap.getProjection().toScreenLocation(markerOptions.getPosition());
         if(mCutOutView.mCenter != null)
         {
             doBlur = false;//@@Math.sqrt(Math.pow(mCutOutView.mCenter.x - markerPosition.x, 2) + Math.pow(mCutOutView.mCenter.y - markerPosition.y, 2)) > mCutOutView.mRadius;
         }
+@@*/
 
         boolean hasRequest = false;
         for(TAPClusterItem tapClusterItem : cluster.getItems())
@@ -2491,22 +2513,26 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         if(hasRequest == true)
         {
+/*@@
             if(doBlur)
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmapRequest, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
+@@*/
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmapRequest, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER);
             }
         }
         else
         {
+/*@@
             if(doBlur)
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBlurBitmap, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER, true);
             }
             else
+@@*/
             {
                 iconBitmap = Helper.OverlayText(mUserMapActivityWeakReference.get(), mItemSizedBitmap, formattedNumber, mPointCenter, textSize, "#FFFFFF", Paint.Align.CENTER);
             }
@@ -2524,6 +2550,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
         markerOptions.anchor(mAnchorX, mAnchorY);
     }
 
+/*@@
     @Override
     protected void onClusterItemRendered(TAPClusterItem tapClusterItem, Marker marker)
     {
@@ -2539,6 +2566,7 @@ class TAPClusterItemRenderer extends DefaultClusterRenderer<TAPClusterItem>
 
         super.onClusterRendered(cluster, marker);
     }
+@@*/
 
     @Override
     protected boolean shouldRenderAsCluster(Cluster cluster)

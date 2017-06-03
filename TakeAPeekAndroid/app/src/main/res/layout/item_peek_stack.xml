@@ -115,7 +115,8 @@
             android:text="@string/follow"
             android:translationZ="4dp"
             android:stateListAnimator="@anim/button_elevation"
-            android:background="@drawable/button_green"/>
+            android:background="@drawable/button_green"
+            android:visibility="invisible"/>
 
         <TextView
             android:id = "@+id/peek_stack_address"
