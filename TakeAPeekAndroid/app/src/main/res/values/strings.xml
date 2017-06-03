@@ -148,6 +148,7 @@
     <string name="title_activity_user_feed">User Feed</string>
     <string name="error_playing_peek">There was an error playing this peek, please try again later.</string>
     <string name="textview_user_feed_empty">This user has no peeks</string>
+    <string name="near_address">Near %1$s, %2$s</string>
 
     <!-- User Map -->
     <string name="search_location">Search</string>

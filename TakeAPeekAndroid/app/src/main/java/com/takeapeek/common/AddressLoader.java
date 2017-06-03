@@ -114,7 +114,14 @@ public class AddressLoader
 
         	try
         	{
-                return LocationHelper.FormattedAddressFromLocation(mContext, mLatLng, mSharedPreferences);
+                String formattedAddress = LocationHelper.FormattedAddressFromLocation(mContext, mLatLng, mSharedPreferences);
+
+                if(formattedAddress == null)
+                {
+                    formattedAddress = LocationHelper.NearAddressFromLocation(mContext, mLatLng, mSharedPreferences);
+                }
+
+                return formattedAddress;
         	}
         	catch(Exception e)
         	{

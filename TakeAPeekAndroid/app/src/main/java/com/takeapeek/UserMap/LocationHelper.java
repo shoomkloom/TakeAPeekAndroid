@@ -37,7 +37,7 @@ public class LocationHelper
                 String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&key=%s",
                 location.latitude, location.longitude, googleMapsKey);
 
-        String responseStr = new Transport().DoHTTPGetRequest(context, reverseGeoCodingURL, null, null);
+        String responseStr = new Transport().DoHTTPSGetRequest(context, reverseGeoCodingURL, null, null);
         FormattedAddressContainer formattedAddressContainer = new Gson().fromJson(responseStr, FormattedAddressContainer.class);
 
         if(formattedAddressContainer != null && formattedAddressContainer.results != null && formattedAddressContainer.results.size() > 0)
@@ -93,6 +93,39 @@ public class LocationHelper
         }
 
         return formattedAddress;
+    }
+
+    static public String NearAddressFromLocation(Context context, LatLng location, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("NearAddressFromLocation(...) Invoked");
+
+        String nearAddress = null;
+
+        String reverseGeoCodingURL =
+                String.format("http://api.geonames.org/findNearbyJSON?lat=%s&lng=%s&username=takeapeekdev",
+                        location.latitude, location.longitude);
+
+        String responseStr = new Transport().DoHTTPGetRequest(context, reverseGeoCodingURL);
+        NearAddressContainer nearAddressContainer = new Gson().fromJson(responseStr, NearAddressContainer.class);
+
+        if(nearAddressContainer != null && nearAddressContainer.geonames != null && nearAddressContainer.geonames.size() > 0)
+        {
+            double shortestDistance = 1000;
+            String formattingStr = context.getString(R.string.near_address);
+
+            //Find the post code, streetNumber and city
+            for(GeoName geoName : nearAddressContainer.geonames)
+            {
+                if(geoName.distance < shortestDistance)
+                {
+                    shortestDistance = geoName.distance;
+
+                    nearAddress = String.format(formattingStr, geoName.name, geoName.countryName);
+                }
+            }
+        }
+
+        return nearAddress;
     }
 
     static public Address AddressFromLocation(Context context, LatLng location) throws Exception
@@ -190,6 +223,7 @@ public class LocationHelper
         return location;
     }
 
+    //Google Reverse GeoCoder
     class FormattedAddressContainer
     {
         public ArrayList<FormattedAddress> results;
@@ -206,5 +240,18 @@ public class LocationHelper
     {
         public ArrayList<AddressComponent> address_components;
         public String formatted_address;
+    }
+
+    //GeoNames Reverse GeoCoder
+    class NearAddressContainer
+    {
+        public ArrayList<GeoName> geonames;
+    }
+
+    class GeoName
+    {
+        public double distance;
+        public String name;
+        public String countryName;
     }
 }
