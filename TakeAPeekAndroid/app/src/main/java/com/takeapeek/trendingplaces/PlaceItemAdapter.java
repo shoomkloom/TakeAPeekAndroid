@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -107,8 +106,7 @@ public class PlaceItemAdapter extends RecyclerView.Adapter<PlaceItemAdapter.View
     public PlaceItemAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         // create a new view
-        View topLayoutView = (RelativeLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_place, parent, false);
+        View topLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_place, parent, false);
 
         ImageView imagePlaceThumbnail = (ImageView)topLayoutView.findViewById(R.id.place_thumbnail);
 
