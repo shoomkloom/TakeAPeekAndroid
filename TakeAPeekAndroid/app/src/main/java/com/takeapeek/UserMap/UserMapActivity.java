@@ -1338,9 +1338,17 @@ public class UserMapActivity extends FragmentActivity implements
 
                 mClusterManager.cluster();
 
+                boolean peekStackVisibile = mLayoutPeekStack.getVisibility() == View.GONE;
+
+                if(peekStackVisibile == true)
+                {
+                    //Clear the location
+                    mTextViewStackUserName.setText("");
+                }
+
                 boundsLock.lock();
 
-                if ((force == true || mLayoutPeekStack.getVisibility() == View.GONE))
+                if (force == true || peekStackVisibile == true)
                 {
                     //Start asynchronous request to server
                     mAsyncTaskGetProfilesInBounds = new AsyncTask<LatLngBounds, Void, ResponseObject>()
