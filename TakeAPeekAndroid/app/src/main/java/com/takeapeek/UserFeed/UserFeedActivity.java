@@ -1430,7 +1430,10 @@ public class UserFeedActivity extends AppCompatActivity
                                 takeAPeekRelationFollow = new TakeAPeekRelation(Constants.RelationTypeEnum.Follow.name(), profileId, null, targetProfileId, targetDisplayName);
                                 DatabaseManager.getInstance().AddTakeAPeekRelation(takeAPeekRelationFollow);
 
-                                Helper.ShowCenteredToast(UserFeedActivity.this, message);
+                                if(targetDisplayName != null && targetDisplayName.trim().compareTo("") != 0)
+                                {
+                                    Helper.ShowCenteredToast(UserFeedActivity.this, message);
+                                }
 
                                 MixPanel.FollowUserEventAndProps(UserFeedActivity.this, mSharedPreferences);
                             }
