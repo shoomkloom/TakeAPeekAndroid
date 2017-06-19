@@ -226,6 +226,8 @@ public class SyncAdapterHelper implements Runnable,
         logger.info("Getting list of pending takeAPeekObjects from takeAPeekObjectList");
 		List<TakeAPeekObject> takeAPeekObjectList = DatabaseManager.getInstance().GetTakeAPeekObjectUploadList();
 
+        boolean refreshPushId = false;
+
         if(takeAPeekObjectList != null)
         {
             logger.info(String.format("Found %d takeAPeekObjects pending upload", takeAPeekObjectList.size()));
@@ -286,11 +288,16 @@ public class SyncAdapterHelper implements Runnable,
                     String completedTakeAPeekJson = new Gson().toJson(takeAPeekObject);
 
                     //Upload the Mutha!
-                    new Transport().UploadFile(
+                    ResponseObject responseObject = new Transport().UploadFile(
                             mContext, username, password, completedTakeAPeekJson,
                             fileToUpload, thumbnailToUpload,
                             Constants.ContentTypeEnum.valueOf(takeAPeekObject.ContentType),
                             mSharedPreferences);
+
+                    if(responseObject != null && responseObject.pushIdExpired == true)
+                    {
+                        refreshPushId = true;
+                    }
 
                     logger.info("Peek uploaded successfully, setting Upload = 0");
                     takeAPeekObject.Upload = 0;
@@ -301,6 +308,20 @@ public class SyncAdapterHelper implements Runnable,
                 {
                     Helper.Error(logger, String.format("EXCEPTION: When trying to upload %s", takeAPeekObject.FilePath), ex);
                 }
+            }
+        }
+
+        if(refreshPushId == true)
+        {
+            try
+            {
+                logger.error("pushIdExpired = true, registering a new push token");
+
+                Helper.RefreshFCMToken(mContext, mSharedPreferences);
+            }
+            catch(Exception e)
+            {
+                Helper.Error(logger, "EXCEPTION: when calling Helper.RefreshFCMToken", e);
             }
         }
 

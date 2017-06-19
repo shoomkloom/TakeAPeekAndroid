@@ -911,7 +911,7 @@ public class Transport
 		return responseObject;
     }
 
-	public void UploadFile(Context context, String username, String password,
+	public ResponseObject UploadFile(Context context, String username, String password,
 		String metaDataJson, File fileToUpload, File thumbnailToUpload,
 		Constants.ContentTypeEnum contentType, SharedPreferences sharedPreferences) throws Exception
 	{
@@ -958,6 +958,8 @@ public class Transport
 			//@@lock.unlock();
 			logger.debug("UploadFile(.........) - after unlock");
 		}
+
+        return responseObject;
 	}
 	
 	public void DownloadFile(Context context, String username, String password, String contactID, String filePath, Handler downloadProgressHandler) throws Exception
