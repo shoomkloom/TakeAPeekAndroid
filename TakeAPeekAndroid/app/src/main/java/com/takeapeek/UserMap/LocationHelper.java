@@ -32,10 +32,13 @@ public class LocationHelper
 
         String formattedAddress = null;
 
+        String latitudeStr = Double.toString(location.latitude);
+        String longitudeStr = Double.toString(location.longitude);
+
         String googleMapsKey = context.getString(R.string.google_maps_key);
         String reverseGeoCodingURL =
-                String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&key=%s",
-                location.latitude, location.longitude, googleMapsKey);
+                String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s",
+                        latitudeStr, longitudeStr, googleMapsKey);
 
         String responseStr = new Transport().DoHTTPSGetRequest(context, reverseGeoCodingURL, null, null);
         FormattedAddressContainer formattedAddressContainer = new Gson().fromJson(responseStr, FormattedAddressContainer.class);

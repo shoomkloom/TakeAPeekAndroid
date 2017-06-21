@@ -38,6 +38,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -52,8 +53,8 @@ public class Transport
 	//*@@*/String mServerRootURL = "http://takeapeek.cloudapp.net";
 	//*@@*/String mServerRootURL = "https://127.0.0.1:3858"; //Nexus 5 test device ip to PC localhost
     //*@@*/String mServerRootURL = "http://10.0.2.2:8888"; //Emulator ip to PC localhost
-	//*@@*/String mServerRootURL = ""; //Staging address
-	
+	//*@@*/String mServerRootURL = "http://74799ff24a214520b9808007abc07f38.cloudapp.net/"; //Staging address
+
 	public boolean IsConnected(Context context)
 	{
 		logger.debug("IsConnected(.) Invoked");
@@ -88,7 +89,7 @@ public class Transport
 			nameValuePairs.add(new NameValuePair("user_name", username));
 			nameValuePairs.add(new NameValuePair("platform", "Android"));
             nameValuePairs.add(new NameValuePair("display_name", displayName));
-            nameValuePairs.add(new NameValuePair("dob", String.format("%d", dateOfBirth)));
+            nameValuePairs.add(new NameValuePair("dob", String.format(Locale.US, "%d", dateOfBirth)));
 			
 			//Returns the password
 			responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
@@ -228,7 +229,7 @@ public class Transport
             nameValuePairs.add(new NameValuePair("action_type", "set_profile_dob"));
             nameValuePairs.add(new NameValuePair("user_name", userName));
             nameValuePairs.add(new NameValuePair("password", password));
-            nameValuePairs.add(new NameValuePair("dob", String.format("%d", dateOfBirthMillis)));
+            nameValuePairs.add(new NameValuePair("dob", String.format(Locale.US, "%d", dateOfBirthMillis)));
 
             responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
         }
@@ -387,13 +388,18 @@ public class Transport
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
+            String northStr = Double.toString(north);
+            String eastStr = Double.toString(east);
+            String southStr = Double.toString(south);
+            String westStr = Double.toString(west);
+
             nameValuePairs.add(new NameValuePair("action_type", "get_profiles_in_bounds_2"));
             nameValuePairs.add(new NameValuePair("user_name", userName));
             nameValuePairs.add(new NameValuePair("password", password));
-            nameValuePairs.add(new NameValuePair("north", String.format("%f", north)));
-            nameValuePairs.add(new NameValuePair("east", String.format("%f", east)));
-            nameValuePairs.add(new NameValuePair("south", String.format("%f", south)));
-            nameValuePairs.add(new NameValuePair("west", String.format("%f", west)));
+            nameValuePairs.add(new NameValuePair("north", northStr));
+            nameValuePairs.add(new NameValuePair("east", eastStr));
+            nameValuePairs.add(new NameValuePair("south", southStr));
+            nameValuePairs.add(new NameValuePair("west", westStr));
 
             responseObject = DoHTTPGetResponse(context, nameValuePairs, sharedPreferences);
         }
@@ -1096,13 +1102,15 @@ public class Transport
             if (IsConnected(context))
             {
                 int responseCode = 0;
-                HttpsURLConnection httpsURLConnection = null;
+                /*@@*/HttpsURLConnection httpsURLConnection = null;
+                //*@@*/HttpURLConnection httpsURLConnection = null;
                 InputStream inputStream = null;
 
                 try
                 {
                     URL url = new URL(requestStr);
-                    httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    /*@@*/httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    //*@@*/httpsURLConnection = (HttpURLConnection) url.openConnection();
                     //@@httpsURLConnection = (HttpURLConnection) url.openConnection();
                     httpsURLConnection.setRequestProperty("connection", "close");
                     httpsURLConnection.setRequestProperty("Cache-Control", "no-cache");
@@ -1205,21 +1213,21 @@ public class Transport
                         catch (Exception e)
                         {
                             String errorDetails = String.format("JSON exception for response string = '%s'", responseStr);
-                            Helper.Error(logger, String.format("EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
+                            Helper.Error(logger, String.format(Locale.US, "EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
                             throw e;
                         }
 
                         if (responseObject != null && responseObject.error != null && responseObject.error.isEmpty() == false)
                         {
                             String error = responseObject == null ?
-                                    String.format("HTTP status code: %d", responseCode) :
-                                    String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
+                                    String.format(Locale.US, "HTTP status code: %d", responseCode) :
+                                    String.format(Locale.US, "HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
 
                             Helper.Error(logger, error);
                             throw new Exception(error);
                         }
 
-                        String error = String.format("HTTP status code: %d", responseCode);
+                        String error = String.format(Locale.US, "HTTP status code: %d", responseCode);
                         Helper.Error(logger, error);
                         throw new Exception(error);
                     }
@@ -1316,14 +1324,14 @@ public class Transport
                     //Get the response
                     logger.info("Sent the request, getting the response");
                     responseCode = httpURLConnection.getResponseCode();
-                    logger.info(String.format("responseCode = %d", responseCode));
+                    logger.info(String.format(Locale.US, "responseCode = %d", responseCode));
 
                     inputStream = httpURLConnection.getInputStream();
                     responseStr = Helper.convertStreamToString(inputStream);
 
                     if (responseCode != 200)
                     {
-                        String error = String.format("HTTP status code: %d", responseCode);
+                        String error = String.format(Locale.US, "HTTP status code: %d", responseCode);
                         Helper.Error(logger, error);
                         throw new Exception(error);
                     }
@@ -1434,7 +1442,8 @@ public class Transport
 
             if (IsConnected(context))
             {
-                HttpsURLConnection httpsURLConnection = null;
+                /*@@*/HttpsURLConnection httpsURLConnection = null;
+                //*@@*/HttpURLConnection httpsURLConnection = null;
                 BufferedOutputStream outputStream = null;
                 BufferedInputStream inputStream = null;
 
@@ -1452,7 +1461,8 @@ public class Transport
                 {
                     int responseCode = 0;
                     URL url = new URL(requestStr);
-                    httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    /*@@*/httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    //*@@*/httpsURLConnection = (HttpURLConnection) url.openConnection();
                     httpsURLConnection.setRequestProperty("connection", "close");
 
                     httpsURLConnection.setDoInput(true);
@@ -1571,7 +1581,7 @@ public class Transport
                     catch (Exception e)
                     {
                         String errorDetails = String.format("JSON exception for response string = '%s'", responseStr);
-                        Helper.Error(logger, String.format("EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
+                        Helper.Error(logger, String.format(Locale.US, "EXCEPTION: statusCode='%d'\n%s", responseCode, errorDetails), e);
                         throw e;
                     }
 
@@ -1585,8 +1595,8 @@ public class Transport
                     if (responseCode != 200)
                     {
                         String error = responseObject == null ?
-                                String.format("HTTP status code: %d", responseCode) :
-                                String.format("HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
+                                String.format(Locale.US, "HTTP status code: %d", responseCode) :
+                                String.format(Locale.US, "HTTP status code: %d, Response error: %s", responseCode, responseObject.error);
 
                         Helper.Error(logger, error);
                         throw new Exception(error);
