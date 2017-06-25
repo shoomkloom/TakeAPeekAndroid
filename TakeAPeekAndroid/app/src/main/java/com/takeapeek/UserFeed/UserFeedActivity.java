@@ -1166,6 +1166,7 @@ public class UserFeedActivity extends AppCompatActivity
                     final Intent captureClipActivityIntent = new Intent(UserFeedActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mCurrentTakeAPeekObject.ProfileID);
+                    captureClipActivityIntent.putExtra(Constants.HIDESKIPBUTTONEXTRA_KEY, true);
                     startActivity(captureClipActivityIntent);
 
                     if(mPeekItemAdapter.getCount() > 0)

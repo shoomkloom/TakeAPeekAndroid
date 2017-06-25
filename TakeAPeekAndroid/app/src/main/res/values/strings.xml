@@ -56,6 +56,7 @@
     <string name="detecting_location_title2">Detecting your location...</string>
     <string name="error_starting_profile">There was an error starting the recording. Please press \'Back\' till you exit the application and then try again.</string>
     <string name="error_open_camera">There was an error opening your camera. Please try again.</string>
+    <string name="intro_skip_peek">SKIP</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

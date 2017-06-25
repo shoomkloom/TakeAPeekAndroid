@@ -19,26 +19,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
-import java.util.Hashtable;
 
 public class ThumbnailLoader
 {
 	static private final Logger logger = LoggerFactory.getLogger(ThumbnailLoader.class);
 	
 	Context mContext = null;
+    boolean mAnimate = true;
     int mPosition = -1;
 
 	SharedPreferences mSharedPreferences = null;
 	BitmapFactory.Options mBitmapFactoryOptions = null;
 
-    Hashtable mAnimationStateHash = new Hashtable();
+    public void SetThumbnail(Context activity, int position, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
+    {
+        logger.debug("SetThumbnail(......) Invoked");
 
-	public void SetThumbnail(Context activity, int position, TakeAPeekObject takeAPeekObject, ImageView imageView, SharedPreferences sharedPreferences)
+        SetThumbnail(activity, position, takeAPeekObject, imageView, true, sharedPreferences);
+    }
+
+	public void SetThumbnail(Context activity, int position, TakeAPeekObject takeAPeekObject, ImageView imageView, boolean animate, SharedPreferences sharedPreferences)
 	{
-		logger.debug("SetThumbnail(......) Invoked");
+		logger.debug("SetThumbnail(.......) Invoked");
 		
 		mContext = activity;
-		mSharedPreferences = sharedPreferences;
+        mAnimate = animate;
+        mSharedPreferences = sharedPreferences;
         mPosition = position;
 
 		mBitmapFactoryOptions = new BitmapFactory.Options();
@@ -150,26 +156,14 @@ public class ThumbnailLoader
                     // Change bitmap only if this process is still associated with it
                     if (this == thumbnailCreatorTask)
                     {
-                        //@@imageView.setBackgroundResource(0);
-                        //*@@*/imageView.setVisibility(View.INVISIBLE);
                         imageView.setImageBitmap(bitmap);
-                        //*@@*/imageView.setVisibility(View.VISIBLE);
-/*@@/
-                    Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
-                    imageView.setAnimation(zoomInAnimation);
-                    zoomInAnimation.start();
-/*@@*/
 
-/*@@*/
-                        if (mAnimationStateHash.containsKey(mPosition) == false)
+                        if (mAnimate == true)
                         {
-                            mAnimationStateHash.put(mPosition, true);
-
                             Animation zoomInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadeinquick);
                             imageView.setAnimation(zoomInAnimation);
                             zoomInAnimation.start();
                         }
-/*@@*/
                     }
                 }
             }

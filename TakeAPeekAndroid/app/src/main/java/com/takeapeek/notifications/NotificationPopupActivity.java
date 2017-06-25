@@ -525,6 +525,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     final Intent captureClipActivityIntent = new Intent(NotificationPopupActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     captureClipActivityIntent.putExtra(Constants.RELATEDPROFILEIDEXTRA_KEY, mProfileObject.profileId);
+                    captureClipActivityIntent.putExtra(Constants.HIDESKIPBUTTONEXTRA_KEY, true);
                     startActivity(captureClipActivityIntent);
 
                     //Remove related notification

@@ -62,6 +62,8 @@
             android:layout_marginRight="15dp"
             android:layout_marginBottom="5dp"
             android:textColor="@color/pt_darkgray"
+            android:maxLines="1"
+            android:ellipsize="start"
             android:gravity="left" />
 
         <TextView
@@ -74,6 +76,8 @@
             android:layout_marginRight="15dp"
             android:layout_marginBottom="5dp"
             android:textColor="@color/pt_darkgray"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:gravity="left" />
 
         <TextView

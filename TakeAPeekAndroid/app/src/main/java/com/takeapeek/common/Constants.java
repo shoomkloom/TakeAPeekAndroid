@@ -140,8 +140,8 @@ public class Constants
 
     //CaptureClipActivity intent extra name
     public static final String RELATEDPROFILEIDEXTRA_KEY = "RelatedProfileID";
-
     public static final String RELATEDNOTIFICATIONIDEXTRA_KEY = "RelatedNotificationID";
+    public static final String HIDESKIPBUTTONEXTRA_KEY = "HideSkipButton";
 
     //UserFeedActivity intent extra name
     public static final String PARAM_PEEKOBJECT = "RelatedPeek";

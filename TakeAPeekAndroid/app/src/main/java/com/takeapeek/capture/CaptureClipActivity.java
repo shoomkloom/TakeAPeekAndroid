@@ -62,8 +62,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.takeapeek.common.Constants.RELATEDNOTIFICATIONIDEXTRA_KEY;
-
 /** The main Activity for Open Camera.
  */
 public class CaptureClipActivity extends Activity implements
@@ -89,6 +87,7 @@ public class CaptureClipActivity extends Activity implements
     LinearLayout mLinearLayoutIntro = null;
     ImageView mImageviewIntroArrow = null;
     TextView mTextviewIntroLine3 = null;
+    TextView mTextviewSkipButton = null;
     ImageView mImageviewIntroClose = null;
     RelativeLayout mRelativelayoutIntro = null;
     LinearLayout mLinearlayoutIntroDetails = null;
@@ -179,6 +178,7 @@ public class CaptureClipActivity extends Activity implements
 
     private String mRelateProfileID = null;
     private String mRelateNotificationID = null;
+    private boolean mHideSkipButton = false;
     private TakeAPeekObject mCompletedTakeAPeekObject = null;
 
     private GoogleApiClient mGoogleApiClient = null;
@@ -218,6 +218,7 @@ public class CaptureClipActivity extends Activity implements
         {
             mRelateProfileID = intent.getStringExtra(Constants.RELATEDPROFILEIDEXTRA_KEY);
             mRelateNotificationID = intent.getStringExtra(Constants.RELATEDNOTIFICATIONIDEXTRA_KEY);
+            mHideSkipButton = intent.getBooleanExtra(Constants.HIDESKIPBUTTONEXTRA_KEY, false);
         }
 
         mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
@@ -268,6 +269,9 @@ public class CaptureClipActivity extends Activity implements
 
         mTextviewIntroLine3 = (TextView)findViewById(R.id.textview_intro_line3);
         Helper.setTypeface(this, mTextviewIntroLine3, Helper.FontTypeEnum.boldFont);
+
+        mTextviewSkipButton = (TextView)findViewById(R.id.textview_skip_button);
+        Helper.setTypeface(this, mTextviewSkipButton, Helper.FontTypeEnum.normalFont);
 
         mImageviewIntroClose = (ImageView)findViewById(R.id.imageview_intro_close);
         mRelativelayoutIntro = (RelativeLayout)findViewById(R.id.relativelayout_intro);
@@ -768,6 +772,14 @@ public class CaptureClipActivity extends Activity implements
         }
     }
 
+    public void clickedSkipButton(View view)
+    {
+        logger.debug("clickedSkipButton(.) Invoked.");
+
+        setResult(RESULT_OK);
+        finish();
+    }
+
     public void clickedDone(View view)
     {
         logger.debug("clickedDone(.) Invoked.");
@@ -1063,12 +1075,19 @@ public class CaptureClipActivity extends Activity implements
                     mLinearLayoutIntro.setVisibility(View.VISIBLE);
                     mImageviewIntroArrow.setVisibility(View.VISIBLE);
                     mTextviewIntroLine3.setVisibility(View.VISIBLE);
+
+                    mTextviewSkipButton.setVisibility(View.GONE);
                 }
                 else
                 {
                     mLinearLayoutIntro.setVisibility(View.INVISIBLE);
                     mImageviewIntroArrow.setVisibility(View.INVISIBLE);
                     mTextviewIntroLine3.setVisibility(View.INVISIBLE);
+
+                    if(mHideSkipButton == false)
+                    {
+                        mTextviewSkipButton.setVisibility(View.VISIBLE);
+                    }
                 }
 
                 mImageviewIntroClose.setVisibility(View.GONE);
@@ -1109,6 +1128,7 @@ public class CaptureClipActivity extends Activity implements
                 mRelativelayoutIntro.setVisibility(View.INVISIBLE);
 
                 mLinearLayoutIntro.setVisibility(View.INVISIBLE);
+                mTextviewSkipButton.setVisibility(View.GONE);
 
                 mImageviewIntroClose.setVisibility(View.GONE);
                 mLinearlayoutIntroDetails.setVisibility(View.GONE);
@@ -1146,6 +1166,7 @@ public class CaptureClipActivity extends Activity implements
                 mImageviewSwitchCamera.setVisibility(View.VISIBLE);
                 mRelativelayoutIntro.setVisibility(View.VISIBLE);
                 mLinearLayoutIntro.setVisibility(View.INVISIBLE);
+                mTextviewSkipButton.setVisibility(View.GONE);
                 mImageviewIntroArrow.setVisibility(View.INVISIBLE);
                 mImageviewIntroClose.setVisibility(View.VISIBLE);
                 mLinearlayoutIntroDetails.setVisibility(View.VISIBLE);

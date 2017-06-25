@@ -24,6 +24,7 @@ import com.takeapeek.common.Helper;
 import com.takeapeek.common.MixPanel;
 import com.takeapeek.common.NameValuePair;
 import com.takeapeek.common.RunnableWithArg;
+import com.takeapeek.common.ThumbnailLoader;
 import com.takeapeek.common.Transport;
 import com.takeapeek.common.TrendingPlaceObject;
 import com.takeapeek.notifications.NotificationPopupActivity;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -49,7 +51,7 @@ public class TrendingPlacesActivity extends AppCompatActivity
 //@@    PlaceItemAdapter mPlaceItemAdapter = null;
 
     private RecyclerView mListViewFeedList;
-    private RecyclerView.Adapter mPlaceItemAdapter;
+    private PlaceItemAdapter mPlaceItemAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     ImageView mImageViewProgressAnimation = null;
@@ -73,6 +75,8 @@ public class TrendingPlacesActivity extends AppCompatActivity
         previewStopped
     }
 
+    Hashtable<Integer, Integer> mPeekIndexForPositionHash = new Hashtable<Integer, Integer>();
+
     Handler mTimerHandler = new Handler();
     Runnable mTimerRunnable = new Runnable()
     {
@@ -81,9 +85,33 @@ public class TrendingPlacesActivity extends AppCompatActivity
         {
             logger.debug("mTimerRunnable.run() Invoked");
 
-            if(mPlaceItemAdapter != null)
+            if(mLayoutManager != null && mListViewFeedList != null)
             {
-                mPlaceItemAdapter.notifyDataSetChanged();
+                int childCount = mLayoutManager.getChildCount();
+                for(int i=0; i<childCount; i++)
+                {
+                    View currentChild = mLayoutManager.getChildAt(i);
+                    ImageView thumbNailView = (ImageView)currentChild.findViewById(R.id.place_thumbnail);
+                    int position = mListViewFeedList.getChildAdapterPosition(currentChild);
+                    TrendingPlaceObject trendingPlaceObject = mPlaceItemAdapter.mTrendingPlaceObjectList.get(position);
+                    if(trendingPlaceObject.Peeks.size() > 1)
+                    {
+                        int peekIndex = 1;
+
+                        if(mPeekIndexForPositionHash.containsKey(position) == true)
+                        {
+                            peekIndex = mPeekIndexForPositionHash.get(position) + 1;
+                            if(peekIndex >= trendingPlaceObject.Peeks.size())
+                            {
+                                peekIndex = 0;
+                            }
+                        }
+
+                        mPeekIndexForPositionHash.put(position, peekIndex);
+
+                        new ThumbnailLoader().SetThumbnail(TrendingPlacesActivity.this, position, trendingPlaceObject.Peeks.get(peekIndex), thumbNailView, mSharedPreferences);
+                    }
+                }
             }
 
             mTimerHandler.postDelayed(this, Constants.INTERVAL_FIVESECONDS);

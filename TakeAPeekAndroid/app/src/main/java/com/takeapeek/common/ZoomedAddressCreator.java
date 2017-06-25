@@ -23,17 +23,19 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
 {
     static private final Logger logger = LoggerFactory.getLogger(ZoomedAddressCreator.class);
 
-    private TextView mTextView;
+    private TextView mTextView = null;
+    private View mLayoutPeekStack = null;
     private Context mContext = null;
     private LatLng mLatlngToTheLeft = null;
     private LatLng mLatlngToTheRight = null;
     private SharedPreferences mSharedPreferences = null;
 
-    public ZoomedAddressCreator(Context context, LatLng latlngToTheLeft, LatLng latlngToTheRight, TextView textView)
+    public ZoomedAddressCreator(Context context, LatLng latlngToTheLeft, LatLng latlngToTheRight, TextView textView, View layoutPeekStack)
     {
         logger.debug("ZoomedAddressCreator::AddressCreatorTask(..) Invoked");
 
         mTextView = textView;
+        mLayoutPeekStack = layoutPeekStack;
         mContext = context;
         mLatlngToTheLeft = latlngToTheLeft;
         mLatlngToTheRight = latlngToTheRight;
@@ -77,7 +79,7 @@ public class ZoomedAddressCreator extends AsyncTask<Void, Void, String>
         if (mTextView != null)
         {
             String currentText = mTextView.getText().toString();
-            if(currentText.compareToIgnoreCase(text) != 0)
+            if(mLayoutPeekStack.getVisibility() == View.GONE && currentText.compareToIgnoreCase(text) != 0)
             {
                 mTextView.setText(text);
                 mTextView.setVisibility(View.VISIBLE);

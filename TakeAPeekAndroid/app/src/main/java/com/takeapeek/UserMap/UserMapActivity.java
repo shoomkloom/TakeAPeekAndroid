@@ -1462,7 +1462,7 @@ public class UserMapActivity extends FragmentActivity implements
                     LatLng latlngToTheLeft = mGoogleMap.getProjection().fromScreenLocation(pointToTheLeft);
                     LatLng latlngToTheRight = mGoogleMap.getProjection().fromScreenLocation(pointToTheRight);
 
-                    mZoomedAddressCreator = new ZoomedAddressCreator(this, latlngToTheLeft, latlngToTheRight, mTextViewStackUserName);
+                    mZoomedAddressCreator = new ZoomedAddressCreator(this, latlngToTheLeft, latlngToTheRight, mTextViewStackUserName, mLayoutPeekStack);
                     mZoomedAddressCreator.execute();
                 }
             }
@@ -1940,6 +1940,7 @@ public class UserMapActivity extends FragmentActivity implements
 
                     final Intent captureClipActivityIntent = new Intent(UserMapActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    captureClipActivityIntent.putExtra(Constants.HIDESKIPBUTTONEXTRA_KEY, true);
                     startActivity(captureClipActivityIntent);
                     break;
 

@@ -35,7 +35,7 @@ public class PlaceItemAdapter extends RecyclerView.Adapter<PlaceItemAdapter.View
     static private final Logger logger = LoggerFactory.getLogger(PlaceItemAdapter.class);
 
     WeakReference<TrendingPlacesActivity> mTrendingPlacesActivity = null;
-    ArrayList<TrendingPlaceObject> mTrendingPlaceObjectList = null;
+    public ArrayList<TrendingPlaceObject> mTrendingPlaceObjectList = null;
     BitmapFactory.Options mBitmapFactoryOptions = null;
 
     private static LayoutInflater mLayoutInflater = null;
@@ -57,7 +57,6 @@ public class PlaceItemAdapter extends RecyclerView.Adapter<PlaceItemAdapter.View
         TextView mTextViewPlaceAddress = null;
         TextView mTextViewNumberOfPeeks = null;
         int mPeekIndex = -1;
-        int mPreviousPeekIndex = -1;
 
         public ViewHolder(View parent,
                           ImageView imagePlaceThumbnail,
@@ -131,19 +130,17 @@ public class PlaceItemAdapter extends RecyclerView.Adapter<PlaceItemAdapter.View
             final TrendingPlaceObject trendingPlaceObject = mTrendingPlaceObjectList.get(position);
 
             //Advance the PeekIndex in a loop
+            int peekListSize = trendingPlaceObject.Peeks.size();
+
             holder.mPeekIndex += 1;
-            if(holder.mPeekIndex >= trendingPlaceObject.Peeks.size())
+            if(holder.mPeekIndex >= peekListSize)
             {
                 holder.mPeekIndex = 0;
             }
 
-            if(holder.mPeekIndex != holder.mPreviousPeekIndex)
-            {
-                //Load the thumbnail asynchronously
-                holder.mImagePlaceThumbnail.setTag(position);
-                new ThumbnailLoader().SetThumbnail(mTrendingPlacesActivity.get(), position, trendingPlaceObject.Peeks.get(holder.mPeekIndex), holder.mImagePlaceThumbnail, mSharedPreferences);
-            }
-            holder.mPreviousPeekIndex = holder.mPeekIndex;
+            //Load the thumbnail asynchronously
+            holder.mImagePlaceThumbnail.setTag(position);
+            new ThumbnailLoader().SetThumbnail(mTrendingPlacesActivity.get(), position, trendingPlaceObject.Peeks.get(holder.mPeekIndex), holder.mImagePlaceThumbnail, mSharedPreferences);
 
             holder.mImagePlaceThumbnail.setOnClickListener(new View.OnClickListener()
             {
