@@ -26,6 +26,19 @@ public class LocationHelper
 {
     static private final Logger logger = LoggerFactory.getLogger(LocationHelper.class);
 
+    //GeoNames Reverse GeoCoder
+    public class NearAddressContainer
+    {
+        public ArrayList<GeoName> geonames;
+    }
+
+    public class GeoName
+    {
+        public double distance;
+        public String name;
+        public String countryName;
+    }
+
     static public String FormattedAddressFromLocation(Context context, LatLng location, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("FormattedAddressFromLocation(...) Invoked");
@@ -43,32 +56,32 @@ public class LocationHelper
         String responseStr = new Transport().DoHTTPSGetRequest(context, reverseGeoCodingURL, null, null);
         FormattedAddressContainer formattedAddressContainer = new Gson().fromJson(responseStr, FormattedAddressContainer.class);
 
-        if(formattedAddressContainer != null && formattedAddressContainer.results != null && formattedAddressContainer.results.size() > 0)
+        if (formattedAddressContainer != null && formattedAddressContainer.results != null && formattedAddressContainer.results.size() > 0)
         {
             String postCode = null;
             String streetNumber = null;
             String locality = null;
 
             //Find the post code, streetNumber and city
-            for(AddressComponent addressComponent : formattedAddressContainer.results.get(0).address_components)
+            for (AddressComponent addressComponent : formattedAddressContainer.results.get(0).address_components)
             {
-                for(String type : addressComponent.types)
+                for (String type : addressComponent.types)
                 {
-                    if(type.compareTo("postal_code") == 0)
+                    if (type.compareTo("postal_code") == 0)
                     {
                         postCode = addressComponent.long_name;
                     }
-                    else if(type.compareTo("street_number") == 0)
+                    else if (type.compareTo("street_number") == 0)
                     {
                         streetNumber = addressComponent.long_name;
                     }
-                    else if(type.compareTo("locality") == 0)
+                    else if (type.compareTo("locality") == 0)
                     {
                         locality = addressComponent.long_name;
                     }
                 }
 
-                if(postCode != null)
+                if (postCode != null)
                 {
                     break;
                 }
@@ -78,11 +91,11 @@ public class LocationHelper
 
             formattedAddress = formattedAddressContainer.results.get(0).formatted_address;
 
-            if(postCode != null)
+            if (postCode != null)
             {
                 formattedAddress = formattedAddress.replace(postCode, "");
             }
-            if(streetNumber != null)
+            if (streetNumber != null)
             {
                 formattedAddress = formattedAddress.replace(streetNumber, "");
             }
@@ -98,11 +111,23 @@ public class LocationHelper
         return formattedAddress;
     }
 
-    static public String NearAddressFromLocation(Context context, LatLng location, SharedPreferences sharedPreferences) throws Exception
+    static public String FormattedNearAddressFromLocation(Context context, LatLng location, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("FormattedNearAddressFromLocation(...) Invoked");
+
+        String nearAddress = null;
+
+        GeoName geoName = NearAddressFromLocation(context, location, sharedPreferences);
+        nearAddress = String.format(context.getString(R.string.near_address), geoName.name, geoName.countryName);
+
+        return nearAddress;
+    }
+
+    static public GeoName NearAddressFromLocation(Context context, LatLng location, SharedPreferences sharedPreferences) throws Exception
     {
         logger.debug("NearAddressFromLocation(...) Invoked");
 
-        String nearAddress = null;
+        GeoName closestGeoName = null;
 
         String reverseGeoCodingURL =
                 String.format("http://api.geonames.org/findNearbyJSON?lat=%s&lng=%s&username=takeapeekdev",
@@ -111,24 +136,23 @@ public class LocationHelper
         String responseStr = new Transport().DoHTTPGetRequest(context, reverseGeoCodingURL);
         NearAddressContainer nearAddressContainer = new Gson().fromJson(responseStr, NearAddressContainer.class);
 
-        if(nearAddressContainer != null && nearAddressContainer.geonames != null && nearAddressContainer.geonames.size() > 0)
+        if (nearAddressContainer != null && nearAddressContainer.geonames != null && nearAddressContainer.geonames.size() > 0)
         {
             double shortestDistance = 1000;
-            String formattingStr = context.getString(R.string.near_address);
 
             //Find the post code, streetNumber and city
-            for(GeoName geoName : nearAddressContainer.geonames)
+            for (GeoName geoName : nearAddressContainer.geonames)
             {
-                if(geoName.distance < shortestDistance)
+                if (geoName.distance < shortestDistance)
                 {
                     shortestDistance = geoName.distance;
 
-                    nearAddress = String.format(formattingStr, geoName.name, geoName.countryName);
+                    closestGeoName = geoName;
                 }
             }
         }
 
-        return nearAddress;
+        return closestGeoName;
     }
 
     static public Address AddressFromLocation(Context context, LatLng location) throws Exception
@@ -243,18 +267,5 @@ public class LocationHelper
     {
         public ArrayList<AddressComponent> address_components;
         public String formatted_address;
-    }
-
-    //GeoNames Reverse GeoCoder
-    class NearAddressContainer
-    {
-        public ArrayList<GeoName> geonames;
-    }
-
-    class GeoName
-    {
-        public double distance;
-        public String name;
-        public String countryName;
     }
 }

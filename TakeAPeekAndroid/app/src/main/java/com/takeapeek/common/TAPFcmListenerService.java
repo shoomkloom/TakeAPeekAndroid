@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
@@ -30,6 +31,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 
 import com.facebook.appevents.AppEventsLogger;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
@@ -39,6 +41,7 @@ import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
 import com.takeapeek.ormlite.TakeAPeekRelation;
+import com.takeapeek.usermap.LocationHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,7 +163,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                         DatabaseManager.getInstance().AddTakeAPeekNotification(takeAPeekNotification);
 
                         //Show notification
-                        sendNotification(takeAPeekNotification.notificationId);
+                        sendNotification(takeAPeekNotification.notificationId, sharedPreferences);
 
                         //Broadcast notification
                         logger.info("Broadcasting intent: " + Constants.PUSH_BROADCAST_ACTION);
@@ -193,7 +196,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
     /**
      * Create and show a simple notification containing the received GCM message.
      */
-    private void sendNotification(String notificatioId)
+    private void sendNotification(String notificatioId, SharedPreferences sharedPreferences)
     {
         Gson gson = new Gson();
 
@@ -201,6 +204,8 @@ public class TAPFcmListenerService extends FirebaseMessagingService
         TakeAPeekObject takeAPeekObject = gson.fromJson(takeAPeekNotification.relatedPeekJson, TakeAPeekObject.class);
         ProfileObject profileObject = gson.fromJson(takeAPeekNotification.srcProfileJson, ProfileObject.class);
         Constants.PushNotificationTypeEnum pushNotificationTypeEnum = Constants.PushNotificationTypeEnum.valueOf(takeAPeekNotification.type);
+
+        String profileNotificationAddress = GetProfileNotificationAddress(profileObject, sharedPreferences);
 
         String contentTitle = null;
         String contentText = null;
@@ -210,16 +215,18 @@ public class TAPFcmListenerService extends FirebaseMessagingService
         Intent intent = new Intent(this, NotificationsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        String myDisplayName = Helper.GetProfileDisplayName(sharedPreferences);
+
         switch(pushNotificationTypeEnum)
         {
             case request:
                 contentTitle = getString(R.string.notification_content_title_request);
-                contentText = String.format(getString(R.string.notification_content_text_request), profileObject.displayName);
+                contentText = String.format(getString(R.string.notification_content_text_request), myDisplayName, profileObject.displayName, profileNotificationAddress);
                 break;
 
             case response:
                 contentTitle = getString(R.string.notification_content_title_response);
-                contentText = String.format(getString(R.string.notification_content_text_response), profileObject.displayName);
+                contentText = String.format(getString(R.string.notification_content_text_response), myDisplayName, profileObject.displayName, profileNotificationAddress);
                 thumbnailBitmap = GetNotificationThumnail(takeAPeekObject);
 
                 intent.putExtra(Constants.PARAM_PROFILEOBJECT, takeAPeekNotification.srcProfileJson);
@@ -228,7 +235,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
             case peek:
                 contentTitle = getString(R.string.notification_content_title_peek);
-                contentText = String.format(getString(R.string.notification_content_text_peek), profileObject.displayName);
+                contentText = String.format(getString(R.string.notification_content_text_peek), myDisplayName, profileObject.displayName, profileNotificationAddress);
                 thumbnailBitmap = GetNotificationThumnail(takeAPeekObject);
 
                 intent.putExtra(Constants.PARAM_PROFILEOBJECT, takeAPeekNotification.srcProfileJson);
@@ -237,7 +244,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
             case follow:
                 contentTitle = getString(R.string.notification_content_title_follow);
-                contentText = String.format(getString(R.string.notification_content_text_follow), profileObject.displayName);
+                contentText = String.format(getString(R.string.notification_content_text_follow), myDisplayName, profileObject.displayName, profileNotificationAddress);
                 break;
 
             default: break;
@@ -277,6 +284,52 @@ public class TAPFcmListenerService extends FirebaseMessagingService
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(takeAPeekNotification.notificationIntId, notificationBuilder.build());
+    }
+
+    private String GetProfileNotificationAddress(ProfileObject profileObject, SharedPreferences sharedPreferences)
+    {
+        String profileNotificationAddress = null;
+
+        LatLng profileLocation = new LatLng(profileObject.latitude, profileObject.longitude);
+
+        try
+        {
+            Address profileAddress = LocationHelper.AddressFromLocation(this, profileLocation);
+            if(profileAddress != null)
+            {
+                profileNotificationAddress = profileAddress.getLocality();
+                if(profileNotificationAddress == null || profileNotificationAddress.compareTo("") == 0)
+                {
+                    profileNotificationAddress = profileAddress.getCountryName();
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when calling LocationHelper.AddressFromLocation", e);
+        }
+
+        try
+        {
+            if(profileNotificationAddress == null || profileNotificationAddress.compareTo("") == 0)
+            {
+                LocationHelper.GeoName profileGeoName = LocationHelper.NearAddressFromLocation(this, profileLocation, sharedPreferences);
+                if(profileGeoName != null)
+                {
+                    profileNotificationAddress = profileGeoName.name;
+                    if(profileNotificationAddress == null || profileNotificationAddress.compareTo("") == 0)
+                    {
+                        profileNotificationAddress = profileGeoName.countryName;
+                    }
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: when calling LocationHelper.NearAddressFromLocation", e);
+        }
+
+        return profileNotificationAddress;
     }
 
     private Bitmap GetNotificationThumnail(TakeAPeekObject takeAPeekObject)

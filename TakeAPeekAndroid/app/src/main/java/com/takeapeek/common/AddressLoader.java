@@ -118,7 +118,7 @@ public class AddressLoader
 
                 if(formattedAddress == null)
                 {
-                    formattedAddress = LocationHelper.NearAddressFromLocation(mContext, mLatLng, mSharedPreferences);
+                    formattedAddress = LocationHelper.FormattedNearAddressFromLocation(mContext, mLatLng, mSharedPreferences);
                 }
 
                 return formattedAddress;

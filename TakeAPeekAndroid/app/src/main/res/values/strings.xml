@@ -208,13 +208,13 @@
     <string name="textview_notification_time_days">%1$d days ago</string>
     <string name="notifications_requested_peek_to">Sent peek request to %1$s</string>
     <string name="notification_content_title_request">Peek Request</string>
-    <string name="notification_content_text_request">%1$s sent you a peek request</string>
+    <string name="notification_content_text_request">%1$s, %2$s from %3$s sent you a peek request, why not send one right now?</string>
     <string name="notification_content_title_response">Peek Response</string>
-    <string name="notification_content_text_response">%1$s sent you a peek response</string>
+    <string name="notification_content_text_response">%1$s, %2$s from %3$s sent you a peek response, click here to check it out!</string>
     <string name="notification_content_title_peek">New Peek</string>
-    <string name="notification_content_text_peek">%1$s created a new peek</string>
+    <string name="notification_content_text_peek">%1$s, %2$s from %3$s created a new peek, click here to check it out!</string>
     <string name="notification_content_title_follow">New Follower</string>
-    <string name="notification_content_text_follow">%1$s is following you</string>
+    <string name="notification_content_text_follow">%1$s, %2$s from %3$s is following you. Cool!</string>
 
     <!-- Notification popup activity -->
     <string name="error_no_notification">There was an error showing the notification. Please try again later.</string>
