@@ -226,7 +226,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
             case response:
                 contentTitle = getString(R.string.notification_content_title_response);
-                contentText = String.format(getString(R.string.notification_content_text_response), myDisplayName, profileObject.displayName, profileNotificationAddress);
+                contentText = String.format(getString(R.string.notification_content_text_response), profileNotificationAddress, profileObject.displayName);
                 thumbnailBitmap = GetNotificationThumnail(takeAPeekObject);
 
                 intent.putExtra(Constants.PARAM_PROFILEOBJECT, takeAPeekNotification.srcProfileJson);
@@ -235,7 +235,7 @@ public class TAPFcmListenerService extends FirebaseMessagingService
 
             case peek:
                 contentTitle = getString(R.string.notification_content_title_peek);
-                contentText = String.format(getString(R.string.notification_content_text_peek), myDisplayName, profileObject.displayName, profileNotificationAddress);
+                contentText = String.format(getString(R.string.notification_content_text_peek), profileNotificationAddress, profileObject.displayName);
                 thumbnailBitmap = GetNotificationThumnail(takeAPeekObject);
 
                 intent.putExtra(Constants.PARAM_PROFILEOBJECT, takeAPeekNotification.srcProfileJson);
@@ -271,6 +271,10 @@ public class TAPFcmListenerService extends FirebaseMessagingService
             }
 
             notificationBuilder.setStyle(bigPictureStyle);
+        }
+        else
+        {
+            notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(contentText));
         }
 
         notificationBuilder.setContentTitle(contentTitle);
