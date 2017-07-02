@@ -243,7 +243,11 @@ public class CaptureClipActivity extends Activity implements
         mAnimationFlipFromMiddle.setAnimationListener(this);
 
         //Set up the back camera
-        SetupBackCamera();
+        //@@SetupBackCamera();
+
+        //Set up the front camera
+        SetupFrontCamera();
+        mCamera.setFacing(CameraKit.Constants.FACING_FRONT);
 
         mCamera.setCameraListener(VideoCameraListener);
 
@@ -1065,7 +1069,7 @@ public class CaptureClipActivity extends Activity implements
         switch(mVideoCaptureStateEnum)
         {
             case Start:
-                mImageviewFlash.setVisibility(View.VISIBLE);
+                mImageviewFlash.setVisibility(View.INVISIBLE);
                 mImageviewCaptureCountdown.setVisibility(View.GONE);
                 mImageviewSwitchCamera.setVisibility(View.VISIBLE);
                 mRelativelayoutIntro.setVisibility(View.VISIBLE);
