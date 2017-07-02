@@ -94,6 +94,16 @@ public class MixPanel
         return mMixPanel;
     }
 
+    public void SetPhoneNumber(Context context, SharedPreferences sharedPreferences) throws Exception
+    {
+        logger.debug("SetPhoneNumber(..) Invoked");
+
+        JSONObject phoneJsonObject = new JSONObject();
+        phoneJsonObject.put("$phone", Helper.GetUserNumber(sharedPreferences));
+
+        mMixPanel.mMixpanelAPI.getPeople().set(phoneJsonObject);
+    }
+
     public void SaveMixPanelParams(Context context)
     {
         logger.debug("SaveMixPanelParams(.) Invoked");

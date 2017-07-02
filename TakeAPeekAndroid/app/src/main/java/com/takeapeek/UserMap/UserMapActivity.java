@@ -108,6 +108,8 @@ import me.crosswall.lib.coverflow.core.PagerContainer;
 import me.toptas.fancyshowcase.FancyShowCaseView;
 import me.toptas.fancyshowcase.OnViewInflateListener;
 
+import static android.R.attr.data;
+
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -417,6 +419,15 @@ public class UserMapActivity extends FragmentActivity implements
                 }
             }
         });
+
+        try
+        {
+            MixPanel.Instance(this).SetPhoneNumber(this, mSharedPreferences);
+        }
+        catch(Exception e)
+        {
+            Helper.Error(logger, "EXCEPTION: When trying to update MixPanel $phone", e);
+        }
     }
 
     @Override

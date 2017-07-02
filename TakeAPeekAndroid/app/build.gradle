@@ -10,8 +10,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 25
         multiDexEnabled true
-        versionCode 109
-        versionName "0.9.109 beta"
+        versionCode 110
+        versionName "0.9.110 beta"
     }
     buildTypes {
         release {
