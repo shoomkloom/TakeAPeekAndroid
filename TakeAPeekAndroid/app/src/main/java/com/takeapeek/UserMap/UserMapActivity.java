@@ -1211,7 +1211,7 @@ public class UserMapActivity extends FragmentActivity implements
         {
             if(mLatLngBoundCenterIntent != null)
             {
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngBoundCenterIntent, 12));
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngBoundCenterIntent, 13));
                 mLatLngBoundCenterIntent = null;
 
                 ShowProfilesInBounds(true);

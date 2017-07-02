@@ -277,6 +277,7 @@ public class UserFeedActivity extends AppCompatActivity
         findViewById(R.id.textview_preview_button_block).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_report).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_share).setOnClickListener(ClickListener);
+        findViewById(textview_preview_button_go_location).setOnClickListener(ClickListener);
         findViewById(R.id.imageview_share).setOnClickListener(ClickListener);
 
         findViewById(R.id.button_control).setOnClickListener(ClickListener);
@@ -1135,6 +1136,28 @@ public class UserFeedActivity extends AppCompatActivity
                     catch(Exception e)
                     {
                         Helper.Error(logger, "EXCEPTION: When trying to load invitation UI", e);
+                    }
+
+                    break;
+
+                case R.id.textview_preview_button_go_location:
+                case R.id.imageview_go_location:
+                    logger.info("onClick: textview_preview_button_go_location/imageview_go_location clicked");
+
+                    try
+                    {
+                        MixPanel.PeekGoToLocationEventAndProps(UserFeedActivity.this, MixPanel.SCREEN_USER_FEED, mSharedPreferences);
+
+                        LatLng peekLocation = new LatLng(mCurrentTakeAPeekObject.Latitude, mCurrentTakeAPeekObject.Longitude);
+
+                        Intent intent = new Intent(UserFeedActivity.this, UserMapActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("com.google.android.gms.maps.model.LatLng", peekLocation);
+                        UserFeedActivity.this.startActivity(intent);
+                    }
+                    catch(Exception e)
+                    {
+                        Helper.Error(logger, "EXCEPTION: When trying to go to Peek location", e);
                     }
 
                     break;
