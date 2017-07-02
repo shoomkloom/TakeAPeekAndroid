@@ -59,7 +59,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:src="@drawable/camera_back"
+        android:src="@drawable/camera_front"
         android:onClick="clickedSwitchCamera"/>
 
     <TextView
