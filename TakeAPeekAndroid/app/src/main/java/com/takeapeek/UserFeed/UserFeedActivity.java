@@ -276,8 +276,9 @@ public class UserFeedActivity extends AppCompatActivity
         findViewById(R.id.textview_preview_button_unfollow).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_block).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_report).setOnClickListener(ClickListener);
+        findViewById(R.id.textview_preview_button_go_location).setOnClickListener(ClickListener);
+        findViewById(R.id.imageview_go_location).setOnClickListener(ClickListener);
         findViewById(R.id.textview_preview_button_share).setOnClickListener(ClickListener);
-        findViewById(textview_preview_button_go_location).setOnClickListener(ClickListener);
         findViewById(R.id.imageview_share).setOnClickListener(ClickListener);
 
         findViewById(R.id.button_control).setOnClickListener(ClickListener);

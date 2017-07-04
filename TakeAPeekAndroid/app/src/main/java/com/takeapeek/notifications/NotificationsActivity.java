@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.takeapeek.common.MixPanel.SCREEN_NOTIFICATION;
-
 public class NotificationsActivity extends AppCompatActivity
 {
     static private final Logger logger = LoggerFactory.getLogger(NotificationsActivity.class);
@@ -124,7 +122,7 @@ public class NotificationsActivity extends AppCompatActivity
     {
         logger.debug("ShowPeek(..) Invoked");
 
-        MixPanel.ViewPeekClickEventAndProps(this, SCREEN_NOTIFICATION, mSharedPreferences);
+        MixPanel.ViewPeekClickEventAndProps(this, MixPanel.SCREEN_NOTIFICATION, mSharedPreferences);
 
         final Intent userFeedActivityIntent = new Intent(this, UserFeedActivity.class);
         userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -185,7 +183,7 @@ public class NotificationsActivity extends AppCompatActivity
             {
                 if (oldNotification == false)
                 {
-                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
+                    if (currentMillis - takeAPeekNotification.creationTime < Constants.INTERVAL_PEEK_LIFE)
                     {
                         takeAPeekNotificationArrayList.add(takeAPeekNotification);
                     }

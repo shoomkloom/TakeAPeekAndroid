@@ -52,7 +52,7 @@ public class SyncAdapterHelper implements Runnable,
 		
 	}
 
-	public void Init(Context context, boolean fullScan, boolean scanOld)
+	public void Init(Context context)
 	{
 		logger.debug("Init(..) Invoked");
 		
@@ -265,9 +265,9 @@ public class SyncAdapterHelper implements Runnable,
                         DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);
                         continue;
                     }
-                    else if(Helper.GetCurrentTimeMillis() - takeAPeekObject.CreationTime > Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
+                    else if(Helper.GetCurrentTimeMillis() - takeAPeekObject.CreationTime > Constants.INTERVAL_PEEK_LIFE)
                     {
-                        logger.warn("Peek older than 1 hour, skipping upload and setting Upload = 0");
+                        logger.warn("Peek older than Constants.INTERVAL_PEEK_LIFE, skipping upload and setting Upload = 0");
                         takeAPeekObject.Upload = 0;
                         takeAPeekObject.Viewed = 1; //Mark as viewed so that they will be deleted later
                         DatabaseManager.getInstance().UpdateTakeAPeekObject(takeAPeekObject);

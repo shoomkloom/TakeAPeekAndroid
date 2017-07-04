@@ -104,7 +104,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     	
     	if(mSyncAdapterHelper != null)
     	{
-    		mSyncAdapterHelper.Init(mContext, false, true);
+    		mSyncAdapterHelper.Init(mContext);
     		mSyncAdapterHelper.run();
     	}
     }

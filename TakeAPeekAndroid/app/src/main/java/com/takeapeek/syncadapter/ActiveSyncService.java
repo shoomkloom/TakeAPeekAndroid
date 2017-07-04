@@ -6,8 +6,6 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 
-import com.takeapeek.common.Constants;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +25,7 @@ public class ActiveSyncService extends Service
 
 		if(intent != null && intent.getExtras() != null)
 		{
-			boolean fullScan = intent.getBooleanExtra(Constants.ACTIVESYNC_FULLSCAN, true);
-			boolean scanOld = intent.getBooleanExtra(Constants.ACTIVESYNC_SCANOLD, true);
-			
-			LoadSyncAdapterHelper(fullScan, scanOld);
+			LoadSyncAdapterHelper();
 		}
 		
 		//return super.onStartCommand(intent, flags, startId);
@@ -59,14 +54,14 @@ public class ActiveSyncService extends Service
 	    }
 	}
 	
-	private synchronized void LoadSyncAdapterHelper(boolean fullScan, boolean scanOld)
+	private synchronized void LoadSyncAdapterHelper()
     {
     	logger.debug("LoadSyncAdapterHelper() Invoked");
     	
     	if(mScanThread == null || mScanThread.isAlive() == false)
     	{
     		com.takeapeek.syncadapter.SyncAdapterHelper syncAdapterHelper = new com.takeapeek.syncadapter.SyncAdapterHelper();
-    		syncAdapterHelper.Init(this, fullScan, scanOld);
+    		syncAdapterHelper.Init(this);
     		
     		mScanThread = new Thread(syncAdapterHelper, "ActiveSyncServiceScanThread");
     		mScanThread.start();

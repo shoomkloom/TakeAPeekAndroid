@@ -1107,7 +1107,7 @@ public class Helper
 
         for (TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
         {
-            if (currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
+            if (currentMillis - takeAPeekNotification.creationTime > Constants.INTERVAL_PEEK_LIFE)
             {
                 notificationManager.cancel(takeAPeekNotification.notificationIntId);
             }
@@ -3157,34 +3157,6 @@ public class Helper
 		Helper.SetUnsentLikes(sharedPreferences.edit(), unsentLikeList);
     }
     
-    public static void StartFullContactScan(Context context, boolean fullScan, boolean scanOld)
-    {
-    	logger.debug("StartFullContactScan(...) Invoked");
-    	
-    	try
-    	{
-/*@@    		
-    		if(fullScan == true)
-    		{
-    			DatabaseManager.init(context);
-    			
-    			//First we clear all Potentials
-    			DatabaseManager.getInstance().ClearContactDataType(ContactTypeEnum.potential);
-    			DatabaseManager.getInstance().ClearContactDataType(ContactTypeEnum.outgoingFriendRequests);
-    		}
-@@*/
-    		
-	    	Intent serviceIntent = new Intent(context, ActiveSyncService.class);
-			serviceIntent.putExtra(Constants.ACTIVESYNC_FULLSCAN, fullScan);
-			serviceIntent.putExtra(Constants.ACTIVESYNC_SCANOLD, scanOld);
-			context.startService(serviceIntent);
-    	}
-    	catch(Exception e)
-    	{
-    		Helper.Error(logger, "EXCEPTION: When starting ActiveSyncService", e);
-    	}
-    }
-
     public static ArrayList<TakeAPeekObject> GetProfileUnViewedPeeks(Context context, ProfileObject profileObject)
     {
         logger.debug("GetUnViewedPeeks() Invoked");

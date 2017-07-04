@@ -108,8 +108,6 @@ import me.crosswall.lib.coverflow.core.PagerContainer;
 import me.toptas.fancyshowcase.FancyShowCaseView;
 import me.toptas.fancyshowcase.OnViewInflateListener;
 
-import static android.R.attr.data;
-
 public class UserMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -596,7 +594,7 @@ public class UserMapActivity extends FragmentActivity implements
             List<TakeAPeekNotification> takeAPeekNotificationList = DatabaseManager.getInstance().GetTakeAPeekNotificationUnnotifiedList();
             for(TakeAPeekNotification takeAPeekNotification : takeAPeekNotificationList)
             {
-                if(Helper.GetCurrentTimeMillis() - takeAPeekNotification.creationTime < Constants.INTERVAL_HOUR * 6) //NOT set back to 1 hour
+                if(Helper.GetCurrentTimeMillis() - takeAPeekNotification.creationTime < Constants.INTERVAL_PEEK_LIFE)
                 {
                     numberOfNewNotifications++;
                 }
