@@ -152,9 +152,11 @@ public class AddressLoader
                     {
                         text = mContext.getString(R.string.unknown_location);
                     }
-
-                    String locationStr = mLatLng.toString();
-                    mLocationAddressHash.put(locationStr, text);
+                    else
+                    {
+                        String locationStr = mLatLng.toString();
+                        mLocationAddressHash.put(locationStr, text);
+                    }
 
                 	textView.setText(text);
                     textView.setVisibility(View.VISIBLE);
