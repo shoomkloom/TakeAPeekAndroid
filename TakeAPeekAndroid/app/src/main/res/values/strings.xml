@@ -228,6 +228,10 @@
     <string name="notification_popup_requested_peeks_to">Sent peek request to %1$s</string>
     <string name="share_big_title">shared a Peek with you</string>
     <string name="share_small_title">Check it out!</string>
+    <string name="invite_friends_title1">Invite your friends\nto install Peek:to…</string>
+    <string name="invite_friends_title2">Peek more places</string>
+    <string name="invite_friends_title3">See more people</string>
+    <string name="invite_friends_title4">Help our community grow</string>
 
     <!-- Trending Places -->
     <string name="places_title">Trending Locations</string>

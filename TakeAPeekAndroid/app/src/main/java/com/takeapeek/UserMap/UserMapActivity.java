@@ -9,7 +9,6 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -85,7 +84,6 @@ import com.takeapeek.notifications.NotificationsActivity;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
-import com.takeapeek.ormlite.TakeAPeekRelation;
 import com.takeapeek.ormlite.TakeAPeekRequest;
 import com.takeapeek.trendingplaces.TrendingPlacesActivity;
 import com.takeapeek.userfeed.UserFeedActivity;
@@ -175,6 +173,8 @@ public class UserMapActivity extends FragmentActivity implements
     int mUserStackItemPosition = -1;
     boolean mOpenStack = false;
 
+    int mSessionTimes = 0;
+
     private final ThumbnailLoader mThumbnailLoader = new ThumbnailLoader();
 
     static public ReentrantLock lockBroadcastReceiver = new ReentrantLock();
@@ -256,19 +256,25 @@ public class UserMapActivity extends FragmentActivity implements
             {
                 logger.info("Registration is complete, proceding...");
 
+                mSessionTimes = Helper.GetSessionTimes(mSharedPreferences);
+
                 boolean locationServicesAvailable = Helper.CheckLocationServicesAvailable(this);
 
                 if(locationServicesAvailable == true)
                 {
-                    logger.info("Location services are on, proceding...");
+                    logger.info("Location services are on, proceeding...");
 
                     boolean showCaptureOnLoad = ShowCaptureOnLoad(true);
 
                     if(showCaptureOnLoad == false)
                     {
-                        logger.info("First Capture is done, proceding...");
+                        logger.info("First Capture is done, proceeding...");
 
                         ShowUserMap();
+                    }
+                    else
+                    {
+                        mSessionTimes = Helper.IncrementSessionTimes(mSharedPreferences);
                     }
                 }
                 else
@@ -1853,6 +1859,21 @@ public class UserMapActivity extends FragmentActivity implements
                             ShowCoachMark_3();
                         }
                     }, 1000);
+
+                    if(mSessionTimes > 1)
+                    {
+                        int mapControlButtonTimesClicked = Helper.IncrementMapControlButtonTimesClicked(mSharedPreferences);
+                        if (mapControlButtonTimesClicked == 6)
+                        {
+                            logger.info("onClick: button_map_control clicked 6 times, show popup Invite Friends");
+
+                            final Intent notificationPopupActivityIntent = new Intent(UserMapActivity.this, NotificationPopupActivity.class);
+                            notificationPopupActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            notificationPopupActivityIntent.putExtra(Constants.POPUP_INVITE_FRIENDS, true);
+                            startActivity(notificationPopupActivityIntent);
+                            overridePendingTransition(R.anim.zoominbounce, R.anim.donothing);
+                        }
+                    }
 
                     break;
 

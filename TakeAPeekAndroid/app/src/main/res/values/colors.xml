@@ -42,6 +42,7 @@
     <color name="pt_green_1">#81c784</color>
     <color name="pt_green_2">#66bb6a</color>
     <color name="pt_darkgray">#283238</color>
+    <color name="pt_darkgray_1">#4a4a4a</color>
     <color name="pt_darkgray_faded">#AA283238</color>
     <color name="pt_black_faded">#CC000000</color>
     <color name="pt_shadow_gray">#CC828282</color>

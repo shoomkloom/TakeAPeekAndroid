@@ -50,14 +50,13 @@ import com.takeapeek.common.Transport;
 import com.takeapeek.ormlite.DatabaseManager;
 import com.takeapeek.ormlite.TakeAPeekNotification;
 import com.takeapeek.ormlite.TakeAPeekObject;
+import com.takeapeek.profile.ShareActivity;
 import com.takeapeek.userfeed.UserFeedActivity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-
-import static com.takeapeek.common.MixPanel.SCREEN_NOTIFICATION_POPUP;
 
 public class NotificationPopupActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -104,14 +103,23 @@ public class NotificationPopupActivity extends FragmentActivity implements
         final Intent intent = getIntent();
         if(intent != null)
         {
-            String notificationID = intent.getStringExtra(Constants.PUSH_BROADCAST_EXTRA_ID);
+            boolean poupInviteFriends = intent.getBooleanExtra(Constants.POPUP_INVITE_FRIENDS, false);
 
-            mTakeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotification(notificationID);
+            if(poupInviteFriends == true)
+            {
+                mPushNotificationTypeEnum = Constants.PushNotificationTypeEnum.invite;
+            }
+            else
+            {
+                String notificationID = intent.getStringExtra(Constants.PUSH_BROADCAST_EXTRA_ID);
 
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mTakeAPeekNotification = DatabaseManager.getInstance().GetTakeAPeekNotification(notificationID);
 
-            notificationManager.cancel(mTakeAPeekNotification.notificationIntId);
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                notificationManager.cancel(mTakeAPeekNotification.notificationIntId);
+            }
         }
         else
         {
@@ -127,6 +135,8 @@ public class NotificationPopupActivity extends FragmentActivity implements
         TextView textViewTitleSmall = (TextView)findViewById(R.id.small_title);
         Helper.setTypeface(this, textViewTitleSmall, Helper.FontTypeEnum.normalFont);
 
+        findViewById(R.id.textview_invite_friends).setOnClickListener(ClickListener);
+
         findViewById(R.id.button_control).setOnClickListener(ClickListener);
         findViewById(R.id.button_control_close).setOnClickListener(ClickListener);
 
@@ -140,11 +150,10 @@ public class NotificationPopupActivity extends FragmentActivity implements
         Helper.setTypeface(this, textviewButtonRequestPeek, Helper.FontTypeEnum.boldFont);
         linearLayoutButtonRequest.setOnClickListener(ClickListener);
 
-        RelativeLayout.LayoutParams relativeLayoutParamsSend = null;
-        RelativeLayout.LayoutParams relativeLayoutParamsRequest = null;
-
         if(mTakeAPeekNotification != null)
         {
+            RelativeLayout.LayoutParams relativeLayoutParamsSend = null;
+
             if(mTakeAPeekNotification.srcProfileJson != null && mTakeAPeekNotification.srcProfileJson.isEmpty() == false)
             {
                 mProfileObject = mGson.fromJson(mTakeAPeekNotification.srcProfileJson, ProfileObject.class);
@@ -343,6 +352,15 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 default: break;
             }
         }
+        else if(mPushNotificationTypeEnum == Constants.PushNotificationTypeEnum.invite)
+        {
+            findViewById(R.id.titles).setVisibility(View.INVISIBLE);
+            findViewById(R.id.buttons).setVisibility(View.INVISIBLE);
+            findViewById(R.id.corner_overlay_on_center).setVisibility(View.INVISIBLE);
+            findViewById(R.id.map).setVisibility(View.INVISIBLE);
+
+            findViewById(R.id.linearlayout_invite_friends).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -498,6 +516,18 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     overridePendingTransition(R.anim.donothing, R.anim.zoomout);
                     break;
 
+                case R.id.textview_invite_friends:
+                    logger.info("onClick: textview_invite_friends clicked");
+
+                    final Intent inviteFriendsIntent = new Intent(NotificationPopupActivity.this, ShareActivity.class);
+                    inviteFriendsIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(inviteFriendsIntent);
+
+                    finish();
+                    overridePendingTransition(R.anim.donothing, R.anim.zoomout);
+
+                    break;
+
                 case R.id.button_control:
                     logger.info("onClick: button_control clicked");
 
@@ -505,7 +535,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                     findViewById(R.id.button_control).setVisibility(View.GONE);
                     findViewById(R.id.button_control_background_close).setVisibility(View.VISIBLE);
 
-                    MixPanel.PeekButtonEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP);
+                    MixPanel.PeekButtonEventAndProps(NotificationPopupActivity.this, MixPanel.SCREEN_NOTIFICATION_POPUP);
 
                     break;
 
@@ -520,7 +550,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 case R.id.button_send_peek:
                     logger.info("onClick: button_send_peek clicked");
 
-                    MixPanel.SendButtonEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP, mSharedPreferences);
+                    MixPanel.SendButtonEventAndProps(NotificationPopupActivity.this, MixPanel.SCREEN_NOTIFICATION_POPUP, mSharedPreferences);
 
                     final Intent captureClipActivityIntent = new Intent(NotificationPopupActivity.this, CaptureClipActivity.class);
                     captureClipActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -592,7 +622,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                                             //Log event to FaceBook
                                             mAppEventsLogger.logEvent("Peek_Request");
 
-                                            MixPanel.RequestButtonEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP, 1, mSharedPreferences);
+                                            MixPanel.RequestButtonEventAndProps(NotificationPopupActivity.this, MixPanel.SCREEN_NOTIFICATION_POPUP, 1, mSharedPreferences);
                                         }
                                     }
                                     finally
@@ -620,7 +650,7 @@ public class NotificationPopupActivity extends FragmentActivity implements
                 case R.id.user_peek_notification_thumbnail_play:
                     logger.info("onClick: user_peek_notification_thumbnail_play clicked");
 
-                    MixPanel.ViewPeekClickEventAndProps(NotificationPopupActivity.this, SCREEN_NOTIFICATION_POPUP, mSharedPreferences);
+                    MixPanel.ViewPeekClickEventAndProps(NotificationPopupActivity.this, MixPanel.SCREEN_NOTIFICATION_POPUP, mSharedPreferences);
 
                     final Intent userFeedActivityIntent = new Intent(NotificationPopupActivity.this, UserFeedActivity.class);
                     userFeedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -107,6 +107,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static com.takeapeek.common.Constants.SESSION_TIMES;
 
 public class Helper
 {
@@ -2989,6 +2990,43 @@ public class Helper
         sharedPreferencesEditor.commit();
     }
     //WalkThrough finished
+
+    //Map control button times clicked
+    public static int IncrementMapControlButtonTimesClicked(SharedPreferences sharedPreferences)
+    {
+        logger.debug("IncrementMapControlButtonTimesClicked(.) Invoked");
+
+        int mapControlButtonTimesClicked = sharedPreferences.getInt(Constants.MAP_CONTROL_BTN_TIMES_CLICKED, 0);
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putInt(Constants.MAP_CONTROL_BTN_TIMES_CLICKED, mapControlButtonTimesClicked + 1);
+        sharedPreferencesEditor.commit();
+
+        return mapControlButtonTimesClicked + 1;
+    }
+    //END Control button times clicked
+
+    //Session times
+    public static int GetSessionTimes(SharedPreferences sharedPreferences)
+    {
+        logger.debug("GetSessionTimes(.) Invoked");
+
+        return sharedPreferences.getInt(Constants.SESSION_TIMES, 1);
+    }
+
+    public static int IncrementSessionTimes(SharedPreferences sharedPreferences)
+    {
+        logger.debug("IncrementSessionTimes(.) Invoked");
+
+        int sessionTimes = sharedPreferences.getInt(Constants.SESSION_TIMES, 1);
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putInt(Constants.SESSION_TIMES, sessionTimes + 1);
+        sharedPreferencesEditor.commit();
+
+        return sessionTimes + 1;
+    }
+    //END Session times
 
     //CoachMark played
     // 1

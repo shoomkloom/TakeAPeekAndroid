@@ -80,7 +80,8 @@ public class Constants
         peek,
         follow,
         online,
-        share
+        share,
+        invite
     }
 
     public enum RelationTypeEnum
@@ -120,6 +121,7 @@ public class Constants
     //LocalBroadcast new push notification action
     public static final String PUSH_BROADCAST_ACTION = "PushNotificationBroadcast";
     public static final String PUSH_BROADCAST_EXTRA_ID = "PushNotificationID";
+    public static final String POPUP_INVITE_FRIENDS = "PopupInviteFriends";
     
     // Account preference keys
     /////////////////////////////////////////////////////////////
@@ -228,6 +230,8 @@ public class Constants
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String SHOW_NOTIFICATIONS = "ShowNotifications";
     public static final String LOCALITY = "Locality";
+    public static final String MAP_CONTROL_BTN_TIMES_CLICKED = "MapControlButtonTimesClicked";
+    public static final String SESSION_TIMES = "SessionTimes";
     
     // Sync Profile constants
     /////////////////////////////////////////////////////////////
