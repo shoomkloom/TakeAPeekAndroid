@@ -34,8 +34,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.takeapeek.common.MixPanel.SCREEN_USER_MAP;
-
 /**
  * Created by orenslev on 11/05/2016.
  */
@@ -415,7 +413,7 @@ public class PeekStackPagerAdapter extends PagerAdapter
             TakeAPeekObject takeAPeekObject = mUserMapActivityWeakReference.get().GetProfileLatestUnViewedPeek(profileObject); //Get the latest peek
             String takeAPeekObjectJSON = new Gson().toJson(takeAPeekObject);
 
-            MixPanel.ViewPeekClickEventAndProps(mUserMapActivityWeakReference.get(), SCREEN_USER_MAP, mSharedPreferences);
+            MixPanel.ViewPeekClickEventAndProps(mUserMapActivityWeakReference.get(), MixPanel.SCREEN_USER_MAP, mSharedPreferences);
 
             final Intent intent = new Intent(mUserMapActivityWeakReference.get(), UserFeedActivity.class);
             intent.putExtra(Constants.PARAM_PROFILEOBJECT, profileObjectJSON);
