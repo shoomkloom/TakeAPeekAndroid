@@ -810,6 +810,11 @@ public class CaptureClipActivity extends Activity implements
             long currentTimeMillis = Helper.GetCurrentTimeMillis();
             Helper.SetLastCapture(mSharedPreferences.edit(), currentTimeMillis);
 
+            if(Helper.GetFirstRun(mSharedPreferences) == true)
+            {
+                Helper.DecrementSessionTimes(mSharedPreferences);
+            }
+
             //First run ends only with first capture
             Helper.SetFirstRun(mSharedPreferences.edit(), false);
 

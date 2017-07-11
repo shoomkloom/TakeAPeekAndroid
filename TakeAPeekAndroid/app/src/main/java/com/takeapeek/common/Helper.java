@@ -3011,20 +3011,35 @@ public class Helper
     {
         logger.debug("GetSessionTimes(.) Invoked");
 
-        return sharedPreferences.getInt(Constants.SESSION_TIMES, 1);
+        int sessionTimes = sharedPreferences.getInt(Constants.SESSION_TIMES, 2);
+
+        return sessionTimes;
     }
 
     public static int IncrementSessionTimes(SharedPreferences sharedPreferences)
     {
         logger.debug("IncrementSessionTimes(.) Invoked");
 
-        int sessionTimes = sharedPreferences.getInt(Constants.SESSION_TIMES, 1);
+        int sessionTimes = sharedPreferences.getInt(Constants.SESSION_TIMES, 2);
 
         Editor sharedPreferencesEditor = sharedPreferences.edit();
         sharedPreferencesEditor.putInt(Constants.SESSION_TIMES, sessionTimes + 1);
         sharedPreferencesEditor.commit();
 
         return sessionTimes + 1;
+    }
+
+    public static int DecrementSessionTimes(SharedPreferences sharedPreferences)
+    {
+        logger.debug("DecrementSessionTimes(.) Invoked");
+
+        int sessionTimes = sharedPreferences.getInt(Constants.SESSION_TIMES, 2);
+
+        Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putInt(Constants.SESSION_TIMES, sessionTimes - 1);
+        sharedPreferencesEditor.commit();
+
+        return sessionTimes - 1;
     }
     //END Session times
 
