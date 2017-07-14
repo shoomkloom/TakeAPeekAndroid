@@ -393,7 +393,7 @@ public class Transport
             String southStr = Double.toString(south);
             String westStr = Double.toString(west);
 
-            nameValuePairs.add(new NameValuePair("action_type", "get_profiles_in_bounds_2"));
+            nameValuePairs.add(new NameValuePair("action_type", "get_profiles_in_bounds_3"));
             nameValuePairs.add(new NameValuePair("user_name", userName));
             nameValuePairs.add(new NameValuePair("password", password));
             nameValuePairs.add(new NameValuePair("north", northStr));
