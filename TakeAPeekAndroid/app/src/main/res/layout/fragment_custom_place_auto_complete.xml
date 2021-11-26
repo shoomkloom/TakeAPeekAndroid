@@ -24,7 +24,7 @@
         android:paddingLeft="5dp"
         android:gravity="left"
         android:theme="@style/AppTheme.EditText"
-        android:background="@color/pt_tra‌​nsparent"/>
+        android:background="@color/pt_transparent_faded"/>
 
     <ImageView
         android:id="@+id/imageview_searchbar_leftarrow"

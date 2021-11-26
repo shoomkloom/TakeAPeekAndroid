@@ -2,13 +2,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "com.takeapeek"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 28
         multiDexEnabled true
         versionCode 114
         versionName "0.9.114 beta"
@@ -22,31 +22,31 @@ android {
 }
 
 dependencies {
-    compile project(':camerakit')
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
+    implementation project(':camerakit')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
     compile files('libs/logback-android-1.1.1-6.jar')
     compile files('libs/slf4j-api-1.7.21.jar')
     compile files('libs/libphonenumber-7.2.6.jar')
     compile files('libs/gson-2.1.jar')
     compile files('libs/ormlite-android-4.47.jar')
     compile files('libs/ormlite-core-4.47.jar')
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:support-v13:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.google.firebase:firebase-core:10.2.4'
-    compile 'com.google.firebase:firebase-crash:10.2.4'
-    compile 'com.google.firebase:firebase-messaging:10.2.4'
-    compile 'com.google.firebase:firebase-invites:10.2.4'
-    compile 'com.google.android.gms:play-services-location:10.2.4'
-    compile 'com.google.android.gms:play-services-places:10.2.4'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile 'com.github.crosswall:Android-Coverflow:release-v1.0.4'
-    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
-    compile "com.mixpanel.android:mixpanel-android:4.9.3"
-    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
-    compile 'com.github.faruktoptas:FancyShowCaseView:0.1.0'
+    implementation 'com.android.support:appcompat-v7:25.4.0'
+    implementation 'com.android.support:support-v13:25.4.0'
+    implementation 'com.android.support:design:25.3.1'
+    implementation 'com.google.firebase:firebase-core:10.2.4'
+    implementation 'com.google.firebase:firebase-crash:10.2.4'
+    implementation 'com.google.firebase:firebase-messaging:10.2.4'
+    implementation 'com.google.firebase:firebase-invites:10.2.4'
+    implementation 'com.google.android.gms:play-services-location:10.2.4'
+    implementation 'com.google.android.gms:play-services-places:10.2.4'
+    implementation 'com.android.support:support-v4:25.3.1'
+    implementation 'com.google.maps.android:android-maps-utils:0.4'
+    implementation 'com.github.crosswall:Android-Coverflow:release-v1.0.4'
+    implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
+    implementation "com.mixpanel.android:mixpanel-android:4.9.3"
+    implementation 'com.google.android.exoplayer:exoplayer:r2.3.1'
+    implementation 'com.github.faruktoptas:FancyShowCaseView:0.1.0'
 }
 
 

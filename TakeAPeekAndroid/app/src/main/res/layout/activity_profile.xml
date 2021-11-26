@@ -196,9 +196,9 @@
         android:dividerHeight="1dp"
         android:orientation="vertical"
         android:layout_below="@+id/top_bar"
-        android:listSelector="@color/pt_tra‌​nsparent"
+        android:listSelector="@color/pt_transparent_faded"
         android:drawSelectorOnTop="true"
         android:animateLayoutChanges="true"
-        android:background="@color/pt_tra‌​nsparent"/>
+        android:background="@color/pt_transparent_faded"/>
 
 </LinearLayout>

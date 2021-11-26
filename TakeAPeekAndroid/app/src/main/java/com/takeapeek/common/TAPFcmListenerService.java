@@ -26,9 +26,9 @@ import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.NotificationCompat;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.maps.model.LatLng;
@@ -49,6 +49,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+
+//import android.support.v7.app.NotificationCompat;
 
 public class TAPFcmListenerService extends FirebaseMessagingService
 {

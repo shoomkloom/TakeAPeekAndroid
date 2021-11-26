@@ -1750,7 +1750,7 @@ public class UserMapActivity extends FragmentActivity implements
         mUserStackItemPosition = -1;
 
         mTextViewStackUserName.setText("");
-        mTextViewStackUserName.setBackgroundColor((ContextCompat.getColor(this, R.color.pt_tra‌​nsparent)));
+        mTextViewStackUserName.setBackgroundColor((ContextCompat.getColor(this, R.color.pt_transparent_faded)));
 
         //Hide the user peek stack
         mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
@@ -1766,7 +1766,7 @@ public class UserMapActivity extends FragmentActivity implements
         mUserStackItemPosition = -1;
 
         mTextViewStackUserName.setText("");
-        mTextViewStackUserName.setBackgroundColor((ContextCompat.getColor(this, R.color.pt_tra‌​nsparent)));
+        mTextViewStackUserName.setBackgroundColor((ContextCompat.getColor(this, R.color.pt_transparent_faded)));
 
         //Hide the user peek stack
         mRelativeLayoutSearchBar.setVisibility(View.VISIBLE);
@@ -1880,7 +1880,7 @@ public class UserMapActivity extends FragmentActivity implements
                 case R.id.button_map_control_close:
                     logger.info("onClick: button_map_control clicked");
 
-                    findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_tra‌​nsparent)));
+                    findViewById(R.id.button_map_control_background).setBackgroundColor((ContextCompat.getColor(UserMapActivity.this, R.color.pt_transparent_faded)));
                     findViewById(R.id.button_map_control).setVisibility(View.VISIBLE);
                     findViewById(R.id.button_map_control_close).setVisibility(View.GONE);
                     findViewById(R.id.button_send_peek).setVisibility(View.GONE);

@@ -1177,7 +1177,7 @@ public class UserFeedActivity extends AppCompatActivity
                 case R.id.button_control_close:
                     logger.info("onClick: button_control clicked");
 
-                    findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(UserFeedActivity.this, R.color.pt_tra‌​nsparent)));
+                    findViewById(R.id.button_control_background).setBackgroundColor((ContextCompat.getColor(UserFeedActivity.this, R.color.pt_transparent_faded)));
                     findViewById(R.id.button_control).setVisibility(View.VISIBLE);
                     findViewById(R.id.button_control_background_close).setVisibility(View.GONE);
                     break;

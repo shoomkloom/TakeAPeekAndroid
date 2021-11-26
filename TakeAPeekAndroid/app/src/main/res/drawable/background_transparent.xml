@@ -6,12 +6,12 @@
         <shape>
 		     <!--
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
-		      -->  
-		    <solid android:color="@color/tap_tra‌​nsparent" />
+		      -->
+		    <solid android:color="@color/pt_transparent_faded" />
 		</shape>
 	</item>
 
-    <item android:state_focused="true" android:color="@color/tap_tra‌​nsparent">
+    <item android:state_focused="true" android:color="@color/pt_transparent_faded">
         <shape>
 		     <!--
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
@@ -25,7 +25,7 @@
 		     <!--
 		     <gradient android:startColor="#D2E0E2" android:endColor="#D2E0E2"/>
 		      -->  
-		    <solid android:color="@color/tap_tra‌​nsparent" />
+		    <solid android:color="@color/pt_transparent_faded" />
 		</shape>
 	</item>
     

@@ -71,7 +71,7 @@
             android:text="@string/verify_mobile_number"
             android:textColor="@color/tap_white"
             android:textSize="25sp"
-            android:background="@color/pt_tra‌​nsparent"
+            android:background="@color/pt_transparent_faded"
             android:visibility="gone"/>
 
         <TextView
@@ -307,7 +307,7 @@
                 android:text="@string/display_name_pick_a_name"
                 android:textColor="@color/tap_white"
                 android:textSize="25sp"
-                android:background="@color/pt_tra‌​nsparent"/>
+                android:background="@color/pt_transparent_faded"/>
 
             <TextView
                 android:id="@+id/textview_display_name_small_title"
@@ -425,7 +425,7 @@
                 android:text="@string/what_is_your_birthday"
                 android:textColor="@color/tap_white"
                 android:textSize="25sp"
-                android:background="@color/pt_tra‌​nsparent"/>
+                android:background="@color/pt_transparent_faded"/>
 
             <TextView
                 android:id="@+id/textview_date_of_birth_small_title"

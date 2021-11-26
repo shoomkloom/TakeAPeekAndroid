@@ -31,7 +31,7 @@
     <color name="tap_dark_yellow_faded">#ccffd755</color>
     <color name="tap_red">#ff5537</color>
     <color name="tap_black">#000000</color>
-    <color name="tap_tra‌​nsparent">#00000000</color>
+    <color name="tap_transparent">#00000000</color>
 
     <color name="pt_red">#ec407a</color>
     <color name="pt_red_faded">#ccec407a</color>
@@ -62,7 +62,6 @@
     <color name="pt_gray_8_faded">#ccb2bec4</color>
     <color name="pt_white">#ffffff</color>
     <color name="pt_white_faded">#55dddddd</color>
-    <color name="pt_tra‌​nsparent">#00000000</color>
     <color name="pt_transparent_faded">#55aaaaaa</color>
 
 </resources>

@@ -179,7 +179,7 @@
             android:id="@+id/user_peek_pager_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/pt_tra‌​nsparent"
+            android:background="@color/pt_transparent_faded"
             android:translationZ="4dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true">

@@ -1466,7 +1466,7 @@ public class AuthenticatorActivity extends AppCompatActivity
                     //Show date picker dialog
                     final Dialog datePickerDialog = new Dialog(AuthenticatorActivity.this);
                     datePickerDialog.setContentView(R.layout.dialog_datepicker);
-                    datePickerDialog.getWindow().setBackgroundDrawableResource(R.color.tap_tra‌​nsparent);
+                    datePickerDialog.getWindow().setBackgroundDrawableResource(R.color.tap_transparent);
 
                     TextView datePickerDialogTitle = (TextView)datePickerDialog.findViewById(R.id.textview_title);
                     Helper.setTypeface(AuthenticatorActivity.this, datePickerDialogTitle, FontTypeEnum.boldFont);

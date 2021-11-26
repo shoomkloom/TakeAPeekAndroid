@@ -1,6 +1,7 @@
 package com.takeapeek.profile;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -8,7 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 
-public class ShareActivity extends ActionBarActivity
+public class ShareActivity extends AppCompatActivity
 {
 	static private final Logger logger = LoggerFactory.getLogger(ShareActivity.class);
     AppEventsLogger mAppEventsLogger = null;
@@ -58,7 +59,7 @@ public class ShareActivity extends ActionBarActivity
 		
 		setContentView(R.layout.activity_share);
 		
-		mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Constants.MODE_MULTI_PROCESS);
+		mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_FILE_NAME, Context.MODE_MULTI_PROCESS);
 		DatabaseManager.init(this);
 		mPackageManager = getPackageManager();
 		
